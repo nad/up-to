@@ -813,136 +813,83 @@ module _ {Name : Set} where
   ----------------------------------------------------------------------
   -- Lemma 6.2.17
 
+  -- Some results mentioned in the proof of 6.2.17 (1) in
+  -- "Enhancements of the bisimulation proof method".
+
+  6-2-17-1-lemma₁ : ∀ {P Q} → (! P ∣ ! Q) ∣ (P ∣ Q) ∼ ! P ∣ ! Q
+  6-2-17-1-lemma₁ {P} {Q} =
+    (! P ∣ ! Q) ∣ (P ∣ Q)  ∼⟨ swap-in-the-middle ⟩
+    (! P ∣ P) ∣ (! Q ∣ Q)  ∼⟨ 6-1-2 ∣-cong 6-1-2 ⟩∎
+    ! P ∣ ! Q              ∎
+
+  6-2-17-1-lemma₂ :
+    ∀ {P Q R μ} →
+    ! (P ∣ Q) [ μ ]⟶ R →
+    ∃ λ S →
+      R ∼ ! (P ∣ Q) ∣ S ×
+      ∃ λ T →
+        ! P ∣ ! Q [ μ ]⟶ T ×
+        (! P ∣ ! Q) ∣ S ∼′ T
+  6-2-17-1-lemma₂ {P} {Q} {R} tr with 6-1-3-2 tr
+  ... | inj₁ (R′ , P∣Q⟶R′ , R∼![P∣Q]∣R′) =
+    let R″ , !P∣!Q⟶R″ , !P∣!Q∣R′∼R″ =
+          [_]_∼_.left-to-right
+            ((! P ∣ ! Q) ∣ (P ∣ Q)  ∼⟨ 6-2-17-1-lemma₁ ⟩∎
+             ! P ∣ ! Q              ∎)
+            ((! P ∣ ! Q) ∣ (P ∣ Q)  ⟶⟨ par-right P∣Q⟶R′ ⟩
+             (! P ∣ ! Q) ∣ R′)
+    in _ , R∼![P∣Q]∣R′ , _ , !P∣!Q⟶R″ , !P∣!Q∣R′∼R″
+
+  ... | inj₂ (refl , R′ , R″ , a , P∣Q⟶R′ , P∣Q⟶R″ , R∼![P∣Q]∣R′∣R″) =
+    let T , !P∣!Q⟶T , !P∣!Q∣[R′∣R″]∼T =
+          [_]_∼_.left-to-right
+            ((! P ∣ ! Q) ∣ ((P ∣ Q) ∣ (P ∣ Q))  ∼⟨ ∣-assoc ⟩
+             ((! P ∣ ! Q) ∣ (P ∣ Q)) ∣ (P ∣ Q)  ∼⟨ 6-2-17-1-lemma₁ ∣-cong reflexive ⟩
+             (! P ∣ ! Q) ∣ (P ∣ Q)              ∼⟨ 6-2-17-1-lemma₁ ⟩∎
+             ! P ∣ ! Q                          ∎)
+            ((! P ∣ ! Q) ∣ ((P ∣ Q) ∣ (P ∣ Q))  ⟶⟨ par-right (par-τ P∣Q⟶R′ P∣Q⟶R″) ⟩
+             (! P ∣ ! Q) ∣ (R′ ∣ R″))
+    in
+      _
+    , (R                      ∼⟨ R∼![P∣Q]∣R′∣R″ ⟩
+       (! (P ∣ Q) ∣ R′) ∣ R″  ∼⟨ symmetric ∣-assoc ⟩∎
+       ! (P ∣ Q) ∣ (R′ ∣ R″)  ∎)
+    , _
+    , !P∣!Q⟶T
+    , !P∣!Q∣[R′∣R″]∼T
+
   mutual
 
     6-2-17-1 : ∀ {i P Q} → [ i ] ! (P ∣ Q) ∼ ! P ∣ ! Q
     6-2-17-1 {i} = ⟨ lr , rl ⟩
       where
-      τ-lemma₀ = λ {P Q R S} →
+      lr : ∀ {P Q R μ} →
+           ! (P ∣ Q) [ μ ]⟶ R →
+           ∃ λ S → ! P ∣ ! Q [ μ ]⟶ S × [ i ] R ∼′ S
+      lr {P} {Q} {R} tr =
+        let S , R∼![P∣Q]∣S , T , !P∣!Q⟶T , !P∣!Q∣S∼T =
+              6-2-17-1-lemma₂ tr in
+          _
+        , !P∣!Q⟶T
+        , (R                ∼⟨ R∼![P∣Q]∣S ⟩′
+           ! (P ∣ Q) ∣ S    ∼′⟨ 6-2-17-1′ ∣-cong′ˡ reflexive ⟩′
+           (! P ∣ ! Q) ∣ S  ∼′⟨ !P∣!Q∣S∼T ⟩′∎
+           T                ∎)
+
+      lemma = λ {P Q R S} →
         ! (P ∣ Q) ∣ (R ∣ S)    ∼′⟨ 6-2-17-1′ {i = i} ∣-cong′ˡ reflexive ⟩′
-        (! P ∣ ! Q) ∣ (R ∣ S)  ∼⟨ swap-rightmost ⟩′
-        (! P ∣ (R ∣ S)) ∣ ! Q  ∼⟨ ∣-assoc ∣-cong reflexive ⟩′
-        ((! P ∣ R) ∣ S) ∣ ! Q  ∼⟨ swap-rightmost ⟩′
-        ((! P ∣ R) ∣ ! Q) ∣ S  ∼⟨ symmetric ∣-assoc ⟩′∎
+        (! P ∣ ! Q) ∣ (R ∣ S)  ∼⟨ swap-in-the-middle ⟩′∎
         (! P ∣ R) ∣ (! Q ∣ S)  ∎
 
       left-lemma = λ {P Q R} →
-        ! (P ∣ Q) ∣ (R ∣ Q)    ∼′⟨ τ-lemma₀ ⟩′
+        ! (P ∣ Q) ∣ (R ∣ Q)    ∼′⟨ lemma ⟩′
         (! P ∣ R) ∣ (! Q ∣ Q)  ∼⟨ reflexive ∣-cong 6-1-2 ⟩′∎
         (! P ∣ R) ∣ ! Q        ∎
 
       right-lemma = λ {P Q R} →
-        ! (P ∣ Q) ∣ (P ∣ R)    ∼′⟨ τ-lemma₀ ⟩′
+        ! (P ∣ Q) ∣ (P ∣ R)    ∼′⟨ lemma ⟩′
         (! P ∣ P) ∣ (! Q ∣ R)  ∼⟨ 6-1-2 ∣-cong reflexive ⟩′∎
         ! P ∣ (! Q ∣ R)        ∎
-
-      τ-lemma₁ = λ {P P′ P″ Q} →
-        (! (P ∣ Q) ∣ (P′ ∣ Q)) ∣ (P″ ∣ Q)  ∼′⟨ left-lemma ∣-cong′ˡ reflexive ⟩′
-        ((! P ∣ P′) ∣ ! Q) ∣ (P″ ∣ Q)      ∼⟨ swap-in-the-middle ⟩′
-        ((! P ∣ P′) ∣ P″) ∣ (! Q ∣ Q)      ∼⟨ reflexive ∣-cong 6-1-2 ⟩′∎
-        ((! P ∣ P′) ∣ P″) ∣ ! Q            ∎
-
-      τ-lemma₂ = λ {P P′ Q Q′} →
-        (! (P ∣ Q) ∣ (P′ ∣ Q)) ∣ (P ∣ Q′)  ∼′⟨ left-lemma ∣-cong′ˡ reflexive ⟩′
-        ((! P ∣ P′) ∣ ! Q) ∣ (P ∣ Q′)      ∼⟨ swap-in-the-middle ⟩′
-        ((! P ∣ P′) ∣ P) ∣ (! Q ∣ Q′)      ∼⟨ swap-rightmost ∣-cong reflexive ⟩′
-        ((! P ∣ P) ∣ P′) ∣ (! Q ∣ Q′)      ∼⟨ (6-1-2 ∣-cong reflexive) ∣-cong reflexive ⟩′∎
-        (! P ∣ P′) ∣ (! Q ∣ Q′)            ∎
-
-      τ-lemma₃ = λ {P Q Q′ R S} →
-        (! (P ∣ Q) ∣ (P ∣ Q′)) ∣ (R ∣ S)  ∼′⟨ right-lemma ∣-cong′ˡ reflexive ⟩′
-        (! P ∣ (! Q ∣ Q′)) ∣ (R ∣ S)      ∼⟨ swap-in-the-middle ⟩′∎
-        (! P ∣ R) ∣ ((! Q ∣ Q′) ∣ S)      ∎
-
-      τ-lemma₄ = λ {P Q Q′ Q″} →
-        (! (P ∣ Q) ∣ (P ∣ Q′)) ∣ (P ∣ Q″)  ∼′⟨ τ-lemma₃ ⟩′
-        (! P ∣ P) ∣ ((! Q ∣ Q′) ∣ Q″)      ∼⟨ 6-1-2 ∣-cong reflexive ⟩′∎
-        ! P ∣ ((! Q ∣ Q′) ∣ Q″)            ∎
-
-      lr : ∀ {P Q R μ} →
-           ! (P ∣ Q) [ μ ]⟶ R →
-           ∃ λ S → ! P ∣ ! Q [ μ ]⟶ S × [ i ] R ∼′ S
-      lr {P} {Q} {R} tr with 6-1-3-2 tr
-
-      ... | inj₁ (.(P′ ∣ Q) , par-left {P′ = P′} P⟶P′ , R∼![P∣Q]∣P′∣Q) =
-          _
-        , (! P        ∣ ! Q  ⟶⟨ par-left (replication (par-right P⟶P′)) ⟩
-           (! P ∣ P′) ∣ ! Q)
-        , (R                     ∼⟨ R∼![P∣Q]∣P′∣Q ⟩′
-           ! (P ∣ Q) ∣ (P′ ∣ Q)  ∼′⟨ left-lemma ⟩′∎
-           (! P ∣ P′) ∣ ! Q      ∎)
-
-      ... | inj₁ ( .(P ∣ Q′) , par-right {Q′ = Q′} Q⟶Q′
-                 , R∼![P∣Q]∣P∣Q′
-                 ) =
-          _
-        , (! P ∣  ! Q        ⟶⟨ par-right (replication (par-right Q⟶Q′)) ⟩
-           ! P ∣ (! Q ∣ Q′))
-        , (R                     ∼⟨ R∼![P∣Q]∣P∣Q′ ⟩′
-           ! (P ∣ Q) ∣ (P ∣ Q′)  ∼′⟨ right-lemma ⟩′∎
-           ! P ∣ (! Q ∣ Q′)      ∎)
-
-      ... | inj₁ ( .(P′ ∣ Q′) , par-τ {P′ = P′} {Q′ = Q′} P⟶P′ Q⟶Q′
-                 , R∼![P∣Q]∣P′∣Q′
-                 ) =
-          _
-        , (! P        ∣  ! Q        [ τ ]⟶⟨ par-τ (replication (par-right P⟶P′))
-                                                  (replication (par-right Q⟶Q′)) ⟩
-           (! P ∣ P′) ∣ (! Q ∣ Q′))
-        , (R                        ∼⟨ R∼![P∣Q]∣P′∣Q′ ⟩′
-           ! (P ∣ Q) ∣ (P′ ∣ Q′)    ∼′⟨ τ-lemma₀ ⟩′∎
-           (! P ∣ P′) ∣ (! Q ∣ Q′)  ∎)
-
-      ... | inj₂ ( refl , .(P′ ∣ Q) , .(P″ ∣ Q) , c
-                 , par-left {P′ = P′} P⟶P′ , par-left {P′ = P″} P⟶P″
-                 , R∼![P∣Q]∣[P′∣Q]∣P″∣Q
-                 ) =
-          _
-        , (! P ∣ ! Q                [ τ ]⟶⟨ par-left (replication (par-τ (replication (par-right P⟶P′)) P⟶P″)) ⟩
-           ((! P ∣ P′) ∣ P″) ∣ ! Q)
-        , (R                                  ∼⟨ R∼![P∣Q]∣[P′∣Q]∣P″∣Q ⟩′
-           (! (P ∣ Q) ∣ (P′ ∣ Q)) ∣ (P″ ∣ Q)  ∼′⟨ τ-lemma₁ ⟩′∎
-           ((! P ∣ P′) ∣ P″) ∣ ! Q            ∎)
-
-      ... | inj₂ ( refl , .(P′ ∣ Q) , .(P ∣ Q′) , c
-                 , par-left {P′ = P′} P⟶P′ , par-right {Q′ = Q′} Q⟶Q′
-                 , R∼![P∣Q]∣[P′∣Q]∣P∣Q′
-                 ) =
-          _
-        , (! P ∣ ! Q                [ τ ]⟶⟨ par-τ (replication (par-right P⟶P′))
-                                                  (replication (par-right Q⟶Q′)) ⟩
-           (! P ∣ P′) ∣ (! Q ∣ Q′))
-
-        , (R                                  ∼⟨ R∼![P∣Q]∣[P′∣Q]∣P∣Q′ ⟩′
-           (! (P ∣ Q) ∣ (P′ ∣ Q)) ∣ (P ∣ Q′)  ∼′⟨ τ-lemma₂ ⟩′∎
-           (! P ∣ P′) ∣ (! Q ∣ Q′)            ∎)
-
-      ... | inj₂ ( refl , .(P ∣ Q′) , .(P′ ∣ Q) , c
-                 , par-right {Q′ = Q′} Q⟶Q′ , par-left {P′ = P′} P⟶P′
-                 , R∼![P∣Q]∣[P∣Q′]∣P′∣Q
-                 ) =
-          _
-        , (! P ∣ ! Q                [ τ ]⟶⟨ par-τ′ (sym $ co-involutive c)
-                                                   (replication (par-right P⟶P′))
-                                                   (replication (par-right Q⟶Q′)) ⟩
-           (! P ∣ P′) ∣ (! Q ∣ Q′))
-
-        , (R                                  ∼⟨ R∼![P∣Q]∣[P∣Q′]∣P′∣Q ⟩′
-           (! (P ∣ Q) ∣ (P ∣ Q′)) ∣ (P′ ∣ Q)  ∼′⟨ τ-lemma₃ ⟩′
-           (! P ∣ P′) ∣ ((! Q ∣ Q′) ∣ Q)      ∼⟨ reflexive ∣-cong swap-rightmost ⟩′
-           (! P ∣ P′) ∣ ((! Q ∣ Q) ∣ Q′)      ∼⟨ reflexive ∣-cong (6-1-2 ∣-cong reflexive) ⟩′∎
-           (! P ∣ P′) ∣ (! Q ∣ Q′)            ∎)
-
-      ... | inj₂ ( refl , .(P ∣ Q′) , .(P ∣ Q″) , c
-                 , par-right {Q′ = Q′} Q⟶Q′ , par-right {Q′ = Q″} Q⟶Q″
-                 , R∼![P∣Q]∣[P∣Q′]∣P∣Q″
-                 ) =
-          _
-        , (! P ∣ ! Q                [ τ ]⟶⟨ par-right (replication (par-τ (replication (par-right Q⟶Q′)) Q⟶Q″)) ⟩
-           ! P ∣ ((! Q ∣ Q′) ∣ Q″))
-        , (R                                  ∼⟨ R∼![P∣Q]∣[P∣Q′]∣P∣Q″ ⟩′
-           (! (P ∣ Q) ∣ (P ∣ Q′)) ∣ (P ∣ Q″)  ∼′⟨ τ-lemma₄ ⟩′∎
-           ! P ∣ ((! Q ∣ Q′) ∣ Q″)            ∎)
 
       rl : ∀ {P Q S μ} →
            ! P ∣ ! Q [ μ ]⟶ S →
@@ -962,7 +909,9 @@ module _ {Name : Set} where
                                                                          (par-left P⟶P″)) ⟩
            (! (P ∣ Q) ∣ (P′ ∣ Q)) ∣ (P″ ∣ Q))
 
-        , ((! (P ∣ Q) ∣ (P′ ∣ Q)) ∣ (P″ ∣ Q)  ∼′⟨ τ-lemma₁ ⟩′
+        , ((! (P ∣ Q) ∣ (P′ ∣ Q)) ∣ (P″ ∣ Q)  ∼′⟨ left-lemma ∣-cong′ˡ reflexive ⟩′
+           ((! P ∣ P′) ∣ ! Q) ∣ (P″ ∣ Q)      ∼⟨ swap-in-the-middle ⟩′
+           ((! P ∣ P′) ∣ P″) ∣ (! Q ∣ Q)      ∼⟨ reflexive ∣-cong 6-1-2 ⟩′
            ((! P ∣ P′) ∣ P″) ∣ ! Q            ∼⟨ symmetric S∼!P∣P′∣P″ ∣-cong reflexive ⟩′∎
            S ∣ ! Q                            ∎)
 
@@ -981,7 +930,9 @@ module _ {Name : Set} where
                                                                          (par-right Q⟶Q″)) ⟩
            (! (P ∣ Q) ∣ (P ∣ Q′)) ∣ (P ∣ Q″))
 
-        , ((! (P ∣ Q) ∣ (P ∣ Q′)) ∣ (P ∣ Q″)  ∼′⟨ τ-lemma₄ ⟩′
+        , ((! (P ∣ Q) ∣ (P ∣ Q′)) ∣ (P ∣ Q″)  ∼′⟨ right-lemma ∣-cong′ˡ reflexive ⟩′
+           (! P ∣ (! Q ∣ Q′)) ∣ (P ∣ Q″)      ∼⟨ swap-in-the-middle ⟩′
+           (! P ∣ P) ∣ ((! Q ∣ Q′) ∣ Q″)      ∼⟨ 6-1-2 ∣-cong reflexive ⟩′
            ! P ∣ ((! Q ∣ Q′) ∣ Q″)            ∼⟨ reflexive ∣-cong symmetric S∼!Q∣Q′∣Q″ ⟩′∎
            ! P ∣ S                            ∎)
 
@@ -994,7 +945,10 @@ module _ {Name : Set} where
                                                                                       (par-right Q⟶Q′)) ⟩
            (! (P ∣ Q) ∣ (P′ ∣ Q)) ∣ (P ∣ Q′))
 
-        , ((! (P ∣ Q) ∣ (P′ ∣ Q)) ∣ (P ∣ Q′)  ∼′⟨ τ-lemma₂ ⟩′
+        , ((! (P ∣ Q) ∣ (P′ ∣ Q)) ∣ (P ∣ Q′)  ∼′⟨ left-lemma ∣-cong′ˡ reflexive ⟩′
+           ((! P ∣ P′) ∣ ! Q) ∣ (P ∣ Q′)      ∼⟨ swap-in-the-middle ⟩′
+           ((! P ∣ P′) ∣ P) ∣ (! Q ∣ Q′)      ∼⟨ swap-rightmost ∣-cong reflexive ⟩′
+           ((! P ∣ P) ∣ P′) ∣ (! Q ∣ Q′)      ∼⟨ (6-1-2 ∣-cong reflexive) ∣-cong reflexive ⟩′
            (! P ∣ P′) ∣ (! Q ∣ Q′)            ∼⟨ symmetric (S∼!P∣P′ ∣-cong S′∼!Q∣Q′) ⟩′∎
            S ∣ S′                             ∎)
 
