@@ -144,44 +144,38 @@ module CCS (Name : Set) where
 
   -- Polyadic contexts.
 
-  data Context : ℕ → Set where
-    hole    : ∀ {n} (x : Fin n) → Context n
-    ∅       : ∀ {n} → Context n
-    _∣_ _⊕_ : ∀ {n} → Context n → Context n → Context n
-    _·_     : ∀ {n} (μ : Action) → Context n → Context n
-    ν       : ∀ {n} (a : Name) → Context n → Context n
-    !_      : ∀ {n} → Context n → Context n
-    weaken  : ∀ {n} → Context n → Context (suc n)
+  data Context (n : ℕ) : Set where
+    hole    : (x : Fin n) → Context n
+    ∅       : Context n
+    _∣_ _⊕_ : Context n → Context n → Context n
+    _·_     : (μ : Action) → Context n → Context n
+    ν       : (a : Name) → Context n → Context n
+    !_      : Context n → Context n
 
   -- Hole filling.
 
   _[_] : ∀ {n} → Context n → (Fin n → Proc) → Proc
-  hole x   [ ps ] = ps x
-  ∅        [ ps ] = ∅
-  C₁ ∣ C₂  [ ps ] = (C₁ [ ps ]) ∣ (C₂ [ ps ])
-  C₁ ⊕ C₂  [ ps ] = (C₁ [ ps ]) ⊕ (C₂ [ ps ])
-  μ · C    [ ps ] = μ · (C [ ps ])
-  ν a C    [ ps ] = ν a (C [ ps ])
-  ! C      [ ps ] = ! (C [ ps ])
-  weaken C [ ps ] = C [ ps ∘ fsuc ]
+  hole x  [ ps ] = ps x
+  ∅       [ ps ] = ∅
+  C₁ ∣ C₂ [ ps ] = (C₁ [ ps ]) ∣ (C₂ [ ps ])
+  C₁ ⊕ C₂ [ ps ] = (C₁ [ ps ]) ⊕ (C₂ [ ps ])
+  μ · C   [ ps ] = μ · (C [ ps ])
+  ν a C   [ ps ] = ν a (C [ ps ])
+  ! C     [ ps ] = ! (C [ ps ])
 
   -- Weakly guarded contexts.
 
-  data Weakly-guarded : ∀ {n} → Context n → Set where
-    ∅      : ∀ {n} → Weakly-guarded {n = n} ∅
-    _∣_    : ∀ {n} {C₁ C₂ : Context n} →
+  data Weakly-guarded {n : ℕ} : Context n → Set where
+    ∅      : Weakly-guarded ∅
+    _∣_    : ∀ {C₁ C₂} →
              Weakly-guarded C₁ → Weakly-guarded C₂ →
              Weakly-guarded (C₁ ∣ C₂)
-    _⊕_    : ∀ {n} {C₁ C₂ : Context n} →
+    _⊕_    : ∀ {C₁ C₂} →
              Weakly-guarded C₁ → Weakly-guarded C₂ →
              Weakly-guarded (C₁ ⊕ C₂)
-    action : ∀ {μ n} {C : Context n} → Weakly-guarded (μ · C)
-    ν      : ∀ {a n} {C : Context n} →
-             Weakly-guarded C → Weakly-guarded (ν a C)
-    !_     : ∀ {n} {C : Context n} →
-             Weakly-guarded C → Weakly-guarded (! C)
-    weaken : ∀ {n} {C : Context n} →
-             Weakly-guarded C → Weakly-guarded (weaken C)
+    action : ∀ {μ C} → Weakly-guarded (μ · C)
+    ν      : ∀ {a C} → Weakly-guarded C → Weakly-guarded (ν a C)
+    !_     : ∀ {C} → Weakly-guarded C → Weakly-guarded (! C)
 
   ----------------------------------------------------------------------
   -- A bunch of simple lemmas
@@ -270,18 +264,41 @@ module CCS (Name : Set) where
     C [ Ps ] [ μ ]⟶ P →
     ∃ λ (C′ : Context n) →
       P ≡ C′ [ Ps ] × ∀ Qs → C [ Qs ] [ μ ]⟶ C′ [ Qs ]
-  6-2-15 ∅          ∅          ()
-  6-2-15 (C₁ ∣ C₂)  (w₁ ∣ w₂)  (par-left  tr)       = Σ-map (_∣ C₂) (Σ-map (cong (_∣ _)) (par-left  ∘_)) (6-2-15 C₁ w₁ tr)
-  6-2-15 (C₁ ∣ C₂)  (w₁ ∣ w₂)  (par-right tr)       = Σ-map (C₁ ∣_) (Σ-map (cong (_ ∣_)) (par-right ∘_)) (6-2-15 C₂ w₂ tr)
-  6-2-15 (C₁ ∣ C₂)  (w₁ ∣ w₂)  (par-τ tr₁ tr₂)      = Σ-zip _∣_ (Σ-zip (cong₂ _)
-                                                                       (λ trs₁ trs₂ Qs → par-τ (trs₁ Qs) (trs₂ Qs)))
-                                                        (6-2-15 C₁ w₁ tr₁) (6-2-15 C₂ w₂ tr₂)
-  6-2-15 (C₁ ⊕ C₂)  (w₁ ⊕ w₂)  (choice-left  tr)    = Σ-map id (Σ-map id (choice-left  ∘_)) (6-2-15 C₁ w₁ tr)
-  6-2-15 (C₁ ⊕ C₂)  (w₁ ⊕ w₂)  (choice-right tr)    = Σ-map id (Σ-map id (choice-right ∘_)) (6-2-15 C₂ w₂ tr)
-  6-2-15 (μ · C)    action     action               = C , refl , λ _ → action
-  6-2-15 (ν a C)    (ν w)      (restriction a∉μ tr) = Σ-map (ν a) (Σ-map (cong _) (restriction a∉μ ∘_)) (6-2-15 C w tr)
-  6-2-15 (! C)      (! w)      (replication tr)     = Σ-map id (Σ-map id (replication ∘_)) (6-2-15 (! C ∣ C) (! w ∣ w) tr)
-  6-2-15 (weaken C) (weaken w) tr                   = Σ-map weaken (Σ-map id (λ trs Qs → trs (Qs ∘ fsuc))) (6-2-15 C w tr)
+  6-2-15 ∅         ∅         ()
+  6-2-15 (C₁ ∣ C₂) (w₁ ∣ w₂) (par-left  tr)       = Σ-map (_∣ C₂) (Σ-map (cong (_∣ _)) (par-left  ∘_)) (6-2-15 C₁ w₁ tr)
+  6-2-15 (C₁ ∣ C₂) (w₁ ∣ w₂) (par-right tr)       = Σ-map (C₁ ∣_) (Σ-map (cong (_ ∣_)) (par-right ∘_)) (6-2-15 C₂ w₂ tr)
+  6-2-15 (C₁ ∣ C₂) (w₁ ∣ w₂) (par-τ tr₁ tr₂)      = Σ-zip _∣_ (Σ-zip (cong₂ _)
+                                                                     (λ trs₁ trs₂ Qs → par-τ (trs₁ Qs) (trs₂ Qs)))
+                                                      (6-2-15 C₁ w₁ tr₁) (6-2-15 C₂ w₂ tr₂)
+  6-2-15 (C₁ ⊕ C₂) (w₁ ⊕ w₂) (choice-left  tr)    = Σ-map id (Σ-map id (choice-left  ∘_)) (6-2-15 C₁ w₁ tr)
+  6-2-15 (C₁ ⊕ C₂) (w₁ ⊕ w₂) (choice-right tr)    = Σ-map id (Σ-map id (choice-right ∘_)) (6-2-15 C₂ w₂ tr)
+  6-2-15 (μ · C)   action    action               = C , refl , λ _ → action
+  6-2-15 (ν a C)   (ν w)     (restriction a∉μ tr) = Σ-map (ν a) (Σ-map (cong _) (restriction a∉μ ∘_)) (6-2-15 C w tr)
+  6-2-15 (! C)     (! w)     (replication tr)     = Σ-map id (Σ-map id (replication ∘_)) (6-2-15 (! C ∣ C) (! w ∣ w) tr)
+
+  -- Weakening of contexts.
+
+  weaken : ∀ {n} → Context n → Context (suc n)
+  weaken (hole x)  = hole (fsuc x)
+  weaken ∅         = ∅
+  weaken (C₁ ∣ C₂) = weaken C₁ ∣ weaken C₂
+  weaken (C₁ ⊕ C₂) = weaken C₁ ⊕ weaken C₂
+  weaken (μ · C)   = μ · weaken C
+  weaken (ν a C)   = ν a (weaken C)
+  weaken (! C)     = ! weaken C
+
+  -- A lemma relating weakening and hole filling.
+
+  weaken-[] :
+    ∀ {n ps} (C : Context n) →
+    weaken C [ ps ] ≡ C [ ps ∘ fsuc ]
+  weaken-[] (hole x)  = refl
+  weaken-[] ∅         = refl
+  weaken-[] (C₁ ∣ C₂) = cong₂ _∣_ (weaken-[] C₁) (weaken-[] C₂)
+  weaken-[] (C₁ ⊕ C₂) = cong₂ _⊕_ (weaken-[] C₁) (weaken-[] C₂)
+  weaken-[] (μ · C)   = cong (μ ·_) (weaken-[] C)
+  weaken-[] (ν a C)   = cong (ν a) (weaken-[] C)
+  weaken-[] (! C)     = cong !_ (weaken-[] C)
 
 -- An LTS from Section 6.2.5 in "Enhancements of the bisimulation
 -- proof method" by Pous and Sangiorgi.

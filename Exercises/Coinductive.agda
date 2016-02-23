@@ -597,16 +597,15 @@ module _ {Name : Set} where
     ∀ {i n Ps Qs}
     (C : Context n) → (∀ x → [ i ] Ps x ∼ Qs x) →
     [ i ] C [ Ps ] ∼ C [ Qs ]
-  hole x   [ Ps∼Qs ]-cong = Ps∼Qs x
-  ∅        [ Ps∼Qs ]-cong = reflexive
-  C₁ ∣ C₂  [ Ps∼Qs ]-cong = (C₁ [ Ps∼Qs ]-cong) ∣-cong
-                            (C₂ [ Ps∼Qs ]-cong)
-  C₁ ⊕ C₂  [ Ps∼Qs ]-cong = (C₁ [ Ps∼Qs ]-cong) ⊕-cong
-                            (C₂ [ Ps∼Qs ]-cong)
-  μ · C    [ Ps∼Qs ]-cong = refl ·-cong (C [ Ps∼Qs ]-cong)
-  ν a C    [ Ps∼Qs ]-cong = ν-cong refl (C [ Ps∼Qs ]-cong)
-  ! C      [ Ps∼Qs ]-cong = !-cong (C [ Ps∼Qs ]-cong)
-  weaken C [ Ps∼Qs ]-cong = C [ Ps∼Qs ∘ fsuc ]-cong
+  hole x  [ Ps∼Qs ]-cong = Ps∼Qs x
+  ∅       [ Ps∼Qs ]-cong = reflexive
+  C₁ ∣ C₂ [ Ps∼Qs ]-cong = (C₁ [ Ps∼Qs ]-cong) ∣-cong
+                           (C₂ [ Ps∼Qs ]-cong)
+  C₁ ⊕ C₂ [ Ps∼Qs ]-cong = (C₁ [ Ps∼Qs ]-cong) ⊕-cong
+                           (C₂ [ Ps∼Qs ]-cong)
+  μ · C   [ Ps∼Qs ]-cong = refl ·-cong (C [ Ps∼Qs ]-cong)
+  ν a C   [ Ps∼Qs ]-cong = ν-cong refl (C [ Ps∼Qs ]-cong)
+  ! C     [ Ps∼Qs ]-cong = !-cong (C [ Ps∼Qs ]-cong)
 
   _[_]-cong′ :
     ∀ {i n Ps Qs}
@@ -665,18 +664,21 @@ module _ {Name : Set} where
            (∀ x → [ i ] Ps x ∼ Qs x) →
            C [ Ps ] [ μ ]⟶ P′ →
            ∃ λ Q′ → C [ Qs ] [ μ ]⟶ Q′ × [ i ] P′ ∼′ Q′
-      lr (hole x)   Ps∼Qs tr                  = [_]_∼_.left-to-right (Ps∼Qs x) tr
-      lr ∅          Ps∼Qs ()
-      lr (C₁ ∣ C₂)  Ps∼Qs (par-left tr)       = Σ-map (_∣ _) (Σ-map par-left (λ b → hole fzero ∣ weaken C₂ [ b ][ Ps∼Qs ]-cong₁)) (lr C₁ Ps∼Qs tr)
-      lr (C₁ ∣ C₂)  Ps∼Qs (par-right tr)      = Σ-map (_ ∣_) (Σ-map par-right (λ b → weaken C₁ ∣ hole fzero [ b ][ Ps∼Qs ]-cong₁)) (lr C₂ Ps∼Qs tr)
-      lr (C₁ ∣ C₂)  Ps∼Qs (par-τ tr₁ tr₂)     = Σ-zip _∣_ (Σ-zip par-τ (λ b₁ b₂ → hole fzero ∣ hole (fsuc fzero) [ b₁ ][ b₂ ]-cong₂))
-                                                  (lr C₁ Ps∼Qs tr₁) (lr C₂ Ps∼Qs tr₂)
-      lr (C₁ ⊕ C₂)  Ps∼Qs (choice-left tr)    = Σ-map id (Σ-map choice-left id) (lr C₁ Ps∼Qs tr)
-      lr (C₁ ⊕ C₂)  Ps∼Qs (choice-right tr)   = Σ-map id (Σ-map choice-right id) (lr C₂ Ps∼Qs tr)
-      lr (μ · C)    Ps∼Qs action              = _ , action , C [ Ps∼Qs ]-cong₂′
-      lr (ν a C)    Ps∼Qs (restriction a∉ tr) = Σ-map (ν a) (Σ-map (restriction a∉) (λ b → ν a (hole fzero) [ b ][ Ps∼Qs ]-cong₁)) (lr C Ps∼Qs tr)
-      lr (! C)      Ps∼Qs (replication tr)    = Σ-map id (Σ-map replication id) (lr (! C ∣ C) Ps∼Qs tr)
-      lr (weaken C) Ps∼Qs tr                  = lr C (Ps∼Qs ∘ fsuc) tr
+      lr (hole x)  Ps∼Qs tr                  = [_]_∼_.left-to-right (Ps∼Qs x) tr
+      lr ∅         Ps∼Qs ()
+      lr (C₁ ∣ C₂) Ps∼Qs (par-left tr)       = Σ-map (_∣ _) (Σ-map par-left (λ b → subst (λ P → [ i ] _ ∼′ _ ∣ P) (weaken-[] C₂) $
+                                                                                   subst (λ P → [ i ] _ ∣ P ∼′ _) (weaken-[] C₂) $
+                                                                                   hole fzero ∣ weaken C₂ [ b ][ Ps∼Qs ]-cong₁)) (lr C₁ Ps∼Qs tr)
+      lr (C₁ ∣ C₂) Ps∼Qs (par-right tr)      = Σ-map (_ ∣_) (Σ-map par-right (λ b → subst (λ P → [ i ] _ ∼′ P ∣ _) (weaken-[] C₁) $
+                                                                                    subst (λ P → [ i ] P ∣ _ ∼′ _) (weaken-[] C₁) $
+                                                                                    weaken C₁ ∣ hole fzero [ b ][ Ps∼Qs ]-cong₁)) (lr C₂ Ps∼Qs tr)
+      lr (C₁ ∣ C₂) Ps∼Qs (par-τ tr₁ tr₂)     = Σ-zip _∣_ (Σ-zip par-τ (λ b₁ b₂ → hole fzero ∣ hole (fsuc fzero) [ b₁ ][ b₂ ]-cong₂))
+                                                 (lr C₁ Ps∼Qs tr₁) (lr C₂ Ps∼Qs tr₂)
+      lr (C₁ ⊕ C₂) Ps∼Qs (choice-left tr)    = Σ-map id (Σ-map choice-left id) (lr C₁ Ps∼Qs tr)
+      lr (C₁ ⊕ C₂) Ps∼Qs (choice-right tr)   = Σ-map id (Σ-map choice-right id) (lr C₂ Ps∼Qs tr)
+      lr (μ · C)   Ps∼Qs action              = _ , action , C [ Ps∼Qs ]-cong₂′
+      lr (ν a C)   Ps∼Qs (restriction a∉ tr) = Σ-map (ν a) (Σ-map (restriction a∉) (λ b → ν a (hole fzero) [ b ][ Ps∼Qs ]-cong₁)) (lr C Ps∼Qs tr)
+      lr (! C)     Ps∼Qs (replication tr)    = Σ-map id (Σ-map replication id) (lr (! C ∣ C) Ps∼Qs tr)
 
     _[_]-cong₂′ :
       ∀ {i n Ps Qs}
