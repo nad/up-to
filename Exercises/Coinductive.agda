@@ -18,6 +18,9 @@ open import Labelled-transition-system
 import Bisimilarity.Coinductive
 import Exercises.Other
 
+------------------------------------------------------------------------
+-- Exercises and results related to CCS
+
 module _ {Name : Set} where
 
   open CCS Name
@@ -1197,3 +1200,100 @@ module _ {Name : Set} where
 
     6-2-17-4′ : ∀ {P i} → [ i ] ! ! P ∼′ ! P
     [_]_∼′_.force 6-2-17-4′ = 6-2-17-4
+
+------------------------------------------------------------------------
+-- Some results related to the 6-2-5 LTS
+
+module _ {Name : Set} where
+
+  open 6-2-5 Name
+  open Bisimilarity.Coinductive 6-2-5
+
+  {-# DISPLAY LTS._[_]⟶_ P a Q = P [ a ]⟶ Q #-}
+  {-# DISPLAY Bisimilarity.Coinductive.[_]_∼_  i P Q = [ i ] P ∼ Q #-}
+  {-# DISPLAY Bisimilarity.Coinductive.[_]_∼′_ i P Q = [ i ] P ∼′ Q #-}
+
+  -- Some simple lemmas.
+
+  op·∅ : ∀ {a} → op (a · ∅) ∼ ∅
+  op·∅ {a} = ⟨ lr , (λ ()) ⟩
+    where
+    lr : ∀ {P′ μ} →
+         op (a · ∅) [ μ ]⟶ P′ →
+         ∃ λ Q′ → ∅ [ μ ]⟶ Q′ × P′ ∼′ Q′
+    lr (op action ())
+
+  op··∅ : ∀ {a} → op (a · a · ∅) ∼ a · ∅
+  op··∅ {a} = ⟨ lr , rl ⟩
+    where
+    lr : ∀ {P′ μ b} →
+         op (a · b · ∅) [ μ ]⟶ P′ →
+         ∃ λ Q′ → b · ∅ [ μ ]⟶ Q′ × P′ ∼′ Q′
+    lr (op action action) = _ , action , reflexive′
+
+    rl : ∀ {Q′ μ} →
+         a · ∅ [ μ ]⟶ Q′ →
+         ∃ λ P′ → op (a · a · ∅) [ μ ]⟶ P′ × P′ ∼′ Q′
+    rl action = _ , op action action , reflexive′
+
+  -- Note that op-cong does not preserve the size of its argument.
+
+  op-cong : ∀ {i P Q} → [ ssuc i ] P ∼ Q → [ i ] op P ∼ op Q
+  op-cong {i} P∼Q =
+    ⟨ lr P∼Q
+    , Σ-map id (Σ-map id symmetric′) ∘ lr (symmetric P∼Q)
+    ⟩
+    where
+    open [_]_∼_
+    open [_]_∼′_
+
+    lr : ∀ {P P′ Q μ} →
+         [ ssuc i ] P ∼ Q → op P [ μ ]⟶ P′ →
+         ∃ λ Q′ → op Q [ μ ]⟶ Q′ × [ i ] P′ ∼′ Q′
+    lr P∼Q (op P⟶P′ P′⟶P″) =
+      let Q′ , Q⟶Q′  , P′∼Q′ = left-to-right        P∼Q    P⟶P′
+          Q″ , Q′⟶Q″ , P″∼Q″ = left-to-right (force P′∼Q′) P′⟶P″
+      in Q″ , op Q⟶Q′ Q′⟶Q″ , P″∼Q″
+
+  -- Let us assume that the Name type is inhabited. In that case
+  -- op-cong /cannot/ preserve the size of its argument. Thus the
+  -- up-to-bisimilarity-and-context technique is not sound.
+
+  op-cong-cannot-preserve-size :
+    Name →
+    ¬ (∀ {i P Q} → [ i ] P ∼ Q → [ i ] op P ∼ op Q)
+  op-cong-cannot-preserve-size a op-cong =
+    a≁b·c a∼a·a
+    where
+    open [_]_∼_
+    open [_]_∼′_
+
+    op-cong′ : ∀ {i P Q} → [ i ] P ∼′ Q → [ i ] op P ∼′ op Q
+    force (op-cong′ P∼′Q) = op-cong (force P∼′Q)
+
+    a∼a·a : ∀ {i} → [ i ] a · ∅ ∼ a · a · ∅
+    a∼a·a {i} = ⟨ lr , rl ⟩
+      where
+      a∼′a·a : ∀ {i} → [ i ] a · ∅ ∼′ a · a · ∅
+      force a∼′a·a = a∼a·a
+
+      lemma =
+        ∅               ∼⟨ symmetric op·∅ ⟩′
+        op (a · ∅)      ∼′⟨ op-cong′ (a∼′a·a {i = i}) ⟩′
+        op (a · a · ∅)  ∼⟨ op··∅ ⟩′∎
+        a · ∅           ∎
+
+      lr : ∀ {P′ μ} →
+           a · ∅ [ μ ]⟶ P′ →
+           ∃ λ Q′ → a · a · ∅ [ μ ]⟶ Q′ × [ i ] P′ ∼′ Q′
+      lr action = a · ∅ , action , lemma
+
+      rl : ∀ {Q′ μ} →
+           a · a · ∅ [ μ ]⟶ Q′ →
+           ∃ λ P′ → a · ∅ [ μ ]⟶ P′ × [ i ] P′ ∼′ Q′
+      rl action = ∅ , action , lemma
+
+    a≁b·c : ∀ {a b c} → ¬ (a · ∅ ∼ b · c · ∅)
+    a≁b·c a∼b·c with right-to-left a∼b·c action
+    ... | .∅ , action , ∅∼a with right-to-left (force ∅∼a) action
+    ...   | _ , () , _

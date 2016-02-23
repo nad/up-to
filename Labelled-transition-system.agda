@@ -275,3 +275,27 @@ module CCS (Name : Set) where
   6-2-15 (μ · C)   action    action               = C , refl , λ _ → action
   6-2-15 (ν a C)   (ν w)     (restriction a∉μ tr) = Σ-map (ν a) (Σ-map (cong _) (restriction a∉μ ∘_)) (6-2-15 C w tr)
   6-2-15 (! C)     (! w)     (replication tr)     = Σ-map id (Σ-map id (replication ∘_)) (6-2-15 (! C ∣ C) (! w ∣ w) tr)
+
+-- An LTS from Section 6.2.5 in "Enhancements of the bisimulation
+-- proof method" by Pous and Sangiorgi.
+
+module 6-2-5 (Name : Set) where
+
+  infixr 12 _·_
+  infix   4 _[_]⟶_
+
+  data Proc : Set where
+    op  : Proc → Proc
+    _·_ : Name → Proc → Proc
+    ∅   : Proc
+
+  data _[_]⟶_ : Proc → Name → Proc → Set where
+    action : ∀ {a P} → a · P [ a ]⟶ P
+    op     : ∀ {a P P′ P″} → P [ a ]⟶ P′ → P′ [ a ]⟶ P″ → op P [ a ]⟶ P″
+
+  6-2-5 : LTS
+  6-2-5 = record
+    { Proc   = Proc
+    ; Label  = Name
+    ; _[_]⟶_ = _[_]⟶_
+    }
