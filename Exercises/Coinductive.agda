@@ -27,11 +27,6 @@ module _ {Name : Set} where
   open LTS CCS using (step-with-action; step-without-action)
   open Bisimilarity.Coinductive CCS
 
-  -- TODO: Why do these pragmas help?
-
-  {-# DISPLAY Bisimilarity.Coinductive.[_]_∼_  i P Q = [ i ] P ∼ Q #-}
-  {-# DISPLAY Bisimilarity.Coinductive.[_]_∼′_ i P Q = [ i ] P ∼′ Q #-}
-
   ------------------------------------------------------------------------
   -- Various lemmas related to _∣_
 
@@ -1281,10 +1276,6 @@ module _ {Name : Set} where
 
   open 6-2-5 Name
   open Bisimilarity.Coinductive 6-2-5
-
-  {-# DISPLAY LTS._[_]⟶_ P a Q = P [ a ]⟶ Q #-}
-  {-# DISPLAY Bisimilarity.Coinductive.[_]_∼_  i P Q = [ i ] P ∼ Q #-}
-  {-# DISPLAY Bisimilarity.Coinductive.[_]_∼′_ i P Q = [ i ] P ∼′ Q #-}
 
   -- Some simple lemmas.
 
