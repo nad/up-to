@@ -41,6 +41,33 @@ p ∼ q = [ ∞ ] p ∼ q
 _∼′_ : Proc → Proc → Set
 p ∼′ q = [ ∞ ] p ∼′ q
 
+-- Combinators that can perhaps make the code a bit nicer to read.
+
+infix -3 _⟶⟨_⟩ʳˡ_ _[_]⟶⟨_⟩ʳˡ_
+         lr-result-with-action lr-result-without-action
+
+_⟶⟨_⟩ʳˡ_ : ∀ {i p′ q′ μ} p → p [ μ ]⟶ p′ → [ i ] p′ ∼′ q′ →
+           ∃ λ p′ → p [ μ ]⟶ p′ × [ i ] p′ ∼′ q′
+_ ⟶⟨ p⟶p′ ⟩ʳˡ p′∼′q′ = _ , p⟶p′ , p′∼′q′
+
+_[_]⟶⟨_⟩ʳˡ_ : ∀ {i p′ q′} p μ → p [ μ ]⟶ p′ → [ i ] p′ ∼′ q′ →
+              ∃ λ p′ → p [ μ ]⟶ p′ × [ i ] p′ ∼′ q′
+_ [ _ ]⟶⟨ p⟶p′ ⟩ʳˡ p′∼′q′ = _ ⟶⟨ p⟶p′ ⟩ʳˡ p′∼′q′
+
+lr-result-without-action :
+  ∀ {i p′ q′ μ} → [ i ] p′ ∼′ q′ → ∀ q → q [ μ ]⟶ q′ →
+  ∃ λ q′ → q [ μ ]⟶ q′ × [ i ] p′ ∼′ q′
+lr-result-without-action p′∼′q′ _ q⟶q′ = _ , q⟶q′ , p′∼′q′
+
+lr-result-with-action :
+  ∀ {i p′ q′} → [ i ] p′ ∼′ q′ → ∀ μ q → q [ μ ]⟶ q′ →
+  ∃ λ q′ → q [ μ ]⟶ q′ × [ i ] p′ ∼′ q′
+lr-result-with-action p′∼′q′ _ _ q⟶q′ =
+  lr-result-without-action  p′∼′q′ _ q⟶q′
+
+syntax lr-result-without-action p′∼q′   q q⟶q′ = p′∼q′      ⟵⟨ q⟶q′ ⟩ q
+syntax lr-result-with-action    p′∼q′ μ q q⟶q′ = p′∼q′ [ μ ]⟵⟨ q⟶q′ ⟩ q
+
 -- Bisimilarity is an equivalence relation.
 
 mutual
@@ -115,10 +142,10 @@ finally-∼′ : ∀ {i} p q → [ i ] p ∼ q → [ i ] p ∼′ q
 finally-′∼′ : ∀ {i} p q → [ i ] p ∼′ q → [ i ] p ∼′ q
 finally-′∼′ _ _ p∼′q = p∼′q
 
-syntax finally-∼   p q p∼q  = p ∼⟨  p∼q  ⟩∎ q ∎
-syntax finally-′∼  p q p∼′q = p ∼′⟨ p∼′q ⟩∎ q ∎
-syntax finally-∼′  p q p∼q  = p ∼⟨  p∼q  ⟩′∎ q ∎
-syntax finally-′∼′ p q p∼′q = p ∼′⟨ p∼′q ⟩′∎ q ∎
+syntax finally-∼   p q p∼q  = p ∼⟨  p∼q  ⟩∎ q
+syntax finally-′∼  p q p∼′q = p ∼′⟨ p∼′q ⟩∎ q
+syntax finally-∼′  p q p∼q  = p ∼⟨  p∼q  ⟩′∎ q
+syntax finally-′∼′ p q p∼′q = p ∼′⟨ p∼′q ⟩′∎ q
 
 -- Bisimilarity of bisimilarity proofs.
 --

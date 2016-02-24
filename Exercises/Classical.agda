@@ -118,7 +118,7 @@ module _ {Name : Set} where
   ∣-right-identity {P} =
     P ∣ ∅  ∼⟨ ∣-comm ⟩
     ∅ ∣ P  ∼⟨ ∣-left-identity ⟩∎
-    P      ∎
+    P
 
   -- _∣_ preserves bisimilarity.
 
@@ -218,7 +218,7 @@ module _ {Name : Set} where
         ! ! a · ∣ P            ∼⟨ reflexive ∣-cong P∼!a∣∅ ⟩
         ! ! a · ∣ (! a · ∣ ∅)  ∼⟨ reflexive ∣-cong ∣-right-identity ⟩
         ! ! a · ∣ ! a ·        ∼⟨ 6-1-2 ⟩∎
-        ! ! a ·                ∎
+        ! ! a ·
 
       lr : ∀ {P P′ Q μ} →
            P R Q → P [ μ ]⟶ P′ →
@@ -234,11 +234,11 @@ module _ {Name : Set} where
         , _
         , (P′            ∼⟨ P′∼!!a∣P″ ⟩
            ! ! a · ∣ P″  ∼⟨ lemma P″∼!a∣∅ ⟩∎
-           ! ! a ·       ∎)
+           ! ! a ·)
         , _
         , base
         , (! a ·      ∼⟨ symmetric ∣-right-identity ⟩∎
-           ! a · ∣ ∅  ∎)
+           ! a · ∣ ∅)
 
       rl : ∀ {P Q Q′ μ} →
            P R Q → Q [ μ ]⟶ Q′ →
@@ -252,12 +252,12 @@ module _ {Name : Set} where
            ! ! a · ∣ Q′)
         , _
         , (! ! a · ∣ Q′  ∼⟨ lemma Q′∼!a∣∅ ⟩∎
-           ! ! a ·       ∎)
+           ! ! a ·)
         , _
         , base
         , (! a ·      ∼⟨ symmetric ∣-right-identity ⟩
            ! a · ∣ ∅  ∼⟨ symmetric Q′∼!a∣∅ ⟩∎
-           Q′         ∎)
+           Q′)
 
   ----------------------------------------------------------------------
   -- A result mentioned in "Enhancements of the bisimulation proof
@@ -281,14 +281,14 @@ module _ {Name : Set} where
         , (name a · (a ·)  [ name a ]⟶⟨ action ⟩
            a ·)
         , inj₂ (∅ ∣ a ·  ∼⟨ ∣-left-identity ⟩∎
-                a ·      ∎)
+                a ·)
 
       lr base (par-right action) =
           _
         , (name a · (a ·)  [ name a ]⟶⟨ action ⟩
            a ·)
         , inj₂ (a · ∣ ∅  ∼⟨ ∣-right-identity ⟩∎
-                a ·      ∎)
+                a ·)
 
       lr base (par-τ′ a≡co-a action action) = ⊥-elim (id≢co a≡co-a)
 
@@ -300,4 +300,4 @@ module _ {Name : Set} where
         , (a · ∣ a ·  [ name a ]⟶⟨ par-right action ⟩
            a · ∣ ∅)
         , inj₂ (a · ∣ ∅  ∼⟨ ∣-right-identity ⟩∎
-                a ·      ∎)
+                a ·)

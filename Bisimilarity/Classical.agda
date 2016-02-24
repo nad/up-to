@@ -193,7 +193,7 @@ _ ∼⟨⟩ p∼q = p∼q
 finally-∼ : ∀ {ℓ} p q → [ ℓ ] p ∼ q → [ ℓ ] p ∼ q
 finally-∼ _ _ p∼q = p∼q
 
-syntax finally-∼ p q p∼q = p ∼⟨ p∼q ⟩∎ q ∎
+syntax finally-∼ p q p∼q = p ∼⟨ p∼q ⟩∎ q
 
 ------------------------------------------------------------------------
 -- Lemmas relating bisimulations and bisimilarity
@@ -255,11 +255,11 @@ bisimulation-up-to-∼⇒bisimulation {ℓ} {_R_ = _R_} R-is =
          s′ , s⟶s′ , q″
        , (p′  ∼⟨ p′∼q′ ⟩
           q′  ∼⟨ q′∼q″ ⟩∎
-          q″  ∎)
+          q″)
        , r″ , q″Rr″
        , (r″  ∼⟨ r″∼r′ ⟩
           r′  ∼⟨ r′∼s′ ⟩∎
-          s′  ∎) })
+          s′) })
   , (λ { {q′ = s′} (q , p∼q , r , qRr , r∼s) s⟶s′ →
        let r′ , r⟶r′ , r′∼s′ =
              right-to-left bisimilarity-is-a-bisimulation r∼s s⟶s′
@@ -271,11 +271,11 @@ bisimulation-up-to-∼⇒bisimulation {ℓ} {_R_ = _R_} R-is =
          p′ , p⟶p′ , q″
        , (p′  ∼⟨ p′∼q′ ⟩
           q′  ∼⟨ q′∼q″ ⟩∎
-          q″  ∎)
+          q″)
        , r″ , q″Rr″
        , (r″  ∼⟨ r″∼r′ ⟩
           r′  ∼⟨ r′∼s′ ⟩∎
-          s′  ∎) })
+          s′) })
   ⟩
   where
   open Progression
