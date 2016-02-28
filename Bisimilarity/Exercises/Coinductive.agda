@@ -7,7 +7,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Exercises.Coinductive where
+module Bisimilarity.Exercises.Coinductive where
 
 open import Equality.Propositional hiding (reflexive)
 open import Prelude
@@ -16,7 +16,7 @@ open import Function-universe equality-with-J hiding (id; _∘_)
 
 open import Labelled-transition-system
 import Bisimilarity.Coinductive
-import Exercises.Other
+import Bisimilarity.Exercises.Other
 
 ------------------------------------------------------------------------
 -- Exercises and results related to CCS
@@ -191,7 +191,7 @@ module _ {Name : Set} where
   ----------------------------------------------------------------------
   -- Exercise 6.1.3 (2), plus some rearrangement lemmas
 
-  open Exercises.Other.6-1-3-2 (record
+  open Bisimilarity.Exercises.Other.6-1-3-2 (record
          { _∼_       = _∼_
          ; _∼⟨_⟩_    = _∼⟨_⟩_
          ; finally-∼ = finally-∼

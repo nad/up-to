@@ -7,7 +7,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Exercises.Other where
+module Bisimilarity.Exercises.Other where
 
 open import Equality.Propositional hiding (reflexive)
 open import Prelude

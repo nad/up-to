@@ -9,13 +9,24 @@ module Labelled-transition-system where
 open import Equality.Propositional
 open import Prelude
 
+open import Bijection equality-with-J using (_↔_)
 open import Bool equality-with-J
+open import Equivalence equality-with-J using (↔⇒≃)
 open import Function-universe equality-with-J hiding (id; _∘_)
+open import Univalence-axiom equality-with-J
 
--- Is this definition due to Keller?
+-- Labelled transition systems were perhaps first defined by Robert M.
+-- Keller (http://dx.doi.org/10.1145/360248.360251). The definition
+-- below is a variant with two fields "Silent" and "silent?", added by
+-- me.
+--
+-- I don't know who first came up with the concept of a weak
+-- transition. The definitions of _⇒_, _[_]⇒_ and _[_]⇒̂_ below are
+-- based on definitions in "Enhancements of the bisimulation proof
+-- method" by Pous and Sangiorgi.
 
 record LTS : Set₁ where
-  infix 4 _[_]⟶_
+  infix 4 _[_]⟶_ _⇒_ _[_]⇒_
   field
     -- Processes.
     Proc : Set
@@ -23,8 +34,151 @@ record LTS : Set₁ where
     -- Labels.
     Label : Set
 
+    -- Is the label silent?
+    Silent : Label → Set
+
+    -- Silence can be decided.
+    silent? : ∀ μ → Dec (Silent μ)
+
     -- Transitions.
     _[_]⟶_ : Proc → Label → Proc → Set
+
+  -- Sequences of zero or more silent transitions.
+
+  data _⇒_ : Proc → Proc → Set where
+    done : ∀ {p} → p ⇒ p
+    step : ∀ {p q r μ} → Silent μ → p [ μ ]⟶ q → q ⇒ r → p ⇒ r
+
+  -- Weak transitions (one kind).
+
+  data _[_]⇒_ (p : Proc) (μ : Label) (q : Proc) : Set where
+    steps : ∀ {p′ q′} → p ⇒ p′ → p′ [ μ ]⟶ q′ → q′ ⇒ q → p [ μ ]⇒ q
+
+  -- Weak transitions (another kind).
+
+  data _[_]⇒̂_ (p : Proc) (μ : Label) (q : Proc) : Set where
+    silent     : Silent μ → p ⇒ q → p [ μ ]⇒̂ q
+    non-silent : ¬ Silent μ → p [ μ ]⇒ q → p [ μ ]⇒̂ q
+
+  -- Regular transitions can be turned into weak ones.
+
+  ⟶⇒⇒ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]⇒ q
+  ⟶⇒⇒ tr = steps done tr done
+
+  ⟶⇒⇒̂ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]⇒̂ q
+  ⟶⇒⇒̂ {μ = μ} tr with silent? μ
+  ... | yes s = silent s (step s tr done)
+  ... | no ¬s = non-silent ¬s (⟶⇒⇒ tr)
+
+  -- Another conversion function.
+
+  ⇒̂→⇒ : ∀ {p q μ} → Silent μ → p [ μ ]⇒̂ q → p ⇒ q
+  ⇒̂→⇒ s (silent _ p⇒q)    = p⇒q
+  ⇒̂→⇒ s (non-silent ¬s _) = ⊥-elim (¬s s)
+
+  -- Several transitivity-like properties.
+
+  ⇒-transitive : ∀ {p q r} → p ⇒ q → q ⇒ r → p ⇒ r
+  ⇒-transitive done             p⇒q = p⇒q
+  ⇒-transitive (step s p⟶q q⇒r) r⇒s = step s p⟶q (⇒-transitive q⇒r r⇒s)
+
+  ⇒⇒̂-transitive : ∀ {p q r μ} → p ⇒ q → q [ μ ]⇒̂ r → p [ μ ]⇒̂ r
+  ⇒⇒̂-transitive p⇒q (silent s q⇒r) = silent s (⇒-transitive p⇒q q⇒r)
+  ⇒⇒̂-transitive p⇒q (non-silent ¬s (steps q⇒r r⟶s s⇒t)) =
+    non-silent ¬s (steps (⇒-transitive p⇒q q⇒r) r⟶s s⇒t)
+
+  ⇒̂⇒-transitive : ∀ {p q r μ} → p [ μ ]⇒̂ q → q ⇒ r → p [ μ ]⇒̂ r
+  ⇒̂⇒-transitive (silent s p⇒q) q⇒r = silent s (⇒-transitive p⇒q q⇒r)
+  ⇒̂⇒-transitive (non-silent ¬s (steps p⇒q q⟶r r⇒s)) s⇒t =
+    non-silent ¬s (steps p⇒q q⟶r (⇒-transitive r⇒s s⇒t))
+
+  -- A lemma that can be used to show that some relation is a weak
+  -- bisimulation (of a certain kind).
+
+  is-weak :
+    {_%_ _%′_ : Proc → Proc → Set}
+    {_[_]%_ : Proc → Label → Proc → Set} →
+    (∀ {p q} → p % q → ∀ {p′ μ} →
+     p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]% q′ × p′ %′ q′) →
+    (∀ {p q} → p %′ q → p % q) →
+    (∀ {p p′ μ} → Silent μ → p [ μ ]% p′ → p ⇒ p′) →
+    (∀ {p p′ μ} → p [ μ ]% p′ → p [ μ ]⇒̂ p′) →
+    ∀ {p p′ q μ} →
+    p % q → p [ μ ]⇒̂ p′ →
+    ∃ λ q′ → q [ μ ]⇒̂ q′ × (p′ % q′)
+  is-weak {_%_} left-to-right %′⇒% %⇒⇒ %⇒⇒̂ = lr⇒̂
+    where
+    lr⇒ : ∀ {q q′ r} →
+          q % r → q ⇒ q′ →
+          ∃ λ r′ → r ⇒ r′ × (q′ % r′)
+    lr⇒ q%r done                = _ , done , q%r
+    lr⇒ q%r (step s q⟶q′ q′⇒q″) =
+      let r′ , r%r′  , q′%′r′ = left-to-right q%r q⟶q′
+          r″ , r′⇒r″ , q″%r″  = lr⇒ (%′⇒% q′%′r′) q′⇒q″
+      in r″ , ⇒-transitive (%⇒⇒ s r%r′) r′⇒r″ , q″%r″
+
+    lr⇒̂ : ∀ {p p′ q μ} →
+          p % q → p [ μ ]⇒̂ p′ →
+          ∃ λ q′ → q [ μ ]⇒̂ q′ × (p′ % q′)
+    lr⇒̂ q%r (silent s q⇒q′) =
+      let r′ , r⇒r′ , q′%r′ = lr⇒ q%r q⇒q′
+      in r′ , silent s r⇒r′ , q′%r′
+    lr⇒̂ q%r (non-silent ¬s (steps q⇒q′ q′⟶q″ q″⇒q‴)) =
+      let r′ , r⇒r′  , r′%q′  = lr⇒ q%r q⇒q′
+          r″ , r′%r″ , r″%′q″ = left-to-right r′%q′ q′⟶q″
+          r‴ , r″⇒r‴ , r‴≈q‴  = lr⇒ (%′⇒% r″%′q″) q″⇒q‴
+      in r‴ , ⇒⇒̂-transitive r⇒r′ (⇒̂⇒-transitive (%⇒⇒̂ r′%r″) r″⇒r‴)
+            , r‴≈q‴
+
+  -- If no action is silent, then _[_]⇒_ is pointwise isomorphic to
+  -- _[_]⟶_.
+
+  ⟶↔⇒ : (∀ μ → ¬ Silent μ) →
+        ∀ {p μ q} → p [ μ ]⟶ q ↔ p [ μ ]⇒ q
+  ⟶↔⇒ ¬silent = record
+    { surjection = record
+      { logical-equivalence = record
+        { to   = ⟶⇒⇒
+        ; from = λ
+            { (steps (step s _ _) _ _) → ⊥-elim (¬silent _ s)
+            ; (steps _ _ (step s _ _)) → ⊥-elim (¬silent _ s)
+            ; (steps done tr done)     → tr
+            }
+        }
+      ; right-inverse-of = λ
+          { (steps (step s _ _) _ _) → ⊥-elim (¬silent _ s)
+          ; (steps _ _ (step s _ _)) → ⊥-elim (¬silent _ s)
+          ; (steps done tr done)     → refl
+          }
+      }
+    ; left-inverse-of = λ _ → refl
+    }
+
+  -- If no action is silent, then _[_]⇒̂_ is pointwise isomorphic to
+  -- _[_]⟶_ (assuming extensionality).
+
+  ⟶↔⇒̂ : Extensionality lzero lzero →
+        (∀ μ → ¬ Silent μ) →
+        ∀ {p μ q} → p [ μ ]⟶ q ↔ p [ μ ]⇒̂ q
+  ⟶↔⇒̂ ext ¬silent = record
+    { surjection = record
+      { logical-equivalence = record
+        { to   = λ tr → non-silent (¬silent _) (_↔_.to (⟶↔⇒ ¬silent) tr)
+        ; from = λ
+            { (silent s _)      → ⊥-elim (¬silent _ s)
+            ; (non-silent _ tr) → _↔_.from (⟶↔⇒ ¬silent) tr
+            }
+        }
+      ; right-inverse-of = λ
+          { (silent s _)      → ⊥-elim (¬silent _ s)
+          ; (non-silent _ tr) →
+              cong₂ non-silent
+                    (ext (⊥-elim ∘ ¬silent _))
+                    (_↔_.right-inverse-of (⟶↔⇒ ¬silent) tr)
+          }
+      }
+    ; left-inverse-of = λ _ → refl
+    }
 
   -- Combinators that can be used to add visible type information to
   -- an expression.
@@ -40,23 +194,64 @@ record LTS : Set₁ where
   syntax step-with-action    p μ q p⟶q = p [ μ ]⟶⟨ p⟶q ⟩ q
   syntax step-without-action p   q p⟶q = p      ⟶⟨ p⟶q ⟩ q
 
+-- Transforms an LTS into one which uses weak transitions as
+-- transitions.
+
+weak : LTS → LTS
+weak lts = record
+  { Proc    = Proc
+  ; Label   = Label
+  ; Silent  = Silent
+  ; silent? = silent?
+  ; _[_]⟶_  = _[_]⇒̂_
+  }
+  where
+  open LTS lts
+
+-- If no lts action is silent, then weak lts is equal to lts (assuming
+-- extensionality and univalence).
+
+weak≡id :
+  Univalence lzero →
+  Extensionality lzero (lsuc lzero) →
+  ∀ lts →
+  (∀ μ → ¬ LTS.Silent lts μ) →
+  weak lts ≡ lts
+weak≡id univ ext lts ¬silent =
+  cong (λ _[_]⟶_ → record
+          { Proc    = Proc
+          ; Label   = Label
+          ; Silent  = Silent
+          ; silent? = silent?
+          ; _[_]⟶_  = _[_]⟶_
+          })
+       (ext λ p → ext λ μ → ext λ q →
+          p [ μ ]⇒̂ q  ≡⟨ ≃⇒≡ univ $ ↔⇒≃ $ inverse $ ⟶↔⇒̂ (lower-extensionality _ _ ext) ¬silent ⟩∎
+          p [ μ ]⟶ q  ∎)
+  where
+  open LTS lts
+
 -- An LTS with no processes or labels.
 
 empty : LTS
 empty = record
-  { Proc   = ⊥
-  ; Label  = ⊥
-  ; _[_]⟶_ = λ ()
+  { Proc    = ⊥
+  ; Label   = ⊥
+  ; Silent  = λ _ → ⊥
+  ; silent? = λ _ → no λ ()
+  ; _[_]⟶_  = λ ()
   }
 
--- An LTS with a single process, a single label, and a single
--- transition.
+-- An LTS with a single process, a single (non-silent) label, and a
+-- single transition.
 
 one-loop : LTS
 one-loop = record
-  { Proc   = ⊤
-  ; Label  = ⊤
-  ; _[_]⟶_ = λ _ _ _ → ⊤
+  { Proc    = ⊤
+  ; Label   = ⊤
+  ; Silent  = λ _ → ⊥
+  ; silent? = λ _ → no λ ()
+  ; _[_]⟶_  = λ _ _ _ → ⊤
   }
 
 -- An LTS with two distinct, but bisimilar, processes. There are
@@ -64,9 +259,11 @@ one-loop = record
 
 two-bisimilar-processes : LTS
 two-bisimilar-processes = record
-  { Proc   = Bool
-  ; Label  = ⊤
-  ; _[_]⟶_ = λ _ _ _ → ⊤
+  { Proc    = Bool
+  ; Label   = ⊤
+  ; Silent  = λ _ → ⊥
+  ; silent? = λ _ → no λ ()
+  ; _[_]⟶_  = λ _ _ _ → ⊤
   }
 
 -- A parametrised LTS for which bisimilarity is logically equivalent
@@ -74,9 +271,11 @@ two-bisimilar-processes = record
 
 bisimilarity⇔equality : Set → LTS
 bisimilarity⇔equality A = record
-  { Proc   = A
-  ; Label  = A
-  ; _[_]⟶_ = λ p μ q → p ≡ μ × p ≡ q
+  { Proc    = A
+  ; Label   = A
+  ; Silent  = λ _ → ⊥
+  ; silent? = λ _ → no λ ()
+  ; _[_]⟶_  = λ p μ q → p ≡ μ × p ≡ q
   }
 
 -- CCS.
@@ -137,9 +336,13 @@ module CCS (Name : Set) where
 
   CCS : LTS
   CCS = record
-    { Proc   = Proc
-    ; Label  = Action
-    ; _[_]⟶_ = _[_]⟶_
+    { Proc    = Proc
+    ; Label   = Action
+    ; Silent  = _≡ τ
+    ; silent? = λ { τ        → yes refl
+                  ; (name _) → no λ ()
+                  }
+    ; _[_]⟶_  = _[_]⟶_
     }
 
   -- Polyadic contexts.
@@ -319,7 +522,67 @@ module 6-2-5 (Name : Set) where
 
   6-2-5 : LTS
   6-2-5 = record
-    { Proc   = Proc
-    ; Label  = Name
-    ; _[_]⟶_ = _[_]⟶_
+    { Proc    = Proc
+    ; Label   = Name
+    ; Silent  = λ _ → ⊥
+    ; silent? = λ _ → no λ ()
+    ; _[_]⟶_  = _[_]⟶_
     }
+
+-- The partiality monad. (Some people may prefer to call it the delay
+-- monad.)
+
+module Partiality-monad where
+
+  mutual
+
+    data Partial (A : Set) (i : Size) : Set where
+      now   : A → Partial A i
+      later : Partial′ A i → Partial A i
+
+    record Partial′ (A : Set) (i : Size) : Set where
+      coinductive
+      field
+        force : {j : Size< i} → Partial A j
+
+  -- Transitions.
+
+  infix 4 _[_]⟶_
+
+  data _[_]⟶_ {A : Set} :
+              Partial A ∞ → Maybe A → Partial A ∞ → Set where
+    now   : ∀ {x} → now x   [ just x  ]⟶ now x
+    later : ∀ {x} → later x [ nothing ]⟶ Partial′.force x
+
+  partiality-monad : Set → LTS
+  partiality-monad A = record
+    { Proc    = Partial A ∞
+    ; Label   = Maybe A
+    ; Silent  = [ const ⊤ , const ⊥ ]
+    ; silent? = [ yes , const (no λ ()) ]
+    ; _[_]⟶_  = _[_]⟶_
+    }
+
+  -- A direct definition of weak bisimilarity.
+
+  mutual
+
+    infix 4 [_]_≈_ [_]_≈′_
+
+    data [_]_≈_ (i : Size) {A : Set} :
+                Partial A ∞ → Partial A ∞ → Set where
+      now    : ∀ {x} → [ i ] now x ≈ now x
+      later  : ∀ {x y} →
+               [ i ] Partial′.force x ≈′ Partial′.force y →
+               [ i ] later x ≈ later y
+      laterˡ : ∀ {x y} →
+               [ i ] Partial′.force x ≈ y →
+               [ i ] later x ≈ y
+      laterʳ : ∀ {x y} →
+               [ i ] x ≈ Partial′.force y →
+               [ i ] x ≈ later y
+
+    record [_]_≈′_ (i : Size) {A : Set} (x y : Partial A ∞) : Set where
+      coinductive
+      field
+        force : {j : Size< i} → [ j ] x ≈ y

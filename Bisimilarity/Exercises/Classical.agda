@@ -7,7 +7,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Exercises.Classical where
+module Bisimilarity.Exercises.Classical where
 
 open import Equality.Propositional hiding (reflexive)
 open import Logical-equivalence using (_⇔_)
@@ -16,9 +16,10 @@ open import Prelude
 open import Function-universe equality-with-J hiding (id; _∘_)
 
 open import Labelled-transition-system
+open import Bisimilarity.Classical.Preliminaries
 import Bisimilarity.Classical
 open import Bisimilarity.Comparison
-import Exercises.Other
+import Bisimilarity.Exercises.Other
 
 module _ {Name : Set} where
 
@@ -181,7 +182,7 @@ module _ {Name : Set} where
   ----------------------------------------------------------------------
   -- Exercise 6.1.3 (2)
 
-  open Exercises.Other.6-1-3-2 (record
+  open Bisimilarity.Exercises.Other.6-1-3-2 (record
          { _∼_       = _∼_
          ; _∼⟨_⟩_    = _∼⟨_⟩_
          ; finally-∼ = finally-∼

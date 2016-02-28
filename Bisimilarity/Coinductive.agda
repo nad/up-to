@@ -98,15 +98,19 @@ mutual
 mutual
 
   transitive : ∀ {i p q r} → [ i ] p ∼ q → [ i ] q ∼ r → [ i ] p ∼ r
-  transitive ⟨ left-to-right₁ , right-to-left₁ ⟩
-             ⟨ left-to-right₂ , right-to-left₂ ⟩ =
-    ⟨ (λ p⟶p′ → let q′ , q⟶q′ , p′∼q′ = left-to-right₁ p⟶p′
-                    r′ , r⟶r′ , q′∼r′ = left-to-right₂ q⟶q′
-                in r′ , r⟶r′ , transitive′ p′∼q′ q′∼r′)
-    , (λ r⟶r′ → let q′ , q⟶q′ , q′∼r′ = right-to-left₂ r⟶r′
-                    p′ , p⟶p′ , p′∼q′ = right-to-left₁ q⟶q′
-                in p′ , p⟶p′ , transitive′ p′∼q′ q′∼r′)
+  transitive {i} = λ p∼q q∼r →
+    ⟨ lr p∼q q∼r
+    , Σ-map id (Σ-map id symmetric′) ∘
+      lr (symmetric q∼r) (symmetric p∼q)
     ⟩
+    where
+    lr : ∀ {p p′ q r μ} →
+         [ i ] p ∼ q → [ i ] q ∼ r → p [ μ ]⟶ p′ →
+         ∃ λ r′ → r [ μ ]⟶ r′ × [ i ] p′ ∼′ r′
+    lr p∼q q∼r p⟶p′ =
+      let q′ , q⟶q′ , p′∼q′ = [_]_∼_.left-to-right p∼q p⟶p′
+          r′ , r⟶r′ , q′∼r′ = [_]_∼_.left-to-right q∼r q⟶q′
+      in r′ , r⟶r′ , transitive′ p′∼q′ q′∼r′
 
   transitive′ :
     ∀ {i p q r} → [ i ] p ∼′ q → [ i ] q ∼′ r → [ i ] p ∼′ r
@@ -146,6 +150,16 @@ syntax finally-∼   p q p∼q  = p ∼⟨  p∼q  ⟩∎ q
 syntax finally-′∼  p q p∼′q = p ∼′⟨ p∼′q ⟩∎ q
 syntax finally-∼′  p q p∼q  = p ∼⟨  p∼q  ⟩′∎ q
 syntax finally-′∼′ p q p∼′q = p ∼′⟨ p∼′q ⟩′∎ q
+
+-- Strong bisimilarity is a weak bisimulation (of a certain kind).
+
+strong-is-weak :
+  ∀ {p p′ q μ} →
+  p ∼ q → p [ μ ]⇒̂ p′ →
+  ∃ λ q′ → q [ μ ]⇒̂ q′ × p′ ∼ q′
+strong-is-weak =
+  is-weak [_]_∼_.left-to-right (λ p∼′q → [_]_∼′_.force p∼′q)
+          (λ s tr → step s tr done) ⟶⇒⇒̂
 
 -- Bisimilarity of bisimilarity proofs.
 --
