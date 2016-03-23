@@ -159,7 +159,7 @@ strong-is-weak :
   ∃ λ q′ → q [ μ ]⇒̂ q′ × p′ ∼ q′
 strong-is-weak =
   is-weak [_]_∼_.left-to-right (λ p∼′q → [_]_∼′_.force p∼′q)
-          (λ s tr → step s tr done) ⟶⇒⇒̂
+          (λ s tr → step s tr done) ⟶→⇒̂
 
 -- Bisimilarity of bisimilarity proofs.
 --

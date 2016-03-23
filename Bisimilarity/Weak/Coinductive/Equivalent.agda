@@ -26,7 +26,7 @@ mutual
   cw⇒cwo : ∀ {i p q} → CW.[ i ] p ≈ q → CWO.[ i ] p ≈ q
   cw⇒cwo p≈q =
     CWO.⟨ lr p≈q
-        , Σ-map id (Σ-map id CWO.symmetric′) ∘ lr (CW.symmetric p≈q)
+        , Σ-map id (Σ-map id CWO.symmetric-≈′) ∘ lr (CW.symmetric p≈q)
         ⟩
     where
     lr : ∀ {i p p′ q μ} →
@@ -34,7 +34,7 @@ mutual
          ∃ λ q′ → q [ μ ]⇒̂ q′ × CWO.[ i ] p′ ≈′ q′
     lr p≈q p⟶p′ =
       Σ-map id (Σ-map id cw⇒cwo′)
-        (CW.[_]_≈_.left-to-right p≈q (⟶⇒⇒̂ p⟶p′))
+        (CW.[_]_≈_.left-to-right p≈q (⟶→⇒̂ p⟶p′))
 
   cw⇒cwo′ : ∀ {i p q} → CW.[ i ] p ≈′ q → CWO.[ i ] p ≈′ q
   CWO.[_]_≈′_.force (cw⇒cwo′ p≈′q) = cw⇒cwo (CW.[_]_≈′_.force p≈′q)
@@ -50,7 +50,7 @@ mutual
   cwo⇒cw : ∀ {i p q} → p CWO.≈ q → CW.[ i ] p ≈ q
   cwo⇒cw p≈q =
     CW.⟨ lr p≈q
-       , Σ-map id (Σ-map id CW.symmetric′) ∘ lr (CWO.symmetric p≈q)
+       , Σ-map id (Σ-map id CW.symmetric′) ∘ lr (CWO.symmetric-≈ p≈q)
        ⟩
     where
     lr : ∀ {i p p′ q μ} →

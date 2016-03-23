@@ -57,3 +57,8 @@ import Bisimilarity.Weak.Comparison
 -- equivalent.
 
 import Bisimilarity.Weak.Coinductive.Equivalent
+
+-- Some exercises and results from "Enhancements of the bisimulation
+-- proof method" by Pous and Sangiorgi.
+
+import Bisimilarity.Weak.Exercises.Coinductive

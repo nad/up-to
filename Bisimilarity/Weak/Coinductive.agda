@@ -99,34 +99,34 @@ mutual
 
 -- More "equational" reasoning combinators.
 
-infix  -1 finally-∼ finally-∼′ finally-′∼ finally-′∼′
-infixr -2 _∼⟨_⟩_ _∼′⟨_⟩_ _∼′⟨_⟩′_ _∼⟨_⟩′_
+infix  -1 finally-∼≈ finally-∼′≈ finally-∼≈′ finally-∼′≈′
+infixr -2 _∼⟨_⟩≈_ _∼′⟨_⟩≈_ _∼′⟨_⟩≈′_ _∼⟨_⟩≈′_
 
-_∼⟨_⟩_ : ∀ {i} p {q r} → p ∼ q → [ i ] q ≈ r → [ i ] p ≈ r
-_ ∼⟨ p∼q ⟩ q≈r = _ ≈⟨ ∼⇒≈ p∼q ⟩ q≈r
+_∼⟨_⟩≈_ : ∀ {i} p {q r} → p ∼ q → [ i ] q ≈ r → [ i ] p ≈ r
+_ ∼⟨ p∼q ⟩≈ q≈r = _ ≈⟨ ∼⇒≈ p∼q ⟩ q≈r
 
-_∼′⟨_⟩_ : ∀ {i} p {q r} → p ∼′ q → [ i ] q ≈ r → [ i ] p ≈ r
-_ ∼′⟨ p∼′q ⟩ q≈r = _ ≈′⟨ ∼⇒≈″ p∼′q ⟩ q≈r
+_∼′⟨_⟩≈_ : ∀ {i} p {q r} → p ∼′ q → [ i ] q ≈ r → [ i ] p ≈ r
+_ ∼′⟨ p∼′q ⟩≈ q≈r = _ ≈′⟨ ∼⇒≈″ p∼′q ⟩ q≈r
 
-_∼′⟨_⟩′_ : ∀ {i} p {q r} → p ∼′ q → [ i ] q ≈′ r → [ i ] p ≈′ r
-_ ∼′⟨ p∼′q ⟩′ q≈′r = _ ≈′⟨ ∼⇒≈″ p∼′q ⟩′ q≈′r
+_∼′⟨_⟩≈′_ : ∀ {i} p {q r} → p ∼′ q → [ i ] q ≈′ r → [ i ] p ≈′ r
+_ ∼′⟨ p∼′q ⟩≈′ q≈′r = _ ≈′⟨ ∼⇒≈″ p∼′q ⟩′ q≈′r
 
-_∼⟨_⟩′_ : ∀ {i} p {q r} → p ∼ q → [ i ] q ≈′ r → [ i ] p ≈′ r
-_ ∼⟨ p∼q ⟩′ q≈′r = _ ≈⟨ ∼⇒≈ p∼q ⟩′ q≈′r
+_∼⟨_⟩≈′_ : ∀ {i} p {q r} → p ∼ q → [ i ] q ≈′ r → [ i ] p ≈′ r
+_ ∼⟨ p∼q ⟩≈′ q≈′r = _ ≈⟨ ∼⇒≈ p∼q ⟩′ q≈′r
 
-finally-∼ : ∀ p q → p ∼ q → p ≈ q
-finally-∼ _ _ p∼q = ∼⇒≈ p∼q
+finally-∼≈ : ∀ p q → p ∼ q → p ≈ q
+finally-∼≈ _ _ p∼q = ∼⇒≈ p∼q
 
-finally-′∼ : ∀ p q → p ∼′ q → p ≈ q
-finally-′∼ _ _ p∼′q = _ ≈′⟨ ∼⇒≈″ p∼′q ⟩∎ _
+finally-∼′≈ : ∀ p q → p ∼′ q → p ≈ q
+finally-∼′≈ _ _ p∼′q = _ ≈′⟨ ∼⇒≈″ p∼′q ⟩∎ _
 
-finally-∼′ : ∀ p q → p ∼ q → p ≈′ q
-finally-∼′ _ _ p∼q = ∼⇒≈′ p∼q
+finally-∼≈′ : ∀ p q → p ∼ q → p ≈′ q
+finally-∼≈′ _ _ p∼q = ∼⇒≈′ p∼q
 
-finally-′∼′ : ∀ p q → p ∼′ q → p ≈′ q
-finally-′∼′ _ _ p∼′q = ∼⇒≈″ p∼′q
+finally-∼′≈′ : ∀ p q → p ∼′ q → p ≈′ q
+finally-∼′≈′ _ _ p∼′q = ∼⇒≈″ p∼′q
 
-syntax finally-∼   p q p∼q  = p ∼⟨  p∼q  ⟩∎ q
-syntax finally-′∼  p q p∼′q = p ∼′⟨ p∼′q ⟩∎ q
-syntax finally-∼′  p q p∼q  = p ∼⟨  p∼q  ⟩′∎ q
-syntax finally-′∼′ p q p∼′q = p ∼′⟨ p∼′q ⟩′∎ q
+syntax finally-∼≈   p q p∼q  = p ∼⟨  p∼q  ⟩≈∎ q
+syntax finally-∼′≈  p q p∼′q = p ∼′⟨ p∼′q ⟩≈∎ q
+syntax finally-∼≈′  p q p∼q  = p ∼⟨  p∼q  ⟩≈′∎ q
+syntax finally-∼′≈′ p q p∼′q = p ∼′⟨ p∼′q ⟩≈′∎ q

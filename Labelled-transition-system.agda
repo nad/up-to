@@ -26,7 +26,7 @@ open import Univalence-axiom equality-with-J
 -- method" by Pous and Sangiorgi.
 
 record LTS : Set₁ where
-  infix 4 _[_]⟶_ _⇒_ _[_]⇒_
+  infix 4 _[_]⟶_ _⇒_ _[_]⇒_ _[_]⇒̂_
   field
     -- Processes.
     Proc : Set
@@ -60,21 +60,18 @@ record LTS : Set₁ where
     silent     : Silent μ → p ⇒ q → p [ μ ]⇒̂ q
     non-silent : ¬ Silent μ → p [ μ ]⇒ q → p [ μ ]⇒̂ q
 
-  -- Regular transitions can be turned into weak ones.
+  -- Regular transitions can (sometimes) be turned into weak ones.
 
-  ⟶⇒⇒ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]⇒ q
-  ⟶⇒⇒ tr = steps done tr done
+  ⟶→⇒ : ∀ {p μ q} → Silent μ → p [ μ ]⟶ q → p ⇒ q
+  ⟶→⇒ s tr = step s tr done
 
-  ⟶⇒⇒̂ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]⇒̂ q
-  ⟶⇒⇒̂ {μ = μ} tr with silent? μ
-  ... | yes s = silent s (step s tr done)
-  ... | no ¬s = non-silent ¬s (⟶⇒⇒ tr)
+  ⟶→[]⇒ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]⇒ q
+  ⟶→[]⇒ tr = steps done tr done
 
-  -- Another conversion function.
-
-  ⇒̂→⇒ : ∀ {p q μ} → Silent μ → p [ μ ]⇒̂ q → p ⇒ q
-  ⇒̂→⇒ s (silent _ p⇒q)    = p⇒q
-  ⇒̂→⇒ s (non-silent ¬s _) = ⊥-elim (¬s s)
+  ⟶→⇒̂ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]⇒̂ q
+  ⟶→⇒̂ {μ = μ} tr with silent? μ
+  ... | yes s = silent s (⟶→⇒ s tr)
+  ... | no ¬s = non-silent ¬s (⟶→[]⇒ tr)
 
   -- Several transitivity-like properties.
 
@@ -82,15 +79,38 @@ record LTS : Set₁ where
   ⇒-transitive done             p⇒q = p⇒q
   ⇒-transitive (step s p⟶q q⇒r) r⇒s = step s p⟶q (⇒-transitive q⇒r r⇒s)
 
+  ⇒[]⇒-transitive : ∀ {p q r μ} → p ⇒ q → q [ μ ]⇒ r → p [ μ ]⇒ r
+  ⇒[]⇒-transitive p⇒q (steps q⇒r r⟶s s⇒t) =
+    steps (⇒-transitive p⇒q q⇒r) r⟶s s⇒t
+
+  []⇒⇒-transitive : ∀ {p q r μ} → p [ μ ]⇒ q → q ⇒ r → p [ μ ]⇒ r
+  []⇒⇒-transitive (steps p⇒q q⟶r r⇒s) s⇒t =
+    steps p⇒q q⟶r (⇒-transitive r⇒s s⇒t)
+
   ⇒⇒̂-transitive : ∀ {p q r μ} → p ⇒ q → q [ μ ]⇒̂ r → p [ μ ]⇒̂ r
   ⇒⇒̂-transitive p⇒q (silent s q⇒r) = silent s (⇒-transitive p⇒q q⇒r)
-  ⇒⇒̂-transitive p⇒q (non-silent ¬s (steps q⇒r r⟶s s⇒t)) =
-    non-silent ¬s (steps (⇒-transitive p⇒q q⇒r) r⟶s s⇒t)
+  ⇒⇒̂-transitive p⇒q (non-silent ¬s q⇒r) =
+    non-silent ¬s (⇒[]⇒-transitive p⇒q q⇒r)
 
   ⇒̂⇒-transitive : ∀ {p q r μ} → p [ μ ]⇒̂ q → q ⇒ r → p [ μ ]⇒̂ r
   ⇒̂⇒-transitive (silent s p⇒q) q⇒r = silent s (⇒-transitive p⇒q q⇒r)
-  ⇒̂⇒-transitive (non-silent ¬s (steps p⇒q q⟶r r⇒s)) s⇒t =
-    non-silent ¬s (steps p⇒q q⟶r (⇒-transitive r⇒s s⇒t))
+  ⇒̂⇒-transitive (non-silent ¬s p⇒q) q⇒r =
+    non-silent ¬s ([]⇒⇒-transitive p⇒q q⇒r)
+
+  -- More conversion functions.
+
+  []⇒→⇒ : ∀ {p q μ} → Silent μ → p [ μ ]⇒ q → p ⇒ q
+  []⇒→⇒ s (steps p⇒p′ p′⟶p″ p″⇒p‴) =
+    ⇒-transitive p⇒p′ (step s p′⟶p″ p″⇒p‴)
+
+  ⇒̂→⇒ : ∀ {p q μ} → Silent μ → p [ μ ]⇒̂ q → p ⇒ q
+  ⇒̂→⇒ s (silent _ p⇒q)    = p⇒q
+  ⇒̂→⇒ s (non-silent ¬s _) = ⊥-elim (¬s s)
+
+  ⇒→⇒̂ : ∀ {p q μ} → p [ μ ]⇒ q → p [ μ ]⇒̂ q
+  ⇒→⇒̂ {μ = μ} tr with silent? μ
+  ... | yes s = silent s ([]⇒→⇒ s tr)
+  ... | no ¬s = non-silent ¬s tr
 
   -- A lemma that can be used to show that some relation is a weak
   -- bisimulation (of a certain kind).
@@ -138,7 +158,7 @@ record LTS : Set₁ where
   ⟶↔⇒ ¬silent = record
     { surjection = record
       { logical-equivalence = record
-        { to   = ⟶⇒⇒
+        { to   = ⟶→[]⇒
         ; from = λ
             { (steps (step s _ _) _ _) → ⊥-elim (¬silent _ s)
             ; (steps _ _ (step s _ _)) → ⊥-elim (¬silent _ s)
@@ -193,6 +213,60 @@ record LTS : Set₁ where
 
   syntax step-with-action    p μ q p⟶q = p [ μ ]⟶⟨ p⟶q ⟩ q
   syntax step-without-action p   q p⟶q = p      ⟶⟨ p⟶q ⟩ q
+
+  -- Map-like functions.
+
+  module _ {F : Proc → Proc}
+           (f : ∀ {p p′ μ} → p [ μ ]⟶ p′ → F p [ μ ]⟶ F p′)
+           where
+
+    map-⇒ : ∀ {p p′} → p ⇒ p′ → F p ⇒ F p′
+    map-⇒ done                = done
+    map-⇒ (step s p⟶p′ p′⇒p″) =
+      step s (f p⟶p′) (map-⇒ p′⇒p″)
+
+    map-[]⇒ : ∀ {p p′ μ} → p [ μ ]⇒ p′ → F p [ μ ]⇒ F p′
+    map-[]⇒ (steps p⇒p′ p′⟶p″ p″⇒p‴) =
+      steps (map-⇒ p⇒p′) (f p′⟶p″) (map-⇒ p″⇒p‴)
+
+    map-⇒̂ : ∀ {p p′ μ} → p [ μ ]⇒̂ p′ → F p [ μ ]⇒̂ F p′
+    map-⇒̂ (silent s p⇒p′)      = silent s (map-⇒ p⇒p′)
+    map-⇒̂ (non-silent ¬s p⇒p′) = non-silent ¬s (map-[]⇒ p⇒p′)
+
+  -- Zip-like functions.
+
+  zip-⇒ : {F : Proc → Proc → Proc} →
+          (∀ {p p′ q μ} → p [ μ ]⟶ p′ → F p q [ μ ]⟶ F p′ q) →
+          (∀ {p q q′ μ} → q [ μ ]⟶ q′ → F p q [ μ ]⟶ F p q′) →
+          ∀ {p p′ q q′} → p ⇒ p′ → q ⇒ q′ → F p q ⇒ F p′ q′
+  zip-⇒ f g done done                = done
+  zip-⇒ f g done (step s q⟶q′ q′⇒q″) = step s (g q⟶q′) (zip-⇒ f g done q′⇒q″)
+  zip-⇒ f g (step s p⟶p′ p′⇒p″) tr   = step s (f p⟶p′) (zip-⇒ f g p′⇒p″ tr)
+
+  module _
+    {F : Proc → Proc → Proc}
+    (f : ∀ {p p′ q μ} → p [ μ ]⟶ p′ → F p q [ μ ]⟶ F p′ q)
+    (g : ∀ {p q q′ μ} → q [ μ ]⟶ q′ → F p q [ μ ]⟶ F p q′)
+    where
+
+    zip-[]⇒ˡ : ∀ {p p′ q q′ μ} →
+               p [ μ ]⇒ p′ → q ⇒ q′ → F p q [ μ ]⇒ F p′ q′
+    zip-[]⇒ˡ (steps p⇒p′ p′⟶p″ p″⇒p‴) q⇒q′ =
+      steps (zip-⇒ f g p⇒p′ q⇒q′) (f p′⟶p″) (zip-⇒ f g p″⇒p‴ done)
+
+    zip-[]⇒ʳ : ∀ {p p′ q q′ μ} →
+               p ⇒ p′ → q [ μ ]⇒ q′ → F p q [ μ ]⇒ F p′ q′
+    zip-[]⇒ʳ p⇒p′ (steps q⇒q′ q′⟶q″ q″⇒q‴) =
+      steps (zip-⇒ f g p⇒p′ q⇒q′) (g q′⟶q″) (zip-⇒ f g done q″⇒q‴)
+
+    zip-[]⇒ :
+      ∀ {μ₁ μ₂ μ₃} →
+      (∀ {p p′ q q′} →
+       p [ μ₁ ]⟶ p′ → q [ μ₂ ]⟶ q′ → F p q [ μ₃ ]⟶ F p′ q′) →
+      ∀ {p p′ q q′} →
+      p [ μ₁ ]⇒ p′ → q [ μ₂ ]⇒ q′ → F p q [ μ₃ ]⇒ F p′ q′
+    zip-[]⇒ h (steps p⇒p′ p′⟶p″ p″⇒p‴) (steps q⇒q′ q′⟶q″ q″⇒q‴) =
+      steps (zip-⇒ f g p⇒p′ q⇒q′) (h p′⟶p″ q′⟶q″) (zip-⇒ f g p″⇒p‴ q″⇒q‴)
 
 -- Transforms an LTS into one which uses weak transitions as
 -- transitions.
@@ -345,6 +419,8 @@ module CCS (Name : Set) where
     ; _[_]⟶_  = _[_]⟶_
     }
 
+  open LTS CCS hiding (Proc; _[_]⟶_)
+
   -- Polyadic contexts.
 
   data Context (n : ℕ) : Set where
@@ -427,8 +503,8 @@ module CCS (Name : Set) where
   -- μ-transitions.
 
   !-only : ∀ {μ₀ P} →
-                     (∀ {P′ μ} → P [ μ ]⟶ P′ → μ₀ ≡ μ) →
-                     ∀ {P′ μ} → ! P [ μ ]⟶ P′ → μ₀ ≡ μ
+           (∀ {P′ μ} → P [ μ ]⟶ P′ → μ₀ ≡ μ) →
+           ∀ {P′ μ} → ! P [ μ ]⟶ P′ → μ₀ ≡ μ
   !-only      only (replication (par-left  tr)) = !-only only tr
   !-only      only (replication (par-right tr)) = only tr
   !-only {μ₀} only (replication (par-τ {a = a} tr₁ tr₂)) = ⊥-elim (
@@ -436,6 +512,17 @@ module CCS (Name : Set) where
     μ₀ ≡ name a × μ₀ ≡ name (co a)  ↝⟨ uncurry trans ∘ Σ-map sym id ⟩
     name a ≡ name (co a)            ↝⟨ id≢co ∘ cancel-name ⟩□
     ⊥                               □)
+
+  -- par-τ can be lifted from _[_]⟶_ to _[_]⇒̂_.
+
+  par-τ-⇒̂ : ∀ {P P′ Q Q′ a} →
+            P [ name a ]⇒̂ P′ → Q [ name (co a) ]⇒̂ Q′ →
+            P ∣ Q [ τ ]⇒̂ P′ ∣ Q′
+  par-τ-⇒̂ (non-silent _ P⇒P′) (non-silent _ Q⇒Q′) =
+    ⇒→⇒̂ (zip-[]⇒ par-left par-right par-τ P⇒P′ Q⇒Q′)
+
+  par-τ-⇒̂ (silent () _)
+  par-τ-⇒̂ _ (silent () _)
 
   -- A simple lemma.
 
