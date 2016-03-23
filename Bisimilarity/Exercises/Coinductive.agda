@@ -24,7 +24,7 @@ import Bisimilarity.Exercises.Other
 module _ {Name : Set} where
 
   open CCS Name
-  open LTS CCS using (step-with-action; step-without-action)
+  open LTS CCS hiding (Proc; _[_]⟶_)
   open Bisimilarity.Coinductive CCS
 
   ------------------------------------------------------------------------
@@ -132,14 +132,14 @@ module _ {Name : Set} where
       lr : ∀ {P P′ Q Q′ R μ} →
            [ i ] P ∼ P′ → [ i ] Q ∼ Q′ → P ∣ Q [ μ ]⟶ R →
            ∃ λ R′ → P′ ∣ Q′ [ μ ]⟶ R′ × [ i ] R ∼′ R′
-      lr P∼P′ Q∼Q′ (par-left  tr)   = Σ-map (_∣ _)
-                                            (Σ-map par-left
-                                                   (_∣-cong′ˡ Q∼Q′))
-                                        (left-to-right P∼P′ tr)
-      lr P∼P′ Q∼Q′ (par-right tr)   = Σ-map (_ ∣_)
-                                            (Σ-map par-right
-                                                   (P∼P′ ∣-cong′ʳ_))
-                                        (left-to-right Q∼Q′ tr)
+      lr P∼P′ Q∼Q′ (par-left  tr)  = Σ-map (_∣ _)
+                                           (Σ-map par-left
+                                                  (_∣-cong′ˡ Q∼Q′))
+                                       (left-to-right P∼P′ tr)
+      lr P∼P′ Q∼Q′ (par-right tr)  = Σ-map (_ ∣_)
+                                           (Σ-map par-right
+                                                  (P∼P′ ∣-cong′ʳ_))
+                                       (left-to-right Q∼Q′ tr)
       lr P∼P′ Q∼Q′ (par-τ tr₁ tr₂) = Σ-zip _∣_ (Σ-zip par-τ _∣-cong′ˡʳ_)
                                        (left-to-right P∼P′ tr₁)
                                        (left-to-right Q∼Q′ tr₂)
