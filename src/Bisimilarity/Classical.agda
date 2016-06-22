@@ -35,6 +35,8 @@ record Progression {r s}
                     p R q → q [ μ ]⟶ q′ →
                     ∃ λ p′ → p [ μ ]⟶ p′ × p′ S q′
 
+open Progression public
+
 -- Bisimulations.
 
 Bisimulation : ∀ {r} → (Proc → Proc → Set r) → Set r

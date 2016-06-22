@@ -32,7 +32,7 @@ instance
   trans∼∼ = is-transitive transitive-∼
 
   trans∼′∼ : Transitive [ ssuc i ]_∼′_ [ i ]_∼_
-  trans∼′∼ = is-transitive λ p∼′q → transitive ([_]_∼′_.force p∼′q)
+  trans∼′∼ = is-transitive λ p∼′q → transitive (force p∼′q)
 
   trans∼′∼′ : Transitive [ i ]_∼′_ [ i ]_∼′_
   trans∼′∼′ = is-transitive transitive-∼′
@@ -41,20 +41,19 @@ instance
   trans∼∼′ = is-transitive lemma
     where
     lemma : ∀ {p q r} → [ i ] p ∼ q → [ i ] q ∼′ r → [ i ] p ∼′ r
-    [_]_∼′_.force (lemma p∼q q∼′r) =
-      transitive-∼ p∼q ([_]_∼′_.force q∼′r)
+    force (lemma p∼q q∼′r) = transitive-∼ p∼q (force q∼′r)
 
   convert∼∼ : Convertible [ i ]_∼_ [ i ]_∼_
   convert∼∼ = is-convertible id
 
   convert∼′∼ : Convertible [ ssuc i ]_∼′_ [ i ]_∼_
-  convert∼′∼ = is-convertible λ p∼′q → [_]_∼′_.force p∼′q
+  convert∼′∼ = is-convertible λ p∼′q → force p∼′q
 
   convert∼∼′ : Convertible [ i ]_∼_ [ i ]_∼′_
   convert∼∼′ = is-convertible lemma
     where
     lemma : ∀ {p q} → [ i ] p ∼ q → [ i ] p ∼′ q
-    [_]_∼′_.force (lemma p∼q) = p∼q
+    force (lemma p∼q) = p∼q
 
   convert∼′∼′ : Convertible [ i ]_∼′_ [ i ]_∼′_
   convert∼′∼′ = is-convertible id

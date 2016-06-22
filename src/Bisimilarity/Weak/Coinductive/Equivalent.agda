@@ -37,11 +37,10 @@ mutual
          CW.[ i ] p ≈ q → p [ μ ]⟶ p′ →
          ∃ λ q′ → q [ μ ]⇒̂ q′ × CWO.[ i ] p′ ≈′ q′
     lr p≈q p⟶p′ =
-      Σ-map id (Σ-map id cw⇒cwo′)
-        (CW.[_]_≈_.left-to-right p≈q (⟶→⇒̂ p⟶p′))
+      Σ-map id (Σ-map id cw⇒cwo′) (CW.left-to-right p≈q (⟶→⇒̂ p⟶p′))
 
   cw⇒cwo′ : ∀ {i p q} → CW.[ i ] p ≈′ q → CWO.[ i ] p ≈′ q
-  CWO.[_]_≈′_.force (cw⇒cwo′ p≈′q) = cw⇒cwo (CW.[_]_≈′_.force p≈′q)
+  CWO.force (cw⇒cwo′ p≈′q) = cw⇒cwo (CW.force p≈′q)
 
 mutual
 
@@ -64,7 +63,7 @@ mutual
       Σ-map id (Σ-map id cwo⇒cw′) (CWO.weak-is-weak p≈q p⇒̂p′)
 
   cwo⇒cw′ : ∀ {i p q} → p CWO.≈ q → CW.[ i ] p ≈′ q
-  CW.[_]_≈′_.force (cwo⇒cw′ p≈q) = cwo⇒cw p≈q
+  CW.force (cwo⇒cw′ p≈q) = cwo⇒cw p≈q
 
 -- The two definitions of weak bisimilarity are logically equivalent.
 

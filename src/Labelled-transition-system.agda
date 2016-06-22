@@ -632,6 +632,8 @@ module Partiality-monad where
       field
         force : {j : Size< i} → Partial A j
 
+  open Partial′ public
+
   -- Transitions.
 
   infix 4 _[_]⟶_
@@ -639,7 +641,7 @@ module Partiality-monad where
   data _[_]⟶_ {A : Set} :
               Partial A ∞ → Maybe A → Partial A ∞ → Set where
     now   : ∀ {x} → now x   [ just x  ]⟶ now x
-    later : ∀ {x} → later x [ nothing ]⟶ Partial′.force x
+    later : ∀ {x} → later x [ nothing ]⟶ force x
 
   partiality-monad : Set → LTS
   partiality-monad A = record
@@ -660,16 +662,18 @@ module Partiality-monad where
                 Partial A ∞ → Partial A ∞ → Set where
       now    : ∀ {x} → [ i ] now x ≈ now x
       later  : ∀ {x y} →
-               [ i ] Partial′.force x ≈′ Partial′.force y →
+               [ i ] force x ≈′ force y →
                [ i ] later x ≈ later y
       laterˡ : ∀ {x y} →
-               [ i ] Partial′.force x ≈ y →
+               [ i ] force x ≈ y →
                [ i ] later x ≈ y
       laterʳ : ∀ {x y} →
-               [ i ] x ≈ Partial′.force y →
+               [ i ] x ≈ force y →
                [ i ] x ≈ later y
 
     record [_]_≈′_ (i : Size) {A : Set} (x y : Partial A ∞) : Set where
       coinductive
       field
         force : {j : Size< i} → [ j ] x ≈ y
+
+  open [_]_≈′_ public

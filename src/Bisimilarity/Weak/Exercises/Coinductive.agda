@@ -80,8 +80,7 @@ module _ {Name : Set} where
     _∣-cong-≈′_ :
       ∀ {i P P′ Q Q′} →
       [ i ] P ≈′ P′ → [ i ] Q ≈′ Q′ → [ i ] P ∣ Q ≈′ P′ ∣ Q′
-    [_]_≈′_.force (P≈′P′ ∣-cong-≈′ Q≈′Q′) =
-      [_]_≈′_.force P≈′P′ ∣-cong-≈ [_]_≈′_.force Q≈′Q′
+    force (P≈′P′ ∣-cong-≈′ Q≈′Q′) = force P≈′P′ ∣-cong-≈ force Q≈′Q′
 
   ----------------------------------------------------------------------
   -- Example 6.5.4
@@ -255,4 +254,4 @@ module _ {Name : Set} where
     6-5-4′ :
       ∀ {i a b} →
       [ i ] ! name a · (b ·) ∣ ! co a · ≈′ (! a · ∣ ! b ·) ∣ ! co a ·
-    [_]_≈′_.force 6-5-4′ = 6-5-4
+    force 6-5-4′ = 6-5-4

@@ -36,6 +36,9 @@ mutual
     field
       force : {j : Size< i} → [ j ] p ∼ q
 
+open [_]_∼_  public
+open [_]_∼′_ public
+
 _∼_ : Proc → Proc → Set
 p ∼ q = [ ∞ ] p ∼ q
 
@@ -80,7 +83,7 @@ mutual
     ⟩
 
   reflexive-∼′ : ∀ {p i} → [ i ] p ∼′ p
-  [_]_∼′_.force reflexive-∼′ = reflexive-∼
+  force reflexive-∼′ = reflexive-∼
 
 ≡⇒∼ : ∀ {p q} → p ≡ q → p ∼ q
 ≡⇒∼ refl = reflexive-∼
@@ -94,7 +97,7 @@ mutual
     ⟩
 
   symmetric-∼′ : ∀ {i p q} → [ i ] p ∼′ q → [ i ] q ∼′ p
-  [_]_∼′_.force (symmetric-∼′ p∼q) = symmetric-∼ ([_]_∼′_.force p∼q)
+  force (symmetric-∼′ p∼q) = symmetric-∼ (force p∼q)
 
 mutual
 
@@ -109,14 +112,13 @@ mutual
          [ i ] p ∼ q → [ i ] q ∼ r → p [ μ ]⟶ p′ →
          ∃ λ r′ → r [ μ ]⟶ r′ × [ i ] p′ ∼′ r′
     lr p∼q q∼r p⟶p′ =
-      let q′ , q⟶q′ , p′∼q′ = [_]_∼_.left-to-right p∼q p⟶p′
-          r′ , r⟶r′ , q′∼r′ = [_]_∼_.left-to-right q∼r q⟶q′
+      let q′ , q⟶q′ , p′∼q′ = left-to-right p∼q p⟶p′
+          r′ , r⟶r′ , q′∼r′ = left-to-right q∼r q⟶q′
       in r′ , r⟶r′ , transitive-∼′ p′∼q′ q′∼r′
 
   transitive-∼′ :
     ∀ {i p q r} → [ i ] p ∼′ q → [ i ] q ∼′ r → [ i ] p ∼′ r
-  [_]_∼′_.force (transitive-∼′ p∼q q∼r) =
-    transitive-∼ ([_]_∼′_.force p∼q) ([_]_∼′_.force q∼r)
+  force (transitive-∼′ p∼q q∼r) = transitive-∼ (force p∼q) (force q∼r)
 
 -- Functions that can be used to aid the instance resolution
 -- mechanism.
@@ -136,7 +138,7 @@ strong-is-weak :
   p ∼ q → p [ μ ]⇒̂ p′ →
   ∃ λ q′ → q [ μ ]⇒̂ q′ × p′ ∼ q′
 strong-is-weak =
-  is-weak [_]_∼_.left-to-right (λ p∼′q → [_]_∼′_.force p∼′q)
+  is-weak left-to-right (λ p∼′q → force p∼′q)
           (λ s tr → step s tr done) ⟶→⇒̂
 
 -- Bisimilarity of bisimilarity proofs.
@@ -154,30 +156,29 @@ mutual
     field
       left-to-right :
         ∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
-        let q′₁ , q⟶q′₁ , p′∼q′₁ = [_]_∼_.left-to-right p∼q₁ p⟶p′
-            q′₂ , q⟶q′₂ , p′∼q′₂ = [_]_∼_.left-to-right p∼q₂ p⟶p′
+        let q′₁ , q⟶q′₁ , p′∼q′₁ = left-to-right p∼q₁ p⟶p′
+            q′₂ , q⟶q′₂ , p′∼q′₂ = left-to-right p∼q₂ p⟶p′
         in ∃ λ (q′₁≡q′₂ : q′₁ ≡ q′₂) →
              subst (q [ μ ]⟶_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
                ×
-             [ i ] subst (p′ ∼_) q′₁≡q′₂ ([_]_∼′_.force p′∼q′₁)
-                     ≡′
-                   [_]_∼′_.force p′∼q′₂
+             [ i ] subst (p′ ∼_) q′₁≡q′₂ (force p′∼q′₁) ≡′ force p′∼q′₂
       right-to-left :
         ∀ {q′ μ} (q⟶q′ : q [ μ ]⟶ q′) →
-        let p′₁ , p⟶p′₁ , p′∼q′₁ = [_]_∼_.right-to-left p∼q₁ q⟶q′
-            p′₂ , p⟶p′₂ , p′∼q′₂ = [_]_∼_.right-to-left p∼q₂ q⟶q′
+        let p′₁ , p⟶p′₁ , p′∼q′₁ = right-to-left p∼q₁ q⟶q′
+            p′₂ , p⟶p′₂ , p′∼q′₂ = right-to-left p∼q₂ q⟶q′
         in ∃ λ (p′₁≡p′₂ : p′₁ ≡ p′₂) →
              subst (p [ μ ]⟶_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
                ×
-             [ i ] subst (_∼ q′) p′₁≡p′₂ ([_]_∼′_.force p′∼q′₁)
-                     ≡′
-                   [_]_∼′_.force p′∼q′₂
+             [ i ] subst (_∼ q′) p′₁≡p′₂ (force p′∼q′₁) ≡′ force p′∼q′₂
 
   record [_]_≡′_ (i : Size) {p q : Proc}
                  (p∼q₁ p∼q₂ : p ∼ q) : Set where
     coinductive
     field
       force : {j : Size< i} → [ j ] p∼q₁ ≡ p∼q₂
+
+open [_]_≡_  public
+open [_]_≡′_ public
 
 -- A statement of extensionality for bisimilarity.
 

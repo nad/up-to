@@ -43,6 +43,9 @@ mutual
     field
       force : {j : Size< i} → [ j ] p ≈ q
 
+open [_]_≈_  public
+open [_]_≈′_ public
+
 _≈_ : Proc → Proc → Set
 p ≈ q = [ ∞ ] p ≈ q
 
@@ -105,8 +108,7 @@ weak-is-weak :
   ∀ {p p′ q μ} →
   p ≈ q → p [ μ ]⇒̂ p′ →
   ∃ λ q′ → q [ μ ]⇒̂ q′ × p′ ≈ q′
-weak-is-weak =
-  is-weak [_]_≈_.left-to-right (λ p≈′q → [_]_≈′_.force p≈′q) ⇒̂→⇒ id
+weak-is-weak = is-weak left-to-right (λ p≈′q → force p≈′q) ⇒̂→⇒ id
 
 -- Bisimilarity is an equivalence relation.
 
@@ -119,7 +121,7 @@ mutual
     ⟩
 
   reflexive-≈′ : ∀ {p i} → [ i ] p ≈′ p
-  [_]_≈′_.force reflexive-≈′ = reflexive-≈
+  force reflexive-≈′ = reflexive-≈
 
 ≡⇒≈ : ∀ {p q} → p ≡ q → p ≈ q
 ≡⇒≈ refl = reflexive-≈
@@ -133,7 +135,7 @@ mutual
     ⟩
 
   symmetric-≈′ : ∀ {i p q} → [ i ] p ≈′ q → [ i ] q ≈′ p
-  [_]_≈′_.force (symmetric-≈′ p≈q) = symmetric-≈ ([_]_≈′_.force p≈q)
+  force (symmetric-≈′ p≈q) = symmetric-≈ (force p≈q)
 
 mutual
 
@@ -154,13 +156,12 @@ mutual
          p ≈ q → q ≈ r → p [ μ ]⟶ p′ →
          ∃ λ r′ → r [ μ ]⇒̂ r′ × [ i ] p′ ≈′ r′
     lr p≈q q≈r p⟶p′ =
-      let q′ , q⇒̂q′ , p′≈′q′ = [_]_≈_.left-to-right p≈q p⟶p′
+      let q′ , q⇒̂q′ , p′≈′q′ = left-to-right p≈q p⟶p′
           r′ , r⇒̂r′ , q′≈r′  = weak-is-weak q≈r q⇒̂q′
       in r′ , r⇒̂r′ , transitive-≈′ p′≈′q′ q′≈r′
 
   transitive-≈′ : ∀ {i p q r} → p ≈′ q → q ≈ r → [ i ] p ≈′ r
-  [_]_≈′_.force (transitive-≈′ p≈q q≈r) =
-    transitive-≈ ([_]_≈′_.force p≈q) q≈r
+  force (transitive-≈′ p≈q q≈r) = transitive-≈ (force p≈q) q≈r
 
 -- The following variants of transitivity are partially
 -- size-preserving.
@@ -176,21 +177,21 @@ mutual
     rl : ∀ {r′ μ} → r [ μ ]⟶ r′ →
          ∃ λ p′ → p [ μ ]⇒̂ p′ × [ i ] p′ ≈′ r′
     rl r⟶r′ =
-      let q′ , q⟶q′ , q′∼′r′ = [_]_∼_.right-to-left q∼r r⟶r′
-          p′ , p⇒̂p′ , p′≈′q′ = [_]_≈_.right-to-left p≈q q⟶q′
+      let q′ , q⟶q′ , q′∼′r′ = SB.right-to-left q∼r r⟶r′
+          p′ , p⇒̂p′ , p′≈′q′ = right-to-left p≈q q⟶q′
       in p′ , p⇒̂p′ , transitive-≈∼′ p′≈′q′ q′∼′r′
 
     lr : ∀ {p′ μ} → p [ μ ]⟶ p′ →
          ∃ λ r′ → r [ μ ]⇒̂ r′ × [ i ] p′ ≈′ r′
     lr p⟶p′ =
-      let q′ , q⇒̂q′ , p′≈′q′ = [_]_≈_.left-to-right p≈q p⟶p′
+      let q′ , q⇒̂q′ , p′≈′q′ = left-to-right p≈q p⟶p′
           r′ , r⇒̂r′ , q′∼r′  = SB.strong-is-weak q∼r q⇒̂q′
       in r′ , r⇒̂r′ , transitive-≈∼′ p′≈′q′ (_ ∼⟨ q′∼r′ ⟩∎ _)
 
   transitive-≈∼′ : ∀ {i p q r} →
                    [ i ] p ≈′ q → q ∼′ r → [ i ] p ≈′ r
-  [_]_≈′_.force (transitive-≈∼′ p≈′q q∼′r) =
-    transitive-≈∼ ([_]_≈′_.force p≈′q) ([_]_∼′_.force q∼′r)
+  force (transitive-≈∼′ p≈′q q∼′r) =
+    transitive-≈∼ (force p≈′q) (SB.force q∼′r)
 
 transitive-∼≈ : ∀ {i p q r} →
                 p ∼ q → [ i ] q ≈ r → [ i ] p ≈ r
@@ -211,11 +212,11 @@ mutual
          [ i ] p ∼ q → q [ μ ]⟶ q′ →
          ∃ λ p′ → p [ μ ]⇒̂ p′ × [ i ] p′ ≈′ q′
     rl p∼q q⟶q′ =
-      let p′ , p⟶p′ , p′∼′q′ = [_]_∼_.right-to-left p∼q q⟶q′
+      let p′ , p⟶p′ , p′∼′q′ = SB.right-to-left p∼q q⟶q′
       in p′ , ⟶→⇒̂ p⟶p′ , ∼⇒≈′ p′∼′q′
 
   ∼⇒≈′ : ∀ {i p q} → [ i ] p ∼′ q → [ i ] p ≈′ q
-  [_]_≈′_.force (∼⇒≈′ p∼′q) = ∼⇒≈ ([_]_∼′_.force p∼′q)
+  force (∼⇒≈′ p∼′q) = ∼⇒≈ (SB.force p∼′q)
 
 -- Functions that can be used to aid the instance resolution
 -- mechanism.
@@ -243,30 +244,29 @@ mutual
     field
       left-to-right :
         ∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
-        let q′₁ , q⇒̂q′₁ , p′≈q′₁ = [_]_≈_.left-to-right p≈q₁ p⟶p′
-            q′₂ , q⇒̂q′₂ , p′≈q′₂ = [_]_≈_.left-to-right p≈q₂ p⟶p′
+        let q′₁ , q⇒̂q′₁ , p′≈q′₁ = left-to-right p≈q₁ p⟶p′
+            q′₂ , q⇒̂q′₂ , p′≈q′₂ = left-to-right p≈q₂ p⟶p′
         in ∃ λ (q′₁≡q′₂ : q′₁ ≡ q′₂) →
              subst (q [ μ ]⇒̂_) q′₁≡q′₂ q⇒̂q′₁ ≡ q⇒̂q′₂
                ×
-             [ i ] subst (p′ ≈_) q′₁≡q′₂ ([_]_≈′_.force p′≈q′₁)
-                     ≡′
-                   [_]_≈′_.force p′≈q′₂
+             [ i ] subst (p′ ≈_) q′₁≡q′₂ (force p′≈q′₁) ≡′ force p′≈q′₂
       right-to-left :
         ∀ {q′ μ} (q⟶q′ : q [ μ ]⟶ q′) →
-        let p′₁ , p⇒̂p′₁ , p′≈q′₁ = [_]_≈_.right-to-left p≈q₁ q⟶q′
-            p′₂ , p⇒̂p′₂ , p′≈q′₂ = [_]_≈_.right-to-left p≈q₂ q⟶q′
+        let p′₁ , p⇒̂p′₁ , p′≈q′₁ = right-to-left p≈q₁ q⟶q′
+            p′₂ , p⇒̂p′₂ , p′≈q′₂ = right-to-left p≈q₂ q⟶q′
         in ∃ λ (p′₁≡p′₂ : p′₁ ≡ p′₂) →
              subst (p [ μ ]⇒̂_) p′₁≡p′₂ p⇒̂p′₁ ≡ p⇒̂p′₂
                ×
-             [ i ] subst (_≈ q′) p′₁≡p′₂ ([_]_≈′_.force p′≈q′₁)
-                     ≡′
-                   [_]_≈′_.force p′≈q′₂
+             [ i ] subst (_≈ q′) p′₁≡p′₂ (force p′≈q′₁) ≡′ force p′≈q′₂
 
   record [_]_≡′_ (i : Size) {p q : Proc}
                  (p≈q₁ p≈q₂ : p ≈ q) : Set where
     coinductive
     field
       force : {j : Size< i} → [ j ] p≈q₁ ≡ p≈q₂
+
+open [_]_≡_  public
+open [_]_≡′_ public
 
 -- A statement of extensionality for weak bisimilarity.
 

@@ -27,6 +27,9 @@ open WB public
         ; [_]_≡_
         ; [_]_≡′_
         ; Extensionality
+        ; force
+        ; left-to-right
+        ; right-to-left
         )
   renaming ( _∼_         to _≈_
            ; _∼′_        to _≈′_
@@ -49,7 +52,7 @@ syntax lr-result-with-action    p′≈q′ μ q q⟶q′ = p′≈q′ [ μ ]�
 private
   module SB = Bisimilarity.Coinductive lts
 
-open SB using (_∼_; _∼′_; [_]_∼_; [_]_∼′_)
+open SB using (_∼_; _∼′_; [_]_∼_; [_]_∼′_; force)
 
 mutual
 
@@ -66,10 +69,10 @@ mutual
       Σ-map id (Σ-map id ∼⇒≈′) (SB.strong-is-weak p∼q p⇒̂p′)
 
   ∼⇒≈′ : ∀ {i p q} → p ∼ q → [ i ] p ≈′ q
-  [_]_≈′_.force (∼⇒≈′ p∼q) = ∼⇒≈ p∼q
+  force (∼⇒≈′ p∼q) = ∼⇒≈ p∼q
 
 ∼⇒≈″ : ∀ {p q} → p ∼′ q → p ≈′ q
-[_]_≈′_.force (∼⇒≈″ p∼′q) = ∼⇒≈ ([_]_∼′_.force p∼′q)
+force (∼⇒≈″ p∼′q) = ∼⇒≈ (force p∼′q)
 
 -- TODO: I suspect that the size isn't necessarily preserved: A weak
 -- proof of a given size might require a strong proof which is much

@@ -40,18 +40,18 @@ module _ {lts : LTS} where
   cl⇒co (_R_ , R-is-a-bisimulation , pRq) =
     Co.⟨ (λ p⟶p′ →
             let q′ , q⟶q′ , p′Rq′ =
-                  Cl.Progression.left-to-right
+                  Cl.left-to-right
                     R-is-a-bisimulation pRq p⟶p′
             in q′ , q⟶q′ , cl⇒co′ (_R_ , R-is-a-bisimulation , p′Rq′))
        , (λ q⟶q′ →
             let r′ , r⟶r′ , p′Rq′ =
-                  Cl.Progression.right-to-left
+                  Cl.right-to-left
                     R-is-a-bisimulation pRq q⟶q′
             in r′ , r⟶r′ , cl⇒co′ (_R_ , R-is-a-bisimulation , p′Rq′))
        ⟩
     where
     cl⇒co′ : ∀ {ℓ i p q} → Cl.[ ℓ ] p ∼ q → Co.[ i ] p ∼′ q
-    Co.[_]_∼′_.force (cl⇒co′ p∼q) = cl⇒co p∼q
+    Co.force (cl⇒co′ p∼q) = cl⇒co p∼q
 
   -- Coinductive bisimilarity is a bisimulation.
 
@@ -59,11 +59,11 @@ module _ {lts : LTS} where
     Cl.Bisimulation Co._∼_
   coinductive-bisimilarity-is-a-bisimulation =
     Cl.⟨ (λ p∼q p⟶p′ →
-            Σ-map id (Σ-map id (λ p∼q → Co.[_]_∼′_.force p∼q))
-              (Co.[_]_∼_.left-to-right p∼q p⟶p′))
+            Σ-map id (Σ-map id (λ p∼q → Co.force p∼q))
+              (Co.left-to-right p∼q p⟶p′))
        ,  (λ p∼q q⟶q′ →
-            Σ-map id (Σ-map id (λ p∼q → Co.[_]_∼′_.force p∼q))
-              (Co.[_]_∼_.right-to-left p∼q q⟶q′))
+            Σ-map id (Σ-map id (λ p∼q → Co.force p∼q))
+              (Co.right-to-left p∼q q⟶q′))
        ⟩
 
   -- Coinductively bisimilar processes are classically bisimilar.
@@ -86,10 +86,10 @@ module _ {lts : LTS} where
        ⟩
     where
     lemma₁ : ∀ {p′ μ} (p⟶p′ : _ [ μ ]⟶ p′) → Co.[ _ ] _ ≡′ _
-    Co.[_]_≡′_.force (lemma₁ _) = cl⇒co∘co⇒cl _
+    Co.force (lemma₁ _) = cl⇒co∘co⇒cl _
 
     lemma₂ : ∀ {q′ μ} (q⟶q′ : _ [ μ ]⟶ q′) → Co.[ _ ] _ ≡′ _
-    Co.[_]_≡′_.force (lemma₂ _) = cl⇒co∘co⇒cl _
+    Co.force (lemma₂ _) = cl⇒co∘co⇒cl _
 
   -- If there are two processes that are not equal, but bisimilar,
   -- then co⇒cl is not a left inverse of cl⇒co.
@@ -163,7 +163,7 @@ coinductive-bisimilarity-is-sometimes-propositional ext =
     ⟩
     where
     irr′ : ∀ {i ∼₁ ∼₂} → [ i ] ∼₁ ≡′ ∼₂
-    [_]_≡′_.force irr′ = irr
+    force irr′ = irr
 
 -- However, classical bisimilarity is, for the same LTS, not pointwise
 -- propositional.
@@ -233,7 +233,7 @@ coinductive-bisimilarity-is-not-propositional =
   (∀ {p q} → Is-proposition (p ∼ q))  ↝⟨ (λ is-prop → is-prop {q = _}) ⟩
   Is-proposition (true ∼ true)        ↝⟨ _⇔_.to propositional⇔irrelevant ⟩
   Proof-irrelevant (true ∼ true)      ↝⟨ (λ irr → irr _ _) ⟩
-  proof true ≡ proof false            ↝⟨ cong (λ p → proj₁ ([_]_∼_.left-to-right p {p′ = true} _)) ⟩
+  proof true ≡ proof false            ↝⟨ cong (λ p → proj₁ (left-to-right p {p′ = true} _)) ⟩
   true ≡ false                        ↝⟨ Bool.true≢false ⟩□
   ⊥                                   □
   where
@@ -247,7 +247,7 @@ coinductive-bisimilarity-is-not-propositional =
       ⟩
 
     proof′ : Bool → ∀ {b₁ b₂ i} → [ i ] b₁ ∼′ b₂
-    [_]_∼′_.force (proof′ b) = proof b
+    force (proof′ b) = proof b
 
 -- In fact, for every type A there is a pointwise split surjection
 -- from a certain instance of bisimilarity to equality on A.

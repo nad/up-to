@@ -35,13 +35,13 @@ instance
   convert≈≈ = is-convertible id
 
   convert≈′≈ : ∀ {i} → Convertible [ ssuc i ]_≈′_ [ i ]_≈_
-  convert≈′≈ = is-convertible (λ p≈′q → [_]_≈′_.force p≈′q)
+  convert≈′≈ = is-convertible (λ p≈′q → force p≈′q)
 
   convert≈≈′ : ∀ {i} → Convertible [ i ]_≈_ [ i ]_≈′_
   convert≈≈′ {i} = is-convertible lemma
     where
     lemma : ∀ {p q} → [ i ] p ≈ q → [ i ] p ≈′ q
-    [_]_≈′_.force (lemma p≈q) = p≈q
+    force (lemma p≈q) = p≈q
 
   convert≈′≈′ : ∀ {i} → Convertible [ i ]_≈′_ [ i ]_≈′_
   convert≈′≈′ = is-convertible id
@@ -56,7 +56,7 @@ instance
   convert∼≈′ {i} = is-convertible lemma
     where
     lemma : ∀ {p q} → [ i ] p ∼ q → [ i ] p ≈′ q
-    [_]_≈′_.force (lemma p∼q) = ∼⇒≈ p∼q
+    force (lemma p∼q) = ∼⇒≈ p∼q
 
   convert∼′≈′ : ∀ {i} → Convertible [ i ]_∼′_ [ i ]_≈′_
   convert∼′≈′ = is-convertible ∼⇒≈′
@@ -65,7 +65,7 @@ instance
   trans≈≈ = is-transitive transitive-≈
 
   trans≈′≈ : Transitive _≈′_ _≈_
-  trans≈′≈ = is-transitive λ p≈′q → transitive ([_]_≈′_.force p≈′q)
+  trans≈′≈ = is-transitive λ p≈′q → transitive (force p≈′q)
 
   trans≈′≈′ : Transitive _≈′_ _≈′_
   trans≈′≈′ = is-transitive λ p≈′q q≈′r →
@@ -85,15 +85,14 @@ instance
   trans∼′≈′ {i} = is-transitive lemma
     where
     lemma : ∀ {p q r} → p ∼′ q → [ i ] q ≈′ r → [ i ] p ≈′ r
-    [_]_≈′_.force (lemma p∼′q q≈′r) =
+    force (lemma p∼′q q≈′r) =
       transitive-∼≈ (convert p∼′q) (convert q≈′r)
 
   trans∼≈′ : ∀ {i} → Transitive _∼_ [ i ]_≈′_
   trans∼≈′ {i} = is-transitive lemma
     where
     lemma : ∀ {p q r} → p ∼ q → [ i ] q ≈′ r → [ i ] p ≈′ r
-    [_]_≈′_.force (lemma p∼q q≈′r) =
-      transitive-∼≈ p∼q (convert q≈′r)
+    force (lemma p∼q q≈′r) = transitive-∼≈ p∼q (convert q≈′r)
 
   trans≈∼ : ∀ {i} → Transitive′ [ i ]_≈_ _∼_
   trans≈∼ = is-transitive transitive-≈∼

@@ -54,7 +54,7 @@ module _ {Name : Set} where
         , ∣-comm′
 
     ∣-comm′ : ∀ {P Q i} → [ i ] P ∣ Q ∼′ Q ∣ P
-    [_]_∼′_.force ∣-comm′ = ∣-comm
+    force ∣-comm′ = ∣-comm
 
   mutual
 
@@ -84,7 +84,7 @@ module _ {Name : Set} where
       rl (par-τ (par-right tr₁) tr₂) = _ , par-right (par-τ tr₁ tr₂) , ∣-assoc′
 
     ∣-assoc′ : ∀ {P Q R i} → [ i ] P ∣ (Q ∣ R) ∼′ (P ∣ Q) ∣ R
-    [_]_∼′_.force ∣-assoc′ = ∣-assoc
+    force ∣-assoc′ = ∣-assoc
 
   mutual
 
@@ -107,7 +107,7 @@ module _ {Name : Set} where
       rl tr = _ , par-right tr , ∣-left-identity′
 
     ∣-left-identity′ : ∀ {P i} → [ i ] ∅ ∣ P ∼′ P
-    [_]_∼′_.force ∣-left-identity′ = ∣-left-identity
+    force ∣-left-identity′ = ∣-left-identity
 
   -- ∅ is a right identity of _∣_.
 
@@ -150,20 +150,19 @@ module _ {Name : Set} where
 
     _∣-cong′ˡ_ : ∀ {i P P′ Q Q′} →
                  [ i ] P ∼′ P′ → [ i ] Q ∼ Q′ → [ i ] P ∣ Q ∼′ P′ ∣ Q′
-    [_]_∼′_.force (P∼P′ ∣-cong′ˡ Q∼Q′) = [_]_∼′_.force P∼P′ ∣-cong Q∼Q′
+    force (P∼P′ ∣-cong′ˡ Q∼Q′) = force P∼P′ ∣-cong Q∼Q′
 
     _∣-cong′ʳ_ : ∀ {i P P′ Q Q′} →
                  [ i ] P ∼ P′ → [ i ] Q ∼′ Q′ → [ i ] P ∣ Q ∼′ P′ ∣ Q′
-    [_]_∼′_.force (P∼P′ ∣-cong′ʳ Q∼Q′) = P∼P′ ∣-cong [_]_∼′_.force Q∼Q′
+    force (P∼P′ ∣-cong′ʳ Q∼Q′) = P∼P′ ∣-cong force Q∼Q′
 
     _∣-cong′ˡʳ_ : ∀ {i P P′ Q Q′} →
                   [ i ] P ∼′ P′ → [ i ] Q ∼′ Q′ → [ i ] P ∣ Q ∼′ P′ ∣ Q′
-    [_]_∼′_.force (P∼P′ ∣-cong′ˡʳ Q∼Q′) =
-      [_]_∼′_.force P∼P′ ∣-cong [_]_∼′_.force Q∼Q′
+    force (P∼P′ ∣-cong′ˡʳ Q∼Q′) = force P∼P′ ∣-cong force Q∼Q′
 
   _∣-cong′_ : ∀ {i P P′ Q Q′} →
               [ i ] P ∼ P′ → [ i ] Q ∼ Q′ → [ i ] P ∣ Q ∼′ P′ ∣ Q′
-  [_]_∼′_.force (P∼P′ ∣-cong′ Q∼Q′) = P∼P′ ∣-cong Q∼Q′
+  force (P∼P′ ∣-cong′ Q∼Q′) = P∼P′ ∣-cong Q∼Q′
 
   ----------------------------------------------------------------------
   -- Exercise 6.1.2
@@ -314,7 +313,7 @@ module _ {Name : Set} where
       ... | inj₂ (() , _) | _
 
     !·⊕·∼′!·∣!· : ∀ {a b i} → [ i ] ! (a · ⊕ b ·) ∼′ ! a · ∣ ! b ·
-    [_]_∼′_.force !·⊕·∼′!·∣!· = !·⊕·∼!·∣!·
+    force !·⊕·∼′!·∣!· = !·⊕·∼!·∣!·
 
   ----------------------------------------------------------------------
   -- Exercise 6.2.4
@@ -367,7 +366,7 @@ module _ {Name : Set} where
         P
 
     6-2-4′ : ∀ {a i} → [ i ] ! ! a · ∼′ ! a ·
-    [_]_∼′_.force 6-2-4′ = 6-2-4
+    force 6-2-4′ = 6-2-4
 
   ----------------------------------------------------------------------
   -- A result mentioned in "Enhancements of the bisimulation proof
@@ -424,20 +423,19 @@ module _ {Name : Set} where
 
   _⊕-cong′_ : ∀ {i P P′ Q Q′} →
               [ i ] P ∼ P′ → [ i ] Q ∼ Q′ → [ i ] P ⊕ Q ∼′ P′ ⊕ Q′
-  [_]_∼′_.force (P∼P′ ⊕-cong′ Q∼Q′) = P∼P′ ⊕-cong Q∼Q′
+  force (P∼P′ ⊕-cong′ Q∼Q′) = P∼P′ ⊕-cong Q∼Q′
 
   _⊕-cong′ˡ_ : ∀ {i P P′ Q Q′} →
                [ i ] P ∼′ P′ → [ i ] Q ∼ Q′ → [ i ] P ⊕ Q ∼′ P′ ⊕ Q′
-  [_]_∼′_.force (P∼P′ ⊕-cong′ˡ Q∼Q′) = [_]_∼′_.force P∼P′ ⊕-cong Q∼Q′
+  force (P∼P′ ⊕-cong′ˡ Q∼Q′) = force P∼P′ ⊕-cong Q∼Q′
 
   _⊕-cong′ʳ_ : ∀ {i P P′ Q Q′} →
                [ i ] P ∼ P′ → [ i ] Q ∼′ Q′ → [ i ] P ⊕ Q ∼′ P′ ⊕ Q′
-  [_]_∼′_.force (P∼P′ ⊕-cong′ʳ Q∼Q′) = P∼P′ ⊕-cong [_]_∼′_.force Q∼Q′
+  force (P∼P′ ⊕-cong′ʳ Q∼Q′) = P∼P′ ⊕-cong force Q∼Q′
 
   _⊕-cong′ˡʳ_ : ∀ {i P P′ Q Q′} →
                 [ i ] P ∼′ P′ → [ i ] Q ∼′ Q′ → [ i ] P ⊕ Q ∼′ P′ ⊕ Q′
-  [_]_∼′_.force (P∼P′ ⊕-cong′ˡʳ Q∼Q′) =
-    [_]_∼′_.force P∼P′ ⊕-cong [_]_∼′_.force Q∼Q′
+  force (P∼P′ ⊕-cong′ˡʳ Q∼Q′) = force P∼P′ ⊕-cong force Q∼Q′
 
   -- _·_ preserves bisimilarity.
 
@@ -460,11 +458,11 @@ module _ {Name : Set} where
 
   _·-cong′_ : ∀ {i μ μ′ P P′} →
               μ ≡ μ′ → [ i ] P ∼ P′ → [ i ] μ · P ∼′ μ′ · P′
-  [_]_∼′_.force (μ≡μ′ ·-cong′ P∼P′) = μ≡μ′ ·-cong P∼P′
+  force (μ≡μ′ ·-cong′ P∼P′) = μ≡μ′ ·-cong P∼P′
 
   _·-cong″_ : ∀ {i μ μ′ P P′} →
               μ ≡ μ′ → [ i ] P ∼′ P′ → [ i ] μ · P ∼′ μ′ · P′
-  [_]_∼′_.force (μ≡μ′ ·-cong″ P∼P′) = μ≡μ′ ·-cong ([_]_∼′_.force P∼P′)
+  force (μ≡μ′ ·-cong″ P∼P′) = μ≡μ′ ·-cong force P∼P′
 
   -- _· turns equality into bisimilarity.
 
@@ -515,10 +513,10 @@ module _ {Name : Set} where
         ! P′
 
     !-cong′_ : ∀ {i P P′} → [ i ] P ∼ P′ → [ i ] ! P ∼′ ! P′
-    [_]_∼′_.force (!-cong′ P∼P′) = !-cong P∼P′
+    force (!-cong′ P∼P′) = !-cong P∼P′
 
   !-cong″_ : ∀ {i P P′} → [ i ] P ∼′ P′ → [ i ] ! P ∼′ ! P′
-  [_]_∼′_.force (!-cong″ P∼P′) = !-cong ([_]_∼′_.force P∼P′)
+  force (!-cong″ P∼P′) = !-cong force P∼P′
 
   mutual
 
@@ -544,11 +542,11 @@ module _ {Name : Set} where
 
     ν-cong″ : ∀ {i a a′ P P′} →
               a ≡ a′ → [ i ] P ∼′ P′ → [ i ] ν a P ∼′ ν a′ P′
-    [_]_∼′_.force (ν-cong″ a≡a′ P∼P′) = ν-cong a≡a′ ([_]_∼′_.force P∼P′)
+    force (ν-cong″ a≡a′ P∼P′) = ν-cong a≡a′ (force P∼P′)
 
   ν-cong′ : ∀ {i a a′ P P′} →
             a ≡ a′ → [ i ] P ∼ P′ → [ i ] ν a P ∼′ ν a′ P′
-  [_]_∼′_.force (ν-cong′ a≡a′ P∼P′) = ν-cong a≡a′ P∼P′
+  force (ν-cong′ a≡a′ P∼P′) = ν-cong a≡a′ P∼P′
 
   -- _[_] preserves bisimilarity. (This result is related to Exercise
   -- 6.2.10.)
@@ -573,14 +571,13 @@ module _ {Name : Set} where
     ∀ {i n Ps Qs}
     (C : Context n) → (∀ x → [ i ] Ps x ∼ Qs x) →
     [ i ] C [ Ps ] ∼′ C [ Qs ]
-  [_]_∼′_.force (C [ Ps∼Qs ]-cong′) = C [ Ps∼Qs ]-cong
+  force (C [ Ps∼Qs ]-cong′) = C [ Ps∼Qs ]-cong
 
   _[_]-cong″ :
     ∀ {i n Ps Qs}
     (C : Context n) → (∀ x → [ i ] Ps x ∼′ Qs x) →
     [ i ] C [ Ps ] ∼′ C [ Qs ]
-  [_]_∼′_.force (C [ Ps∼Qs ]-cong″) =
-    C [ (λ x → [_]_∼′_.force (Ps∼Qs x)) ]-cong
+  force (C [ Ps∼Qs ]-cong″) = C [ (λ x → force (Ps∼Qs x)) ]-cong
 
   mutual
 
@@ -607,8 +604,8 @@ module _ {Name : Set} where
         [ i ] P ∼′ Q →
         (∀ x → [ i ] Ps x ∼ Qs x) →
         [ i ] C [ [ const P , Ps ] ] ∼′ C [ [ const Q , Qs ] ]
-      [_]_∼′_.force (C [ P∼′Q ][ Ps∼Qs ]-cong₁) =
-        C [ [ const ([_]_∼′_.force P∼′Q) , Ps∼Qs ] ]-cong₂
+      force (C [ P∼′Q ][ Ps∼Qs ]-cong₁) =
+        C [ [ const (force P∼′Q) , Ps∼Qs ] ]-cong₂
 
       _[_][_]-cong₂ :
         ∀ {P Q R S} →
@@ -617,16 +614,16 @@ module _ {Name : Set} where
         [ i ] R ∼′ S →
         [ i ] C [ [ const P , [ const R , (λ ()) ] ] ] ∼′
               C [ [ const Q , [ const S , (λ ()) ] ] ]
-      [_]_∼′_.force (C [ P∼′Q ][ R∼′S ]-cong₂) =
-        C [ [ const ([_]_∼′_.force P∼′Q)
-            , [ const ([_]_∼′_.force R∼′S) , (λ ()) ]
+      force (C [ P∼′Q ][ R∼′S ]-cong₂) =
+        C [ [ const (force P∼′Q)
+            , [ const (force R∼′S) , (λ ()) ]
             ] ]-cong₂
 
       lr : ∀ {n Ps Qs P′ μ} (C : Context n) →
            (∀ x → [ i ] Ps x ∼ Qs x) →
            C [ Ps ] [ μ ]⟶ P′ →
            ∃ λ Q′ → C [ Qs ] [ μ ]⟶ Q′ × [ i ] P′ ∼′ Q′
-      lr (hole x)  Ps∼Qs tr                  = [_]_∼_.left-to-right (Ps∼Qs x) tr
+      lr (hole x)  Ps∼Qs tr                  = left-to-right (Ps∼Qs x) tr
       lr ∅         Ps∼Qs ()
       lr (C₁ ∣ C₂) Ps∼Qs (par-left tr)       = Σ-map (_∣ _) (Σ-map par-left (λ b → subst (λ P → [ i ] _ ∼′ _ ∣ P) (weaken-[] C₂) $
                                                                                    subst (λ P → [ i ] _ ∣ P ∼′ _) (weaken-[] C₂) $
@@ -646,14 +643,13 @@ module _ {Name : Set} where
       ∀ {i n Ps Qs}
       (C : Context n) → (∀ x → [ i ] Ps x ∼ Qs x) →
       [ i ] C [ Ps ] ∼′ C [ Qs ]
-    [_]_∼′_.force (C [ Ps∼Qs ]-cong₂′) = C [ Ps∼Qs ]-cong₂
+    force (C [ Ps∼Qs ]-cong₂′) = C [ Ps∼Qs ]-cong₂
 
     _[_]-cong₂″ :
       ∀ {i n Ps Qs}
       (C : Context n) → (∀ x → [ i ] Ps x ∼′ Qs x) →
       [ i ] C [ Ps ] ∼′ C [ Qs ]
-    [_]_∼′_.force (C [ Ps∼′Qs ]-cong₂″) =
-      C [ (λ x → [_]_∼′_.force (Ps∼′Qs x)) ]-cong₂
+    force (C [ Ps∼′Qs ]-cong₂″) = C [ (λ x → force (Ps∼′Qs x)) ]-cong₂
 
   ----------------------------------------------------------------------
   -- Lemma 6.2.14
@@ -759,7 +755,7 @@ module _ {Name : Set} where
     6-2-14′ :
       ∀ {i a b P Q} →
       [ i ] ! (name a · P ⊕ name b · Q) ∼′ ! name a · P ∣ ! name b · Q
-    [_]_∼′_.force 6-2-14′ = 6-2-14
+    force 6-2-14′ = 6-2-14
 
   ----------------------------------------------------------------------
   -- Theorem 6.2.16
@@ -796,8 +792,7 @@ module _ {Name : Set} where
       (∀ x → [ i ] Ps x ∼ C x [ Ps ]) →
       (∀ x → [ i ] Qs x ∼ C x [ Qs ]) →
       ∀ x → [ i ] Ps x ∼′ Qs x
-    [_]_∼′_.force (6-2-16′ w ∼C[Ps] ∼C[Qs] x) =
-      6-2-16 w ∼C[Ps] ∼C[Qs] x
+    force (6-2-16′ w ∼C[Ps] ∼C[Qs] x) = 6-2-16 w ∼C[Ps] ∼C[Qs] x
 
   ----------------------------------------------------------------------
   -- A lemma related to _⊕_
@@ -825,7 +820,7 @@ module _ {Name : Set} where
       P
 
   ⊕-idempotent′ : ∀ {P} → P ⊕ P ∼′ P
-  [_]_∼′_.force ⊕-idempotent′ = ⊕-idempotent
+  force ⊕-idempotent′ = ⊕-idempotent
 
   ----------------------------------------------------------------------
   -- Lemma 6.2.17
@@ -960,7 +955,7 @@ module _ {Name : Set} where
       ... | inj₂ (() , _) | _
 
     6-2-17-1′ : ∀ {i P Q} → [ i ] ! (P ∣ Q) ∼′ ! P ∣ ! Q
-    [_]_∼′_.force 6-2-17-1′ = 6-2-17-1
+    force 6-2-17-1′ = 6-2-17-1
 
   mutual
 
@@ -1094,7 +1089,7 @@ module _ {Name : Set} where
       ... | inj₂ (() , _) | _
 
     6-2-17-2′ : ∀ {i P Q} → [ i ] ! (P ⊕ Q) ∼′ ! P ∣ ! Q
-    [_]_∼′_.force 6-2-17-2′ = 6-2-17-2
+    force 6-2-17-2′ = 6-2-17-2
 
   6-2-17-3 : ∀ {P} → ! P ∣ ! P ∼ ! P
   6-2-17-3 {P} =
@@ -1168,7 +1163,7 @@ module _ {Name : Set} where
         Q
 
     6-2-17-4′ : ∀ {P i} → [ i ] ! ! P ∼′ ! P
-    [_]_∼′_.force 6-2-17-4′ = 6-2-17-4
+    force 6-2-17-4′ = 6-2-17-4
 
 ------------------------------------------------------------------------
 -- Some results related to the 6-2-5 LTS
