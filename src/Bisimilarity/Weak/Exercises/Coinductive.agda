@@ -2,8 +2,8 @@
 -- Some exercises and results from "Enhancements of the bisimulation
 -- proof method" by Pous and Sangiorgi
 --
---- Implemented using the coinductive definitions of strong and weak
---- bisimilarity.
+-- Implemented using the coinductive definitions of strong and weak
+-- bisimilarity.
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K #-}
