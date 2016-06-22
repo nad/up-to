@@ -177,16 +177,16 @@ module _ {Name : Set} where
   -- A less compact proof.
 
   6-1-2 : ∀ {P i} → [ i ] ! P ∣ P ∼ ! P
-  6-1-2 {P} =
-    ⟨ (λ {P′} {μ} tr →
-         P′   ∼′⟨ reflexive′ ⟩′∎
-         P′   [ μ ]⟵⟨ replication tr ⟩
-         ! P)
-    , (λ { {q′ = P′} {μ = μ} (replication tr) →
-           ! P ∣ P  [ μ ]⟶⟨ tr ⟩ʳˡ
-           P′       ∼′⟨ reflexive′ ⟩′∎
-           P′ })
-    ⟩
+  6-1-2 {P} = record
+    { left-to-right = λ {P′} {μ} tr →
+                        P′   ∼′⟨ reflexive′ ⟩′∎
+                        P′   [ μ ]⟵⟨ replication tr ⟩
+                        ! P
+    ; right-to-left = λ { {q′ = P′} {μ = μ} (replication tr) →
+                          ! P ∣ P  [ μ ]⟶⟨ tr ⟩ʳˡ
+                          P′       ∼′⟨ reflexive′ ⟩′∎
+                          P′ }
+    }
 
   ----------------------------------------------------------------------
   -- Exercise 6.1.3 (2), plus some rearrangement lemmas
