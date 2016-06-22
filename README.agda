@@ -4,7 +4,7 @@
 -- Nils Anders Danielsson
 ------------------------------------------------------------------------
 
-module Read-me where
+module README where
 
 -- Overloaded "equational" reasoning combinators.
 
