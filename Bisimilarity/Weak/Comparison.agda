@@ -15,12 +15,12 @@ open import H-level equality-with-J
 open import Surjection equality-with-J using (_↠_)
 open import Univalence-axiom equality-with-J
 
-open import Labelled-transition-system
 import Bisimilarity.Classical
 import Bisimilarity.Coinductive
 import Bisimilarity.Comparison as Comp
 import Bisimilarity.Weak.Classical
 import Bisimilarity.Weak.Coinductive
+open import Labelled-transition-system
 
 module _ {lts : LTS} where
 

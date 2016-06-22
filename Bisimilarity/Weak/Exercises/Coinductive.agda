@@ -15,11 +15,16 @@ open import Prelude
 
 open import Function-universe equality-with-J hiding (id; _∘_)
 
-open import Labelled-transition-system
 import Bisimilarity.Coinductive
+import
+  Bisimilarity.Coinductive.Equational-reasoning-instances
 open import Bisimilarity.Exercises.Coinductive
 import Bisimilarity.Exercises.Other
 import Bisimilarity.Weak.Coinductive.Other
+import
+  Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
+open import Equational-reasoning
+open import Labelled-transition-system
 
 ------------------------------------------------------------------------
 -- Exercises and results related to CCS
@@ -42,14 +47,14 @@ module _ {Name : Set} where
 
   mutual
 
-    infix 6 _∣-cong-≈_ _∣-cong-≈′ˡ_ _∣-cong-≈′ʳ_ _∣-cong-≈′ˡʳ_
+    infix 6 _∣-cong-≈_ _∣-cong-≈′_
 
     _∣-cong-≈_ : ∀ {i P P′ Q Q′} →
                  [ i ] P ≈ P′ → [ i ] Q ≈ Q′ → [ i ] P ∣ Q ≈ P′ ∣ Q′
     _∣-cong-≈_ {i} = λ P≈P′ Q≈Q′ →
       ⟨ lr P≈P′ Q≈Q′
-      , Σ-map id (Σ-map id symmetric-≈′) ∘
-        lr (symmetric-≈ P≈P′) (symmetric-≈ Q≈Q′)
+      , Σ-map id (Σ-map id symmetric) ∘
+        lr (symmetric P≈P′) (symmetric Q≈Q′)
       ⟩
       where
       open [_]_≈_
@@ -59,33 +64,23 @@ module _ {Name : Set} where
            ∃ λ R′ → P′ ∣ Q′ [ μ ]⇒̂ R′ × [ i ] R ≈′ R′
       lr P≈P′ Q≈Q′ (par-left tr)   = Σ-map (_∣ _)
                                            (Σ-map (map-⇒̂ par-left)
-                                                  (_∣-cong-≈′ˡ Q≈Q′))
+                                                  (_∣-cong-≈′
+                                                     convert Q≈Q′))
                                        (left-to-right P≈P′ tr)
       lr P≈P′ Q≈Q′ (par-right tr)  = Σ-map (_ ∣_)
                                            (Σ-map (map-⇒̂ par-right)
-                                                  (P≈P′ ∣-cong-≈′ʳ_))
+                                                  (convert P≈P′
+                                                     ∣-cong-≈′_))
                                        (left-to-right Q≈Q′ tr)
       lr P≈P′ Q≈Q′ (par-τ tr₁ tr₂) = Σ-zip _∣_
-                                           (Σ-zip par-τ-⇒̂ _∣-cong-≈′ˡʳ_)
+                                           (Σ-zip par-τ-⇒̂ _∣-cong-≈′_)
                                        (left-to-right P≈P′ tr₁)
                                        (left-to-right Q≈Q′ tr₂)
 
-    _∣-cong-≈′ˡ_ :
-      ∀ {i P P′ Q Q′} →
-      [ i ] P ≈′ P′ → [ i ] Q ≈ Q′ → [ i ] P ∣ Q ≈′ P′ ∣ Q′
-    [_]_≈′_.force (P≈′P′ ∣-cong-≈′ˡ Q≈Q′) =
-      [_]_≈′_.force P≈′P′ ∣-cong-≈ Q≈Q′
-
-    _∣-cong-≈′ʳ_ :
-      ∀ {i P P′ Q Q′} →
-      [ i ] P ≈ P′ → [ i ] Q ≈′ Q′ → [ i ] P ∣ Q ≈′ P′ ∣ Q′
-    [_]_≈′_.force (P≈P′ ∣-cong-≈′ʳ Q≈′Q′) =
-      P≈P′ ∣-cong-≈ [_]_≈′_.force Q≈′Q′
-
-    _∣-cong-≈′ˡʳ_ :
+    _∣-cong-≈′_ :
       ∀ {i P P′ Q Q′} →
       [ i ] P ≈′ P′ → [ i ] Q ≈′ Q′ → [ i ] P ∣ Q ≈′ P′ ∣ Q′
-    [_]_≈′_.force (P≈′P′ ∣-cong-≈′ˡʳ Q≈′Q′) =
+    [_]_≈′_.force (P≈′P′ ∣-cong-≈′ Q≈′Q′) =
       [_]_≈′_.force P≈′P′ ∣-cong-≈ [_]_≈′_.force Q≈′Q′
 
   ----------------------------------------------------------------------
@@ -109,10 +104,10 @@ module _ {Name : Set} where
         ∃ λ Q → (! a · ∣ ! b ·) ∣ ! co a · [ μ ]⇒̂ Q × [ i ] P ≈′ Q
       lr (par-left {P′ = P} tr) with 6-1-3-2 tr
       ... | inj₁ (.(b ·) , action , P∼!ab∣b) =
-        P ∣ ! co a ·                         ∼⟨ P∼!ab∣b ∣-cong reflexive ⟩≈′
-        (! name a · (b ·) ∣ b ·) ∣ ! co a ·  ∼⟨ swap-rightmost ⟩≈′
-        (! name a · (b ·) ∣ ! co a ·) ∣ b ·  ≈′⟨ 6-5-4′ ∣-cong-≈′ˡ reflexive-≈ ⟩∼
-        ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ b ·   ∼⟨ swap-rightmost ⟩
+        P ∣ ! co a ·                         ∼⟨ P∼!ab∣b ∣-cong reflexive ⟩
+        (! name a · (b ·) ∣ b ·) ∣ ! co a ·  ∼⟨ swap-rightmost ⟩
+        (! name a · (b ·) ∣ ! co a ·) ∣ b ·  ∽⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩
+        ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ b ·   ∼⟨ swap-rightmost ⟩ ∼:
         ((! a · ∣ ! b ·) ∣ b ·) ∣ ! co a ·   ∼⟨ lemma ∣-cong reflexive ⟩∎
         ((! a · ∣ ∅) ∣ ! b ·) ∣ ! co a ·     ⟵⟨ par-left (par-left (replication (par-right action))) ⟩⇒̂
         (! a · ∣ ! b ·) ∣ ! co a ·
@@ -122,9 +117,9 @@ module _ {Name : Set} where
 
       lr (par-right {Q′ = Q} tr) with 6-1-3-2 tr
       ... | inj₁ (.∅ , action , Q∼!a̅∣∅) =
-        ! name a · (b ·) ∣ Q               ∼⟨ reflexive ∣-cong Q∼!a̅∣∅ ⟩≈′
-        ! name a · (b ·) ∣ (! co a · ∣ ∅)  ∼⟨ ∣-assoc ⟩≈′
-        (! name a · (b ·) ∣ ! co a ·) ∣ ∅  ≈′⟨ 6-5-4′ ∣-cong-≈′ˡ reflexive-≈ ⟩∼
+        ! name a · (b ·) ∣ Q               ∼⟨ reflexive ∣-cong Q∼!a̅∣∅ ⟩
+        ! name a · (b ·) ∣ (! co a · ∣ ∅)  ∼⟨ ∣-assoc ⟩
+        (! name a · (b ·) ∣ ! co a ·) ∣ ∅  ∽⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩ ∼:
         ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ ∅   ∼⟨ symmetric ∣-assoc ⟩∎
         (! a · ∣ ! b ·) ∣ (! co a · ∣ ∅)   ⟵⟨ par-right (replication (par-right action)) ⟩⇒̂
         (! a · ∣ ! b ·) ∣ ! co a ·
@@ -136,10 +131,10 @@ module _ {Name : Set} where
         with 6-1-3-2 tr₁ | 6-1-3-2 tr₂
       ... | inj₁ (.(b ·) , action , P∼!ab∣b)
           | inj₁ (.∅ , action , Q∼!a̅∣∅) =
-        P ∣ Q                                      ∼⟨ P∼!ab∣b ∣-cong Q∼!a̅∣∅ ⟩≈′
-        (! name a · (b ·) ∣ b ·) ∣ (! co a · ∣ ∅)  ∼⟨ swap-in-the-middle ⟩≈′
-        (! name a · (b ·) ∣ ! co a ·) ∣ (b · ∣ ∅)  ≈′⟨ 6-5-4′ ∣-cong-≈′ˡ reflexive-≈ ⟩∼
-        ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ (b · ∣ ∅)   ∼⟨ swap-in-the-middle ⟩
+        P ∣ Q                                      ∼⟨ P∼!ab∣b ∣-cong Q∼!a̅∣∅ ⟩
+        (! name a · (b ·) ∣ b ·) ∣ (! co a · ∣ ∅)  ∼⟨ swap-in-the-middle ⟩
+        (! name a · (b ·) ∣ ! co a ·) ∣ (b · ∣ ∅)  ∽⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩
+        ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ (b · ∣ ∅)   ∼⟨ swap-in-the-middle ⟩ ∼:
         ((! a · ∣ ! b ·) ∣ b ·) ∣ (! co a · ∣ ∅)   ∼⟨ lemma ∣-cong reflexive ⟩∎
         ((! a · ∣ ∅) ∣ ! b ·) ∣ (! co a · ∣ ∅)     [ τ ]⟵⟨ par-τ (par-left (replication (par-right action)))
                                                                  (replication (par-right action)) ⟩⇒̂
@@ -224,11 +219,11 @@ module _ {Name : Set} where
       rl {Q} tr with rl-lemma tr
       ... | !a∣!b∣!a̅∼Q , inj₁ refl =
         ! name a · (b ·) ∣ ! co a ·          [ name a ]⟶⟨ par-left (replication (par-right action)) ⟩⇒̂
-        (! name a · (b ·) ∣ b ·) ∣ ! co a ·  ∼⟨ swap-rightmost ⟩≈′
-        (! name a · (b ·) ∣ ! co a ·) ∣ b ·  ≈′⟨ 6-5-4′ ∣-cong-≈′ˡ reflexive-≈ ⟩∼
+        (! name a · (b ·) ∣ b ·) ∣ ! co a ·  ∼⟨ swap-rightmost ⟩
+        (! name a · (b ·) ∣ ! co a ·) ∣ b ·  ∽⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩
         ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ b ·   ∼⟨ swap-rightmost ⟩
         ((! a · ∣ ! b ·) ∣ b ·) ∣ ! co a ·   ∼⟨ symmetric ∣-assoc ∣-cong reflexive ⟩
-        (! a · ∣ (! b · ∣ b ·)) ∣ ! co a ·   ∼⟨ (reflexive ∣-cong 6-1-2) ∣-cong reflexive ⟩
+        (! a · ∣ (! b · ∣ b ·)) ∣ ! co a ·   ∼⟨ (reflexive ∣-cong 6-1-2) ∣-cong reflexive ⟩ ∼:
         (! a · ∣ ! b ·) ∣ ! co a ·           ∼⟨ !a∣!b∣!a̅∼Q ⟩∎
         Q
 
@@ -239,21 +234,21 @@ module _ {Name : Set} where
                                                                                                         (replication (par-right action))))
                                                                                        (par-left (par-right action))
                                                                                        done) ⟩ʳˡ
-        (! name a · (b ·) ∣ ∅) ∣ (! co a · ∣ ∅)  ∼⟨ ∣-right-identity ∣-cong ∣-right-identity ⟩≈′
-        (! name a · (b ·)) ∣ ! co a ·            ≈′⟨ 6-5-4′ ⟩∼
+        (! name a · (b ·) ∣ ∅) ∣ (! co a · ∣ ∅)  ∼⟨ ∣-right-identity ∣-cong ∣-right-identity ⟩
+        (! name a · (b ·)) ∣ ! co a ·            ∽⟨ 6-5-4′ ⟩ ∼:
         (! a · ∣ ! b ·) ∣ ! co a ·               ∼⟨ !a∣!b∣!a̅∼Q ⟩∎
         Q
 
       ... | !a∣!b∣!a̅∼Q , inj₂ (inj₂ (inj₁ refl)) =
         ! name a · (b ·) ∣ ! co a ·        [ name (co a) ]⟶⟨ par-right (replication (par-right action)) ⟩⇒̂
-        ! name a · (b ·) ∣ (! co a · ∣ ∅)  ∼⟨ reflexive ∣-cong ∣-right-identity ⟩≈′
-        ! name a · (b ·) ∣ ! co a ·        ≈′⟨ 6-5-4′ ⟩∼
+        ! name a · (b ·) ∣ (! co a · ∣ ∅)  ∼⟨ reflexive ∣-cong ∣-right-identity ⟩
+        ! name a · (b ·) ∣ ! co a ·        ∽⟨ 6-5-4′ ⟩ ∼:
         (! a · ∣ ! b ·) ∣ ! co a ·         ∼⟨ !a∣!b∣!a̅∼Q ⟩∎
         Q
 
       ... | !a∣!b∣!a̅∼Q , inj₂ (inj₂ (inj₂ refl)) =
         ! name a · (b ·) ∣ ! co a ·  [ τ ]⇒̂⟨ silent refl done ⟩ʳˡ
-        ! name a · (b ·) ∣ ! co a ·  ≈′⟨ 6-5-4′ ⟩∼
+        ! name a · (b ·) ∣ ! co a ·  ∽⟨ 6-5-4′ ⟩ ∼:
         (! a · ∣ ! b ·) ∣ ! co a ·   ∼⟨ !a∣!b∣!a̅∼Q ⟩∎
         Q
 

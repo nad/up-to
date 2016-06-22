@@ -11,6 +11,7 @@ module Bisimilarity.Coinductive (lts : LTS) where
 open import Equality.Propositional hiding (reflexive; Extensionality)
 open import Prelude
 
+import Equational-reasoning
 open LTS lts
 
 -- Bisimilarity. Note that this definition is small.
@@ -72,36 +73,36 @@ syntax lr-result-with-action    p′∼q′ μ q q⟶q′ = p′∼q′ [ μ ]�
 
 mutual
 
-  reflexive : ∀ {p i} → [ i ] p ∼ p
-  reflexive =
-    ⟨ (λ p⟶p′ → _ , p⟶p′ , reflexive′)
-    , (λ q⟶q′ → _ , q⟶q′ , reflexive′)
+  reflexive-∼ : ∀ {p i} → [ i ] p ∼ p
+  reflexive-∼ =
+    ⟨ (λ p⟶p′ → _ , p⟶p′ , reflexive-∼′)
+    , (λ q⟶q′ → _ , q⟶q′ , reflexive-∼′)
     ⟩
 
-  reflexive′ : ∀ {p i} → [ i ] p ∼′ p
-  [_]_∼′_.force reflexive′ = reflexive
+  reflexive-∼′ : ∀ {p i} → [ i ] p ∼′ p
+  [_]_∼′_.force reflexive-∼′ = reflexive-∼
 
 ≡⇒∼ : ∀ {p q} → p ≡ q → p ∼ q
-≡⇒∼ refl = reflexive
+≡⇒∼ refl = reflexive-∼
 
 mutual
 
-  symmetric : ∀ {i p q} → [ i ] p ∼ q → [ i ] q ∼ p
-  symmetric ⟨ left-to-right , right-to-left ⟩ =
-    ⟨ Σ-map id (Σ-map id symmetric′) ∘ right-to-left
-    , Σ-map id (Σ-map id symmetric′) ∘ left-to-right
+  symmetric-∼ : ∀ {i p q} → [ i ] p ∼ q → [ i ] q ∼ p
+  symmetric-∼ ⟨ left-to-right , right-to-left ⟩ =
+    ⟨ Σ-map id (Σ-map id symmetric-∼′) ∘ right-to-left
+    , Σ-map id (Σ-map id symmetric-∼′) ∘ left-to-right
     ⟩
 
-  symmetric′ : ∀ {i p q} → [ i ] p ∼′ q → [ i ] q ∼′ p
-  [_]_∼′_.force (symmetric′ p∼q) = symmetric ([_]_∼′_.force p∼q)
+  symmetric-∼′ : ∀ {i p q} → [ i ] p ∼′ q → [ i ] q ∼′ p
+  [_]_∼′_.force (symmetric-∼′ p∼q) = symmetric-∼ ([_]_∼′_.force p∼q)
 
 mutual
 
-  transitive : ∀ {i p q r} → [ i ] p ∼ q → [ i ] q ∼ r → [ i ] p ∼ r
-  transitive {i} = λ p∼q q∼r →
+  transitive-∼ : ∀ {i p q r} → [ i ] p ∼ q → [ i ] q ∼ r → [ i ] p ∼ r
+  transitive-∼ {i} = λ p∼q q∼r →
     ⟨ lr p∼q q∼r
-    , Σ-map id (Σ-map id symmetric′) ∘
-      lr (symmetric q∼r) (symmetric p∼q)
+    , Σ-map id (Σ-map id symmetric-∼′) ∘
+      lr (symmetric-∼ q∼r) (symmetric-∼ p∼q)
     ⟩
     where
     lr : ∀ {p p′ q r μ} →
@@ -110,46 +111,23 @@ mutual
     lr p∼q q∼r p⟶p′ =
       let q′ , q⟶q′ , p′∼q′ = [_]_∼_.left-to-right p∼q p⟶p′
           r′ , r⟶r′ , q′∼r′ = [_]_∼_.left-to-right q∼r q⟶q′
-      in r′ , r⟶r′ , transitive′ p′∼q′ q′∼r′
+      in r′ , r⟶r′ , transitive-∼′ p′∼q′ q′∼r′
 
-  transitive′ :
+  transitive-∼′ :
     ∀ {i p q r} → [ i ] p ∼′ q → [ i ] q ∼′ r → [ i ] p ∼′ r
-  [_]_∼′_.force (transitive′ p∼q q∼r) =
-    transitive ([_]_∼′_.force p∼q) ([_]_∼′_.force q∼r)
+  [_]_∼′_.force (transitive-∼′ p∼q q∼r) =
+    transitive-∼ ([_]_∼′_.force p∼q) ([_]_∼′_.force q∼r)
 
--- "Equational" reasoning combinators.
+-- Functions that can be used to aid the instance resolution
+-- mechanism.
 
-infix  -1 finally-∼ finally-∼′ finally-′∼ finally-′∼′
-infixr -2 _∼⟨_⟩_ _∼′⟨_⟩_ _∼′⟨_⟩′_ _∼⟨_⟩′_
+infix -2 ∼:_ ∼′:_
 
-_∼⟨_⟩_ : ∀ {i} p {q r} → [ i ] p ∼ q → [ i ] q ∼ r → [ i ] p ∼ r
-_ ∼⟨ p∼q ⟩ q∼r = transitive p∼q q∼r
+∼:_ : ∀ {i p q} → [ i ] p ∼ q → [ i ] p ∼ q
+∼:_ = id
 
-_∼′⟨_⟩_ : ∀ {i} p {q r} → [ ssuc i ] p ∼′ q → [ i ] q ∼ r → [ i ] p ∼ r
-_ ∼′⟨ p∼′q ⟩ q∼r = transitive ([_]_∼′_.force p∼′q) q∼r
-
-_∼′⟨_⟩′_ : ∀ {i} p {q r} → [ i ] p ∼′ q → [ i ] q ∼′ r → [ i ] p ∼′ r
-_ ∼′⟨ p∼′q ⟩′ q∼′r = transitive′ p∼′q q∼′r
-
-_∼⟨_⟩′_ : ∀ {i} p {q r} → [ i ] p ∼ q → [ i ] q ∼′ r → [ i ] p ∼′ r
-[_]_∼′_.force (_ ∼⟨ p∼q ⟩′ q∼′r) = transitive p∼q ([_]_∼′_.force q∼′r)
-
-finally-∼ : ∀ {i} p q → [ i ] p ∼ q → [ i ] p ∼ q
-finally-∼ _ _ p∼q = p∼q
-
-finally-′∼ : ∀ {i} p q → [ ssuc i ] p ∼′ q → [ i ] p ∼ q
-finally-′∼ _ _ p∼′q = [_]_∼′_.force p∼′q
-
-finally-∼′ : ∀ {i} p q → [ i ] p ∼ q → [ i ] p ∼′ q
-[_]_∼′_.force (finally-∼′ _ _ p∼q) = p∼q
-
-finally-′∼′ : ∀ {i} p q → [ i ] p ∼′ q → [ i ] p ∼′ q
-finally-′∼′ _ _ p∼′q = p∼′q
-
-syntax finally-∼   p q p∼q  = p ∼⟨  p∼q  ⟩∎ q
-syntax finally-′∼  p q p∼′q = p ∼′⟨ p∼′q ⟩∎ q
-syntax finally-∼′  p q p∼q  = p ∼⟨  p∼q  ⟩′∎ q
-syntax finally-′∼′ p q p∼′q = p ∼′⟨ p∼′q ⟩′∎ q
+∼′:_ : ∀ {i p q} → [ i ] p ∼′ q → [ i ] p ∼′ q
+∼′:_ = id
 
 -- Strong bisimilarity is a weak bisimulation (of a certain kind).
 

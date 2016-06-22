@@ -13,8 +13,12 @@ open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 
-import Bisimilarity.Weak.Coinductive       lts as CW
+import Bisimilarity.Weak.Coinductive lts as CW
+import Bisimilarity.Weak.Coinductive.Equational-reasoning-instances
 import Bisimilarity.Weak.Coinductive.Other lts as CWO
+import
+  Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
+open import Equational-reasoning
 
 open LTS lts
 
@@ -26,7 +30,7 @@ mutual
   cw⇒cwo : ∀ {i p q} → CW.[ i ] p ≈ q → CWO.[ i ] p ≈ q
   cw⇒cwo p≈q =
     CWO.⟨ lr p≈q
-        , Σ-map id (Σ-map id CWO.symmetric-≈′) ∘ lr (CW.symmetric p≈q)
+        , Σ-map id (Σ-map id symmetric) ∘ lr (symmetric p≈q)
         ⟩
     where
     lr : ∀ {i p p′ q μ} →
@@ -50,7 +54,7 @@ mutual
   cwo⇒cw : ∀ {i p q} → p CWO.≈ q → CW.[ i ] p ≈ q
   cwo⇒cw p≈q =
     CW.⟨ lr p≈q
-       , Σ-map id (Σ-map id CW.symmetric′) ∘ lr (CWO.symmetric-≈ p≈q)
+       , Σ-map id (Σ-map id symmetric) ∘ lr (symmetric p≈q)
        ⟩
     where
     lr : ∀ {i p p′ q μ} →

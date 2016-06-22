@@ -56,8 +56,8 @@ p ∼ q = [ lzero ] p ∼ q
 
 -- Reflexivity.
 
-reflexive : ∀ {ℓ p} → [ ℓ ] p ∼ p
-reflexive =
+reflexive-∼ : ∀ {ℓ p} → [ ℓ ] p ∼ p
+reflexive-∼ =
     (λ p q → ↑ _ (p ≡ q))
   , ⟨ (λ { {q = ._} (lift refl) p⟶p′ → _ , p⟶p′ , lift refl })
     , (λ { {p = ._} (lift refl) q⟶q′ → _ , q⟶q′ , lift refl })
@@ -66,8 +66,8 @@ reflexive =
 
 -- Symmetry.
 
-symmetric : ∀ {ℓ p q} → [ ℓ ] p ∼ q → [ ℓ ] q ∼ p
-symmetric (_R_ , ⟨ left-to-right , right-to-left ⟩ , pRq) =
+symmetric-∼ : ∀ {ℓ p q} → [ ℓ ] p ∼ q → [ ℓ ] q ∼ p
+symmetric-∼ (_R_ , ⟨ left-to-right , right-to-left ⟩ , pRq) =
     flip _R_
   , ⟨ right-to-left
     , left-to-right
@@ -76,9 +76,9 @@ symmetric (_R_ , ⟨ left-to-right , right-to-left ⟩ , pRq) =
 
 -- Transitivity.
 
-transitive : ∀ {ℓ p q r} → [ ℓ ] p ∼ q → [ ℓ ] q ∼ r → [ ℓ ] p ∼ r
-transitive (_R₁_ , ⟨ left-to-right₁ , right-to-left₁ ⟩ , pR₁q)
-           (_R₂_ , ⟨ left-to-right₂ , right-to-left₂ ⟩ , qR₂r) =
+transitive-∼ : ∀ {ℓ p q r} → [ ℓ ] p ∼ q → [ ℓ ] q ∼ r → [ ℓ ] p ∼ r
+transitive-∼ (_R₁_ , ⟨ left-to-right₁ , right-to-left₁ ⟩ , pR₁q)
+             (_R₂_ , ⟨ left-to-right₂ , right-to-left₂ ⟩ , qR₂r) =
     (λ p r → ∃ λ q → p R₁ q × q R₂ r)
   , ⟨ (λ { (q , pR₁q , qR₂r) p⟶p′ →
            let q′ , q⟶q′ , p′R₁q′ = left-to-right₁ pR₁q p⟶p′
@@ -91,21 +91,13 @@ transitive (_R₁_ , ⟨ left-to-right₁ , right-to-left₁ ⟩ , pR₁q)
     ⟩
   , _ , pR₁q , qR₂r
 
--- "Equational" reasoning combinators.
+-- A function that can be used to aid the instance resolution
+-- mechanism.
 
-infix  -1 finally-∼
-infixr -2 _∼⟨_⟩_ _∼⟨⟩_
+infix -2 ∼:_
 
-_∼⟨_⟩_ : ∀ {ℓ} p {q r} → [ ℓ ] p ∼ q → [ ℓ ] q ∼ r → [ ℓ ] p ∼ r
-_ ∼⟨ p∼q ⟩ q∼r = transitive p∼q q∼r
-
-_∼⟨⟩_ : ∀ {ℓ} p {q} → [ ℓ ] p ∼ q → [ ℓ ] p ∼ q
-_ ∼⟨⟩ p∼q = p∼q
-
-finally-∼ : ∀ {ℓ} p q → [ ℓ ] p ∼ q → [ ℓ ] p ∼ q
-finally-∼ _ _ p∼q = p∼q
-
-syntax finally-∼ p q p∼q = p ∼⟨ p∼q ⟩∎ q
+∼:_ : ∀ {i p q} → [ i ] p ∼ q → [ i ] p ∼ q
+∼:_ = id
 
 ------------------------------------------------------------------------
 -- Lemmas relating bisimulations and bisimilarity
@@ -156,7 +148,7 @@ bisimulation-up-to-∼⇒bisimulation :
   Bisimulation-up-to-bisimilarity ℓ _R_ →
   Bisimulation ([ ℓ ]_∼_ ⊙ _R_ ⊙ [ ℓ ]_∼_)
 bisimulation-up-to-∼⇒bisimulation {ℓ} {_R_ = _R_} R-is =
-  ⟨ (λ { {p′ = p′} (q , p∼q , r , qRr , r∼s) p⟶p′ →
+  ⟨ (λ { (q , p∼q , r , qRr , r∼s) p⟶p′ →
        let q′ , q⟶q′ , p′∼q′ =
              left-to-right bisimilarity-is-a-bisimulation p∼q p⟶p′
            r′ , r⟶r′ , (q″ , q′∼q″ , r″ , q″Rr″ , r″∼r′) =
@@ -165,14 +157,10 @@ bisimulation-up-to-∼⇒bisimulation {ℓ} {_R_ = _R_} R-is =
              left-to-right bisimilarity-is-a-bisimulation r∼s r⟶r′
        in
          s′ , s⟶s′ , q″
-       , (p′  ∼⟨ p′∼q′ ⟩
-          q′  ∼⟨ q′∼q″ ⟩∎
-          q″)
+       , transitive-∼ p′∼q′ q′∼q″
        , r″ , q″Rr″
-       , (r″  ∼⟨ r″∼r′ ⟩
-          r′  ∼⟨ r′∼s′ ⟩∎
-          s′) })
-  , (λ { {q′ = s′} (q , p∼q , r , qRr , r∼s) s⟶s′ →
+       , transitive-∼ r″∼r′ r′∼s′ })
+  , (λ { (q , p∼q , r , qRr , r∼s) s⟶s′ →
        let r′ , r⟶r′ , r′∼s′ =
              right-to-left bisimilarity-is-a-bisimulation r∼s s⟶s′
            q′ , q⟶q′ , (q″ , q′∼q″ , r″ , q″Rr″ , r″∼r′) =
@@ -181,13 +169,9 @@ bisimulation-up-to-∼⇒bisimulation {ℓ} {_R_ = _R_} R-is =
              right-to-left bisimilarity-is-a-bisimulation p∼q q⟶q′
        in
          p′ , p⟶p′ , q″
-       , (p′  ∼⟨ p′∼q′ ⟩
-          q′  ∼⟨ q′∼q″ ⟩∎
-          q″)
+       , transitive-∼ p′∼q′ q′∼q″
        , r″ , q″Rr″
-       , (r″  ∼⟨ r″∼r′ ⟩
-          r′  ∼⟨ r′∼s′ ⟩∎
-          s′) })
+       , transitive-∼ r″∼r′ r′∼s′ })
   ⟩
   where
   open Progression
@@ -200,7 +184,7 @@ bisimulation-up-to-∼⊆∼ :
   Bisimulation-up-to-bisimilarity ℓ _R_ →
   _R_ ⊆ [ lsuc ℓ ⊔ r ]_∼_
 bisimulation-up-to-∼⊆∼ {ℓ} {r} {_R_} R-is =
-  _R_                        ⊆⟨ (λ p q pRq → p , reflexive , q , pRq , reflexive) ⟩
+  _R_                        ⊆⟨ (λ p q pRq → p , reflexive-∼ , q , pRq , reflexive-∼) ⟩
   [ ℓ ]_∼_ ⊙ _R_ ⊙ [ ℓ ]_∼_  ⊆⟨ bisimulation⊆∼ (bisimulation-up-to-∼⇒bisimulation R-is) ⟩∎
   [ lsuc ℓ ⊔ r ]_∼_          ∎
 
@@ -298,7 +282,7 @@ bisimulation-up-to-*⊆∼ {_R_} R-is =
 -- Equal processes are bisimilar.
 
 ≡⇒∼ : ∀ {ℓ p q} → p ≡ q → [ ℓ ] p ∼ q
-≡⇒∼ refl = reflexive
+≡⇒∼ refl = reflexive-∼
 
 -- The lifting operator preserves the "is a bisimulation" relation.
 

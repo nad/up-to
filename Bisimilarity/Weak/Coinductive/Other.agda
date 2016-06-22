@@ -9,9 +9,11 @@ open import Labelled-transition-system
 module Bisimilarity.Weak.Coinductive.Other (lts : LTS) where
 
 open import Equality.Propositional hiding (reflexive; Extensionality)
+open import Equational-reasoning
 open import Prelude
 
 import Bisimilarity.Coinductive
+import Bisimilarity.Coinductive.Equational-reasoning-instances
 import Bisimilarity.Weak.Coinductive
 
 open LTS lts
@@ -97,27 +99,6 @@ syntax lr-result-with-action      p′≈q′ μ q q⇒̂q′ = p′≈q′ [ μ
 syntax lr-result-without-action-⟶ p′≈q′   q q⟶q′ = p′≈q′      ⟵⟨ q⟶q′ ⟩⇒̂ q
 syntax lr-result-with-action-⟶    p′≈q′ μ q q⟶q′ = p′≈q′ [ μ ]⟵⟨ q⟶q′ ⟩⇒̂ q
 
--- Some "equational" reasoning combinators.
-
-infix -1 finally-≈ finally-≈′ finally-′≈ finally-′≈′
-
-finally-≈ : ∀ {i} p q → [ i ] p ≈ q → [ i ] p ≈ q
-finally-≈ _ _ p≈q = p≈q
-
-finally-′≈ : ∀ {i} p q → [ ssuc i ] p ≈′ q → [ i ] p ≈ q
-finally-′≈ _ _ p≈′q = [_]_≈′_.force p≈′q
-
-finally-≈′ : ∀ {i} p q → [ i ] p ≈ q → [ i ] p ≈′ q
-[_]_≈′_.force (finally-≈′ _ _ p≈q) = p≈q
-
-finally-′≈′ : ∀ {i} p q → [ i ] p ≈′ q → [ i ] p ≈′ q
-finally-′≈′ _ _ p≈′q = p≈′q
-
-syntax finally-≈   p q p≈q  = p ≈⟨  p≈q  ⟩∎ q
-syntax finally-′≈  p q p≈′q = p ≈′⟨ p≈′q ⟩∎ q
-syntax finally-≈′  p q p≈q  = p ≈⟨  p≈q  ⟩′∎ q
-syntax finally-′≈′ p q p≈′q = p ≈′⟨ p≈′q ⟩′∎ q
-
 -- Weak bisimilarity is a weak bisimulation (of a certain kind).
 
 weak-is-weak :
@@ -197,24 +178,24 @@ mutual
     rl r⟶r′ =
       let q′ , q⟶q′ , q′∼′r′ = [_]_∼_.right-to-left q∼r r⟶r′
           p′ , p⇒̂p′ , p′≈′q′ = [_]_≈_.right-to-left p≈q q⟶q′
-      in p′ , p⇒̂p′ , transitive-≈∼′ˡʳ p′≈′q′ q′∼′r′
+      in p′ , p⇒̂p′ , transitive-≈∼′ p′≈′q′ q′∼′r′
 
     lr : ∀ {p′ μ} → p [ μ ]⟶ p′ →
          ∃ λ r′ → r [ μ ]⇒̂ r′ × [ i ] p′ ≈′ r′
     lr p⟶p′ =
       let q′ , q⇒̂q′ , p′≈′q′ = [_]_≈_.left-to-right p≈q p⟶p′
           r′ , r⇒̂r′ , q′∼r′  = SB.strong-is-weak q∼r q⇒̂q′
-      in r′ , r⇒̂r′ , transitive-≈∼′ˡʳ p′≈′q′ (_ SB.∼⟨ q′∼r′ ⟩′∎ _)
+      in r′ , r⇒̂r′ , transitive-≈∼′ p′≈′q′ (_ ∼⟨ q′∼r′ ⟩∎ _)
 
-  transitive-≈∼′ˡʳ : ∀ {i p q r} →
-                     [ i ] p ≈′ q → q ∼′ r → [ i ] p ≈′ r
-  [_]_≈′_.force (transitive-≈∼′ˡʳ p≈′q q∼′r) =
+  transitive-≈∼′ : ∀ {i p q r} →
+                   [ i ] p ≈′ q → q ∼′ r → [ i ] p ≈′ r
+  [_]_≈′_.force (transitive-≈∼′ p≈′q q∼′r) =
     transitive-≈∼ ([_]_≈′_.force p≈′q) ([_]_∼′_.force q∼′r)
 
 transitive-∼≈ : ∀ {i p q r} →
                 p ∼ q → [ i ] q ≈ r → [ i ] p ≈ r
 transitive-∼≈ p∼q q≈r =
-  symmetric-≈ (transitive-≈∼ (symmetric-≈ q≈r) (SB.symmetric p∼q))
+  symmetric-≈ (transitive-≈∼ (symmetric-≈ q≈r) (symmetric p∼q))
 
 -- Strongly bisimilar processes are weakly bisimilar.
 
@@ -222,7 +203,7 @@ mutual
 
   ∼⇒≈ : ∀ {i p q} → [ i ] p ∼ q → [ i ] p ≈ q
   ∼⇒≈ {i} = λ p∼q →
-    ⟨ Σ-map id (Σ-map id symmetric-≈′) ∘ rl (SB.symmetric p∼q)
+    ⟨ Σ-map id (Σ-map id symmetric-≈′) ∘ rl (symmetric p∼q)
     , rl p∼q
     ⟩
     where
@@ -231,70 +212,21 @@ mutual
          ∃ λ p′ → p [ μ ]⇒̂ p′ × [ i ] p′ ≈′ q′
     rl p∼q q⟶q′ =
       let p′ , p⟶p′ , p′∼′q′ = [_]_∼_.right-to-left p∼q q⟶q′
-      in p′ , ⟶→⇒̂ p⟶p′ , ∼⇒≈″ p′∼′q′
+      in p′ , ⟶→⇒̂ p⟶p′ , ∼⇒≈′ p′∼′q′
 
-  ∼⇒≈″ : ∀ {i p q} → [ i ] p ∼′ q → [ i ] p ≈′ q
-  [_]_≈′_.force (∼⇒≈″ p∼′q) = ∼⇒≈ ([_]_∼′_.force p∼′q)
+  ∼⇒≈′ : ∀ {i p q} → [ i ] p ∼′ q → [ i ] p ≈′ q
+  [_]_≈′_.force (∼⇒≈′ p∼′q) = ∼⇒≈ ([_]_∼′_.force p∼′q)
 
-∼⇒≈′ : ∀ {i p q} → [ i ] p ∼ q → [ i ] p ≈′ q
-[_]_≈′_.force (∼⇒≈′ p∼q) = ∼⇒≈ p∼q
+-- Functions that can be used to aid the instance resolution
+-- mechanism.
 
--- More "equational" reasoning combinators.
+infix -2 ≈:_ ≈′:_
 
-infix  -1 finally-∼≈ finally-∼≈′ finally-∼′≈ finally-∼′≈′
-infixr -2 _≈⟨_⟩_ _≈′⟨_⟩_ _≈′⟨_⟩′_ _≈⟨_⟩′_
-          _∼⟨_⟩≈_ _∼′⟨_⟩≈_ _∼′⟨_⟩≈′_ _∼⟨_⟩≈′_
-          _≈⟨_⟩∼_ _≈′⟨_⟩∼_
+≈:_ : ∀ {i p q} → [ i ] p ≈ q → [ i ] p ≈ q
+≈:_ = id
 
-_≈⟨_⟩_ : ∀ p {q r} → p ≈ q → q ≈ r → p ≈ r
-_ ≈⟨ p≈q ⟩ q≈r = transitive-≈ p≈q q≈r
-
-_≈′⟨_⟩_ : ∀ p {q r} → p ≈′ q → q ≈ r → p ≈ r
-_ ≈′⟨ p≈′q ⟩ q≈r = transitive-≈ ([_]_≈′_.force p≈′q) q≈r
-
-_≈′⟨_⟩′_ : ∀ p {q r} → p ≈′ q → q ≈′ r → p ≈′ r
-_ ≈′⟨ p≈′q ⟩′ q≈′r = transitive-≈′ p≈′q (_ ≈′⟨ q≈′r ⟩∎ _)
-
-_≈⟨_⟩′_ : ∀ p {q r} → p ≈ q → q ≈′ r → p ≈′ r
-_ ≈⟨ p≈q ⟩′ q≈′r = transitive-≈′ (_ ≈⟨ p≈q ⟩′∎ _) (_ ≈′⟨ q≈′r ⟩∎ _)
-
-_∼⟨_⟩≈_ : ∀ {i} p {q r} → p ∼ q → [ i ] q ≈ r → [ i ] p ≈ r
-_ ∼⟨ p∼q ⟩≈ q≈r = transitive-∼≈ p∼q q≈r
-
-_∼′⟨_⟩≈_ : ∀ {i} p {q r} → p ∼′ q → [ i ] q ≈ r → [ i ] p ≈ r
-_ ∼′⟨ p∼′q ⟩≈ q≈r = transitive-∼≈ (_ SB.∼′⟨ p∼′q ⟩∎ _) q≈r
-
-_∼′⟨_⟩≈′_ : ∀ {i} p {q r} → p ∼′ q → [ i ] q ≈′ r → [ i ] p ≈′ r
-[_]_≈′_.force (_ ∼′⟨ p∼′q ⟩≈′ q≈′r) =
-  transitive-∼≈ ([_]_∼′_.force p∼′q) ([_]_≈′_.force q≈′r)
-
-_∼⟨_⟩≈′_ : ∀ {i} p {q r} → p ∼ q → [ i ] q ≈′ r → [ i ] p ≈′ r
-[_]_≈′_.force (_ ∼⟨ p∼q ⟩≈′ q≈′r) =
-  transitive-∼≈ p∼q ([_]_≈′_.force q≈′r)
-
-_≈⟨_⟩∼_ : ∀ {i} p {q r} → [ i ] p ≈ q → q ∼ r → [ i ] p ≈ r
-_ ≈⟨ p≈q ⟩∼ q∼r = transitive-≈∼ p≈q q∼r
-
-_≈′⟨_⟩∼_ : ∀ {i} p {q r} → [ i ] p ≈′ q → q ∼ r → [ i ] p ≈′ r
-[_]_≈′_.force (_ ≈′⟨ p≈′q ⟩∼ q∼r) =
-  transitive-≈∼ ([_]_≈′_.force p≈′q) q∼r
-
-finally-∼≈ : ∀ p q → p ∼ q → p ≈ q
-finally-∼≈ _ _ p∼q = ∼⇒≈ p∼q
-
-finally-∼′≈ : ∀ p q → p ∼′ q → p ≈ q
-finally-∼′≈ _ _ p∼′q = _ ≈′⟨ ∼⇒≈″ p∼′q ⟩∎ _
-
-finally-∼≈′ : ∀ p q → p ∼ q → p ≈′ q
-finally-∼≈′ _ _ p∼q = ∼⇒≈′ p∼q
-
-finally-∼′≈′ : ∀ p q → p ∼′ q → p ≈′ q
-finally-∼′≈′ _ _ p∼′q = ∼⇒≈″ p∼′q
-
-syntax finally-∼≈   p q p∼q  = p ∼⟨  p∼q  ⟩≈∎ q
-syntax finally-∼′≈  p q p∼′q = p ∼′⟨ p∼′q ⟩≈∎ q
-syntax finally-∼≈′  p q p∼q  = p ∼⟨  p∼q  ⟩≈′∎ q
-syntax finally-∼′≈′ p q p∼′q = p ∼′⟨ p∼′q ⟩≈′∎ q
+≈′:_ : ∀ {i p q} → [ i ] p ≈′ q → [ i ] p ≈′ q
+≈′:_ = id
 
 -- Strong bisimilarity of weak bisimilarity proofs.
 --

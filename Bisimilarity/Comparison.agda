@@ -19,9 +19,12 @@ open import H-level.Closure equality-with-J
 open import Nat equality-with-J as Nat
 open import Surjection equality-with-J using (_↠_)
 
-open import Labelled-transition-system
 import Bisimilarity.Classical
+import Bisimilarity.Classical.Equational-reasoning-instances
 import Bisimilarity.Coinductive
+import Bisimilarity.Coinductive.Equational-reasoning-instances
+open import Equational-reasoning
+open import Labelled-transition-system
 
 module _ {lts : LTS} where
 
@@ -95,13 +98,13 @@ module _ {lts : LTS} where
                 p ≢ q → p Co.∼ q →
                 ∃ λ (p∼p : Cl.[ ℓ ] p ∼ p) → co⇒cl (cl⇒co p∼p) ≢ p∼p
   co⇒cl∘cl⇒co {p} {q} p≢q p∼q =
-      Cl.reflexive
+      reflexive
 
-    , (co⇒cl (cl⇒co Cl.reflexive) ≡ Cl.reflexive  ↝⟨ cong (λ R → proj₁ R p q) ⟩
-       ↑ _ (p Co.∼ q) ≡ ↑ _ (p ≡ q)               ↝⟨ (λ eq → ≡⇒↝ _ eq $ lift p∼q) ⟩
-       ↑ _ (p ≡ q)                                ↝⟨ lower ⟩
-       p ≡ q                                      ↝⟨ p≢q ⟩□
-       ⊥                                          □)
+    , (co⇒cl (cl⇒co reflexive) ≡ reflexive  ↝⟨ cong (λ R → proj₁ R p q) ⟩
+       ↑ _ (p Co.∼ q) ≡ ↑ _ (p ≡ q)         ↝⟨ (λ eq → ≡⇒↝ _ eq $ lift p∼q) ⟩
+       ↑ _ (p ≡ q)                          ↝⟨ lower ⟩
+       p ≡ q                                ↝⟨ p≢q ⟩□
+       ⊥                                    □)
 
   -- The two definitions of bisimilarity are logically equivalent.
 

@@ -11,6 +11,8 @@ module Bisimilarity.Weak.Coinductive (lts : LTS) where
 open import Prelude
 
 import Bisimilarity.Coinductive
+import Bisimilarity.Coinductive.Equational-reasoning-instances
+open import Equational-reasoning
 
 open LTS lts
 
@@ -22,12 +24,6 @@ private
 
 open WB public
   using ( ⟨_,_⟩
-        ; reflexive
-        ; reflexive′
-        ; symmetric
-        ; symmetric′
-        ; transitive
-        ; transitive′
         ; [_]_≡_
         ; [_]_≡′_
         ; Extensionality
@@ -38,10 +34,6 @@ open WB public
            ; [_]_∼′_     to [_]_≈′_
            ; _⟶⟨_⟩ʳˡ_    to _⇒⟨_⟩ʳˡ_
            ; _[_]⟶⟨_⟩ʳˡ_ to _[_]⇒⟨_⟩ʳˡ_
-           ; _∼⟨_⟩_      to _≈⟨_⟩_
-           ; _∼′⟨_⟩_     to _≈′⟨_⟩_
-           ; _∼′⟨_⟩′_    to _≈′⟨_⟩′_
-           ; _∼⟨_⟩′_     to _≈⟨_⟩′_
            )
 
 infix -3 lr-result-with-action lr-result-without-action
@@ -51,18 +43,6 @@ lr-result-with-action    = WB.lr-result-with-action
 
 syntax lr-result-without-action p′≈q′   q q⟶q′ = p′≈q′      ⇐⟨ q⟶q′ ⟩ q
 syntax lr-result-with-action    p′≈q′ μ q q⟶q′ = p′≈q′ [ μ ]⇐⟨ q⟶q′ ⟩ q
-
-infix -1 finally-≈ finally-≈′ finally-′≈ finally-′≈′
-
-finally-≈   = WB.finally-∼
-finally-′≈  = WB.finally-′∼
-finally-≈′  = WB.finally-∼′
-finally-′≈′ = WB.finally-′∼′
-
-syntax finally-≈   p q p≈q  = p ≈⟨  p≈q  ⟩∎ q
-syntax finally-′≈  p q p≈′q = p ≈′⟨ p≈′q ⟩∎ q
-syntax finally-≈′  p q p≈q  = p ≈⟨  p≈q  ⟩′∎ q
-syntax finally-′≈′ p q p≈′q = p ≈′⟨ p≈′q ⟩′∎ q
 
 -- Strongly bisimilar processes are weakly bisimilar.
 
@@ -76,7 +56,7 @@ mutual
   ∼⇒≈ : ∀ {i p q} → p ∼ q → [ i ] p ≈ q
   ∼⇒≈ {i} = λ p∼q →
     ⟨ lr p∼q
-    , Σ-map id (Σ-map id symmetric′) ∘ lr (SB.symmetric p∼q)
+    , Σ-map id (Σ-map id symmetric) ∘ lr (symmetric p∼q)
     ⟩
     where
     lr : ∀ {p p′ q μ} →
@@ -96,37 +76,3 @@ mutual
 -- larger, because a single weak transition might correspond to a
 -- large number of strong transitions. I guess this has to be proved
 -- for a particular LTS, or with certain assumptions about the LTS.
-
--- More "equational" reasoning combinators.
-
-infix  -1 finally-∼≈ finally-∼′≈ finally-∼≈′ finally-∼′≈′
-infixr -2 _∼⟨_⟩≈_ _∼′⟨_⟩≈_ _∼′⟨_⟩≈′_ _∼⟨_⟩≈′_
-
-_∼⟨_⟩≈_ : ∀ {i} p {q r} → p ∼ q → [ i ] q ≈ r → [ i ] p ≈ r
-_ ∼⟨ p∼q ⟩≈ q≈r = _ ≈⟨ ∼⇒≈ p∼q ⟩ q≈r
-
-_∼′⟨_⟩≈_ : ∀ {i} p {q r} → p ∼′ q → [ i ] q ≈ r → [ i ] p ≈ r
-_ ∼′⟨ p∼′q ⟩≈ q≈r = _ ≈′⟨ ∼⇒≈″ p∼′q ⟩ q≈r
-
-_∼′⟨_⟩≈′_ : ∀ {i} p {q r} → p ∼′ q → [ i ] q ≈′ r → [ i ] p ≈′ r
-_ ∼′⟨ p∼′q ⟩≈′ q≈′r = _ ≈′⟨ ∼⇒≈″ p∼′q ⟩′ q≈′r
-
-_∼⟨_⟩≈′_ : ∀ {i} p {q r} → p ∼ q → [ i ] q ≈′ r → [ i ] p ≈′ r
-_ ∼⟨ p∼q ⟩≈′ q≈′r = _ ≈⟨ ∼⇒≈ p∼q ⟩′ q≈′r
-
-finally-∼≈ : ∀ p q → p ∼ q → p ≈ q
-finally-∼≈ _ _ p∼q = ∼⇒≈ p∼q
-
-finally-∼′≈ : ∀ p q → p ∼′ q → p ≈ q
-finally-∼′≈ _ _ p∼′q = _ ≈′⟨ ∼⇒≈″ p∼′q ⟩∎ _
-
-finally-∼≈′ : ∀ p q → p ∼ q → p ≈′ q
-finally-∼≈′ _ _ p∼q = ∼⇒≈′ p∼q
-
-finally-∼′≈′ : ∀ p q → p ∼′ q → p ≈′ q
-finally-∼′≈′ _ _ p∼′q = ∼⇒≈″ p∼′q
-
-syntax finally-∼≈   p q p∼q  = p ∼⟨  p∼q  ⟩≈∎ q
-syntax finally-∼′≈  p q p∼′q = p ∼′⟨ p∼′q ⟩≈∎ q
-syntax finally-∼≈′  p q p∼q  = p ∼⟨  p∼q  ⟩≈′∎ q
-syntax finally-∼′≈′ p q p∼′q = p ∼′⟨ p∼′q ⟩≈′∎ q

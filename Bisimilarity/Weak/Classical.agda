@@ -21,13 +21,8 @@ private
   module WB = Bisimilarity.Classical (weak lts)
 
 open WB public
-  using ( ⟨_,_⟩
-        ; reflexive
-        ; symmetric
-        ; transitive
-        )
+  using (⟨_,_⟩)
   renaming ( Bisimulation to Weak-bisimulation
            ; _∼_          to _≈_
            ; [_]_∼_       to [_]_≈_
-           ; _∼⟨_⟩_       to _≈⟨_⟩_
            )

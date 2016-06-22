@@ -15,11 +15,13 @@ open import Prelude
 
 open import Function-universe equality-with-J hiding (id; _∘_)
 
-open import Labelled-transition-system
-open import Bisimilarity.Classical.Preliminaries
 import Bisimilarity.Classical
+import Bisimilarity.Classical.Equational-reasoning-instances
+open import Bisimilarity.Classical.Preliminaries
 open import Bisimilarity.Comparison
 import Bisimilarity.Exercises.Other
+open import Equational-reasoning
+open import Labelled-transition-system
 
 module _ {Name : Set} where
 
@@ -185,7 +187,7 @@ module _ {Name : Set} where
   open Bisimilarity.Exercises.Other.6-1-3-2 (record
          { _∼_       = _∼_
          ; _∼⟨_⟩_    = _∼⟨_⟩_
-         ; finally-∼ = finally-∼
+         ; finally-∼ = Equational-reasoning.finally
          ; reflexive = reflexive
          ; symmetric = symmetric
          ; ∣-comm    = ∣-comm
@@ -234,7 +236,7 @@ module _ {Name : Set} where
            ! a · ∣ ∅)
         , _
         , (P′            ∼⟨ P′∼!!a∣P″ ⟩
-           ! ! a · ∣ P″  ∼⟨ lemma P″∼!a∣∅ ⟩∎
+           ! ! a · ∣ P″  ∼⟨ ∼: lemma P″∼!a∣∅ ⟩∎
            ! ! a ·)
         , _
         , base
