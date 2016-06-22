@@ -16,6 +16,7 @@ open import Fin equality-with-J
 open import Function-universe equality-with-J hiding (_∘_; id)
 open import H-level equality-with-J as H-level
 open import H-level.Closure equality-with-J
+open import Nat equality-with-J as Nat
 open import Surjection equality-with-J using (_↠_)
 
 open import Labelled-transition-system
@@ -177,7 +178,7 @@ classical-bisimilarity-is-not-propositional {ℓ} =
                                                Fin 1 ⊎ Fin 1  ↝⟨ Fin⊎Fin↔Fin+ 1 1 ⟩□
                                                Fin 2          □) ⟩
   Fin 1 ↔ Fin 2                     ↝⟨ _⇔_.to isomorphic-same-size ⟩
-  1 ≡ 2                             ↝⟨ from-⊎ (1 ℕ.≟ 2) ⟩□
+  1 ≡ 2                             ↝⟨ from-⊎ (1 Nat.≟ 2) ⟩□
   ⊥                                 □
   where
   open Bisimilarity.Classical one-loop

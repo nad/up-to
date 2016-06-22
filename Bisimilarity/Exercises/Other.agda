@@ -10,6 +10,7 @@
 module Bisimilarity.Exercises.Other where
 
 open import Equality.Propositional hiding (reflexive)
+open import List equality-with-J
 open import Prelude
 
 open import Labelled-transition-system
