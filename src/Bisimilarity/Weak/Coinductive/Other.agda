@@ -139,11 +139,11 @@ mutual
 
 mutual
 
-  -- Note that the transitivity proof is not size-preserving.
-
-  -- TODO: I guess that this proof cannot be size-preserving in any of
-  -- its two arguments. Perhaps one of the examples given by Pous and
-  -- Sangiorgi can be used as a counterexample.
+  -- Note that the transitivity proof is not claimed to be
+  -- size-preserving. For proofs showing that transitivity cannot, in
+  -- general, be size-preserving in any of its arguments, see
+  -- Bisimilarity.Weak.Exercises.Coinductive.size-preserving-transitivityʳ⇔uninhabited
+  -- and size-preserving-transitivityˡ⇔uninhabited.
 
   transitive-≈ : ∀ {i p q r} → p ≈ q → q ≈ r → [ i ] p ≈ r
   transitive-≈ {i} = λ p≈q q≈r →

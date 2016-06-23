@@ -1,3 +1,3 @@
 name: up-to
-depend: equality
+depend: equality partiality-monad
 include: src

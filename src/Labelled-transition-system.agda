@@ -6,6 +6,7 @@
 
 module Labelled-transition-system where
 
+open import Delay-monad as No-name
 open import Equality.Propositional
 open import Prelude
 
@@ -616,64 +617,59 @@ module 6-2-5 (Name : Set) where
     ; _[_]⟶_  = _[_]⟶_
     }
 
--- The partiality monad. (Some people may prefer to call it the delay
--- monad.)
+-- The delay monad.
 
-module Partiality-monad where
+module Delay-monad (A : Set) where
 
-  mutual
-
-    data Partial (A : Set) (i : Size) : Set where
-      now   : A → Partial A i
-      later : Partial′ A i → Partial A i
-
-    record Partial′ (A : Set) (i : Size) : Set where
-      coinductive
-      field
-        force : {j : Size< i} → Partial A j
-
-  open Partial′ public
-
-  -- Transitions.
+  ----------------------------------------------------------------------
+  -- Transitions
 
   infix 4 _[_]⟶_
 
-  data _[_]⟶_ {A : Set} :
-              Partial A ∞ → Maybe A → Partial A ∞ → Set where
-    now   : ∀ {x} → now x   [ just x  ]⟶ now x
-    later : ∀ {x} → later x [ nothing ]⟶ force x
+  data _[_]⟶_ : Delay A ∞ → Maybe A → Delay A ∞ → Set where
+    now⟶   : ∀ {x} → now x   [ just x  ]⟶ now x
+    later⟶ : ∀ {x} → later x [ nothing ]⟶ force x
 
-  partiality-monad : Set → LTS
-  partiality-monad A = record
-    { Proc    = Partial A ∞
+  delay-monad : LTS
+  delay-monad = record
+    { Proc    = Delay A ∞
     ; Label   = Maybe A
     ; Silent  = [ const ⊤ , const ⊥ ]
     ; silent? = [ yes , const (no λ ()) ]
     ; _[_]⟶_  = _[_]⟶_
     }
 
-  -- A direct definition of weak bisimilarity.
+  open LTS delay-monad hiding (_[_]⟶_)
 
-  mutual
+  ----------------------------------------------------------------------
+  -- Some simple lemmas
 
-    infix 4 [_]_≈_ [_]_≈′_
+  -- If now x can make a sequence of silent transitions to y, then y
+  -- is equal to now x.
 
-    data [_]_≈_ (i : Size) {A : Set} :
-                Partial A ∞ → Partial A ∞ → Set where
-      now    : ∀ {x} → [ i ] now x ≈ now x
-      later  : ∀ {x y} →
-               [ i ] force x ≈′ force y →
-               [ i ] later x ≈ later y
-      laterˡ : ∀ {x y} →
-               [ i ] force x ≈ y →
-               [ i ] later x ≈ y
-      laterʳ : ∀ {x y} →
-               [ i ] x ≈ force y →
-               [ i ] x ≈ later y
+  now⇒ : ∀ {x y} → now x ⇒ y → y ≡ now x
+  now⇒ done             = refl
+  now⇒ (step () now⟶ _)
 
-    record [_]_≈′_ (i : Size) {A : Set} (x y : Partial A ∞) : Set where
-      coinductive
-      field
-        force : {j : Size< i} → [ j ] x ≈ y
+  now[nothing]⇒̂ : ∀ {x y} → now x [ nothing ]⇒̂ y → y ≡ now x
+  now[nothing]⇒̂ (silent _ tr)                = now⇒ tr
+  now[nothing]⇒̂ (non-silent contradiction _) = ⊥-elim (contradiction _)
 
-  open [_]_≈′_ public
+  -- If now x can make a just y-transition, then x is equal to y.
+
+  now[just]⟶ : ∀ {x y z} → now x [ just y ]⟶ z → x ≡ y
+  now[just]⟶ now⟶ = refl
+
+  now[just]⇒ : ∀ {x y z} → now x [ just y ]⇒ z → x ≡ y
+  now[just]⇒ (steps tr₁ tr₂ _) =
+    now[just]⟶ (subst (_[ _ ]⟶ _) (now⇒ tr₁) tr₂)
+
+  now[just]⇒̂ : ∀ {x y z} → now x [ just y ]⇒̂ z → x ≡ y
+  now[just]⇒̂ (silent () _)
+  now[just]⇒̂ (non-silent _ tr) = now[just]⇒ tr
+
+  -- If force x can make a [ μ ]⇒̂-transition to y, then later x can
+  -- also make a [ μ ]⇒̂-transition to y.
+
+  later⇒̂ : ∀ {μ x y} → force x [ μ ]⇒̂ y → later x [ μ ]⇒̂ y
+  later⇒̂ = ⇒⇒̂-transitive (⟶→⇒ _ later⟶)

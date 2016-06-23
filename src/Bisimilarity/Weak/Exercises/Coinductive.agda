@@ -10,9 +10,16 @@
 
 module Bisimilarity.Weak.Exercises.Coinductive where
 
+open import Delay-monad
+open import Delay-monad.Weak-bisimilarity as DW
+  hiding (_≈_; reflexive; symmetric;
+          size-preserving-transitivityˡ⇔uninhabited;
+          size-preserving-transitivityʳ⇔uninhabited)
 open import Equality.Propositional hiding (reflexive)
+open import Logical-equivalence using (_⇔_)
 open import Prelude
 
+open import Equality.Decision-procedures equality-with-J
 open import Function-universe equality-with-J hiding (id; _∘_)
 
 import Bisimilarity.Coinductive
@@ -255,3 +262,165 @@ module _ {Name : Set} where
       ∀ {i a b} →
       [ i ] ! name a · (b ·) ∣ ! co a · ≈′ (! a · ∣ ! b ·) ∣ ! co a ·
     force 6-5-4′ = 6-5-4
+
+------------------------------------------------------------------------
+-- Results related to the delay monad
+
+module _ {A : Set} where
+
+  open Labelled-transition-system.Delay-monad A
+  open LTS delay-monad hiding (_[_]⟶_)
+  open Bisimilarity.Weak.Coinductive.Other delay-monad
+
+  -- Emulations of the constructors later-cong, laterˡ and laterʳ.
+
+  later-cong′ : ∀ {i x y} →
+                [ i ] force x ≈′ force y → [ i ] later x ≈ later y
+  later-cong′ x≈′y =
+    ⟨ (λ { later⟶ → _ , ⟶→⇒̂ later⟶ , x≈′y })
+    , (λ { later⟶ → _ , ⟶→⇒̂ later⟶ , x≈′y })
+    ⟩
+
+  laterˡ′ : ∀ {i x y} → [ i ] force x ≈ y → [ i ] later x ≈ y
+  laterˡ′ x≈y =
+    ⟨ (λ { later⟶ → _ , silent _ done , convert x≈y })
+    , Σ-map id (Σ-map later⇒̂ id) ∘ right-to-left x≈y
+    ⟩
+
+  laterʳ′ : ∀ {i x y} → [ i ] x ≈ force y → [ i ] x ≈ later y
+  laterʳ′ x≈y =
+    ⟨ Σ-map id (Σ-map later⇒̂ id) ∘ left-to-right x≈y
+    , (λ { later⟶ → _ , silent _ done , convert x≈y })
+    ⟩
+
+  mutual
+
+    -- The direct definition of weak bisimilarity is contained in the
+    -- one obtained from the transition relation.
+
+    direct→indirect : ∀ {i x y} →
+                      Weakly-bisimilar i x y → [ i ] x ≈ y
+    direct→indirect now-cong       = reflexive
+    direct→indirect (later-cong p) = later-cong′ (direct→indirect′ p)
+    direct→indirect (laterˡ p)     = laterˡ′ (direct→indirect p)
+    direct→indirect (laterʳ p)     = laterʳ′ (direct→indirect p)
+
+    direct→indirect′ : ∀ {i x y} →
+                       ∞Weakly-bisimilar i x y → [ i ] x ≈′ y
+    force (direct→indirect′ p) = direct→indirect (force p)
+
+  -- If x makes a sequence of zero or more silent transitions to y,
+  -- then x is weakly bisimilar to y.
+
+  ⇒→≈ : ∀ {i x y} → x ⇒ y → Weakly-bisimilar i x y
+  ⇒→≈ done               = DW.reflexive _
+  ⇒→≈ (step _ now⟶ tr)   = ⇒→≈ tr
+  ⇒→≈ (step _ later⟶ tr) = laterˡ (⇒→≈ tr)
+
+  -- If x makes a non-silent weak transition with the label y, then x
+  -- is weakly bisimilar to now y.
+
+  [just]⇒→≈now : ∀ {i x x′ y} →
+                 x [ just y ]⇒ x′ → Weakly-bisimilar i x (now y)
+  [just]⇒→≈now (steps tr now⟶ _) = ⇒→≈ tr
+
+  [just]⇒̂→≈now : ∀ {i x x′ y} →
+                 x [ just y ]⇒̂ x′ → Weakly-bisimilar i x (now y)
+  [just]⇒̂→≈now (silent () _)
+  [just]⇒̂→≈now (non-silent _ tr) = [just]⇒→≈now tr
+
+  mutual
+
+    -- The definition of weak bisimilarity obtained from the
+    -- transition relation is contained in the direct one. Note that
+    -- this proof is not claimed to be size-preserving.
+
+    indirect→direct : ∀ {i} x y → x ≈ y → Weakly-bisimilar i x y
+    indirect→direct {i} (now x) y =
+      now x ≈ y                                   ↝⟨ (λ p → left-to-right p now⟶) ⟩
+      (∃ λ y′ → y [ later x ]⇒̂ y′ × now x ≈′ y′)  ↝⟨ [just]⇒̂→≈now ∘ proj₁ ∘ proj₂ ⟩
+      Weakly-bisimilar i y (now x)                ↝⟨ DW.symmetric ⟩□
+      Weakly-bisimilar i (now x) y                □
+
+    indirect→direct {i} x (now y) =
+      x ≈ now y                                   ↝⟨ (λ p → right-to-left p now⟶) ⟩
+      (∃ λ x′ → x [ later y ]⇒̂ x′ × x′ ≈′ now y)  ↝⟨ [just]⇒̂→≈now ∘ proj₁ ∘ proj₂ ⟩□
+      Weakly-bisimilar i x (now y)                □
+
+    indirect→direct (later x) (later y) lx≈ly with left-to-right lx≈ly later⟶
+    ... | y′ , non-silent contradiction _    , _     = ⊥-elim (contradiction _)
+    ... | y′ , silent _ (step _ later⟶ y⇒y′) , x≈′y′ = later-cong (∞indirect→direct′ y⇒y′ x≈′y′)
+    ... | y′ , silent _ done                 , x≈′ly with right-to-left (force x≈′ly) later⟶
+    ...   | x′ , non-silent contradiction _   , _     = ⊥-elim (contradiction _)
+    ...   | x′ , silent _ x⇒x′                , x′≈′y =
+      later-cong (DW.∞symmetric (∞indirect→direct′ x⇒x′ (symmetric x′≈′y)))
+
+    -- Lemmas used by indirect→direct.
+
+    indirect→direct′ : ∀ {i x y y′} →
+                       y ⇒ y′ → x ≈ y′ → Weakly-bisimilar i x y
+    indirect→direct′ done               p = indirect→direct _ _ p
+    indirect→direct′ (step _ later⟶ tr) p = laterʳ (indirect→direct′ tr p)
+    indirect→direct′ (step () now⟶ _)
+
+    ∞indirect→direct′ : ∀ {i x y y′} →
+                        y ⇒ y′ → x ≈′ y′ → ∞Weakly-bisimilar i x y
+    force (∞indirect→direct′ tr p) = indirect→direct′ tr (force p)
+
+  -- The direct definition of weak bisimilarity is logically
+  -- equivalent to the one obtained from the transition relation.
+
+  direct⇔indirect : ∀ {x y} → Weakly-bisimilar ∞ x y ⇔ x ≈ y
+  direct⇔indirect = record
+    { to   = direct→indirect
+    ; from = indirect→direct _ _
+    }
+
+  -- There is a transitivity proof (for the indirect definition of
+  -- weak bisimilarity) that preserves the size of the second argument
+  -- iff A is uninhabited.
+
+  size-preserving-transitivityʳ⇔uninhabited :
+    (∀ {i} {x y z : Delay A ∞} → x ≈ y → [ i ] y ≈ z → [ i ] x ≈ z) ⇔
+    ¬ A
+  size-preserving-transitivityʳ⇔uninhabited = record
+    { to   = Trans                  ↝⟨ (λ trans x → ≈never (λ {i} → trans {i}) (record { force = now x })) ⟩
+             (∀ x → now x ≈ never)  ↝⟨ (λ hyp x → now≉never (indirect→direct _ _ (hyp x))) ⟩
+             ¬ A                    □
+    ; from = ¬ A                 ↝⟨ uninhabited→trivial ⟩
+             (∀ x y → x DW.≈ y)  ↝⟨ (λ hyp x y → direct→indirect (hyp x y)) ⟩
+             (∀ x y → x ≈ y)     ↝⟨ (λ trivial {_ _ _ _} _ _ → trivial _ _) ⟩□
+             Trans               □
+    }
+    where
+    Trans = ∀ {i} {x y z : Delay A ∞} →
+            x ≈ y → [ i ] y ≈ z → [ i ] x ≈ z
+
+    mutual
+
+      ≈never : Trans → ∀ {i} (x : ∞Delay _ _) →
+               [ i ] force x ≈ never
+      ≈never trans x =
+        trans (laterʳ′ {y = x} reflexive)
+              (later-cong′ (≈never′ trans x))
+
+      ≈never′ : Trans → ∀ {i} (x : ∞Delay _ _) →
+                [ i ] force x ≈′ never
+      force (≈never′ trans x) = ≈never trans x
+
+  -- There is a transitivity proof (for the indirect definition of
+  -- weak bisimilarity) that preserves the size of the first argument
+  -- iff A is uninhabited.
+
+  size-preserving-transitivityˡ⇔uninhabited :
+    (∀ {i} {x y z : Delay A ∞} → [ i ] x ≈ y → y ≈ z → [ i ] x ≈ z) ⇔
+    ¬ A
+  size-preserving-transitivityˡ⇔uninhabited =
+    (∀ {i} {x y z : Delay A ∞} → [ i ] x ≈ y → y ≈ z → [ i ] x ≈ z)  ↝⟨ record { to   = λ trans {_ _ _ _} p q →
+                                                                                          symmetric (trans (symmetric q) (symmetric p))
+                                                                               ; from = λ trans {_ _ _ _} p q →
+                                                                                          symmetric (trans (symmetric q) (symmetric p))
+                                                                               } ⟩
+    (∀ {i} {x y z : Delay A ∞} → x ≈ y → [ i ] y ≈ z → [ i ] x ≈ z)  ↝⟨ size-preserving-transitivityʳ⇔uninhabited ⟩□
+
+    ¬ A                                                              □
