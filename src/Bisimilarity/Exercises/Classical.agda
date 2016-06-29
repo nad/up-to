@@ -120,7 +120,7 @@ module _ {Name : Set} where
   ∣-right-identity : ∀ {P} → P ∣ ∅ ∼ P
   ∣-right-identity {P} =
     P ∣ ∅  ∼⟨ ∣-comm ⟩
-    ∅ ∣ P  ∼⟨ ∣-left-identity ⟩∎
+    ∅ ∣ P  ∼⟨ ∣-left-identity ⟩■
     P
 
   -- _∣_ preserves bisimilarity.
@@ -220,7 +220,7 @@ module _ {Name : Set} where
       lemma = λ {P} P∼!a∣∅ →
         ! ! a · ∣ P            ∼⟨ reflexive ∣-cong P∼!a∣∅ ⟩
         ! ! a · ∣ (! a · ∣ ∅)  ∼⟨ reflexive ∣-cong ∣-right-identity ⟩
-        ! ! a · ∣ ! a ·        ∼⟨ 6-1-2 ⟩∎
+        ! ! a · ∣ ! a ·        ∼⟨ 6-1-2 ⟩■
         ! ! a ·
 
       lr : ∀ {P P′ Q μ} →
@@ -236,11 +236,11 @@ module _ {Name : Set} where
            ! a · ∣ ∅)
         , _
         , (P′            ∼⟨ P′∼!!a∣P″ ⟩
-           ! ! a · ∣ P″  ∼⟨ ∼: lemma P″∼!a∣∅ ⟩∎
+           ! ! a · ∣ P″  ∼⟨ ∼: lemma P″∼!a∣∅ ⟩■
            ! ! a ·)
         , _
         , base
-        , (! a ·      ∼⟨ symmetric ∣-right-identity ⟩∎
+        , (! a ·      ∼⟨ symmetric ∣-right-identity ⟩■
            ! a · ∣ ∅)
 
       rl : ∀ {P Q Q′ μ} →
@@ -254,12 +254,12 @@ module _ {Name : Set} where
         , (! ! a ·       [ name a ]⟶⟨ replication (par-right !a⟶Q′) ⟩
            ! ! a · ∣ Q′)
         , _
-        , (! ! a · ∣ Q′  ∼⟨ lemma Q′∼!a∣∅ ⟩∎
+        , (! ! a · ∣ Q′  ∼⟨ lemma Q′∼!a∣∅ ⟩■
            ! ! a ·)
         , _
         , base
         , (! a ·      ∼⟨ symmetric ∣-right-identity ⟩
-           ! a · ∣ ∅  ∼⟨ symmetric Q′∼!a∣∅ ⟩∎
+           ! a · ∣ ∅  ∼⟨ symmetric Q′∼!a∣∅ ⟩■
            Q′)
 
   ----------------------------------------------------------------------
@@ -283,14 +283,14 @@ module _ {Name : Set} where
           _
         , (name a · (a ·)  [ name a ]⟶⟨ action ⟩
            a ·)
-        , inj₂ (∅ ∣ a ·  ∼⟨ ∣-left-identity ⟩∎
+        , inj₂ (∅ ∣ a ·  ∼⟨ ∣-left-identity ⟩■
                 a ·)
 
       lr base (par-right action) =
           _
         , (name a · (a ·)  [ name a ]⟶⟨ action ⟩
            a ·)
-        , inj₂ (a · ∣ ∅  ∼⟨ ∣-right-identity ⟩∎
+        , inj₂ (a · ∣ ∅  ∼⟨ ∣-right-identity ⟩■
                 a ·)
 
       lr base (par-τ′ a≡co-a action action) = ⊥-elim (id≢co a≡co-a)
@@ -302,5 +302,5 @@ module _ {Name : Set} where
           _
         , (a · ∣ a ·  [ name a ]⟶⟨ par-right action ⟩
            a · ∣ ∅)
-        , inj₂ (a · ∣ ∅  ∼⟨ ∣-right-identity ⟩∎
+        , inj₂ (a · ∣ ∅  ∼⟨ ∣-right-identity ⟩■
                 a ·)

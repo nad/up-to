@@ -8,8 +8,8 @@ module Equational-reasoning where
 
 open import Prelude
 
-infix  -1 finally
-infixr -2 _∼⟨_⟩_ _∽⟨_⟩_
+infix  -1 _■ finally
+infixr -2 _∼⟨_⟩_ _∼⟨⟩_ _∽⟨_⟩_
 
 ------------------------------------------------------------------------
 -- Reflexivity
@@ -22,6 +22,19 @@ record Reflexive {a p} {A : Set a}
     reflexive : ∀ {x} → P x x
 
 open Reflexive ⦃ … ⦄ public
+
+_■ : ∀ {a p} {A : Set a} {P : A → A → Set p} ⦃ r : Reflexive P ⦄
+     (x : A) → P x x
+_ ■ = reflexive
+
+-- A transitivity-like combinator. This combinator can be used when
+-- two arguments are definitionally equal. (The Reflexive instance
+-- argument is used to make type inference easier.)
+
+_∼⟨⟩_ : ∀ {a p} {A : Set a} {P : A → A → Set p}
+          ⦃ p : Reflexive P ⦄ x {y} →
+        P x y → P x y
+_ ∼⟨⟩ p = p
 
 ------------------------------------------------------------------------
 -- Symmetry
@@ -38,6 +51,8 @@ open Symmetric ⦃ … ⦄ public
 ------------------------------------------------------------------------
 -- Transitivity
 
+-- One variant of transitivity.
+--
 -- Note that the combinator can (depending on the available instances)
 -- be used to convert from one type to another, but only in its first
 -- argument (in order to make instance resolution easier).
@@ -57,6 +72,8 @@ _∼⟨_⟩_ : ∀ {a b p q} {A : Set a} {B : Set b}
          P x y → Q y z → Q x z
 _∼⟨_⟩_ _ = transitive
 
+-- Another variant of transitivity.
+--
 -- Note that the combinator can (depending on the available instances)
 -- be used to convert from one type to another, but only in its second
 -- argument (in order to make instance resolution easier).
@@ -82,7 +99,7 @@ _∽⟨_⟩_ _ = transitive′
 -- This combinator is intended to be used in the last step of an
 -- equational reasoning proof:
 --
---   x ∼⟨ ? ⟩∎
+--   x  ∼⟨ ? ⟩■
 --   y
 --
 -- Note that the combinator can (depending on the available instances)
@@ -103,4 +120,4 @@ finally : ∀ {a b p q} {A : Set a} {B : Set b}
           P x y → Q x y
 finally _ _ = convert
 
-syntax finally x y x∼y = x ∼⟨ x∼y ⟩∎ y
+syntax finally x y x∼y = x ∼⟨ x∼y ⟩■ y

@@ -186,7 +186,7 @@ mutual
     lr p⟶p′ =
       let q′ , q⇒̂q′ , p′≈′q′ = left-to-right p≈q p⟶p′
           r′ , r⇒̂r′ , q′∼r′  = SB.strong-is-weak q∼r q⇒̂q′
-      in r′ , r⇒̂r′ , transitive-≈∼′ p′≈′q′ (_ ∼⟨ q′∼r′ ⟩∎ _)
+      in r′ , r⇒̂r′ , transitive-≈∼′ p′≈′q′ (_ ∼⟨ q′∼r′ ⟩■ _)
 
   transitive-≈∼′ : ∀ {i p q r} →
                    [ i ] p ≈′ q → q ∼′ r → [ i ] p ≈′ r
