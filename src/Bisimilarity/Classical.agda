@@ -11,7 +11,7 @@ open import Labelled-transition-system
 
 module Bisimilarity.Classical (lts : LTS) where
 
-open import Equality.Propositional hiding (reflexive)
+open import Equality.Propositional
 open import Prelude
 
 open import Bisimilarity.Classical.Preliminaries

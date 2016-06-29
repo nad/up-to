@@ -15,7 +15,7 @@ open import Delay-monad.Weak-bisimilarity as DW
   hiding (_≈_; reflexive; symmetric;
           size-preserving-transitivityˡ⇔uninhabited;
           size-preserving-transitivityʳ⇔uninhabited)
-open import Equality.Propositional hiding (reflexive)
+open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 

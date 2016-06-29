@@ -8,7 +8,7 @@ open import Labelled-transition-system
 
 module Bisimilarity.Coinductive (lts : LTS) where
 
-open import Equality.Propositional hiding (reflexive; Extensionality)
+open import Equality.Propositional hiding (Extensionality)
 open import Prelude
 
 import Equational-reasoning

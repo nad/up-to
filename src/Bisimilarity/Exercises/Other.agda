@@ -9,7 +9,7 @@
 
 module Bisimilarity.Exercises.Other where
 
-open import Equality.Propositional hiding (reflexive)
+open import Equality.Propositional
 open import List equality-with-J
 open import Prelude
 
