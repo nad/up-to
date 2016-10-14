@@ -104,12 +104,13 @@ module _ {Name : Set} where
   record 6-1-3-2-assumptions ℓ : Set (lsuc ℓ) where
     infix 4 _∼_
     infix  -1 finally-∼
-    infixr -2 _∼⟨_⟩_
+    infixr -2 step-∼
     syntax finally-∼ p q p∼q = p ∼⟨ p∼q ⟩∎ q ∎
+    syntax step-∼ p q∼r p∼q  = p ∼⟨ p∼q ⟩ q∼r
 
     field
       _∼_       : Proc → Proc → Set ℓ
-      _∼⟨_⟩_    : ∀ P {Q R} → P ∼ Q → Q ∼ R → P ∼ R
+      step-∼    : ∀ P {Q R} → Q ∼ R → P ∼ Q → P ∼ R
       finally-∼ : ∀ P Q → P ∼ Q → P ∼ Q
       reflexive : ∀ {P} → P ∼ P
       symmetric : ∀ {P Q} → P ∼ Q → Q ∼ P
