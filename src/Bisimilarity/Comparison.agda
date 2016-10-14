@@ -8,7 +8,7 @@ module Bisimilarity.Comparison where
 
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
-open import Prelude
+open import Prelude hiding (Unit)
 
 open import Bijection equality-with-J as Bijection using (_↔_)
 open import Equality.Decision-procedures equality-with-J
