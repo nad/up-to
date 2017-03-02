@@ -39,9 +39,9 @@ module _ {Name : Set} where
     -- _∣_ is commutative.
 
     ∣-comm : ∀ {P Q i} → [ i ] P ∣ Q ∼ Q ∣ P
-    ∣-comm = ⟨ lr , Σ-map id (Σ-map id symmetric) ∘ lr ⟩
+    ∣-comm {i = i} = ⟨ lr , Σ-map id (Σ-map id symmetric) ∘ lr ⟩
       where
-      lr : ∀ {P P′ Q μ i} →
+      lr : ∀ {P P′ Q μ} →
            P ∣ Q [ μ ]⟶ P′ →
            ∃ λ Q′ → Q ∣ P [ μ ]⟶ Q′ × [ i ] P′ ∼′ Q′
       lr (par-left tr)   = _ , par-right tr , ∣-comm′
