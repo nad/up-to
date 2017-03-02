@@ -12,9 +12,8 @@ module Bisimilarity.Weak.Exercises.Coinductive where
 
 open import Delay-monad
 open import Delay-monad.Weak-bisimilarity as DW
-  hiding (_≈_; reflexive; symmetric;
-          size-preserving-transitivityˡ⇔uninhabited;
-          size-preserving-transitivityʳ⇔uninhabited)
+  using (Weakly-bisimilar; ∞Weakly-bisimilar; force)
+open Weakly-bisimilar
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
@@ -385,9 +384,9 @@ module _ {A : Set} where
     ¬ A
   size-preserving-transitivityʳ⇔uninhabited = record
     { to   = Trans                  ↝⟨ (λ trans x → ≈never (λ {i} → trans {i}) (record { force = now x })) ⟩
-             (∀ x → now x ≈ never)  ↝⟨ (λ hyp x → now≉never (indirect→direct _ _ (hyp x))) ⟩
+             (∀ x → now x ≈ never)  ↝⟨ (λ hyp x → DW.now≉never (indirect→direct _ _ (hyp x))) ⟩
              ¬ A                    □
-    ; from = ¬ A                 ↝⟨ uninhabited→trivial ⟩
+    ; from = ¬ A                 ↝⟨ DW.uninhabited→trivial ⟩
              (∀ x y → x DW.≈ y)  ↝⟨ (λ hyp x y → direct→indirect (hyp x y)) ⟩
              (∀ x y → x ≈ y)     ↝⟨ (λ trivial {_ _ _ _} _ _ → trivial _ _) ⟩□
              Trans               □
