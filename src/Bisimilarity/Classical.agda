@@ -247,6 +247,7 @@ bisimulation-up-to-*⇒bisimulation :
 bisimulation-up-to-*⇒bisimulation {_R_} R-is = ⟨ lr , rl ⟩
   where
   open Progression
+
   lr : ∀ {p p′ q μ} →
        (_R_ *) p q → p [ μ ]⟶ p′ →
        ∃ λ q′ → q [ μ ]⟶ q′ × (_R_ *) p′ q′

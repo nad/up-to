@@ -236,29 +236,26 @@ record LTS : Set₁ where
 
   -- Zip-like functions.
 
-  zip-⇒ : {F : Proc → Proc → Proc} →
-          (∀ {p p′ q μ} → p [ μ ]⟶ p′ → F p q [ μ ]⟶ F p′ q) →
-          (∀ {p q q′ μ} → q [ μ ]⟶ q′ → F p q [ μ ]⟶ F p q′) →
-          ∀ {p p′ q q′} → p ⇒ p′ → q ⇒ q′ → F p q ⇒ F p′ q′
-  zip-⇒ f g done done                = done
-  zip-⇒ f g done (step s q⟶q′ q′⇒q″) = step s (g q⟶q′) (zip-⇒ f g done q′⇒q″)
-  zip-⇒ f g (step s p⟶p′ p′⇒p″) tr   = step s (f p⟶p′) (zip-⇒ f g p′⇒p″ tr)
-
   module _
     {F : Proc → Proc → Proc}
     (f : ∀ {p p′ q μ} → p [ μ ]⟶ p′ → F p q [ μ ]⟶ F p′ q)
     (g : ∀ {p q q′ μ} → q [ μ ]⟶ q′ → F p q [ μ ]⟶ F p q′)
     where
 
+    zip-⇒ : ∀ {p p′ q q′} → p ⇒ p′ → q ⇒ q′ → F p q ⇒ F p′ q′
+    zip-⇒ done done                = done
+    zip-⇒ done (step s q⟶q′ q′⇒q″) = step s (g q⟶q′) (zip-⇒ done q′⇒q″)
+    zip-⇒ (step s p⟶p′ p′⇒p″) tr   = step s (f p⟶p′) (zip-⇒ p′⇒p″ tr)
+
     zip-[]⇒ˡ : ∀ {p p′ q q′ μ} →
                p [ μ ]⇒ p′ → q ⇒ q′ → F p q [ μ ]⇒ F p′ q′
     zip-[]⇒ˡ (steps p⇒p′ p′⟶p″ p″⇒p‴) q⇒q′ =
-      steps (zip-⇒ f g p⇒p′ q⇒q′) (f p′⟶p″) (zip-⇒ f g p″⇒p‴ done)
+      steps (zip-⇒ p⇒p′ q⇒q′) (f p′⟶p″) (zip-⇒ p″⇒p‴ done)
 
     zip-[]⇒ʳ : ∀ {p p′ q q′ μ} →
                p ⇒ p′ → q [ μ ]⇒ q′ → F p q [ μ ]⇒ F p′ q′
     zip-[]⇒ʳ p⇒p′ (steps q⇒q′ q′⟶q″ q″⇒q‴) =
-      steps (zip-⇒ f g p⇒p′ q⇒q′) (g q′⟶q″) (zip-⇒ f g done q″⇒q‴)
+      steps (zip-⇒ p⇒p′ q⇒q′) (g q′⟶q″) (zip-⇒ done q″⇒q‴)
 
     zip-[]⇒ :
       ∀ {μ₁ μ₂ μ₃} →
@@ -267,7 +264,7 @@ record LTS : Set₁ where
       ∀ {p p′ q q′} →
       p [ μ₁ ]⇒ p′ → q [ μ₂ ]⇒ q′ → F p q [ μ₃ ]⇒ F p′ q′
     zip-[]⇒ h (steps p⇒p′ p′⟶p″ p″⇒p‴) (steps q⇒q′ q′⟶q″ q″⇒q‴) =
-      steps (zip-⇒ f g p⇒p′ q⇒q′) (h p′⟶p″ q′⟶q″) (zip-⇒ f g p″⇒p‴ q″⇒q‴)
+      steps (zip-⇒ p⇒p′ q⇒q′) (h p′⟶p″ q′⟶q″) (zip-⇒ p″⇒p‴ q″⇒q‴)
 
 -- Transforms an LTS into one which uses weak transitions as
 -- transitions.
@@ -634,7 +631,7 @@ module Delay-monad (A : Set) where
   delay-monad = record
     { Proc    = Delay A ∞
     ; Label   = Maybe A
-    ; Silent  = [ const ⊤ , const ⊥ ]
+    ; Silent  = if_then ⊤ else ⊥
     ; silent? = [ yes , const (no λ ()) ]
     ; _[_]⟶_  = _[_]⟶_
     }
