@@ -665,8 +665,60 @@ module Delay-monad (A : Set) where
   now[just]⇒̂ (silent () _)
   now[just]⇒̂ (non-silent _ tr) = now[just]⇒ tr
 
+  -- If x can make a non-silent transition, with label just y, to z,
+  -- then z is equal to now y.
+
+  [just]⟶ : ∀ {x y z} → x [ just y ]⟶ z → z ≡ now y
+  [just]⟶ now⟶ = refl
+
+  [just]⇒ : ∀ {x y z} → x [ just y ]⇒ z → z ≡ now y
+  [just]⇒ (steps _ now⟶ ny⇒z) = now⇒ ny⇒z
+
+  [just]⇒̂ : ∀ {x y z} → x [ just y ]⇒̂ z → z ≡ now y
+  [just]⇒̂ (silent () _)
+  [just]⇒̂ (non-silent _ x⇒z) = [just]⇒ x⇒z
+
   -- If force x can make a [ μ ]⇒̂-transition to y, then later x can
   -- also make a [ μ ]⇒̂-transition to y.
 
   later⇒̂ : ∀ {μ x y} → force x [ μ ]⇒̂ y → later x [ μ ]⇒̂ y
   later⇒̂ = ⇒⇒̂-transitive (⟶→⇒ _ later⟶)
+
+  -- If later x can make a transition to later y, then force x can
+  -- make a transition (of the same kind) to force y.
+
+  drop-later⟶ :
+    ∀ {μ x y} → later x [ μ ]⟶ later y → force x [ μ ]⟶ force y
+  drop-later⟶ lx⟶ly = helper lx⟶ly refl refl
+    where
+    helper : ∀ {μ x x′ y y′} →
+             later x [ μ ]⟶ y′ →
+             y′ ≡ later y →
+             x′ ≡ force x →
+             x′ [ μ ]⟶ force y
+    helper {x = x} {x′} {y} later⟶ x≡ly x′≡x =
+      subst (_[ _ ]⟶ _) ly≡x′ later⟶
+      where
+      ly≡x′ =
+        later y  ≡⟨ sym x≡ly ⟩
+        force x  ≡⟨ sym x′≡x ⟩∎
+        x′       ∎
+
+  drop-later⇒ : ∀ {x y} → later x ⇒ later y → force x ⇒ force y
+  drop-later⇒ done                 = done
+  drop-later⇒ (step _ later⟶ x⇒ly) =
+    ⇒-transitive x⇒ly (step _ later⟶ done)
+
+  drop-later[]⇒ :
+    ∀ {μ x y} → later x [ μ ]⇒ later y → force x [ μ ]⇒ force y
+  drop-later[]⇒ (steps lx⇒ly later⟶ y⇒lz) =
+    ⇒[]⇒-transitive (⇒-transitive (drop-later⇒ lx⇒ly) y⇒lz)
+                    (⟶→[]⇒ later⟶)
+  drop-later[]⇒ (steps _ now⟶ ny⇒lz) with now⇒ ny⇒lz
+  ... | ()
+
+  drop-later⇒̂ :
+    ∀ {μ x y} → later x [ μ ]⇒̂ later y → force x [ μ ]⇒̂ force y
+  drop-later⇒̂ (silent s lx⇒ly)      = silent s (drop-later⇒ lx⇒ly)
+  drop-later⇒̂ (non-silent ¬s lx⇒ly) =
+    non-silent ¬s (drop-later[]⇒ lx⇒ly)
