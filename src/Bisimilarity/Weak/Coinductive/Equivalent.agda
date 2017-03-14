@@ -47,7 +47,7 @@ mutual
   -- One can also convert in the other direction. Note that this
   -- conversion is not guaranteed to be size-preserving. For at least
   -- one LTS it cannot (in general) be size-preserving, see
-  -- Bisimilarity.Weak.Exercises.Coinductive.size-preserving-cwo⇒cw⇔uninhabited.
+  -- Bisimilarity.Weak.Delay-monad.size-preserving-cwo⇒cw⇔uninhabited.
 
   cwo⇒cw : ∀ {i p q} → p CWO.≈ q → CW.[ i ] p ≈ q
   cwo⇒cw p≈q =

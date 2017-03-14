@@ -70,3 +70,8 @@ import Bisimilarity.Weak.Coinductive.Equivalent
 -- proof method" by Pous and Sangiorgi.
 
 import Bisimilarity.Weak.Exercises.Coinductive
+
+-- Some results about various forms of coinductively defined weak
+-- bisimilarity for the delay monad.
+
+import Bisimilarity.Weak.Delay-monad
