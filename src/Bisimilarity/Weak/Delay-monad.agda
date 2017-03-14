@@ -145,6 +145,16 @@ direct⇔indirect = record
   ; from = indirect→direct _ _
   }
 
+-- The direct definition of weak bisimilarity is logically equivalent
+-- to the "first" one obtained from the transition relation. Note that
+-- this proof is not size-preserving.
+
+direct⇔indirect′ : ∀ {x y} → x DW.≈ y ⇔ x BW.≈ y
+direct⇔indirect′ {x} {y} =
+  x DW.≈ y  ↝⟨ direct⇔indirect ⟩
+  x ≈ y     ↝⟨ inverse cw⇔cwo ⟩□
+  x BW.≈ y  □
+
 -- There is a transitivity proof (for the "other" indirect
 -- definition of weak bisimilarity) that preserves the size of the
 -- second argument iff A is uninhabited.
