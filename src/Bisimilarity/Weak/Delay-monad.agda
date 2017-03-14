@@ -20,8 +20,10 @@ open import Labelled-transition-system
 open Labelled-transition-system.Delay-monad A
 open LTS delay-monad hiding (_[_]⟶_)
 
-import Bisimilarity.Coinductive.Equational-reasoning-instances
-import Bisimilarity.Weak.Coinductive delay-monad as BW
+open import Bisimilarity.Weak.Coinductive delay-monad as BW
+  using (force)
+import
+  Bisimilarity.Weak.Coinductive.Equational-reasoning-instances
 open import Bisimilarity.Weak.Coinductive.Equivalent
 open import Bisimilarity.Weak.Coinductive.Other delay-monad
 import
@@ -187,6 +189,16 @@ size-preserving-transitivityˡ⇔uninhabited =
 
   ¬ A                                                              □
 
+private
+
+  -- If A is uninhabited, then BW._≈_ is trivial.
+
+  uninhabited→trivial : ¬ A → ∀ x y → x BW.≈ y
+  uninhabited→trivial =
+    ¬ A                 ↝⟨ DW.uninhabited→trivial ⟩
+    (∀ x y → x DW.≈ y)  ↝⟨ ∀-cong-→ (λ _ → ∀-cong-→ λ _ → _⇔_.to direct⇔indirect′) ⟩
+    (∀ x y → x BW.≈ y)  □
+
 -- The function cwo⇒cw translating from the "other" indirect
 -- definition of weak bisimilarity to the first indirect one can be
 -- made size-preserving iff A is uninhabited.
@@ -199,9 +211,41 @@ size-preserving-cwo⇒cw⇔uninhabited = record
       (∀ {i} {x y z : Delay A ∞} → x ≈ y → [ i ] y ≈ z → [ i ] x ≈ z)  ↝⟨ _⇔_.to size-preserving-transitivityʳ⇔uninhabited ⟩□
       ¬ A                                                              □
   ; from =
-      ¬ A                                         ↝⟨ DW.uninhabited→trivial ⟩
-      (∀ x y → x DW.≈ y)                          ↝⟨ ∀-cong-→ (λ _ → ∀-cong-→ λ _ → direct→indirect) ⟩
-      (∀ x y → x ≈ y)                             ↝⟨ ∀-cong-→ (λ _ → ∀-cong-→ λ _ → cwo⇒cw) ⟩
+      ¬ A                                         ↝⟨ uninhabited→trivial ⟩
       (∀ x y → x BW.≈ y)                          ↝⟨ (λ trivial {_ _ _} _ → trivial _ _) ⟩□
       (∀ {i p q} → [ i ] p ≈ q → BW.[ i ] p ≈ q)  □
   }
+
+-- One can define a size-preserving "later-cong" function for the
+-- "first" indirect definition of weak bisimilarity iff A is
+-- uninhabited.
+
+size-preserving-later-cong⇔uninhabited :
+  (∀ {i x y} → BW.[ i ] force x ≈′ force y → BW.[ i ] later x ≈ later y)
+    ⇔
+  ¬ A
+size-preserving-later-cong⇔uninhabited = record
+  { to   = Later-cong                ↝⟨ (λ later-cong → now≈never (λ {i} → later-cong {i})) ⟩
+           (∀ x → now x BW.≈ never)  ↝⟨ ∀-cong-→ (λ _ → _⇔_.from direct⇔indirect′) ⟩
+           (∀ x → now x DW.≈ never)  ↝⟨ (λ hyp → DW.now≉never ∘ hyp) ⟩□
+           ¬ A                       □
+  ; from = ¬ A                 ↝⟨ uninhabited→trivial ⟩
+           (∀ x y → x BW.≈ y)  ↝⟨ (λ trivial {_ _ _} _ → trivial _ _) ⟩□
+           Later-cong          □
+  }
+  where
+  Later-cong =
+    ∀ {i x y} → BW.[ i ] force x ≈′ force y → BW.[ i ] later x ≈ later y
+
+  module _ (later-cong : Later-cong) where
+
+    mutual
+
+      now≈never : ∀ {i} x → BW.[ i ] now x ≈ never
+      now≈never x =
+        now x                             ∼⟨ cwo⇒cw (laterʳ reflexive) ⟩
+        later (record { force = now x })  ∼⟨ later-cong (now≈never′ x) ⟩■
+        never
+
+      now≈never′ : ∀ {i} x → BW.[ i ] now x ≈′ never
+      force (now≈never′ x) = now≈never x
