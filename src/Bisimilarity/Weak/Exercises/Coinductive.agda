@@ -26,6 +26,8 @@ import
   Bisimilarity.Coinductive.Equational-reasoning-instances
 open import Bisimilarity.Exercises.Coinductive
 import Bisimilarity.Exercises.Other
+import Bisimilarity.Weak.Coinductive
+open import Bisimilarity.Weak.Coinductive.Equivalent
 import Bisimilarity.Weak.Coinductive.Other
 import
   Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
@@ -270,6 +272,8 @@ module _ {A : Set} where
   open Labelled-transition-system.Delay-monad A
   open LTS delay-monad hiding (_[_]⟶_)
   open Bisimilarity.Weak.Coinductive.Other delay-monad
+  private
+    module BW = Bisimilarity.Weak.Coinductive delay-monad
 
   -- Emulations of the constructors later-cong, laterˡ and laterʳ.
 
@@ -418,3 +422,22 @@ module _ {A : Set} where
      Weakly-bisimilar i x y → y DW.≈ z → Weakly-bisimilar i x z)     ↝⟨ DW.size-preserving-transitivityˡ⇔uninhabited ⟩□
 
     ¬ A                                                              □
+
+  -- The function cwo⇒cw translating from the "other" indirect
+  -- definition of weak bisimilarity to the first indirect one can be
+  -- made size-preserving iff A is uninhabited.
+
+  size-preserving-cwo⇒cw⇔uninhabited :
+    (∀ {i p q} → [ i ] p ≈ q → BW.[ i ] p ≈ q) ⇔ ¬ A
+  size-preserving-cwo⇒cw⇔uninhabited = record
+    { to =
+        (∀ {i p q} → [ i ] p ≈ q → BW.[ i ] p ≈ q)                       ↝⟨ (λ cwo⇒cw x≈y y≈z → cw⇒cwo (transitive (cwo⇒cw x≈y) (cwo⇒cw y≈z))) ⟩
+        (∀ {i} {x y z : Delay A ∞} → x ≈ y → [ i ] y ≈ z → [ i ] x ≈ z)  ↝⟨ _⇔_.to size-preserving-transitivityʳ⇔uninhabited ⟩□
+        ¬ A                                                              □
+    ; from =
+        ¬ A                                         ↝⟨ DW.uninhabited→trivial ⟩
+        (∀ x y → x DW.≈ y)                          ↝⟨ ∀-cong-→ (λ _ → ∀-cong-→ λ _ → direct→indirect) ⟩
+        (∀ x y → x ≈ y)                             ↝⟨ ∀-cong-→ (λ _ → ∀-cong-→ λ _ → cwo⇒cw) ⟩
+        (∀ x y → x BW.≈ y)                          ↝⟨ (λ trivial {_ _ _} _ → trivial _ _) ⟩□
+        (∀ {i p q} → [ i ] p ≈ q → BW.[ i ] p ≈ q)  □
+    }
