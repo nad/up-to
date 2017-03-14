@@ -147,9 +147,9 @@ record LTS : Set₁ where
     lr⇒̂ q%r (non-silent ¬s (steps q⇒q′ q′⟶q″ q″⇒q‴)) =
       let r′ , r⇒r′  , r′%q′  = lr⇒ q%r q⇒q′
           r″ , r′%r″ , r″%′q″ = left-to-right r′%q′ q′⟶q″
-          r‴ , r″⇒r‴ , r‴≈q‴  = lr⇒ (%′⇒% r″%′q″) q″⇒q‴
+          r‴ , r″⇒r‴ , r‴%q‴  = lr⇒ (%′⇒% r″%′q″) q″⇒q‴
       in r‴ , ⇒⇒̂-transitive r⇒r′ (⇒̂⇒-transitive (%⇒⇒̂ r′%r″) r″⇒r‴)
-            , r‴≈q‴
+            , r‴%q‴
 
   -- If no action is silent, then _[_]⇒_ is pointwise isomorphic to
   -- _[_]⟶_.

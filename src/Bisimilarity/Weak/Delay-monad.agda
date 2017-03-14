@@ -10,7 +10,6 @@ module Bisimilarity.Weak.Delay-monad {A : Set} where
 open import Delay-monad
 open import Delay-monad.Weak-bisimilarity as DW
   using (Weakly-bisimilar; ∞Weakly-bisimilar; force)
-open Weakly-bisimilar
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
@@ -29,23 +28,24 @@ import
   Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
 open import Equational-reasoning
 
--- Emulations of the constructors later-cong, laterˡ and laterʳ.
+-- Emulations of the constructors DW.later-cong, DW.laterˡ and
+-- DW.laterʳ.
 
-later-cong′ : ∀ {i x y} →
-              [ i ] force x ≈′ force y → [ i ] later x ≈ later y
-later-cong′ x≈′y =
+later-cong : ∀ {i x y} →
+             [ i ] force x ≈′ force y → [ i ] later x ≈ later y
+later-cong x≈′y =
   ⟨ (λ { later⟶ → _ , ⟶→⇒̂ later⟶ , x≈′y })
   , (λ { later⟶ → _ , ⟶→⇒̂ later⟶ , x≈′y })
   ⟩
 
-laterˡ′ : ∀ {i x y} → [ i ] force x ≈ y → [ i ] later x ≈ y
-laterˡ′ x≈y =
+laterˡ : ∀ {i x y} → [ i ] force x ≈ y → [ i ] later x ≈ y
+laterˡ x≈y =
   ⟨ (λ { later⟶ → _ , silent _ done , convert x≈y })
   , Σ-map id (Σ-map later⇒̂ id) ∘ right-to-left x≈y
   ⟩
 
-laterʳ′ : ∀ {i x y} → [ i ] x ≈ force y → [ i ] x ≈ later y
-laterʳ′ x≈y =
+laterʳ : ∀ {i x y} → [ i ] x ≈ force y → [ i ] x ≈ later y
+laterʳ x≈y =
   ⟨ Σ-map id (Σ-map later⇒̂ id) ∘ left-to-right x≈y
   , (λ { later⟶ → _ , silent _ done , convert x≈y })
   ⟩
@@ -58,10 +58,10 @@ mutual
 
   direct→indirect : ∀ {i x y} →
                     Weakly-bisimilar i x y → [ i ] x ≈ y
-  direct→indirect now-cong       = reflexive
-  direct→indirect (later-cong p) = later-cong′ (direct→indirect′ p)
-  direct→indirect (laterˡ p)     = laterˡ′ (direct→indirect p)
-  direct→indirect (laterʳ p)     = laterʳ′ (direct→indirect p)
+  direct→indirect DW.now-cong       = reflexive
+  direct→indirect (DW.later-cong p) = later-cong (direct→indirect′ p)
+  direct→indirect (DW.laterˡ p)     = laterˡ (direct→indirect p)
+  direct→indirect (DW.laterʳ p)     = laterʳ (direct→indirect p)
 
   direct→indirect′ : ∀ {i x y} →
                      ∞Weakly-bisimilar i x y → [ i ] x ≈′ y
@@ -73,7 +73,7 @@ mutual
 ⇒→≈ : ∀ {i x y} → x ⇒ y → Weakly-bisimilar i x y
 ⇒→≈ done               = DW.reflexive _
 ⇒→≈ (step _ now⟶ tr)   = ⇒→≈ tr
-⇒→≈ (step _ later⟶ tr) = laterˡ (⇒→≈ tr)
+⇒→≈ (step _ later⟶ tr) = DW.laterˡ (⇒→≈ tr)
 
 -- If x makes a non-silent weak transition with the label y, then x
 -- is weakly bisimilar to now y.
@@ -106,15 +106,15 @@ mutual
 
   indirect→direct (later x) (later y) lx≈ly with left-to-right lx≈ly later⟶
   ... | y′ , non-silent contradiction _    , _     = ⊥-elim (contradiction _)
-  ... | y′ , silent _ (step _ later⟶ y⇒y′) , x≈′y′ = later-cong $
+  ... | y′ , silent _ (step _ later⟶ y⇒y′) , x≈′y′ = DW.later-cong $
                                                      ∞indirect→direct′ y⇒y′ x≈′y′
   ... | y′ , silent _ done                 , x≈′ly with right-to-left lx≈ly later⟶
   ...   | x′ , non-silent contradiction _    , _     = ⊥-elim (contradiction _)
-  ...   | x′ , silent _ (step _ later⟶ x⇒x′) , x′≈′y = later-cong $
+  ...   | x′ , silent _ (step _ later⟶ x⇒x′) , x′≈′y = DW.later-cong $
                                                        DW.∞symmetric $
                                                        ∞indirect→direct′ x⇒x′ $
                                                        symmetric x′≈′y
-  ...   | x′ , silent _ done                 , lx≈′y = later-cong $
+  ...   | x′ , silent _ done                 , lx≈′y = DW.later-cong $
                                                        DW.∞laterˡʳ⁻¹
                                                          (∞indirect→direct lx≈′y)
                                                          (∞indirect→direct x≈′ly)
@@ -124,7 +124,7 @@ mutual
   indirect→direct′ : ∀ {i x y y′} →
                      y ⇒ y′ → [ i ] x ≈ y′ → Weakly-bisimilar i x y
   indirect→direct′ done               p = indirect→direct _ _ p
-  indirect→direct′ (step _ later⟶ tr) p = laterʳ (indirect→direct′ tr p)
+  indirect→direct′ (step _ later⟶ tr) p = DW.laterʳ (indirect→direct′ tr p)
   indirect→direct′ (step () now⟶ _)
 
   ∞indirect→direct′ : ∀ {i x y y′} →
