@@ -684,6 +684,40 @@ module Delay-monad (A : Set) where
   later⇒̂ : ∀ {μ x y} → force x [ μ ]⇒̂ y → later x [ μ ]⇒̂ y
   later⇒̂ = ⇒⇒̂-transitive (⟶→⇒ _ later⟶)
 
+  -- The process x can make a silent transition to drop-later x.
+
+  ⇒drop-later : ∀ {x} → x ⇒ drop-later x
+  ⇒drop-later {now x}   = done
+  ⇒drop-later {later x} = step _ later⟶ done
+
+  -- If x can make a transition to y, then drop-later x can in some
+  -- cases make a transition of the same kind to drop-later y.
+
+  drop-later-cong⟶ :
+    ∀ {x μ y} →
+    ¬ Silent μ → x [ μ ]⟶ y → drop-later x [ μ ]⟶ drop-later y
+  drop-later-cong⟶ _  now⟶   = now⟶
+  drop-later-cong⟶ ¬s later⟶ = ⊥-elim (¬s _)
+
+  drop-later-cong⇒ : ∀ {x y} → x ⇒ y → drop-later x ⇒ drop-later y
+  drop-later-cong⇒ done                = done
+  drop-later-cong⇒ (step () now⟶  _)
+  drop-later-cong⇒ (step _ later⟶ x⇒y) =
+    ⇒-transitive ⇒drop-later (drop-later-cong⇒ x⇒y)
+
+  drop-later-cong[]⇒ :
+    ∀ {x μ y} →
+    ¬ Silent μ → x [ μ ]⇒ y → drop-later x [ μ ]⇒ drop-later y
+  drop-later-cong[]⇒ ¬s (steps x⇒y y⟶z z⇒u) =
+    steps (drop-later-cong⇒ x⇒y) (drop-later-cong⟶ ¬s y⟶z)
+          (drop-later-cong⇒ z⇒u)
+
+  drop-later-cong⇒̂ :
+    ∀ {x μ y} → x [ μ ]⇒̂ y → drop-later x [ μ ]⇒̂ drop-later y
+  drop-later-cong⇒̂ (silent s x⇒y)      = silent s (drop-later-cong⇒ x⇒y)
+  drop-later-cong⇒̂ (non-silent ¬s x⇒y) =
+    non-silent ¬s (drop-later-cong[]⇒ ¬s x⇒y)
+
   -- If later x can make a transition to later y, then force x can
   -- make a transition (of the same kind) to force y.
 
@@ -705,9 +739,7 @@ module Delay-monad (A : Set) where
         x′       ∎
 
   drop-later⇒ : ∀ {x y} → later x ⇒ later y → force x ⇒ force y
-  drop-later⇒ done                 = done
-  drop-later⇒ (step _ later⟶ x⇒ly) =
-    ⇒-transitive x⇒ly (step _ later⟶ done)
+  drop-later⇒ = drop-later-cong⇒
 
   drop-later[]⇒ :
     ∀ {μ x y} → later x [ μ ]⇒ later y → force x [ μ ]⇒ force y
@@ -719,6 +751,4 @@ module Delay-monad (A : Set) where
 
   drop-later⇒̂ :
     ∀ {μ x y} → later x [ μ ]⇒̂ later y → force x [ μ ]⇒̂ force y
-  drop-later⇒̂ (silent s lx⇒ly)      = silent s (drop-later⇒ lx⇒ly)
-  drop-later⇒̂ (non-silent ¬s lx⇒ly) =
-    non-silent ¬s (drop-later[]⇒ lx⇒ly)
+  drop-later⇒̂ = drop-later-cong⇒̂
