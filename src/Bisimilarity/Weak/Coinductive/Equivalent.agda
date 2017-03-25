@@ -50,12 +50,12 @@ mutual
   -- Bisimilarity.Weak.Delay-monad.size-preserving-cwo⇒cw⇔uninhabited.
 
   cwo⇒cw : ∀ {i p q} → p CWO.≈ q → CW.[ i ] p ≈ q
-  cwo⇒cw p≈q =
+  cwo⇒cw {i} p≈q =
     CW.⟨ lr p≈q
        , Σ-map id (Σ-map id symmetric) ∘ lr (symmetric p≈q)
        ⟩
     where
-    lr : ∀ {i p p′ q μ} →
+    lr : ∀ {p p′ q μ} →
          p CWO.≈ q → p [ μ ]⇒̂ p′ →
          ∃ λ q′ → q [ μ ]⇒̂ q′ × CW.[ i ] p′ ≈′ q′
     lr p≈q p⇒̂p′ =
