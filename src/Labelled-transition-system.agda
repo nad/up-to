@@ -789,3 +789,37 @@ module Delay-monad (A : Set) where
   drop-later⇒̂ :
     ∀ {μ x y} → later x [ μ ]⇒̂ later y → force x [ μ ]⇒̂ force y
   drop-later⇒̂ = drop-later-cong⇒̂
+
+  -- If x makes silent transitions to both y and z, then one of y and
+  -- z makes silent transitions to the other.
+
+  ⇒×⇒→… : ∀ {x y z} → x ⇒ y → x ⇒ z → y ⇒ z ⊎ z ⇒ y
+  ⇒×⇒→… done                x⇒z                 = inj₁ x⇒z
+  ⇒×⇒→… x⇒y                 done                = inj₂ x⇒y
+  ⇒×⇒→… (step _ later⟶ x⇒y) (step _ later⟶ x⇒z) = ⇒×⇒→… x⇒y x⇒z
+  ⇒×⇒→… (step () now⟶ _)
+
+  -- If x makes silent transitions to y and a non-silent weak
+  -- μ-transition (of one kind) to z, then y makes a weak μ-transition
+  -- to z.
+
+  ⇒×⇒[]→… :
+    ∀ {x y z μ} →
+    ¬ Silent μ → x ⇒ y → x [ μ ]⇒ z → y [ μ ]⇒ z
+  ⇒×⇒[]→… _ x⇒y (steps x⇒x′ x′⟶x″ x″⇒z) with ⇒×⇒→… x⇒y x⇒x′
+  ⇒×⇒[]→… _ _   (steps _    x′⟶x″ x″⇒z) | inj₁ y⇒x′ = steps y⇒x′ x′⟶x″ x″⇒z
+  ⇒×⇒[]→… _ _   (steps _    now⟶  n⇒z)  | inj₂ done = steps done now⟶  n⇒z
+
+  ⇒×⇒[]→… _  _  _                  | inj₂ (step () now⟶ _)
+  ⇒×⇒[]→… ¬s _  (steps _ later⟶ _) | _ = ⊥-elim (¬s _)
+
+  -- If x makes silent transitions to y and a weak μ-transition (of
+  -- one kind) to z, then either y makes a weak μ-transition to z, or
+  -- μ is silent and z makes silent transitions to y.
+
+  ⇒×⇒̂→… :
+    ∀ {x y z μ} → x ⇒ y → x [ μ ]⇒̂ z → y [ μ ]⇒̂ z ⊎ Silent μ × z ⇒ y
+  ⇒×⇒̂→… x⇒y (silent     s  x⇒z) = ⊎-map (silent s) (s ,_)
+                                        (⇒×⇒→… x⇒y x⇒z)
+  ⇒×⇒̂→… x⇒y (non-silent ¬s x⇒z) =
+    inj₁ (non-silent ¬s (⇒×⇒[]→… ¬s x⇒y x⇒z))
