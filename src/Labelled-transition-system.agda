@@ -644,13 +644,20 @@ module Delay-monad (A : Set) where
   -- If now x can make a sequence of silent transitions to y, then y
   -- is equal to now x.
 
+  now[nothing]⟶ : ∀ {x y} → now x [ nothing ]⟶ y → y ≡ now x
+  now[nothing]⟶ ()
+
   now⇒ : ∀ {x y} → now x ⇒ y → y ≡ now x
   now⇒ done             = refl
   now⇒ (step () now⟶ _)
 
+  now[nothing]⇒ : ∀ {x y} → now x [ nothing ]⇒ y → y ≡ now x
+  now[nothing]⇒ (steps nx⇒x′ x′⟶x″ x″⇒y)
+    rewrite now⇒ nx⇒x′ | now[nothing]⟶ x′⟶x″ = now⇒ x″⇒y
+
   now[nothing]⇒̂ : ∀ {x y} → now x [ nothing ]⇒̂ y → y ≡ now x
-  now[nothing]⇒̂ (silent _ tr)                = now⇒ tr
-  now[nothing]⇒̂ (non-silent contradiction _) = ⊥-elim (contradiction _)
+  now[nothing]⇒̂ (silent _ tr)     = now⇒ tr
+  now[nothing]⇒̂ (non-silent ¬s _) = ⊥-elim (¬s _)
 
   -- If now x can make a just y-transition, then x is equal to y.
 
