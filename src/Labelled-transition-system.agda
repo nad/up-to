@@ -672,6 +672,23 @@ module Delay-monad (A : Set) where
   now[just]⇒̂ (silent () _)
   now[just]⇒̂ (non-silent _ tr) = now[just]⇒ tr
 
+  -- The computation never can only transition to itself.
+
+  never⟶never : ∀ {μ x} → never [ μ ]⟶ x → x ≡ never
+  never⟶never later⟶ = refl
+
+  never⇒never : ∀ {x} → never ⇒ x → x ≡ never
+  never⇒never done                   = refl
+  never⇒never (step _ later⟶ ne⇒) = never⇒never ne⇒
+
+  never[]⇒never : ∀ {μ x} → never [ μ ]⇒ x → x ≡ never
+  never[]⇒never (steps ne⇒x x⟶y y⇒z)
+    rewrite never⇒never ne⇒x | never⟶never x⟶y = never⇒never y⇒z
+
+  never⇒̂never : ∀ {μ x} → never [ μ ]⇒̂ x → x ≡ never
+  never⇒̂never (silent     _ ne⇒) = never⇒never ne⇒
+  never⇒̂never (non-silent _ ne⇒) = never[]⇒never ne⇒
+
   -- If x can make a non-silent transition, with label just y, to z,
   -- then z is equal to now y.
 
