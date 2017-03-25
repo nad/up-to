@@ -689,6 +689,19 @@ module Delay-monad (A : Set) where
   never⇒̂never (silent     _ ne⇒) = never⇒never ne⇒
   never⇒̂never (non-silent _ ne⇒) = never[]⇒never ne⇒
 
+  -- If never can make a μ-transition, then μ is silent.
+
+  never⟶→silent : ∀ {μ x} → never [ μ ]⟶ x → Silent μ
+  never⟶→silent later⟶ = _
+
+  never[]⇒→silent : ∀ {μ x} → never [ μ ]⇒ x → Silent μ
+  never[]⇒→silent (steps ne⇒x  x⟶  _) with never⇒never ne⇒x
+  never[]⇒→silent (steps ne⇒ne ne⟶ _) | refl = never⟶→silent ne⟶
+
+  never⇒̂→silent : ∀ {μ x} → never [ μ ]⇒̂ x → Silent μ
+  never⇒̂→silent (silent s _)       = s
+  never⇒̂→silent (non-silent _ ne⇒) = never[]⇒→silent ne⇒
+
   -- If x can make a non-silent transition, with label just y, to z,
   -- then z is equal to now y.
 
