@@ -249,3 +249,33 @@ size-preserving-later-cong⇔uninhabited = record
 
       now≈never′ : ∀ {i} x → BW.[ i ] now x ≈′ never
       force (now≈never′ x) = now≈never x
+
+-- If x and y both make non-silent transitions of the same kind,
+-- then they are weakly bisimilar.
+
+⟶-with-equal-labels→≈ :
+  ∀ {x x′ y y′ μ} →
+  ¬ Silent μ → x [ μ ]⟶ x′ → y [ μ ]⟶ y′ → x ≈ y
+⟶-with-equal-labels→≈ _  now⟶   now⟶ = reflexive
+⟶-with-equal-labels→≈ ¬s later⟶ _    = ⊥-elim (¬s _)
+
+[]⇒-with-equal-labels→≈ :
+  ∀ {x x′ y y′ μ} →
+  ¬ Silent μ → x [ μ ]⇒ x′ → y [ μ ]⇒ y′ → x ≈ y
+[]⇒-with-equal-labels→≈
+  {x = x} {y = y} ¬s
+  (steps {p′ = x′} x⇒x′ x′⟶x″ x″⇒x‴)
+  (steps {p′ = y′} y⇒y′ y′⟶y″ y″⇒y‴) =
+
+  x   ∼⟨ direct→indirect (⇒→≈ x⇒x′) ⟩
+  x′  ∼⟨ ⟶-with-equal-labels→≈ ¬s x′⟶x″ y′⟶y″ ⟩
+  y′  ∼⟨ symmetric (direct→indirect (⇒→≈ y⇒y′)) ⟩■
+  y
+
+⇒̂-with-equal-labels→≈ :
+  ∀ {x x′ y y′ μ} →
+  ¬ Silent μ → x [ μ ]⇒̂ x′ → y [ μ ]⇒̂ y′ → x ≈ y
+⇒̂-with-equal-labels→≈ ¬s (non-silent _ x⇒x′) (non-silent _ y⇒y′) =
+  []⇒-with-equal-labels→≈ ¬s x⇒x′ y⇒y′
+⇒̂-with-equal-labels→≈ ¬s   (silent s _) = ⊥-elim (¬s s)
+⇒̂-with-equal-labels→≈ ¬s _ (silent s _) = ⊥-elim (¬s s)
