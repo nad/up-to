@@ -8,6 +8,7 @@ module Labelled-transition-system where
 
 open import Delay-monad as No-name
 open import Equality.Propositional
+open import Interval using (ext)
 open import Prelude
 
 open import Bijection equality-with-J using (_↔_)
@@ -176,12 +177,11 @@ record LTS : Set₁ where
     }
 
   -- If no action is silent, then _[_]⇒̂_ is pointwise isomorphic to
-  -- _[_]⟶_ (assuming extensionality).
+  -- _[_]⟶_.
 
-  ⟶↔⇒̂ : Extensionality lzero lzero →
-        (∀ μ → ¬ Silent μ) →
+  ⟶↔⇒̂ : (∀ μ → ¬ Silent μ) →
         ∀ {p μ q} → p [ μ ]⟶ q ↔ p [ μ ]⇒̂ q
-  ⟶↔⇒̂ ext ¬silent = record
+  ⟶↔⇒̂ ¬silent = record
     { surjection = record
       { logical-equivalence = record
         { to   = λ tr → non-silent (¬silent _) (_↔_.to (⟶↔⇒ ¬silent) tr)
@@ -281,15 +281,14 @@ weak lts = record
   open LTS lts
 
 -- If no lts action is silent, then weak lts is equal to lts (assuming
--- extensionality and univalence).
+-- univalence).
 
 weak≡id :
   Univalence lzero →
-  Extensionality lzero (lsuc lzero) →
   ∀ lts →
   (∀ μ → ¬ LTS.Silent lts μ) →
   weak lts ≡ lts
-weak≡id univ ext lts ¬silent =
+weak≡id univ lts ¬silent =
   cong (λ _[_]⟶_ → record
           { Proc    = Proc
           ; Label   = Label
@@ -298,7 +297,7 @@ weak≡id univ ext lts ¬silent =
           ; _[_]⟶_  = _[_]⟶_
           })
        (ext λ p → ext λ μ → ext λ q →
-          p [ μ ]⇒̂ q  ≡⟨ ≃⇒≡ univ $ ↔⇒≃ $ inverse $ ⟶↔⇒̂ (lower-extensionality _ _ ext) ¬silent ⟩∎
+          p [ μ ]⇒̂ q  ≡⟨ ≃⇒≡ univ $ ↔⇒≃ $ inverse $ ⟶↔⇒̂ ¬silent ⟩∎
           p [ μ ]⟶ q  ∎)
   where
   open LTS lts
