@@ -22,6 +22,14 @@ _⊙_ : ∀ {a ℓ₁ ℓ₂} {A : Set a} →
       Rel ℓ₁ A → Rel ℓ₂ A → Rel (a ⊔ ℓ₁ ⊔ ℓ₂) A
 _R_ ⊙ _S_ = λ x z → ∃ λ y → (x R y) × (y S z)
 
+-- Postcomposition with a function.
+
+infixr 9 [_]⊙_
+
+[_]⊙_ : ∀ {a ℓ₁ ℓ₂} {A : Set a} →
+        (Set ℓ₁ → Set ℓ₂) → Rel ℓ₁ A → Rel ℓ₂ A
+[ f ]⊙ _R_ = λ x y → f (x R y)
+
 -- Composition of a relation with itself.
 
 infix 10 _^^_
