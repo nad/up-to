@@ -42,6 +42,13 @@ import Bisimilarity.Exercises.Other
 import Bisimilarity.Exercises.Classical
 import Bisimilarity.Exercises.Coinductive
 
+-- Up-to techniques.
+
+import Bisimilarity.Up-to
+import Bisimilarity.Up-to.CCS
+import Bisimilarity.Up-to.Delay-monad
+import Bisimilarity.Up-to.Counterexamples
+
 ------------------------------------------------------------------------
 -- Weak bisimilarity
 
