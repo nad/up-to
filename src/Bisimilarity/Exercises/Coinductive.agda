@@ -1198,8 +1198,9 @@ module _ {Name : Set} where
 
   -- Note that op-cong does not preserve the size of its argument.
 
-  op-cong : ∀ {i P Q} → [ ssuc i ] P ∼ Q → [ i ] op P ∼ op Q
-  op-cong {i} P∼Q =
+  op-cong : ∀ {i} {j : Size< i} {P Q} →
+            [ i ] P ∼ Q → [ j ] op P ∼ op Q
+  op-cong {i} {j} P∼Q =
     ⟨ lr P∼Q
     , Σ-map id (Σ-map id symmetric) ∘ lr (symmetric P∼Q)
     ⟩
@@ -1208,8 +1209,8 @@ module _ {Name : Set} where
     open [_]_∼′_
 
     lr : ∀ {P P′ Q μ} →
-         [ ssuc i ] P ∼ Q → op P [ μ ]⟶ P′ →
-         ∃ λ Q′ → op Q [ μ ]⟶ Q′ × [ i ] P′ ∼′ Q′
+         [ i ] P ∼ Q → op P [ μ ]⟶ P′ →
+         ∃ λ Q′ → op Q [ μ ]⟶ Q′ × [ j ] P′ ∼′ Q′
     lr P∼Q (op P⟶P′ P′⟶P″) =
       let Q′ , Q⟶Q′  , P′∼Q′ = left-to-right        P∼Q    P⟶P′
           Q″ , Q′⟶Q″ , P″∼Q″ = left-to-right (force P′∼Q′) P′⟶P″
