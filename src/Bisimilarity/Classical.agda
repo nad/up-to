@@ -24,9 +24,9 @@ open LTS lts
 -- Progressions.
 
 record Progression {r s}
-                   (_R_ : Proc → Proc → Set r)
-                   (_S_ : Proc → Proc → Set s) : Set (r ⊔ s) where
   constructor ⟨_,_⟩
+                   (_R_ : Rel r Proc)
+                   (_S_ : Rel s Proc) : Set (r ⊔ s) where
   field
     left-to-right : ∀ {p p′ q μ} →
                     p R q → p [ μ ]⟶ p′ →
@@ -39,18 +39,18 @@ open Progression public
 
 -- Bisimulations.
 
-Bisimulation : ∀ {r} → (Proc → Proc → Set r) → Set r
+Bisimulation : ∀ {r} → Rel r Proc → Set r
 Bisimulation _R_ = Progression _R_ _R_
 
 -- Bisimilarity.
 
 infix 4 [_]_∼_ _∼_
 
-[_]_∼_ : ∀ ℓ → Proc → Proc → Set (lsuc ℓ)
+[_]_∼_ : ∀ ℓ → Rel (lsuc ℓ) Proc
 [ ℓ ] p ∼ q =
-  ∃ λ (_R_ : Proc → Proc → Set ℓ) → Bisimulation _R_ × p R q
+  ∃ λ (_R_ : Rel ℓ Proc) → Bisimulation _R_ × p R q
 
-_∼_ : Proc → Proc → Set₁
+_∼_ : Rel (# 1) Proc
 p ∼ q = [ lzero ] p ∼ q
 
 ------------------------------------------------------------------------
@@ -127,7 +127,7 @@ bisimilarity-is-a-bisimulation =
 -- Bisimilarity is larger than every bisimulation.
 
 bisimulation⊆∼ :
-  ∀ {ℓ} {_R_ : Proc → Proc → Set ℓ} →
+  ∀ {ℓ} {_R_ : Rel ℓ Proc} →
   Bisimulation _R_ → _R_ ⊆ [ ℓ ]_∼_
 bisimulation⊆∼ {_R_ = _R_} R-is-a-bisimulation _ _ pRq =
   _R_ , R-is-a-bisimulation , pRq
@@ -138,7 +138,7 @@ bisimulation⊆∼ {_R_ = _R_} R-is-a-bisimulation _ _ pRq =
 -- Bisimulations up to bisimilarity.
 
 Bisimulation-up-to-bisimilarity :
-  (ℓ : Level) → ∀ {r} → (Proc → Proc → Set r) → Set (lsuc ℓ ⊔ r)
+  (ℓ : Level) → ∀ {r} → Rel r Proc → Set (lsuc ℓ ⊔ r)
 Bisimulation-up-to-bisimilarity ℓ _R_ =
   Progression _R_ ([ ℓ ]_∼_ ⊙ _R_ ⊙ [ ℓ ]_∼_)
 
@@ -146,7 +146,7 @@ Bisimulation-up-to-bisimilarity ℓ _R_ =
 -- bisimulation.
 
 bisimulation-up-to-∼⇒bisimulation :
-  ∀ {ℓ r} {_R_ : Proc → Proc → Set r} →
+  ∀ {ℓ r} {_R_ : Rel r Proc} →
   Bisimulation-up-to-bisimilarity ℓ _R_ →
   Bisimulation ([ ℓ ]_∼_ ⊙ _R_ ⊙ [ ℓ ]_∼_)
 bisimulation-up-to-∼⇒bisimulation {ℓ} {_R_ = _R_} R-is =
@@ -182,7 +182,7 @@ bisimulation-up-to-∼⇒bisimulation {ℓ} {_R_ = _R_} R-is =
 -- bisimilarity.
 
 bisimulation-up-to-∼⊆∼ :
-  ∀ {ℓ r} {_R_ : Proc → Proc → Set r} →
+  ∀ {ℓ r} {_R_ : Rel r Proc} →
   Bisimulation-up-to-bisimilarity ℓ _R_ →
   _R_ ⊆ [ lsuc ℓ ⊔ r ]_∼_
 bisimulation-up-to-∼⊆∼ {ℓ} {r} {_R_} R-is =
@@ -203,7 +203,7 @@ Bisimulation-up-to-∪ ℓ _R_ =
 -- If _R_ is a bisimulation up to ∪, then _R_ ∪ _∼_ is a bisimulation.
 
 bisimulation-up-to-∪⇒bisimulation :
-  ∀ {ℓ r} {_R_ : Proc → Proc → Set r} →
+  ∀ {ℓ r} {_R_ : Rel r Proc} →
   Bisimulation-up-to-∪ ℓ _R_ →
   Bisimulation (_R_ ∪ [ ℓ ]_∼_)
 bisimulation-up-to-∪⇒bisimulation {ℓ} {_R_ = _R_} R-is =
@@ -223,7 +223,7 @@ bisimulation-up-to-∪⇒bisimulation {ℓ} {_R_ = _R_} R-is =
 -- bisimilarity.
 
 bisimulation-up-to-∪⊆∼ :
-  ∀ {ℓ r} {_R_ : Proc → Proc → Set r} →
+  ∀ {ℓ r} {_R_ : Rel r Proc} →
   Bisimulation-up-to-∪ ℓ _R_ →
   _R_ ⊆ [ lsuc ℓ ⊔ r ]_∼_
 bisimulation-up-to-∪⊆∼ {ℓ} {r} {_R_} R-is =
@@ -236,7 +236,7 @@ bisimulation-up-to-∪⊆∼ {ℓ} {r} {_R_} R-is =
 
 -- Bisimulations up to reflexive transitive closure.
 
-Bisimulation-up-to-* : (Proc → Proc → Set) → Set
+Bisimulation-up-to-* : Rel (# 0) Proc → Set
 Bisimulation-up-to-* _R_ = Progression _R_ (_R_ *)
 
 -- If _R_ is a bisimulation up to reflexive transitive closure, then
@@ -290,7 +290,7 @@ bisimulation-up-to-*⊆∼ {_R_} R-is =
 -- The lifting operator preserves the "is a bisimulation" relation.
 
 ↑-preserves-bisimulations :
-  ∀ {ℓ r} {_R_ : Proc → Proc → Set r} →
+  ∀ {ℓ r} {_R_ : Rel r Proc} →
   Bisimulation _R_ → Bisimulation (λ p q → ↑ ℓ (p R q))
 ↑-preserves-bisimulations ⟨ left-to-right , right-to-left ⟩ =
   ⟨ (λ pRq → Σ-map id (Σ-map id lift) ∘ left-to-right (lower pRq))
@@ -301,7 +301,7 @@ bisimulation-up-to-*⊆∼ {_R_} R-is =
 -- relation.
 
 ×2-preserves-bisimulations :
-  ∀ {ℓ} {_R_ : Proc → Proc → Set ℓ} →
+  ∀ {ℓ} {_R_ : Rel ℓ Proc} →
   Bisimulation _R_ →
   Bisimulation (λ p q → (p R q) ⊎ (p R q))
 ×2-preserves-bisimulations {_R_ = _R_} ⟨ lr , rl ⟩ =

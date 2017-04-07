@@ -14,6 +14,11 @@ open import Prelude
 Rel : ∀ {ℓ₁} ℓ₂ → Set ℓ₁ → Set (ℓ₁ ⊔ lsuc ℓ₂)
 Rel ℓ A = A → A → Set ℓ
 
+-- One kind of homogeneous binary relation transformers.
+
+Trans : ∀ {a} ℓ → Set a → Set (a ⊔ lsuc ℓ)
+Trans ℓ A = Rel ℓ A → Rel ℓ A
+
 -- Composition of relations.
 
 infixr 9 _⊙_
