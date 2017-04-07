@@ -58,13 +58,13 @@ module _ {lts : LTS} where
   coinductive-bisimilarity-is-a-bisimulation :
     Cl.Bisimulation Co._∼_
   coinductive-bisimilarity-is-a-bisimulation =
-    Cl.⟨ (λ p∼q p⟶p′ →
+    Cl.⟪ (λ p∼q p⟶p′ →
             Σ-map id (Σ-map id (λ p∼q → Co.force p∼q))
               (Co.left-to-right p∼q p⟶p′))
        ,  (λ p∼q q⟶q′ →
             Σ-map id (Σ-map id (λ p∼q → Co.force p∼q))
               (Co.right-to-left p∼q q⟶q′))
-       ⟩
+       ⟫
 
   -- Coinductively bisimilar processes are classically bisimilar.
 

@@ -131,8 +131,6 @@ module _ {Name : Set} where
         lr (symmetric P∼P′) (symmetric Q∼Q′)
       ⟩
       where
-      open [_]_∼_
-
       lr : ∀ {P P′ Q Q′ R μ} →
            [ i ] P ∼ P′ → [ i ] Q ∼ Q′ → P ∣ Q [ μ ]⟶ R →
            ∃ λ R′ → P′ ∣ Q′ [ μ ]⟶ R′ × [ i ] R ∼′ R′
@@ -411,8 +409,6 @@ module _ {Name : Set} where
       lr (symmetric P∼P′) (symmetric Q∼Q′)
     ⟩
     where
-    open [_]_∼_
-
     lr : ∀ {P P′ Q Q′ R μ} →
          [ i ] P ∼ P′ → [ i ] Q ∼ Q′ → P ⊕ Q [ μ ]⟶ R →
          ∃ λ R′ → P′ ⊕ Q′ [ μ ]⟶ R′ × [ i ] R ∼′ R′
@@ -487,8 +483,6 @@ module _ {Name : Set} where
       , Σ-map id (Σ-map id symmetric) ∘ lr (symmetric P∼P′)
       ⟩
       where
-      open [_]_∼_
-
       lr : ∀ {P P′ Q μ} →
            [ i ] P ∼ P′ → ! P [ μ ]⟶ Q →
            ∃ λ Q′ → ! P′ [ μ ]⟶ Q′ × [ i ] Q ∼′ Q′
@@ -529,8 +523,6 @@ module _ {Name : Set} where
       , Σ-map id (Σ-map id symmetric) ∘ lr (symmetric P∼P′)
       ⟩
       where
-      open [_]_∼_
-
       lr : ∀ {P P′ Q μ} →
            [ i ] P ∼ P′ → ν a P [ μ ]⟶ Q →
            ∃ λ Q′ → ν a P′ [ μ ]⟶ Q′ × [ i ] Q ∼′ Q′
@@ -845,7 +837,7 @@ module _ {Name : Set} where
   6-2-17-1-lemma₂ {P} {Q} {R} tr with 6-1-3-2 tr
   ... | inj₁ (R′ , P∣Q⟶R′ , R∼![P∣Q]∣R′) =
     let R″ , !P∣!Q⟶R″ , !P∣!Q∣R′∼R″ =
-          [_]_∼_.left-to-right
+          Step.left-to-right
             ((! P ∣ ! Q) ∣ (P ∣ Q)  ∼⟨ 6-2-17-1-lemma₁ ⟩■
              ! P ∣ ! Q)
             ((! P ∣ ! Q) ∣ (P ∣ Q)  ⟶⟨ par-right P∣Q⟶R′ ⟩
@@ -854,7 +846,7 @@ module _ {Name : Set} where
 
   ... | inj₂ (refl , R′ , R″ , a , P∣Q⟶R′ , P∣Q⟶R″ , R∼![P∣Q]∣R′∣R″) =
     let T , !P∣!Q⟶T , !P∣!Q∣[R′∣R″]∼T =
-          [_]_∼_.left-to-right
+          Step.left-to-right
             ((! P ∣ ! Q) ∣ ((P ∣ Q) ∣ (P ∣ Q))  ∼⟨ ∣-assoc ⟩
              ((! P ∣ ! Q) ∣ (P ∣ Q)) ∣ (P ∣ Q)  ∼⟨ 6-2-17-1-lemma₁ ∣-cong reflexive ⟩
              (! P ∣ ! Q) ∣ (P ∣ Q)              ∼⟨ 6-2-17-1-lemma₁ ⟩■
@@ -1205,7 +1197,6 @@ module _ {Name : Set} where
     , Σ-map id (Σ-map id symmetric) ∘ lr (symmetric P∼Q)
     ⟩
     where
-    open [_]_∼_
     open [_]_∼′_
 
     lr : ∀ {P P′ Q μ} →
@@ -1226,7 +1217,6 @@ module _ {Name : Set} where
   op-cong-cannot-preserve-size a op-cong =
     a≁b·c a∼a·a
     where
-    open [_]_∼_
     open [_]_∼′_
 
     op-cong′ : ∀ {i P Q} → [ i ] P ∼′ Q → [ i ] op P ∼′ op Q

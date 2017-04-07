@@ -45,9 +45,9 @@ module _ {Name : Set} where
 
     R-is-a-bisimulation : Bisimulation _R_
     R-is-a-bisimulation =
-      ⟨ lr , (λ PRQ tr →
+      ⟪ lr , (λ PRQ tr →
                 Σ-map id (Σ-map id R-is-symmetric)
-                  (lr (R-is-symmetric PRQ) tr)) ⟩
+                  (lr (R-is-symmetric PRQ) tr)) ⟫
       where
       lr : ∀ {P P′ Q μ} →
            P R Q → P [ μ ]⟶ P′ →
@@ -70,7 +70,7 @@ module _ {Name : Set} where
       base : ∀ {P Q R} → (P ∣ (Q ∣ R)) S ((P ∣ Q) ∣ R)
 
     S-is-a-bisimulation : Bisimulation _S_
-    S-is-a-bisimulation = ⟨ lr , rl ⟩
+    S-is-a-bisimulation = ⟪ lr , rl ⟫
       where
       lr : ∀ {P P′ Q μ} →
            P S Q → P [ μ ]⟶ P′ →
@@ -101,7 +101,7 @@ module _ {Name : Set} where
       base : ∀ {P} → (∅ ∣ P) R P
 
     R-is-a-bisimulation : Bisimulation _R_
-    R-is-a-bisimulation = ⟨ lr , rl ⟩
+    R-is-a-bisimulation = ⟪ lr , rl ⟫
       where
       lr : ∀ {P P′ Q μ} →
            P R Q → P [ μ ]⟶ P′ →
@@ -126,8 +126,8 @@ module _ {Name : Set} where
   -- _∣_ preserves bisimilarity.
 
   _∣-cong_ : ∀ {P P′ Q Q′} → P ∼ P′ → Q ∼ Q′ → P ∣ Q ∼ P′ ∣ Q′
-  (_L_ , ⟨ lrˡ , rlˡ ⟩ , PLP′) ∣-cong (_R_ , ⟨ lrʳ , rlʳ ⟩ , QRQ′) =
-    _LR_ , ⟨ lr , rl ⟩ , base PLP′ QRQ′
+  (_L_ , L-bisim , PLP′) ∣-cong (_R_ , R-bisim , QRQ′) =
+    _LR_ , ⟪ lr , rl ⟫ , base PLP′ QRQ′
     where
     data _LR_ : Proc → Proc → Set where
       base : ∀ {P P′ Q Q′} → P L P′ → Q R Q′ → (P ∣ Q) LR (P′ ∣ Q′)
@@ -136,25 +136,33 @@ module _ {Name : Set} where
          P LR Q → P [ μ ]⟶ P′ →
          ∃ λ Q′ → Q [ μ ]⟶ Q′ × P′ LR Q′
     lr (base PLP′ QRQ′) (par-left tr) =
-      Σ-map (_∣ _) (Σ-map par-left (flip base QRQ′)) (lrˡ PLP′ tr)
+      Σ-map (_∣ _) (Σ-map par-left (flip base QRQ′))
+        (left-to-right L-bisim PLP′ tr)
 
     lr (base PLP′ QRQ′) (par-right tr) =
-      Σ-map (_ ∣_) (Σ-map par-right (base PLP′)) (lrʳ QRQ′ tr)
+      Σ-map (_ ∣_) (Σ-map par-right (base PLP′))
+        (left-to-right R-bisim QRQ′ tr)
 
     lr (base PLP′ QRQ′) (par-τ tr₁ tr₂) =
-      Σ-zip _∣_ (Σ-zip par-τ base) (lrˡ PLP′ tr₁) (lrʳ QRQ′ tr₂)
+      Σ-zip _∣_ (Σ-zip par-τ base)
+        (left-to-right L-bisim PLP′ tr₁)
+        (left-to-right R-bisim QRQ′ tr₂)
 
     rl : ∀ {P Q Q′ μ} →
          P LR Q → Q [ μ ]⟶ Q′ →
          ∃ λ P′ → P [ μ ]⟶ P′ × P′ LR Q′
     rl (base PLP′ QRQ′) (par-left tr) =
-      Σ-map (_∣ _) (Σ-map par-left (flip base QRQ′)) (rlˡ PLP′ tr)
+      Σ-map (_∣ _) (Σ-map par-left (flip base QRQ′))
+        (right-to-left L-bisim PLP′ tr)
 
     rl (base PLP′ QRQ′) (par-right tr) =
-      Σ-map (_ ∣_) (Σ-map par-right (base PLP′)) (rlʳ QRQ′ tr)
+      Σ-map (_ ∣_) (Σ-map par-right (base PLP′))
+        (right-to-left R-bisim QRQ′ tr)
 
     rl (base PLP′ QRQ′) (par-τ tr₁ tr₂) =
-      Σ-zip _∣_ (Σ-zip par-τ base) (rlˡ PLP′ tr₁) (rlʳ QRQ′ tr₂)
+      Σ-zip _∣_ (Σ-zip par-τ base)
+        (right-to-left L-bisim PLP′ tr₁)
+        (right-to-left R-bisim QRQ′ tr₂)
 
   ----------------------------------------------------------------------
   -- Exercise 6.1.2
@@ -167,7 +175,7 @@ module _ {Name : Set} where
       refl : ∀ {P} → P R P
 
     R-is-a-bisimulation : Bisimulation _R_
-    R-is-a-bisimulation = ⟨ lr , rl ⟩
+    R-is-a-bisimulation = ⟪ lr , rl ⟫
       where
       lr : ∀ {P P′ Q μ} →
            P R Q → P [ μ ]⟶ P′ →
@@ -215,7 +223,7 @@ module _ {Name : Set} where
        τ       ∎)
 
     R-is : Bisimulation-up-to-bisimilarity lzero _R_
-    R-is = ⟨ lr , rl ⟩
+    R-is = ⟪ lr , rl ⟫
       where
       lemma = λ {P} P∼!a∣∅ →
         ! ! a · ∣ P            ∼⟨ reflexive ∣-cong P∼!a∣∅ ⟩
@@ -274,7 +282,7 @@ module _ {Name : Set} where
       base : (a · ∣ a ·) R (name a · (a ·))
 
     R-is : Bisimulation-up-to-∪ lzero _R_
-    R-is = ⟨ lr , rl ⟩
+    R-is = ⟪ lr , rl ⟫
       where
       lr : ∀ {P P′ Q μ} →
            P R Q → P [ μ ]⟶ P′ →

@@ -17,6 +17,10 @@ import Labelled-transition-system
 ------------------------------------------------------------------------
 -- Strong bisimilarity
 
+-- The Step function, used to define bisimilarity.
+
+import Bisimilarity.Step
+
 -- The classical definition of (strong) bisimilarity.
 
 import Bisimilarity.Classical.Preliminaries

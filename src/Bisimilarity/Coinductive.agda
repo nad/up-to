@@ -12,7 +12,10 @@ open import Equality.Propositional hiding (Extensionality)
 open import Prelude
 
 import Equational-reasoning
+
+open import Bisimilarity.Step lts public using (Step; ⟨_,_⟩)
 open LTS lts
+open Step public using (left-to-right; right-to-left)
 
 -- Bisimilarity. Note that this definition is small.
 
@@ -20,23 +23,14 @@ mutual
 
   infix 4 _∼_ _∼′_ [_]_∼_ [_]_∼′_
 
-  record [_]_∼_ (i : Size) (p q : Proc) : Set where
-    inductive
-    constructor ⟨_,_⟩
-    field
-      left-to-right :
-        ∀ {p′ μ} →
-        p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]⟶ q′ × [ i ] p′ ∼′ q′
-      right-to-left :
-        ∀ {q′ μ} →
-        q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]⟶ p′ × [ i ] p′ ∼′ q′
+  [_]_∼_ : Size → Proc → Proc → Set
+  [_]_∼_ i = Step [ i ]_∼′_
 
   record [_]_∼′_ (i : Size) (p q : Proc) : Set where
     coinductive
     field
       force : {j : Size< i} → [ j ] p ∼ q
 
-open [_]_∼_  public
 open [_]_∼′_ public
 
 _∼_ : Proc → Proc → Set

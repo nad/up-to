@@ -28,7 +28,7 @@ instance
   trans∼′≈′ = is-transitive (transitive ∘ ∼⇒≈″)
 
   trans∼≈′ : ∀ {i} → Transitive _∼_ [ i ]_≈′_
-  trans∼≈′ = is-transitive (transitive ∘ ∼⇒≈)
+  trans∼≈′ {i} = is-transitive (transitive ∘ ∼⇒≈ {i})
 
   convert∼≈ : Convertible _∼_ _≈_
   convert∼≈ = is-convertible ∼⇒≈
