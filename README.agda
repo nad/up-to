@@ -21,7 +21,7 @@ import Indexed-container
 ------------------------------------------------------------------------
 -- Strong bisimilarity
 
--- The Step function, used to define bisimilarity.
+-- The Step function, used to define strong and weak bisimilarity.
 
 import Bisimilarity.Step
 
@@ -29,6 +29,11 @@ import Bisimilarity.Step
 
 import Bisimilarity.Classical.Preliminaries
 import Bisimilarity.Classical
+
+-- A parametrised coinductive definition that can be used to define
+-- both strong and weak bisimilarity.
+
+import Bisimilarity.Coinductive.General
 
 -- A coinductive definition of (strong) bisimilarity.
 

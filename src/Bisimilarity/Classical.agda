@@ -14,10 +14,10 @@ module Bisimilarity.Classical (lts : LTS) where
 open import Equality.Propositional
 open import Prelude
 
-open import Bisimilarity.Classical.Preliminaries
-open import Bisimilarity.Step lts
-
 open LTS lts
+
+open import Bisimilarity.Classical.Preliminaries
+open import Bisimilarity.Step lts _[_]⟶_
 
 ------------------------------------------------------------------------
 -- Progressions, bisimulations and bisimilarity

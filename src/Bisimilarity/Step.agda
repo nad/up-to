@@ -1,12 +1,16 @@
 ------------------------------------------------------------------------
--- The Step function, used to define bisimilarity
+-- The Step function, used to define strong and weak bisimilarity
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K #-}
 
 open import Labelled-transition-system
 
-module Bisimilarity.Step (lts : LTS) where
+module Bisimilarity.Step
+         (lts : LTS)
+         (open LTS lts)
+         (_[_]↝_ : Proc → Label → Proc → Set)
+         where
 
 open import Equality.Propositional
 open import Interval using (ext)
@@ -19,22 +23,23 @@ open import Function-universe equality-with-J hiding (id; _∘_)
 open import Bisimilarity.Classical.Preliminaries
 open import Indexed-container hiding (⟨_⟩)
 
-open LTS lts
-
 private
  module Temporarily-private where
 
-  -- This is basically the function from Definition 6.3.1 in Pous and
-  -- Sangiorgi's "Enhancements of the bisimulation proof method",
-  -- except that clause (3) is omitted.
+  -- If _[_]↝_ is instantiated with _[_]⟶_, then this is basically the
+  -- function from Definition 6.3.1 in Pous and Sangiorgi's
+  -- "Enhancements of the bisimulation proof method", except that
+  -- clause (3) is omitted. Similarly, if _[_]↝_ is instantiated with
+  -- _[_]⇒̂_, then this is basically the function wb₁, again with the
+  -- exception that clause (3) is omitted.
 
   record Step {r} (_R_ : Rel r Proc) (p q : Proc) : Set r where
     constructor ⟨_,_⟩
     field
       left-to-right : ∀ {p′ μ} →
-                      p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]⟶ q′ × p′ R q′
+                      p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝ q′ × p′ R q′
       right-to-left : ∀ {q′ μ} →
-                      q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]⟶ p′ × p′ R q′
+                      q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]↝ p′ × p′ R q′
 
 open Temporarily-private using (Step)
 
@@ -72,9 +77,9 @@ S̲t̲e̲p̲ : Container (Proc × Proc) (Proc × Proc)
 S̲t̲e̲p̲ =
   (λ { (p , q) → Magic  -- Included in order to aid type inference.
                    ×
-                 (∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]⟶ q′)
+                 (∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝ q′)
                    ×
-                 (∀ {q′ μ} → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]⟶ p′)
+                 (∀ {q′ μ} → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]↝ p′)
      })
     ◁
   (λ { {o = p , q} (_ , lr , rl) (p′ , q′) →
@@ -148,8 +153,8 @@ module S̲t̲e̲p̲ {r} {_R_ : Rel r Proc} {p q} where
   -- A "constructor".
 
   ⟨_,_⟩ :
-    (∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]⟶ q′ × p′ R q′) →
-    (∀ {q′ μ} → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]⟶ p′ × p′ R q′) →
+    (∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝ q′ × p′ R q′) →
+    (∀ {q′ μ} → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]↝ p′ × p′ R q′) →
     ⟦ S̲t̲e̲p̲ ⟧₂ _R_ p q
   ⟨ lr , rl ⟩ = _↔_.to Step↔S̲t̲e̲p̲ Step.⟨ lr , rl ⟩
 
@@ -157,12 +162,12 @@ module S̲t̲e̲p̲ {r} {_R_ : Rel r Proc} {p q} where
 
   left-to-right :
     ⟦ S̲t̲e̲p̲ ⟧₂ _R_ p q →
-    ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]⟶ q′ × p′ R q′
+    ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝ q′ × p′ R q′
   left-to-right = Step.left-to-right ∘ _↔_.from Step↔S̲t̲e̲p̲
 
   right-to-left :
     ⟦ S̲t̲e̲p̲ ⟧₂ _R_ p q →
-    ∀ {q′ μ} → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]⟶ p′ × p′ R q′
+    ∀ {q′ μ} → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]↝ p′ × p′ R q′
   right-to-left = Step.right-to-left ∘ _↔_.from Step↔S̲t̲e̲p̲
 
 open Temporarily-private public

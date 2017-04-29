@@ -53,8 +53,6 @@ module _ {Name : Set} where
         lr (symmetric P≈P′) (symmetric Q≈Q′)
       ⟩
       where
-      open [_]_≈_
-
       lr : ∀ {P P′ Q Q′ R μ} →
            [ i ] P ≈ P′ → [ i ] Q ≈ Q′ → P ∣ Q [ μ ]⟶ R →
            ∃ λ R′ → P′ ∣ Q′ [ μ ]⇒̂ R′ × [ i ] R ≈′ R′

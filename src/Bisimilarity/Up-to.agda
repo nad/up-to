@@ -15,16 +15,16 @@ open import Prelude
 open import Bijection equality-with-J using (_↔_)
 open import Function-universe equality-with-J as F hiding (id; _∘_)
 
+open LTS lts
+
 import Bisimilarity.Classical
 open import Bisimilarity.Classical.Preliminaries
 import Bisimilarity.Coinductive
 import Bisimilarity.Coinductive.Equational-reasoning-instances
 open import Bisimilarity.Comparison
-open import Bisimilarity.Step lts
+open import Bisimilarity.Step lts _[_]⟶_
 open import Equational-reasoning
 open import Indexed-container
-
-open LTS lts
 
 private
   module Cl = Bisimilarity.Classical   lts
