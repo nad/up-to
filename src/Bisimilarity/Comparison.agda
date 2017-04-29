@@ -200,7 +200,7 @@ classical-bisimilarity-is-not-propositional {ℓ} =
 
   Unit↔Fin1 =
     Unit     ↝⟨ Bijection.↑↔ ⟩
-    tt ≡ tt  ↝⟨ inverse $ _⇔_.to contractible⇔⊤↔ (mono₁ 0 ⊤-contractible _ _) ⟩
+    tt ≡ tt  ↝⟨ _⇔_.to contractible⇔↔⊤ (mono₁ 0 ⊤-contractible _ _) ⟩
     ⊤        ↝⟨ inverse ⊎-right-identity ⟩□
     Fin 1    □
 
