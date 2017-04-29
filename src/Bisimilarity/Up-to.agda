@@ -12,6 +12,7 @@ open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 
+open import Bijection equality-with-J using (_↔_)
 open import Function-universe equality-with-J as F hiding (id; _∘_)
 
 import Bisimilarity.Classical
@@ -21,6 +22,7 @@ import Bisimilarity.Coinductive.Equational-reasoning-instances
 open import Bisimilarity.Comparison
 open import Bisimilarity.Step lts
 open import Equational-reasoning
+open import Indexed-container
 
 open LTS lts
 
@@ -50,7 +52,7 @@ Up-to-technique {ℓ} F =
 -- b-compatibility, specialised to bisimilarity.
 
 Step-compatible : ∀ {ℓ} → Trans ℓ Proc → Set (lsuc ℓ)
-Step-compatible F = ∀ R → F (Step R) ⊆ Step (F R)
+Step-compatible F = ∀ R → F (⟦ S̲t̲e̲p̲ ⟧₂ R) ⊆ ⟦ S̲t̲e̲p̲ ⟧₂ (F R)
 
 -- Monotone step-compatible functions are up-to techniques.
 --
@@ -79,15 +81,16 @@ module _
 
       -- A lemma.
 
-      Fⁿ⊆Step∘F¹⁺ⁿ : ∀ n → F ^[ n ] R ⊆ Step (F ^[ suc n ] R)
+      Fⁿ⊆Step∘F¹⁺ⁿ : ∀ n → F ^[ n ] R ⊆ ⟦ S̲t̲e̲p̲ ⟧₂ (F ^[ suc n ] R)
       Fⁿ⊆Step∘F¹⁺ⁿ zero =
-        R           ⊆⟨ Cl.progression R-prog ⟩∎
-        Step (F R)  ∎
+        R                ⊆⟨ Cl.progression R-prog ⟩
+        Step (F R)       ⊆⟨ (λ _ _ → _↔_.to Step↔S̲t̲e̲p̲) ⟩∎
+        ⟦ S̲t̲e̲p̲ ⟧₂ (F R)  ∎
       Fⁿ⊆Step∘F¹⁺ⁿ (suc n) =
-        F ^[ 1 + n ] R             ⊆⟨⟩
-        F (F ^[ n ] R)             ⊆⟨ mono (Fⁿ⊆Step∘F¹⁺ⁿ n) ⟩
-        F (Step (F ^[ 1 + n ] R))  ⊆⟨ comp _ ⟩∎
-        Step (F ^[ 2 + n ] R)      ∎
+        F ^[ 1 + n ] R                  ⊆⟨⟩
+        F (F ^[ n ] R)                  ⊆⟨ mono (Fⁿ⊆Step∘F¹⁺ⁿ n) ⟩
+        F (⟦ S̲t̲e̲p̲ ⟧₂ (F ^[ 1 + n ] R))  ⊆⟨ comp _ ⟩∎
+        ⟦ S̲t̲e̲p̲ ⟧₂ (F ^[ 2 + n ] R)      ∎
 
       -- An analogue of ⋃ₙ Fⁿ(R).
 
@@ -98,9 +101,10 @@ module _
 
       F^ωR-bisim : Cl.Bisimulation F^ωR
       Cl.progression F^ωR-bisim p q = uncurry λ n →
-        (F ^[ n ] R             ⊆⟨ Fⁿ⊆Step∘F¹⁺ⁿ n ⟩
-         Step (F ^[ 1 + n ] R)  ⊆⟨ Step-monotone (λ _ _ → 1 + n ,_) ⟩∎
-         Step F^ωR              ∎) p q
+        (F ^[ n ] R                  ⊆⟨ Fⁿ⊆Step∘F¹⁺ⁿ n ⟩
+         ⟦ S̲t̲e̲p̲ ⟧₂ (F ^[ 1 + n ] R)  ⊆⟨ S̲t̲e̲p̲-monotone (λ _ _ → 1 + n ,_) ⟩
+         ⟦ S̲t̲e̲p̲ ⟧₂ F^ωR              ⊆⟨ (λ _ _ → _↔_.from Step↔S̲t̲e̲p̲) ⟩∎
+         Step F^ωR                   ∎) p q
 
   compatible→up-to : Up-to-technique F
   compatible→up-to R R-prog =
@@ -145,25 +149,25 @@ module _
 
     pres′ : ∀ {R : Rel ℓ Proc} {i} →
             R ⊆ Co.[ i ]_∼′_ → F R ⊆ Co.[ i ]_∼′_
-    Co.force (pres′ R⊆∼′ p q FRpq) =
-      pres (λ p′ q′ Rp′q′ → Co.force (R⊆∼′ p′ q′ Rp′q′)) p q FRpq
+    force (pres′ R⊆∼′ p q FRpq) =
+      pres (λ p′ q′ Rp′q′ → force (R⊆∼′ p′ q′ Rp′q′)) p q FRpq
 
-    mutual
-
-      size-preserving→up-to′ :
-        ∀ {i} (R : Rel ℓ Proc) →
-        Cl.Progression R (F R) → R ⊆ Co.[ i ]_∼_
-      Co.left-to-right (size-preserving→up-to′ R prog p q Rpq) p⟶p′ =
-        let q′ , q⟶q′ , FRp′q′ = Cl.left-to-right prog Rpq p⟶p′ in
-        q′ , q⟶q′ , pres′ (size-preserving→up-to″ R prog) _ _ FRp′q′
-      Co.right-to-left (size-preserving→up-to′ R prog p q Rpq) q⟶q′ =
-        let p′ , p⟶p′ , FRp′q′ = Cl.right-to-left prog Rpq q⟶q′ in
-        p′ , p⟶p′ , pres′ (size-preserving→up-to″ R prog) _ _ FRp′q′
-
-      size-preserving→up-to″ :
-        ∀ {i} (R : Rel ℓ Proc) →
-        Cl.Progression R (F R) → R ⊆ Co.[ i ]_∼′_
-      Co.force (size-preserving→up-to″ R prog p q Rpq) =
+    size-preserving→up-to′ :
+      ∀ {i} (R : Rel ℓ Proc) →
+      Cl.Progression R (F R) → R ⊆ Co.[ i ]_∼_
+    size-preserving→up-to′ {i} R prog p q Rpq =
+      S̲t̲e̲p̲.⟨ (λ {p′ μ} →
+                p [ μ ]⟶ p′                                 ↝⟨ Cl.left-to-right prog Rpq ⟩
+                (∃ λ q′ → q [ μ ]⟶ q′ × F R p′ q′)          ↝⟨ Σ-map id (Σ-map id (pres′ size-preserving→up-to″ _ _)) ⟩□
+                (∃ λ q′ → q [ μ ]⟶ q′ × Co.[ i ] p′ ∼′ q′)  □)
+           , (λ {q′ μ} →
+                q [ μ ]⟶ q′                                 ↝⟨ Cl.right-to-left prog Rpq ⟩
+                (∃ λ p′ → p [ μ ]⟶ p′ × F R p′ q′)          ↝⟨ Σ-map id (Σ-map id (pres′ size-preserving→up-to″ _ _)) ⟩□
+                (∃ λ p′ → p [ μ ]⟶ p′ × Co.[ i ] p′ ∼′ q′)  □)
+           ⟩
+      where
+      size-preserving→up-to″ : R ⊆ Co.[ i ]_∼′_
+      force (size-preserving→up-to″ p q Rpq) =
         size-preserving→up-to′ R prog p q Rpq
 
   size-preserving→up-to : Up-to-technique F
@@ -284,22 +288,22 @@ monotone→compatible→size-preserving {ℓ} F mono comp =
 
     lemma : ∀ {i} → F ([ ↑ ℓ ]⊙ Co.[ i ]_∼_) ⊆ Co.[ i ]_∼_
     lemma {i} =
-      F ([ ↑ ℓ ]⊙ Co.[ i ]_∼_)          ⊆⟨⟩
-      F ([ ↑ ℓ ]⊙ Step Co.[ i ]_∼′_)    ⊆⟨ mono (
+      F ([ ↑ ℓ ]⊙ Co.[ i ]_∼_)               ⊆⟨⟩
+      F ([ ↑ ℓ ]⊙ ⟦ S̲t̲e̲p̲ ⟧₂ Co.[ i ]_∼′_)    ⊆⟨ mono (
 
-          [ ↑ ℓ ]⊙ Step Co.[ i ]_∼′_         ⊆⟨ (λ _ _ → lower) ⟩
-          Step Co.[ i ]_∼′_                  ⊆⟨ Step-monotone (λ _ _ → lift) ⟩∎
-          Step ([ ↑ ℓ ]⊙ Co.[ i ]_∼′_)       ∎) ⟩
+          [ ↑ ℓ ]⊙ ⟦ S̲t̲e̲p̲ ⟧₂ Co.[ i ]_∼′_         ⊆⟨ (λ _ _ → lower) ⟩
+          ⟦ S̲t̲e̲p̲ ⟧₂ Co.[ i ]_∼′_                  ⊆⟨ S̲t̲e̲p̲-monotone (λ _ _ → lift) ⟩∎
+          ⟦ S̲t̲e̲p̲ ⟧₂ ([ ↑ ℓ ]⊙ Co.[ i ]_∼′_)       ∎) ⟩
 
-      F (Step ([ ↑ ℓ ]⊙ Co.[ i ]_∼′_))  ⊆⟨ comp _ ⟩
-      Step (F ([ ↑ ℓ ]⊙ Co.[ i ]_∼′_))  ⊆⟨ Step-monotone lemma′ ⟩
-      Step Co.[ i ]_∼′_                 ⊆⟨ (λ _ _ → id) ⟩∎
-      Co.[ i ]_∼_                       ∎
+      F (⟦ S̲t̲e̲p̲ ⟧₂ ([ ↑ ℓ ]⊙ Co.[ i ]_∼′_))  ⊆⟨ comp _ ⟩
+      ⟦ S̲t̲e̲p̲ ⟧₂ (F ([ ↑ ℓ ]⊙ Co.[ i ]_∼′_))  ⊆⟨ S̲t̲e̲p̲-monotone lemma′ ⟩
+      ⟦ S̲t̲e̲p̲ ⟧₂ Co.[ i ]_∼′_                 ⊆⟨ (λ _ _ → id) ⟩∎
+      Co.[ i ]_∼_                            ∎
 
     lemma′ : ∀ {i} → F ([ ↑ ℓ ]⊙ Co.[ i ]_∼′_) ⊆ Co.[ i ]_∼′_
-    Co.force (lemma′ {i} p q F∼′pq) {j = j} =
+    force (lemma′ {i} p q F∼′pq) {j = j} =
       lemma p q (mono ([ ↑ ℓ ]⊙ Co.[ i ]_∼′_  ⊆⟨ (λ _ _ → lower) ⟩
-                       Co.[ i ]_∼′_           ⊆⟨ (λ p q p∼′q → Co.force p∼′q) ⟩
+                       Co.[ i ]_∼′_           ⊆⟨ (λ p q p∼′q → force p∼′q) ⟩
                        Co.[ j ]_∼_            ⊆⟨ (λ _ _ → lift) ⟩∎
                        [ ↑ ℓ ]⊙ Co.[ j ]_∼_   ∎)
                       _ _ F∼′pq)
@@ -325,8 +329,7 @@ const-bisimilarity-size-preserving R⊆∼ _ = R⊆∼
 -- If F and G are both bisimilarity-size-preserving, then F ∘ G is
 -- also bisimilarity-size-preserving.
 
-∘-closure :
-  ∀ {ℓ} {F G : Trans ℓ Proc} →
+∘-closure :  ∀ {ℓ} {F G : Trans ℓ Proc} →
   Bisimilarity-size-preserving F →
   Bisimilarity-size-preserving G →
   Bisimilarity-size-preserving (F ∘ G)

@@ -61,9 +61,9 @@ module _ {Name : Set} where
     -- _∣_ is associative.
 
     ∣-assoc : ∀ {P Q R i} → [ i ] P ∣ (Q ∣ R) ∼ (P ∣ Q) ∣ R
-    ∣-assoc = ⟨ lr , rl ⟩
+    ∣-assoc {i = i} = ⟨ lr , rl ⟩
       where
-      lr : ∀ {P Q R P′ μ i} →
+      lr : ∀ {P Q R P′ μ} →
            P ∣ (Q ∣ R) [ μ ]⟶ P′ →
            ∃ λ Q′ → (P ∣ Q) ∣ R [ μ ]⟶ Q′ × [ i ] P′ ∼′ Q′
       lr (par-left tr)               = _ , par-left (par-left tr)    , ∣-assoc′
@@ -73,7 +73,7 @@ module _ {Name : Set} where
       lr (par-τ tr₁ (par-left tr₂))  = _ , par-left (par-τ tr₁ tr₂)  , ∣-assoc′
       lr (par-τ tr₁ (par-right tr₂)) = _ , par-τ (par-left tr₁) tr₂  , ∣-assoc′
 
-      rl : ∀ {P Q R Q′ μ i} →
+      rl : ∀ {P Q R Q′ μ} →
            (P ∣ Q) ∣ R [ μ ]⟶ Q′ →
            ∃ λ P′ → P ∣ (Q ∣ R) [ μ ]⟶ P′ × [ i ] P′ ∼′ Q′
       rl (par-left (par-left tr))    = _ , par-left tr               , ∣-assoc′
@@ -90,18 +90,18 @@ module _ {Name : Set} where
 
     -- ∅ is a left identity of _∣_.
 
-    ∣-left-identity : ∀ {P} → ∅ ∣ P ∼ P
-    ∣-left-identity = ⟨ lr , rl ⟩
+    ∣-left-identity : ∀ {P i} → [ i ] ∅ ∣ P ∼ P
+    ∣-left-identity {i = i} = ⟨ lr , rl ⟩
       where
 
-      lr : ∀ {P P′ μ i} →
+      lr : ∀ {P P′ μ} →
            ∅ ∣ P [ μ ]⟶ P′ →
            ∃ λ Q′ → P [ μ ]⟶ Q′ × [ i ] P′ ∼′ Q′
       lr (par-right tr) = _ , tr , ∣-left-identity′
       lr (par-left ())
       lr (par-τ () _)
 
-      rl : ∀ {P Q′ μ i} →
+      rl : ∀ {P Q′ μ} →
            P [ μ ]⟶ Q′ →
            ∃ λ P′ → ∅ ∣ P [ μ ]⟶ P′ × [ i ] P′ ∼′ Q′
       rl tr = _ , par-right tr , ∣-left-identity′
@@ -178,16 +178,16 @@ module _ {Name : Set} where
   -- A less compact proof.
 
   6-1-2 : ∀ {P i} → [ i ] ! P ∣ P ∼ ! P
-  6-1-2 {P} = record
-    { left-to-right = λ {P′} {μ} tr →
-                        P′   ∼⟨ ∼′: reflexive ⟩■
-                        P′   [ μ ]⟵⟨ replication tr ⟩
-                        ! P
-    ; right-to-left = λ { {q′ = P′} {μ = μ} (replication tr) →
-                          ! P ∣ P  [ μ ]⟶⟨ tr ⟩ʳˡ
-                          P′       ∼⟨ ∼′: reflexive ⟩■
-                          P′ }
-    }
+  6-1-2 {P} =
+    ⟨ (λ {P′} {μ} tr →
+         P′   ∼⟨ ∼′: reflexive ⟩■
+         P′   [ μ ]⟵⟨ replication tr ⟩
+         ! P)
+    , (λ { {q′ = P′} {μ = μ} (replication tr) →
+           ! P ∣ P  [ μ ]⟶⟨ tr ⟩ʳˡ
+           P′       ∼⟨ ∼′: reflexive ⟩■
+           P′ })
+    ⟩
 
   ----------------------------------------------------------------------
   -- Exercise 6.1.3 (2), plus some rearrangement lemmas
@@ -837,7 +837,7 @@ module _ {Name : Set} where
   6-2-17-1-lemma₂ {P} {Q} {R} tr with 6-1-3-2 tr
   ... | inj₁ (R′ , P∣Q⟶R′ , R∼![P∣Q]∣R′) =
     let R″ , !P∣!Q⟶R″ , !P∣!Q∣R′∼R″ =
-          Step.left-to-right
+          left-to-right
             ((! P ∣ ! Q) ∣ (P ∣ Q)  ∼⟨ 6-2-17-1-lemma₁ ⟩■
              ! P ∣ ! Q)
             ((! P ∣ ! Q) ∣ (P ∣ Q)  ⟶⟨ par-right P∣Q⟶R′ ⟩
@@ -846,7 +846,7 @@ module _ {Name : Set} where
 
   ... | inj₂ (refl , R′ , R″ , a , P∣Q⟶R′ , P∣Q⟶R″ , R∼![P∣Q]∣R′∣R″) =
     let T , !P∣!Q⟶T , !P∣!Q∣[R′∣R″]∼T =
-          Step.left-to-right
+          left-to-right
             ((! P ∣ ! Q) ∣ ((P ∣ Q) ∣ (P ∣ Q))  ∼⟨ ∣-assoc ⟩
              ((! P ∣ ! Q) ∣ (P ∣ Q)) ∣ (P ∣ Q)  ∼⟨ 6-2-17-1-lemma₁ ∣-cong reflexive ⟩
              (! P ∣ ! Q) ∣ (P ∣ Q)              ∼⟨ 6-2-17-1-lemma₁ ⟩■
@@ -1197,8 +1197,6 @@ module _ {Name : Set} where
     , Σ-map id (Σ-map id symmetric) ∘ lr (symmetric P∼Q)
     ⟩
     where
-    open [_]_∼′_
-
     lr : ∀ {P P′ Q μ} →
          [ i ] P ∼ Q → op P [ μ ]⟶ P′ →
          ∃ λ Q′ → op Q [ μ ]⟶ Q′ × [ j ] P′ ∼′ Q′
@@ -1217,8 +1215,6 @@ module _ {Name : Set} where
   op-cong-cannot-preserve-size a op-cong =
     a≁b·c a∼a·a
     where
-    open [_]_∼′_
-
     op-cong′ : ∀ {i P Q} → [ i ] P ∼′ Q → [ i ] op P ∼′ op Q
     force (op-cong′ P∼′Q) = op-cong (force P∼′Q)
 

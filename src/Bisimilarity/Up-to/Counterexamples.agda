@@ -10,9 +10,11 @@ open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 
+open import Bijection equality-with-J using (_↔_)
 open import Fin equality-with-J
 open import Function-universe equality-with-J hiding (id; _∘_)
 
+open import Indexed-container using (⟦_⟧₂; force)
 open import Labelled-transition-system
 
 import Bisimilarity.Classical
@@ -20,6 +22,7 @@ open import Bisimilarity.Classical.Preliminaries
 import Bisimilarity.Coinductive
 import Bisimilarity.Coinductive.Equational-reasoning-instances
 open import Bisimilarity.Comparison
+import Bisimilarity.Step
 import Bisimilarity.Up-to
 open import Equational-reasoning
 
@@ -34,6 +37,7 @@ private
              Bisimulation; bisimulation⊆∼)
       renaming (_∼_ to _∼-cl_)
     open Bisimilarity.Coinductive lts public
+    open Bisimilarity.Step lts public using (Step; Step↔S̲t̲e̲p̲)
     open Bisimilarity.Up-to lts public
     open LTS lts public hiding (_[_]⟶_)
 
@@ -126,7 +130,7 @@ private
   -- Bisimilarity of size i is a pre-fixpoint of F (modulo a lifting).
 
   pre : ∀ {i} → F ([ ↑ ℓ ]⊙ [ i ]_∼_) ⊆ [ i ]_∼_
-  pre true  true  = λ _ → reflexive
+  pre true  true  = λ _ → true ■
   pre true  false = lower
   pre false true  = lower
   pre false false = lower
@@ -139,21 +143,21 @@ private
   -- A lemma.
 
   StepRff : Step R false false
-  left-to-right StepRff ()
-  right-to-left StepRff ()
+  Step.left-to-right StepRff ()
+  Step.right-to-left StepRff ()
 
   -- F is not step-compatible.
 
   ¬comp : ¬ Step-compatible F
   ¬comp =
-    Step-compatible F                              ↝⟨ (λ comp → comp R) ⟩
-    F (Step R) ⊆ Step (F R)                        ↝⟨ (λ le → le true true) ⟩
-    (F (Step R) true true → Step (F R) true true)  ↔⟨⟩
-    (Step R false false → Step (F R) true true)    ↝⟨ _$ StepRff ⟩
-    Step (F R) true true                           ↝⟨ (λ step → Step.left-to-right step {p′ = false} _ ) ⟩
-    (∃ λ y → T (not y) × F R false y)              ↔⟨⟩
-    (∃ λ y → T (not y) × R false y)                ↝⟨ uncurry [ const proj₁ , const (⊥-elim ∘ proj₂) ] ⟩□
-    ⊥                                              □
+    Step-compatible F                                        ↝⟨ (λ comp → comp R) ⟩
+    F (⟦ S̲t̲e̲p̲ ⟧₂ R) ⊆ ⟦ S̲t̲e̲p̲ ⟧₂ (F R)                        ↝⟨ (λ le → le true true) ⟩
+    (F (⟦ S̲t̲e̲p̲ ⟧₂ R) true true → ⟦ S̲t̲e̲p̲ ⟧₂ (F R) true true)  ↔⟨⟩
+    (⟦ S̲t̲e̲p̲ ⟧₂ R false false → ⟦ S̲t̲e̲p̲ ⟧₂ (F R) true true)    ↝⟨ _$ _↔_.to Step↔S̲t̲e̲p̲ StepRff ⟩
+    ⟦ S̲t̲e̲p̲ ⟧₂ (F R) true true                                ↝⟨ (λ step → S̲t̲e̲p̲.left-to-right {p = true} {q = true} step {p′ = false} _ ) ⟩
+    (∃ λ y → T (not y) × F R false y)                        ↔⟨⟩
+    (∃ λ y → T (not y) × R false y)                          ↝⟨ uncurry [ const proj₁ , const (⊥-elim ∘ proj₂) ] ⟩□
+    ⊥                                                        □
 
 -- Up-to-technique is not closed under composition, not even for
 -- monotone relation transformers.
@@ -182,11 +186,11 @@ private
 
      R̲ ⊆ _∼_                                                            ↝⟨ (λ le → le _ _ pp) ⟩
 
-     p left ∼ p right                                                   ↝⟨ (λ rel → left-to-right rel pq) ⟩
+     p left ∼ p right                                                   ↝⟨ (λ rel → S̲t̲e̲p̲.left-to-right rel pq) ⟩
 
      (∃ λ y → p right [ pq ]⟶ y × q left ∼′ y)                          ↝⟨ (λ { (.(q right) , pq , rel) → rel }) ⟩
 
-     q left ∼′ q right                                                  ↝⟨ (λ rel → left-to-right (force rel) qq) ⟩
+     q left ∼′ q right                                                  ↝⟨ (λ rel → S̲t̲e̲p̲.left-to-right (force rel) qq) ⟩
 
      (∃ λ y → q right [ qq left ]⟶ y × q left ∼′ y)                     ↝⟨ (λ { (_ , () , _) }) ⟩□
 

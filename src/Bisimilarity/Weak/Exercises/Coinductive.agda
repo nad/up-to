@@ -30,12 +30,11 @@ module _ {Name : Set} where
 
   open CCS Name
   open LTS CCS hiding (Proc; _[_]⟶_)
-  open Bisimilarity.Coinductive CCS
+  open Bisimilarity.Coinductive CCS using (_∼_; ∼:_)
   open Bisimilarity.Weak.Coinductive.Other CCS
 
   {-# DISPLAY LTS._[_]⟶_ p μ q = p [ μ ]⟶ q #-}
   {-# DISPLAY LTS._[_]⇒̂_ p μ q = p [ μ ]⇒̂ q #-}
-  {-# DISPLAY Bisimilarity.Coinductive.[_]_∼_ i p q = [ i ] p ∼ q #-}
   {-# DISPLAY Bisimilarity.Weak.Coinductive.Other.[_]_≈′_ i p q =
               [ i ] p ≈′ q #-}
 

@@ -80,16 +80,28 @@ module _ {lts : LTS} where
   cl⇒co∘co⇒cl : ∀ {ℓ i p q}
                 (p∼q : p Co.∼ q) →
                 Co.[ i ] cl⇒co (co⇒cl {ℓ = ℓ} p∼q) ≡ p∼q
-  cl⇒co∘co⇒cl p∼q =
-    Co.⟨ (λ p⟶p′ → refl , refl , lemma₁ p⟶p′)
-       , (λ q⟶q′ → refl , refl , lemma₂ q⟶q′)
-       ⟩
+  cl⇒co∘co⇒cl {ℓ} {i} {p} {q} p∼q =
+    Co.Bisimilarity-of-∼.⟨ cl⇒co (co⇒cl p∼q)
+                         , p∼q
+                         , (λ p⟶p′ → refl , refl , lemma₁ p⟶p′)
+                         , (λ q⟶q′ → refl , refl , lemma₂ q⟶q′)
+                         ⟩
     where
-    lemma₁ : ∀ {p′ μ} (p⟶p′ : _ [ μ ]⟶ p′) → Co.[ _ ] _ ≡′ _
-    Co.force (lemma₁ _) = cl⇒co∘co⇒cl _
+    lemma₁ :
+      ∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
+      Co.[ i ] proj₂ (proj₂ (Co.left-to-right
+                               (cl⇒co (co⇒cl {ℓ = ℓ} p∼q)) p⟶p′)) ≡′
+               proj₂ (proj₂ (Co.left-to-right p∼q p⟶p′))
+    Co.force (lemma₁ p⟶p′) =
+      cl⇒co∘co⇒cl (Co.force (proj₂ (proj₂ (Co.left-to-right p∼q p⟶p′))))
 
-    lemma₂ : ∀ {q′ μ} (q⟶q′ : _ [ μ ]⟶ q′) → Co.[ _ ] _ ≡′ _
-    Co.force (lemma₂ _) = cl⇒co∘co⇒cl _
+    lemma₂ :
+      ∀ {q′ μ} (q⟶q′ : q [ μ ]⟶ q′) →
+      Co.[ i ] proj₂ (proj₂ (Co.right-to-left
+                               (cl⇒co (co⇒cl {ℓ = ℓ} p∼q)) q⟶q′)) ≡′
+               proj₂ (proj₂ (Co.right-to-left p∼q q⟶q′))
+    Co.force (lemma₂ q⟶q′) =
+      cl⇒co∘co⇒cl (Co.force (proj₂ (proj₂ (Co.right-to-left p∼q q⟶q′))))
 
   -- If there are two processes that are not equal, but bisimilar,
   -- then co⇒cl is not a left inverse of cl⇒co.
@@ -132,7 +144,7 @@ module _ {lts : LTS} where
     ∀ {ℓ p q} → Cl.[ ℓ ] p ∼ q ↠ p Co.∼ q
   classical↠coinductive ext = record
     { logical-equivalence = classical⇔coinductive
-    ; right-inverse-of    = ext ∘ cl⇒co∘co⇒cl
+    ; right-inverse-of    = Co.extensionality ext ∘ cl⇒co∘co⇒cl
     }
 
 -- There is at least one LTS for which there is a split surjection
@@ -152,18 +164,21 @@ coinductive-bisimilarity-is-sometimes-propositional :
   let module Co = Bisimilarity.Coinductive one-loop in
   Co.Extensionality → Is-proposition (tt Co.∼ tt)
 coinductive-bisimilarity-is-sometimes-propositional ext =
-  _⇔_.from propositional⇔irrelevant λ _ _ → ext irr
+  _⇔_.from propositional⇔irrelevant λ ∼₁ ∼₂ →
+    extensionality ext (irr ∼₁ ∼₂)
   where
   open Bisimilarity.Coinductive one-loop
 
-  irr : ∀ {i ∼₁ ∼₂} → [ i ] ∼₁ ≡ ∼₂
-  irr =
-    ⟨ (λ _ → refl , refl , irr′)
-    , (λ _ → refl , refl , irr′)
-    ⟩
+  irr : ∀ {i} ∼₁ ∼₂ → [ i ] ∼₁ ≡ ∼₂
+  irr ∼₁ ∼₂ =
+    Bisimilarity-of-∼.⟨ ∼₁
+                      , ∼₂
+                      , (λ _ → refl , refl , irr′ _ _)
+                      , (λ _ → refl , refl , irr′ _ _)
+                      ⟩
     where
-    irr′ : ∀ {i ∼₁ ∼₂} → [ i ] ∼₁ ≡′ ∼₂
-    force irr′ = irr
+    irr′ : ∀ {i} ∼₁ ∼₂ → [ i ] ∼₁ ≡′ ∼₂
+    force (irr′ ∼₁ ∼₂) = irr (force ∼₁) (force ∼₂)
 
 -- However, classical bisimilarity is, for the same LTS, not pointwise
 -- propositional.
@@ -230,24 +245,26 @@ coinductive-bisimilarity-is-not-propositional :
   let open Bisimilarity.Coinductive two-bisimilar-processes in
   ¬ (∀ {p q} → Is-proposition (p ∼ q))
 coinductive-bisimilarity-is-not-propositional =
-  (∀ {p q} → Is-proposition (p ∼ q))  ↝⟨ (λ is-prop → is-prop {q = _}) ⟩
-  Is-proposition (true ∼ true)        ↝⟨ _⇔_.to propositional⇔irrelevant ⟩
-  Proof-irrelevant (true ∼ true)      ↝⟨ (λ irr → irr _ _) ⟩
-  proof true ≡ proof false            ↝⟨ cong (λ p → proj₁ (left-to-right p {p′ = true} _)) ⟩
-  true ≡ false                        ↝⟨ Bool.true≢false ⟩□
-  ⊥                                   □
+  (∀ {p q} → Is-proposition (p ∼ q))            ↝⟨ (λ is-prop → is-prop {p = true} {q = true}) ⟩
+  Is-proposition (true ∼ true)                  ↝⟨ _⇔_.to propositional⇔irrelevant ⟩
+  Proof-irrelevant (true ∼ true)                ↝⟨ (λ irr → irr _ _) ⟩
+  proof true true true ≡ proof false true true  ↝⟨ cong (λ p → proj₁ (left-to-right {p = true} {q = true} p {p′ = true} _)) ⟩
+  true ≡ false                                  ↝⟨ Bool.true≢false ⟩□
+  ⊥                                             □
   where
   open Bisimilarity.Coinductive two-bisimilar-processes
 
-  mutual
-    proof : Bool → ∀ {b₁ b₂ i} → [ i ] b₁ ∼ b₂
-    proof b =
-      ⟨ (λ _ → b , _ , proof′ b)
-      , (λ _ → b , _ , proof′ b)
-      ⟩
+  open import Indexed-container
 
-    proof′ : Bool → ∀ {b₁ b₂ i} → [ i ] b₁ ∼′ b₂
-    force (proof′ b) = proof b
+  mutual
+    proof : Bool → ∀ b₁ b₂ {i} → [ i ] b₁ ∼ b₂
+    proof b b₁ b₂ =
+      ⟨_,_⟩ {p = b₁} {q = b₂}
+        (λ _ → b , _ , proof′ b _ _)
+        (λ _ → b , _ , proof′ b _ _)
+
+    proof′ : Bool → ∀ b₁ b₂ {i} → [ i ] b₁ ∼′ b₂
+    force (proof′ b b₁ b₂) = proof b b₁ b₂
 
 -- In fact, for every type A there is a pointwise split surjection
 -- from a certain instance of bisimilarity to equality on A.
@@ -267,7 +284,7 @@ bisimilarity↠equality {A} = record
   open Bisimilarity.Coinductive (bisimilarity⇔equality A)
 
   to : ∀ {p q} → p ∼ q → p ≡ q
-  to ⟨ lr , _ ⟩ with lr (refl , refl)
+  to p∼q with left-to-right p∼q (refl , refl)
   ... | _ , (refl , _) , _ = refl
 
   from : ∀ {p q} → p ≡ q → p ∼ q
