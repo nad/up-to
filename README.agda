@@ -14,6 +14,10 @@ import Equational-reasoning
 
 import Labelled-transition-system
 
+-- Indexed containers.
+
+import Indexed-container
+
 ------------------------------------------------------------------------
 -- Strong bisimilarity
 
