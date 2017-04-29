@@ -7,6 +7,7 @@
 module Bisimilarity.Up-to.CCS {Name : Set} where
 
 open import Equality.Propositional
+open import Logical-equivalence using (_⇔_)
 open import Prelude
 
 open import Equational-reasoning
@@ -33,14 +34,18 @@ Up-to-context R (p , q) =
     ×
   ∀ x → R (ps x , qs x)
 
--- Up to context is an up-to technique.
+-- Up to context is monotone.
 
-Up-to-context-works : Up-to-technique Up-to-context
-Up-to-context-works = size-preserving→up-to′
-  {F = Up-to-context}
-  (λ R⊆S _ →
-     Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id
-       (R⊆S _ ∘_))
+Up-to-context-monotone : Monotone Up-to-context
+Up-to-context-monotone R⊆S _ =
+  Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id
+    (R⊆S _ ∘_)
+
+-- Up to context is size-preserving.
+
+Up-to-context-size-preserving : Size-preserving Up-to-context
+Up-to-context-size-preserving =
+  _⇔_.from (monotone→⇔ Up-to-context-monotone)
   (λ where
     .(C [ ps ] , C [ qs ]) (_ , C , ps , qs , refl , refl , ps∼qs) →
 
