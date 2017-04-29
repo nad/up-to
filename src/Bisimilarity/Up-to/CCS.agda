@@ -21,7 +21,7 @@ open import Relation
 
 -- Up to context for CCS (for polyadic contexts).
 
-Up-to-context : ∀ {ℓ} → Trans₂ ℓ Proc
+Up-to-context : Trans₂ (# 0) Proc
 Up-to-context R (p , q) =
   ∃ λ n →
   ∃ λ (C : Context n) →
@@ -35,10 +35,9 @@ Up-to-context R (p , q) =
 
 -- Up to context is an up-to technique.
 
-Up-to-context-works :
-  ∀ {ℓ} → Up-to-technique (Up-to-context {ℓ = ℓ})
-Up-to-context-works = size-preserving→up-to-∀
-  Up-to-context
+Up-to-context-works : Up-to-technique Up-to-context
+Up-to-context-works = size-preserving→up-to′
+  {F = Up-to-context}
   (λ R⊆S _ →
      Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id
        (R⊆S _ ∘_))

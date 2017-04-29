@@ -103,17 +103,6 @@ Monotone :
   Trans ℓ A → Set (a ⊔ lsuc ℓ)
 Monotone F = ∀ {R S} → R ⊆ S → F R ⊆ F S
 
--- Monotonicity of (universe-polymorphic and level-preserving)
--- relation transformers.
-
-Monotone-∀ :
-  ∀ {a} {A : Set a} →
-  (∀ {ℓ} → Trans ℓ A) →
-  (ℓ₁ ℓ₂ : Level) → Set (a ⊔ lsuc (ℓ₁ ⊔ ℓ₂))
-Monotone-∀ {A = A} F r s =
-  {R : Rel r A} {S : Rel s A} →
-  R ⊆ S → F R ⊆ F S
-
 -- "Equational" reasoning combinators.
 
 infix  -1 finally-⊆

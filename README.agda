@@ -22,6 +22,10 @@ import Relation
 
 import Indexed-container
 
+-- Up-to techniques.
+
+import Up-to
+
 ------------------------------------------------------------------------
 -- Strong bisimilarity
 

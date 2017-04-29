@@ -48,16 +48,6 @@ private
 
 open Temporarily-private using (Step)
 
--- Step is monotone.
-
-Step-monotone : ∀ {ℓ₁ ℓ₂} → Monotone-∀ Step ℓ₁ ℓ₂
-Step-monotone R⊆S (p , q) StepRpq =
-  Step.⟨ (λ p⟶p′ → Σ-map id (Σ-map id (R⊆S _))
-                     (Step.left-to-right StepRpq p⟶p′))
-       , (λ q⟶q′ → Σ-map id (Σ-map id (R⊆S _))
-                     (Step.right-to-left StepRpq q⟶q′))
-       ⟩
-
 -- Used to aid type inference. Note that this type is parametrised
 -- (see the module telescope above). The inclusion of a value of this
 -- type in the definition of S̲t̲e̲p̲ below makes it easier for Agda to
@@ -141,17 +131,6 @@ Step↔S̲t̲e̲p̲ {R = R} {pq} = record
     to₂ (from (s , f)) pos ≡ f pos
   to₂∘from f (inj₁ (_ , _ , refl)) = refl
   to₂∘from f (inj₂ (_ , _ , refl)) = refl
-
--- The interpretation of S̲t̲e̲p̲ is monotone.
-
-S̲t̲e̲p̲-monotone :
-  ∀ {ℓ₁ ℓ₂} → Monotone-∀ ⟦ S̲t̲e̲p̲ ⟧ ℓ₁ ℓ₂
-S̲t̲e̲p̲-monotone {R = R} {S = S} =
-  R ⊆ S                    ↝⟨ Step-monotone ⟩
-  Step R ⊆ Step S          ↝⟨ _⇔_.to (∀-cong-⇔ λ _ → →-cong-⇔
-                                (_↔_.logical-equivalence Step↔S̲t̲e̲p̲)
-                                (_↔_.logical-equivalence Step↔S̲t̲e̲p̲)) ⟩□
-  ⟦ S̲t̲e̲p̲ ⟧ R ⊆ ⟦ S̲t̲e̲p̲ ⟧ S  □
 
 module S̲t̲e̲p̲ {r} {R : Rel₂ r Proc} {p q} where
 

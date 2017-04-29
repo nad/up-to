@@ -23,8 +23,7 @@ open import Labelled-transition-system
 open Labelled-transition-system.Delay-monad A
 open LTS delay-monad hiding (_[_]⟶_)
 
-open import Bisimilarity.Classical (weak delay-monad)
-  using (Progression)
+open import Bisimilarity.Step (weak delay-monad) _[_]⇒̂_
 open import Bisimilarity.Up-to (weak delay-monad)
 open import Bisimilarity.Weak.Coinductive delay-monad
 import Bisimilarity.Weak.Coinductive.Equational-reasoning-instances
@@ -37,15 +36,14 @@ open import Relation
 -- delay monad (if A is a set, and assuming excluded middle).
 
 everything-up-to :
-  ∀ {ℓ} →
   Excluded-middle lzero →
   Is-set A →
-  (F : Trans₂ ℓ (Delay A ∞)) →
+  (F : Trans₂ (# 0) (Delay A ∞)) →
   Up-to-technique F
-everything-up-to {ℓ} em A-set F R R-prog = uncurry everything-up-to′
+everything-up-to em A-set F {R = R} R-prog = uncurry everything-up-to′
   where
   lemma :
-    ∀ {x y} {P : Rel₂ ℓ (Delay A ∞)} →
+    ∀ {x y} {P : Rel₂ (# 0) (Delay A ∞)} →
     (∀ {x′ z} → x [ just z ]⇒̂ x′ →
      ∃ λ y′ → y [ just z ]⇒̂ y′ × P (x′ , y′)) →
     (∃ λ z → now z W.≈ x) →
@@ -60,11 +58,10 @@ everything-up-to {ℓ} em A-set F R R-prog = uncurry everything-up-to′
 
   everything-up-to′ : ∀ x y → R (x , y) → x ≈ y
   everything-up-to′ x y Rxy with P.⇑⊎⇓ em A-set x | P.⇑⊎⇓ em A-set y
-  ... | inj₂ x⇓ | _       = lemma (Progression.left-to-right
-                                     R-prog Rxy) x⇓
+  ... | inj₂ x⇓ | _       = lemma (S̲t̲e̲p̲.left-to-right (R-prog _ Rxy)) x⇓
   ... | _       | inj₂ y⇓ = symmetric
-                              (lemma (Progression.right-to-left
-                                        R-prog Rxy) y⇓)
+                              (lemma (S̲t̲e̲p̲.right-to-left (R-prog _ Rxy))
+                                     y⇓)
   ... | inj₁ x⇑ | inj₁ y⇑ =
     x      ∼⟨ symmetric (_⇔_.to W′.direct⇔indirect′ x⇑) ⟩
     never  ∼⟨ _⇔_.to W′.direct⇔indirect′ y⇑ ⟩■

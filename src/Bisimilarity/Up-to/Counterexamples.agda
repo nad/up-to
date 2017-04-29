@@ -42,24 +42,20 @@ private
     open Bisimilarity.Up-to lts public
     open LTS lts public hiding (_[_]⟶_)
 
--- Bisimilarity-size-preserving relation transformers are not
--- necessarily monotone.
+-- Size-preserving relation transformers are not necessarily monotone.
 
 ¬size-preserving→monotone :
-  ∀ {ℓ} →
   ∃ λ lts → let open Combination lts in
-  ¬ ((F : Trans₂ ℓ Proc) →
-     Bisimilarity-size-preserving F →
-     Monotone F)
-¬size-preserving→monotone {ℓ} =
+  ¬ ((F : Trans₂ (# 0) Proc) → Size-preserving F → Monotone F)
+¬size-preserving→monotone =
     one-loop
-  , ((∀ G → Bisimilarity-size-preserving G → Monotone G)  ↝⟨ (λ hyp → hyp _ F-pres) ⟩
-     Monotone F                                           ↝⟨ ¬-F-mono ⟩□
-     ⊥                                                    □)
+  , ((∀ G → Size-preserving G → Monotone G)  ↝⟨ (λ hyp → hyp _ F-pres) ⟩
+     Monotone F                              ↝⟨ ¬-F-mono ⟩□
+     ⊥                                       □)
   where
   open Combination one-loop
 
-  F : Trans₂ ℓ Proc
+  F : Trans₂ (# 0) Proc
   F R = ¬_ ∘ R
 
   ¬-F-mono : ¬ Monotone F
@@ -75,28 +71,22 @@ private
   total : ∀ {i x y} → [ i ] x ∼ y
   total = reflexive
 
-  F-pres : Bisimilarity-size-preserving F
+  F-pres : Size-preserving F
   F-pres _ _ _ = total
 
--- Monotone, bisimilarity-size-preserving relation transformers are
--- not necessarily step-compatible.
+-- Monotone, size-preserving relation transformers are not necessarily
+-- compatible.
 
 ¬monotone→size-preserving→compatible :
-  ∀ {ℓ} →
   ∃ λ lts → let open Combination lts in
-  ¬ ((F : Trans₂ ℓ Proc) →
-     Monotone F →
-     Bisimilarity-size-preserving F →
-     Step-compatible F)
-¬monotone→size-preserving→compatible {ℓ} =
+  ¬ ((F : Trans₂ (# 0) Proc) →
+     Monotone F → Size-preserving F → Compatible F)
+¬monotone→size-preserving→compatible =
     one-transition
 
-  , ((∀ F → Monotone F → Bisimilarity-size-preserving F →
-      Step-compatible F)                                   ↝⟨ (λ hyp → hyp F mono (_⇔_.from (monotone→⇔ F mono) pre)) ⟩
-
-     Step-compatible F                                     ↝⟨ ¬comp ⟩□
-
-     ⊥                                                     □)
+  , ((∀ F → Monotone F → Size-preserving F → Compatible F)  ↝⟨ (λ hyp → hyp F mono (_⇔_.from (monotone→⇔ mono) pre)) ⟩
+     Compatible F                                           ↝⟨ ¬comp ⟩□
+     ⊥                                                      □)
 
   where
 
@@ -116,7 +106,7 @@ private
 
   -- A relation transformer.
 
-  F : Trans₂ ℓ Proc
+  F : Trans₂ (# 0) Proc
   F R (true , true) = R (false , false)
   F R               = R
 
@@ -128,17 +118,17 @@ private
   mono R⊆S (false , true)  = R⊆S _
   mono R⊆S (false , false) = R⊆S _
 
-  -- Bisimilarity of size i is a pre-fixpoint of F (modulo a lifting).
+  -- Bisimilarity of size i is a pre-fixpoint of F.
 
-  pre : ∀ {i} → F (↑ ℓ ∘ Bisimilarity i) ⊆ Bisimilarity i
+  pre : ∀ {i} → F (Bisimilarity i) ⊆ Bisimilarity i
   pre (true  , true)  = λ _ → true ■
-  pre (true  , false) = lower
-  pre (false , true)  = lower
-  pre (false , false) = lower
+  pre (true  , false) = id
+  pre (false , true)  = id
+  pre (false , false) = id
 
   -- A relation.
 
-  R : Rel₂ ℓ Proc
+  R : Rel₂ (# 0) Proc
   R _ = ⊥
 
   -- A lemma.
@@ -147,11 +137,11 @@ private
   Step.left-to-right StepRff ()
   Step.right-to-left StepRff ()
 
-  -- F is not step-compatible.
+  -- F is not compatible.
 
-  ¬comp : ¬ Step-compatible F
+  ¬comp : ¬ Compatible F
   ¬comp =
-    Step-compatible F                                              ↝⟨ (λ comp → comp R) ⟩
+    Compatible F                                                   ↝⟨ (λ comp → comp) ⟩
     F (⟦ S̲t̲e̲p̲ ⟧ R) ⊆ ⟦ S̲t̲e̲p̲ ⟧ (F R)                                ↝⟨ (λ le → le (true , true)) ⟩
     (F (⟦ S̲t̲e̲p̲ ⟧ R) (true , true) → ⟦ S̲t̲e̲p̲ ⟧ (F R) (true , true))  ↔⟨⟩
     (⟦ S̲t̲e̲p̲ ⟧ R (false , false) → ⟦ S̲t̲e̲p̲ ⟧ (F R) (true , true))    ↝⟨ _$ _↔_.to Step↔S̲t̲e̲p̲ StepRff ⟩
@@ -163,27 +153,24 @@ private
 -- Up-to-technique is not closed under composition, not even for
 -- monotone relation transformers.
 --
--- Pous and Sangiorgi mention two counterexamples to a generalisation
--- of this property in "Enhancements of the bisimulation proof
--- method", but I don't think those counterexamples apply in this
--- specific case.
+-- (Pous and Sangiorgi mention two other counterexamples to this
+-- property in "Enhancements of the bisimulation proof method".)
 
 ¬-∘-closure :
-  ∀ {ℓ} →
   ∃ λ lts → let open Combination lts in
-  ¬ ({F G : Trans₂ ℓ Proc} →
+  ¬ ({F G : Trans₂ (# 0) Proc} →
      Monotone F →
      Monotone G →
      Up-to-technique F →
      Up-to-technique G →
      Up-to-technique (F ∘ G))
-¬-∘-closure {ℓ} =
+¬-∘-closure =
     lts
 
   , ((∀ {F G} → Monotone F → Monotone G →
       Up-to-technique F → Up-to-technique G → Up-to-technique (F ∘ G))  ↝⟨ (λ cl → cl F-lemmas.mono G-lemmas.mono F-lemmas.up-to G-lemmas.up-to) ⟩
 
-     Up-to-technique (F ∘ G)                                            ↝⟨ (λ up-to → up-to R̲ R̲-prog) ⟩
+     Up-to-technique (F ∘ G)                                            ↝⟨ (λ up-to → up-to R̲-prog′) ⟩
 
      R̲ ⊆ Bisimilarity ∞                                                 ↝⟨ (λ le → le _ pp) ⟩
 
@@ -240,17 +227,17 @@ private
 
   -- F and G both add (at most) one pair to the underlying relation.
 
-  data F (R : Rel₂ ℓ Proc) : Rel₂ ℓ Proc where
+  data F (R : Rel₂ (# 0) Proc) : Rel₂ (# 0) Proc where
     qq  : F R (q left , q right)
     [_] : ∀ {x} → R x → F R x
 
-  data G (R : Rel₂ ℓ Proc) : Rel₂ ℓ Proc where
+  data G (R : Rel₂ (# 0) Proc) : Rel₂ (# 0) Proc where
     rr  : G R (r left , r right)
     [_] : ∀ {x} → R x → G R x
 
   -- R̲ adds one pair to reflexivity.
 
-  data R̲ : Rel₂ ℓ Proc where
+  data R̲ : Rel₂ (# 0) Proc where
     pp   : R̲ (p left , p right)
     refl : ∀ {x} → R̲ (x , x)
 
@@ -274,6 +261,9 @@ private
               rr refl → _ , rr , [ [ refl ] ])
     ⟫
 
+  R̲-prog′ : R̲ ⊆ ⟦ S̲t̲e̲p̲ ⟧ (F (G R̲))
+  R̲-prog′ = (_↔_.to Step↔S̲t̲e̲p̲ ∘_) ∘ progression R̲-prog
+
   module F-lemmas where
 
     -- F is monotone.
@@ -284,7 +274,10 @@ private
 
     -- F is an up-to technique.
 
-    module _ R (R-prog : Progression R (F R)) where
+    module _ {R} (R-prog′ : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ (F R)) where
+
+      R-prog : Progression R (F R)
+      progression R-prog = (_↔_.from Step↔S̲t̲e̲p̲ ∘_) ∘ R-prog′
 
       ¬rr : ∀ {s} → ¬ R (r s , r (not s))
       ¬rr rel with Progression.left-to-right R-prog rel rr
@@ -354,7 +347,10 @@ private
 
     -- G is an up-to technique.
 
-    module _ R (R-prog : Progression R (G R)) where
+    module _ {R} (R-prog′ : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ (G R)) where
+
+      R-prog : Progression R (G R)
+      progression R-prog = (_↔_.from Step↔S̲t̲e̲p̲ ∘_) ∘ R-prog′
 
       ¬rr : ∀ {s} → ¬ R (r s , r (not s))
       ¬rr rel with Progression.left-to-right R-prog rel rr
@@ -414,16 +410,13 @@ private
       up-to (r right , r left)  rel = ⊥-elim (¬rr rel)
       up-to (r right , r right) rel = reflexive
 
--- Up-to techniques are not necessarily bisimilarity-size-preserving,
--- not even if they are monotone.
+-- Up-to techniques are not necessarily size-preserving, not even if
+-- they are monotone.
 
 ¬monotone→up-to→size-preserving :
-  ∀ {ℓ} →
   ∃ λ lts → let open Combination lts in
-  ¬ ((F : Trans₂ ℓ Proc) →
-     Monotone F →
-     Up-to-technique F →
-     Bisimilarity-size-preserving F)
+  ¬ ((F : Trans₂ (# 0) Proc) →
+     Monotone F → Up-to-technique F → Size-preserving F)
 ¬monotone→up-to→size-preserving =
   let lts , ¬-∘-closure = ¬-∘-closure
       open Combination lts
@@ -433,14 +426,14 @@ private
 
   , λ monotone→up-to→size-preserving →
 
-    ¬-∘-closure λ {F G} F-mono G-mono F-up-to G-up-to →                $⟨ ((λ {_ _} → F-mono) , F-up-to) , ((λ {_ _} → G-mono) , G-up-to) ⟩
+    ¬-∘-closure λ {F G} F-mono G-mono F-up-to G-up-to →  $⟨ ((λ {_ _} → F-mono) , (λ {_} → F-up-to)) , ((λ {_ _} → G-mono) , (λ {_} → G-up-to)) ⟩
 
       (Monotone F × Up-to-technique F) ×
-      (Monotone G × Up-to-technique G)                                 ↝⟨ Σ-map (uncurry $ monotone→up-to→size-preserving _)
-                                                                                (uncurry $ monotone→up-to→size-preserving _) ⟩
+      (Monotone G × Up-to-technique G)                   ↝⟨ Σ-map (uncurry $ monotone→up-to→size-preserving _)
+                                                                  (uncurry $ monotone→up-to→size-preserving _) ⟩
 
-      Bisimilarity-size-preserving F × Bisimilarity-size-preserving G  ↝⟨ uncurry ∘-closure ⟩
+      Size-preserving F × Size-preserving G              ↝⟨ uncurry ∘-closure ⟩
 
-      Bisimilarity-size-preserving (F ∘ G)                             ↝⟨ size-preserving→up-to _ ⟩□
+      Size-preserving (F ∘ G)                            ↝⟨ size-preserving→up-to ⟩□
 
-      Up-to-technique (F ∘ G)                                          □
+      Up-to-technique (F ∘ G)                            □
