@@ -377,16 +377,16 @@ Up-to-bisimilarity-works = size-preserving→up-to-∀
        s  ∼⟨ s∼q ⟩■
        q)
 
--- Up to union.
+-- Up to union with bisimilarity.
 
-Up-to-∪ : ∀ {ℓ} → Trans₂ ℓ Proc
-Up-to-∪ R = R ∪ Co.Bisimilarity ∞
+Up-to-∪∼ : ∀ {ℓ} → Trans₂ ℓ Proc
+Up-to-∪∼ R = R ∪ Co.Bisimilarity ∞
 
--- Up to union is an up-to technique.
+-- Up to union with bisimilarity is an up-to technique.
 
-Up-to-∪-works : ∀ {ℓ} → Up-to-technique (Up-to-∪ {ℓ = ℓ})
-Up-to-∪-works = size-preserving→up-to-∀
-  Up-to-∪
+Up-to-∪∼-works : ∀ {ℓ} → Up-to-technique (Up-to-∪∼ {ℓ = ℓ})
+Up-to-∪∼-works = size-preserving→up-to-∀
+  Up-to-∪∼
   (λ R⊆S _ → ⊎-map (R⊆S _) id)
   (λ where
      (p , q) (inj₁ p∼q) → p  ∼⟨ p∼q ⟩■
