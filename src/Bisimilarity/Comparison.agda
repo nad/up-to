@@ -174,8 +174,10 @@ coinductive-bisimilarity-is-sometimes-propositional ext =
   irr ∼₁ ∼₂ =
     Bisimilarity-of-∼.⟨ ∼₁
                       , ∼₂
-                      , (λ _ → refl , refl , irr′ _ _)
-                      , (λ _ → refl , refl , irr′ _ _)
+                      , (λ _ → refl , refl , irr′ (proj₂ ∼₁ _)
+                                                  (proj₂ ∼₂ _))
+                      , (λ _ → refl , refl , irr′ (proj₂ ∼₁ _)
+                                                  (proj₂ ∼₂ _))
                       ⟩
     where
     irr′ : ∀ {i} ∼₁ ∼₂ → [ i ] ∼₁ ≡′ ∼₂

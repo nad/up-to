@@ -26,7 +26,7 @@ open import H-level equality-with-J
 open import H-level.Closure equality-with-J
 
 open import Bisimilarity.Step lts _[_]↝_ as Step public using (S̲t̲e̲p̲)
-open import Indexed-container hiding (⟨_⟩)
+open import Indexed-container hiding (⟨_⟩; Bisimilarity)
 open import Relation
 
 open Indexed-container public using (force)
@@ -158,7 +158,7 @@ infix 4 [_]_≡_ [_]_≡′_
 
 []≡↔ {p} {q} {i} (s₁@(_ , lr₁ , rl₁) , f₁) (s₂@(_ , lr₂ , rl₂) , f₂) =
 
-  [ i ] s₁ , f₁ ≡ s₂ , f₂                                                 ↔⟨⟩
+  [ i ] s₁ , f₁ ≡ s₂ , f₂                                                 ↝⟨ ν-bisimilar↔ (s₁ , f₁) (s₂ , f₂) ⟩
 
   (∃ λ (eq : s₁ ≡ s₂) →
    ∀ {o} (p : Container.Position S̲t̲e̲p̲ s₁ o) →
@@ -181,14 +181,14 @@ infix 4 [_]_≡_ [_]_≡′_
                            (cong₂ _,_ refl eq) p))                        ↝⟨ (∃-cong λ eq → implicit-∀-cong ext $ ∀-cong ext λ _ →
                                                                               ≡⇒↝ _ $
                                                                               cong (λ (eq : s₁ ≡ s₂) →
-                                                                                      [ _ ] _ ≡′
-                                                                                        f₂ (subst (λ s → Container.Position S̲t̲e̲p̲ s _) eq _)) $
+                                                                                      [ _ ] f₁ _ ≡′
+                                                                                            f₂ (subst (λ s → Container.Position S̲t̲e̲p̲ s _) eq _)) $
                                                                               trans-reflˡ (cong (_ ,_) eq)) ⟩
   (∃ λ (eq : proj₂ s₁ ≡ proj₂ s₂) →
    ∀ {o} (p : Container.Position S̲t̲e̲p̲ s₁ o) →
    [ i ] f₁ p ≡′ f₂ (subst (λ s → Container.Position S̲t̲e̲p̲ s o)
                            (cong (_ ,_) eq) p))                           ↝⟨ (∃-cong λ eq → implicit-∀-cong ext $ ∀-cong ext λ _ →
-                                                                              ≡⇒↝ _ $ cong (λ p → [ _ ] _ ≡′ f₂ p) $ sym $
+                                                                              ≡⇒↝ _ $ cong (λ p → [ _ ] f₁ _ ≡′ f₂ p) $ sym $
                                                                               subst-∘ _ _ eq) ⟩
   (∃ λ (eq : proj₂ s₁ ≡ proj₂ s₂) →
    ∀ {o} (p : Container.Position S̲t̲e̲p̲ s₁ o) →
@@ -473,10 +473,10 @@ infix 4 [_]_≡_ [_]_≡′_
                             ∃ λ μ → ∃ λ (q⟶q′′ : q [ μ ]⟶ q′) →
                             proj₁ (rl q⟶q′′) ≡ proj₁ (rl₁ q⟶q′))
                          eq (μ , q⟶q′ , refl))))                          ↝⟨ (∃-cong λ eq → ∀-cong ext λ _ → ∀-cong ext λ _ → ∀-cong ext λ _ →
-                                                                              ≡⇒↝ _ $ cong (([ _ ] _ ≡′_) ∘ f₂ ∘ inj₁) $ lemma₂ eq)
+                                                                              ≡⇒↝ _ $ cong (([ _ ] f₁ _ ≡′_) ∘ f₂ ∘ inj₁) $ lemma₂ eq)
                                                                                ×-cong
                                                                              (∃-cong λ eq → ∀-cong ext λ _ → ∀-cong ext λ _ → ∀-cong ext λ _ →
-                                                                              ≡⇒↝ _ $ cong (([ _ ] _ ≡′_) ∘ f₂ ∘ inj₂) $ lemma₂ eq) ⟩
+                                                                              ≡⇒↝ _ $ cong (([ _ ] f₁ _ ≡′_) ∘ f₂ ∘ inj₂) $ lemma₂ eq) ⟩
   (∃ λ (eq : (λ {p′ μ} → lr₁ {p′ = p′} {μ = μ}) ≡ lr₂) →
    ∀ p′ μ (p⟶p′ : p [ μ ]⟶ p′) →
    [ i ] f₁ (inj₁ (μ , p⟶p′ , refl)) ≡′
@@ -523,16 +523,18 @@ infix 4 [_]_≡_ [_]_≡′_
                                                                                                   {k = bijection} ext) λ eq →
                                                                               implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ p⟶p′ →
                                                                               ≡⇒↝ _ $ sym $
-                                                                              cong (λ eq → [ _ ] _ ≡′ f₂ (inj₁ (_ , p⟶p′ ,
-                                                                                                        sym (cong (λ lr → proj₁ (lr p⟶p′)) eq)))) $
+                                                                              cong (λ eq → [ _ ] f₁ _ ≡′
+                                                                                                 f₂ (inj₁ (_ , p⟶p′ ,
+                                                                                                       sym (cong (λ lr → proj₁ (lr p⟶p′)) eq)))) $
                                                                               _↔_.right-inverse-of (implicit-extensionality-isomorphism ext) eq)
                                                                                ×-cong
                                                                              (Σ-cong (inverse $ implicit-extensionality-isomorphism
                                                                                                   {k = bijection} ext) λ eq →
                                                                               implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ q⟶q′ →
                                                                               ≡⇒↝ _ $ sym $
-                                                                              cong (λ eq → [ _ ] _ ≡′ f₂ (inj₂ (_ , q⟶q′ ,
-                                                                                                        sym (cong (λ rl → proj₁ (rl q⟶q′)) eq)))) $
+                                                                              cong (λ eq → [ _ ] f₁ _ ≡′
+                                                                                                 f₂ (inj₂ (_ , q⟶q′ ,
+                                                                                                       sym (cong (λ rl → proj₁ (rl q⟶q′)) eq)))) $
                                                                               _↔_.right-inverse-of (implicit-extensionality-isomorphism ext) eq) ⟩
   (∃ λ (eq : ∀ p′ → (λ {μ} → lr₁ {p′ = p′} {μ = μ}) ≡ lr₂) →
    let eq′ = _↔_.to (implicit-extensionality-isomorphism ext) eq in
@@ -546,12 +548,12 @@ infix 4 [_]_≡_ [_]_≡′_
    [ i ] f₁ (inj₂ (μ , q⟶q′ , refl)) ≡′
          f₂ (inj₂ (μ , q⟶q′ , sym (cong (λ rl → proj₁ (rl q⟶q′)) eq′))))  ↝⟨ (∃-cong λ eq →
                                                                               implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ p⟶p′ →
-                                                                              ≡⇒↝ _ $ cong (λ eq → [ _ ] _ ≡′ f₂ (inj₁ (_ , p⟶p′ , sym eq))) $
+                                                                              ≡⇒↝ _ $ cong (λ eq → [ _ ] f₁ _ ≡′ f₂ (inj₁ (_ , p⟶p′ , sym eq))) $
                                                                               lemma₃ eq)
                                                                                ×-cong
                                                                              (∃-cong λ eq →
                                                                               implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ q⟶q′ →
-                                                                              ≡⇒↝ _ $ cong (λ eq → [ _ ] _ ≡′ f₂ (inj₂ (_ , q⟶q′ , sym eq))) $
+                                                                              ≡⇒↝ _ $ cong (λ eq → [ _ ] f₁ _ ≡′ f₂ (inj₂ (_ , q⟶q′ , sym eq))) $
                                                                               lemma₃ eq) ⟩
   (∃ λ (eq : ∀ p′ → (λ {μ} → lr₁ {p′ = p′} {μ = μ}) ≡ lr₂) →
    ∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
@@ -568,9 +570,10 @@ infix 4 [_]_≡_ [_]_≡′_
                                                                                         {k = bijection} ext) λ eq →
                                                                               implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ p⟶p′ →
                                                                               ≡⇒↝ _ $ sym $
-                                                                              cong (λ eq → [ _ ] _ ≡′ f₂ (inj₁ (_ , p⟶p′ ,
-                                                                                                        sym (cong (λ lr → proj₁ (lr _ p⟶p′))
-                                                                                                                  (Eq.good-ext ext eq))))) $
+                                                                              cong (λ eq → [ _ ] f₁ _ ≡′
+                                                                                                 f₂ (inj₁ (_ , p⟶p′
+                                                                                                             , sym (cong (λ lr → proj₁ (lr _ p⟶p′))
+                                                                                                                         (Eq.good-ext ext eq))))) $
                                                                               ext (_↔_.right-inverse-of
                                                                                      (implicit-extensionality-isomorphism ext) ∘ eq))
                                                                                ×-cong
@@ -579,9 +582,10 @@ infix 4 [_]_≡_ [_]_≡′_
                                                                                         {k = bijection} ext) λ eq →
                                                                               implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ q⟶q′ →
                                                                               ≡⇒↝ _ $ sym $
-                                                                              cong (λ eq → [ _ ] _ ≡′ f₂ (inj₂ (_ , q⟶q′ ,
-                                                                                                        sym (cong (λ rl → proj₁ (rl _ q⟶q′))
-                                                                                                                  (Eq.good-ext ext eq))))) $
+                                                                              cong (λ eq → [ _ ] f₁ _ ≡′
+                                                                                                 f₂ (inj₂ (_ , q⟶q′
+                                                                                                             , sym (cong (λ rl → proj₁ (rl _ q⟶q′))
+                                                                                                                         (Eq.good-ext ext eq))))) $
                                                                               ext (_↔_.right-inverse-of
                                                                                      (implicit-extensionality-isomorphism ext) ∘ eq)) ⟩
   (∃ λ (eq : ∀ p′ μ → lr₁ {p′ = p′} {μ = μ} ≡ lr₂) →
@@ -598,12 +602,12 @@ infix 4 [_]_≡_ [_]_≡′_
          f₂ (inj₂ (μ , q⟶q′ , sym (cong (λ rl → proj₁ (rl q′ q⟶q′))
                                         (Eq.good-ext ext eq′)))))         ↝⟨ (∃-cong λ _ →
                                                                               implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ _ →
-                                                                              ≡⇒↝ _ $ cong (λ eq → [ _ ] _ ≡′ f₂ (inj₁ (_ , _ , sym eq))) $
+                                                                              ≡⇒↝ _ $ cong (λ eq → [ _ ] f₁ _ ≡′ f₂ (inj₁ (_ , _ , sym eq))) $
                                                                               lemma₄ _)
                                                                                ×-cong
                                                                              (∃-cong λ _ →
                                                                               implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ _ →
-                                                                              ≡⇒↝ _ $ cong (λ eq → [ _ ] _ ≡′ f₂ (inj₂ (_ , _ , sym eq))) $
+                                                                              ≡⇒↝ _ $ cong (λ eq → [ _ ] f₁ _ ≡′ f₂ (inj₂ (_ , _ , sym eq))) $
                                                                               lemma₄ _) ⟩
   (∃ λ (eq : ∀ p′ μ → lr₁ {p′ = p′} {μ = μ} ≡ lr₂) →
    ∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
@@ -645,12 +649,12 @@ infix 4 [_]_≡_ [_]_≡′_
          f₂ (inj₂ (μ , q⟶q′
                      , sym (cong (λ rl → proj₁ (rl q⟶q′)) eq))))          ↝⟨ (∃-cong λ eq →
                                                                               implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ p⟶p′ →
-                                                                              ≡⇒↝ _ $ cong (λ eq → [ _ ] _ ≡′ f₂ (inj₁ (_ , _ , sym eq))) $ sym $
+                                                                              ≡⇒↝ _ $ cong (λ eq → [ _ ] f₁ _ ≡′ f₂ (inj₁ (_ , _ , sym eq))) $ sym $
                                                                               cong-∘ proj₁ (_$ p⟶p′) (eq {μ = _}))
                                                                                ×-cong
                                                                              (∃-cong λ eq →
                                                                               implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ q⟶q′ →
-                                                                              ≡⇒↝ _ $ cong (λ eq → [ _ ] _ ≡′ f₂ (inj₂ (_ , _ , sym eq))) $ sym $
+                                                                              ≡⇒↝ _ $ cong (λ eq → [ _ ] f₁ _ ≡′ f₂ (inj₂ (_ , _ , sym eq))) $ sym $
                                                                               cong-∘ proj₁ (_$ q⟶q′) (eq {μ = _})) ⟩
   (∃ λ (eq : ∀ {p′ μ} → lr₁ {p′ = p′} {μ = μ} ≡ lr₂) →
    ∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
@@ -738,12 +742,12 @@ infix 4 [_]_≡_ [_]_≡′_
             f₂ (inj₂ (μ , q⟶q′
                         , sym (cong proj₁ (uncurry Σ-≡,≡→≡ eq)))))        ↝⟨ (implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ _ →
                                                                               ∃-cong λ eq →
-                                                                              ≡⇒↝ _ $ cong (λ eq → [ _ ] _ ≡′ f₂ (inj₁ (_ , _ , sym eq))) $
+                                                                              ≡⇒↝ _ $ cong (λ eq → [ _ ] f₁ _ ≡′ f₂ (inj₁ (_ , _ , sym eq))) $
                                                                               proj₁-Σ-≡,≡→≡ (proj₁ eq) (proj₂ eq))
                                                                                ×-cong
                                                                              (implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ _ →
                                                                               ∃-cong λ eq →
-                                                                              ≡⇒↝ _ $ cong (λ eq → [ _ ] _ ≡′ f₂ (inj₂ (_ , _ , sym eq))) $
+                                                                              ≡⇒↝ _ $ cong (λ eq → [ _ ] f₁ _ ≡′ f₂ (inj₂ (_ , _ , sym eq))) $
                                                                               proj₁-Σ-≡,≡→≡ (proj₁ eq) (proj₂ eq)) ⟩
   (∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
    let q′₁ , q⟶q′₁ = lr₁ p⟶p′
@@ -833,20 +837,20 @@ infix 4 [_]_≡_ [_]_≡′_
 
     [ i ] f₁ (inj₁ pos) ≡′
           f₂ (subst (λ s → Container.Position S̲t̲e̲p̲ (_ , s) p′q′)
-                    (cong₂ _,_ (proj₁ eq) (proj₂ eq)) (inj₁ pos))         ≡⟨ cong (([ _ ] _ ≡′_) ∘ f₂) $
+                    (cong₂ _,_ (proj₁ eq) (proj₂ eq)) (inj₁ pos))         ≡⟨ cong (([ _ ] f₁ _ ≡′_) ∘ f₂) $
                                                                              push-subst-inj₁ {y≡z = cong₂ _,_ (proj₁ eq) (proj₂ eq)} _ _ ⟩
     [ i ] f₁ (inj₁ pos) ≡′
           f₂ (inj₁ (subst (λ s →
                              ∃ λ μ → ∃ λ (p⟶p′ : p [ μ ]⟶ proj₁ p′q′) →
                              proj₁ (proj₁ s p⟶p′) ≡ proj₂ p′q′)
-                          (cong₂ _,_ (proj₁ eq) (proj₂ eq)) pos))         ≡⟨ cong (([ _ ] _ ≡′_) ∘ f₂ ∘ inj₁) $
+                          (cong₂ _,_ (proj₁ eq) (proj₂ eq)) pos))         ≡⟨ cong (([ _ ] f₁ _ ≡′_) ∘ f₂ ∘ inj₁) $
                                                                              subst-∘ _ _ (cong₂ _,_ (proj₁ eq) (proj₂ eq)) ⟩
     [ i ] f₁ (inj₁ pos) ≡′
           f₂ (inj₁ (subst (λ lr →
                              ∃ λ μ → ∃ λ (p⟶p′ : p [ μ ]⟶ proj₁ p′q′) →
                              proj₁ (lr p⟶p′) ≡ proj₂ p′q′)
                           (cong proj₁ (cong₂ _,_ (proj₁ eq) (proj₂ eq)))
-                          pos))                                           ≡⟨ cong (([ _ ] _ ≡′_) ∘ f₂ ∘ inj₁) $ cong (flip (subst _) _) $
+                          pos))                                           ≡⟨ cong (([ _ ] f₁ _ ≡′_) ∘ f₂ ∘ inj₁) $ cong (flip (subst _) _) $
                                                                              cong-proj₁-cong₂-, (proj₁ eq) (proj₂ eq) ⟩∎
     [ i ] f₁ (inj₁ pos) ≡′
           f₂ (inj₁ (subst (λ lr →
@@ -863,20 +867,20 @@ infix 4 [_]_≡_ [_]_≡′_
 
     [ i ] f₁ (inj₂ pos) ≡′
           f₂ (subst (λ s → Container.Position S̲t̲e̲p̲ (_ , s) p′q′)
-                    (cong₂ _,_ (proj₁ eq) (proj₂ eq)) (inj₂ pos))         ≡⟨ cong (([ _ ] _ ≡′_) ∘ f₂) $
+                    (cong₂ _,_ (proj₁ eq) (proj₂ eq)) (inj₂ pos))         ≡⟨ cong (([ _ ] f₁ _ ≡′_) ∘ f₂) $
                                                                              push-subst-inj₂ {y≡z = cong₂ _,_ (proj₁ eq) (proj₂ eq)} _ _ ⟩
     [ i ] f₁ (inj₂ pos) ≡′
           f₂ (inj₂ (subst (λ s →
                              ∃ λ μ → ∃ λ (q⟶q′ : q [ μ ]⟶ proj₂ p′q′) →
                              proj₁ (proj₂ s q⟶q′) ≡ proj₁ p′q′)
-                          (cong₂ _,_ (proj₁ eq) (proj₂ eq)) pos))         ≡⟨ cong (([ _ ] _ ≡′_) ∘ f₂ ∘ inj₂) $
+                          (cong₂ _,_ (proj₁ eq) (proj₂ eq)) pos))         ≡⟨ cong (([ _ ] f₁ _ ≡′_) ∘ f₂ ∘ inj₂) $
                                                                              subst-∘ _ _ (cong₂ _,_ (proj₁ eq) (proj₂ eq)) ⟩
     [ i ] f₁ (inj₂ pos) ≡′
           f₂ (inj₂ (subst (λ rl →
                              ∃ λ μ → ∃ λ (q⟶q′ : q [ μ ]⟶ proj₂ p′q′) →
                              proj₁ (rl q⟶q′) ≡ proj₁ p′q′)
                           (cong proj₂ (cong₂ _,_ (proj₁ eq) (proj₂ eq)))
-                          pos))                                           ≡⟨ cong (([ _ ] _ ≡′_) ∘ f₂ ∘ inj₂) $ cong (flip (subst _) _) $
+                          pos))                                           ≡⟨ cong (([ _ ] f₁ _ ≡′_) ∘ f₂ ∘ inj₂) $ cong (flip (subst _) _) $
                                                                              cong-proj₂-cong₂-, (proj₁ eq) (proj₂ eq) ⟩∎
     [ i ] f₁ (inj₂ pos) ≡′
           f₂ (inj₂ (subst (λ rl →
@@ -1018,7 +1022,7 @@ infix 4 [_]_≡_ [_]_≡′_
            f₂ (inj₁ (_ , p⟶p′ , refl)))
   lemma₅₁ {p′} {μ} {p⟶p′} q′₁≡q′₂ =
     ([ i ] f₁ (inj₁ (μ , p⟶p′ , refl)) ≡′
-           f₂ (inj₁ (μ , p⟶p′ , sym q′₁≡q′₂)))        ≡⟨ cong ([ _ ] _ ≡′_) $ lemma′ q′₁≡q′₂ ⟩
+           f₂ (inj₁ (μ , p⟶p′ , sym q′₁≡q′₂)))        ≡⟨ cong ([ _ ] f₁ _ ≡′_) $ lemma′ q′₁≡q′₂ ⟩
 
     ([ i ] f₁ (inj₁ (μ , p⟶p′ , refl)) ≡′
            subst (ν′ S̲t̲e̲p̲ ∞ ∘ (p′ ,_)) (sym q′₁≡q′₂)
@@ -1056,7 +1060,7 @@ infix 4 [_]_≡_ [_]_≡′_
            f₂ (inj₂ (_ , q⟶q′ , refl)))
   lemma₅₂ {q′} {μ} {q⟶q′} p′₁≡p′₂ =
     ([ i ] f₁ (inj₂ (μ , q⟶q′ , refl)) ≡′
-           f₂ (inj₂ (μ , q⟶q′ , sym p′₁≡p′₂)))        ≡⟨ cong ([ _ ] _ ≡′_) $ lemma′ p′₁≡p′₂ ⟩
+           f₂ (inj₂ (μ , q⟶q′ , sym p′₁≡p′₂)))        ≡⟨ cong ([ _ ] f₁ _ ≡′_) $ lemma′ p′₁≡p′₂ ⟩
 
     ([ i ] f₁ (inj₂ (μ , q⟶q′ , refl)) ≡′
            subst (ν′ S̲t̲e̲p̲ ∞ ∘ (_, q′)) (sym p′₁≡p′₂)
