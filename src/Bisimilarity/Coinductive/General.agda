@@ -25,9 +25,9 @@ open import Function-universe equality-with-J as F hiding (id; _∘_)
 open import H-level equality-with-J
 open import H-level.Closure equality-with-J
 
-open import Bisimilarity.Classical.Preliminaries
 open import Bisimilarity.Step lts _[_]↝_ as Step public using (S̲t̲e̲p̲)
 open import Indexed-container hiding (⟨_⟩)
+open import Relation
 
 open Indexed-container public using (force)
 
@@ -35,17 +35,23 @@ open Indexed-container public using (force)
 
 infix 4 _∼_ _∼′_ [_]_∼_ [_]_∼′_
 
+Bisimilarity : Size → Rel₂ (# 0) Proc
+Bisimilarity i = ν S̲t̲e̲p̲ i
+
+Bisimilarity′ : Size → Rel₂ (# 0) Proc
+Bisimilarity′ i = ν′ S̲t̲e̲p̲ i
+
 [_]_∼_ : Size → Proc → Proc → Set
-[ i ] p ∼ q = ν S̲t̲e̲p̲ i (p , q)
+[_]_∼_ = curry ∘ Bisimilarity
 
 [_]_∼′_ : Size → Proc → Proc → Set
-[ i ] p ∼′ q = ν′ S̲t̲e̲p̲ i (p , q)
+[_]_∼′_ = curry ∘ Bisimilarity′
 
 _∼_ : Proc → Proc → Set
-p ∼ q = [ ∞ ] p ∼ q
+_∼_ = [ ∞ ]_∼_
 
 _∼′_ : Proc → Proc → Set
-p ∼′ q = [ ∞ ] p ∼′ q
+_∼′_ = [ ∞ ]_∼′_
 
 -- Combinators that can perhaps make the code a bit nicer to read.
 

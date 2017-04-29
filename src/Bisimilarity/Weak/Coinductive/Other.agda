@@ -20,7 +20,8 @@ private
     using (_∼_; _∼′_; [_]_∼_; [_]_∼′_)
 
 open import Bisimilarity.Coinductive.General lts _[_]⇒̂_ ⟶→⇒̂ public
-  using (S̲t̲e̲p̲; ⟨_,_⟩; left-to-right; right-to-left; force;
+  using (Bisimilarity; Bisimilarity′;
+         S̲t̲e̲p̲; ⟨_,_⟩; left-to-right; right-to-left; force;
          [_]_≡_; [_]_≡′_; []≡↔;
          Extensionality; extensionality)
   renaming ( [_]_∼_ to [_]_≈_

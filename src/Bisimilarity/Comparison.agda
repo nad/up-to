@@ -25,6 +25,7 @@ import Bisimilarity.Coinductive
 import Bisimilarity.Coinductive.Equational-reasoning-instances
 open import Equational-reasoning
 open import Labelled-transition-system
+open import Relation
 
 module _ {lts : LTS} where
 
@@ -56,7 +57,7 @@ module _ {lts : LTS} where
   -- Coinductive bisimilarity is a bisimulation.
 
   coinductive-bisimilarity-is-a-bisimulation :
-    Cl.Bisimulation Co._∼_
+    Cl.Bisimulation (Co.Bisimilarity ∞)
   coinductive-bisimilarity-is-a-bisimulation =
     Cl.⟪ (λ p∼q p⟶p′ →
             Σ-map id (Σ-map id (λ p∼q → Co.force p∼q))
@@ -70,7 +71,7 @@ module _ {lts : LTS} where
 
   co⇒cl : ∀ {ℓ p q} → p Co.∼ q → Cl.[ ℓ ] p ∼ q
   co⇒cl p∼q =
-      (λ p q → ↑ _ (p Co.∼ q))
+      ↑ _ ∘ Co.Bisimilarity ∞
     , Cl.↑-preserves-bisimulations
         coinductive-bisimilarity-is-a-bisimulation
     , lift p∼q
@@ -112,7 +113,7 @@ module _ {lts : LTS} where
   co⇒cl∘cl⇒co {p} {q} p≢q p∼q =
       reflexive
 
-    , (co⇒cl (cl⇒co reflexive) ≡ reflexive  ↝⟨ cong (λ R → proj₁ R p q) ⟩
+    , (co⇒cl (cl⇒co reflexive) ≡ reflexive  ↝⟨ cong (λ R → proj₁ R (p , q)) ⟩
        ↑ _ (p Co.∼ q) ≡ ↑ _ (p ≡ q)         ↝⟨ (λ eq → ≡⇒↝ _ eq $ lift p∼q) ⟩
        ↑ _ (p ≡ q)                          ↝⟨ lower ⟩
        p ≡ q                                ↝⟨ p≢q ⟩□
@@ -189,7 +190,7 @@ classical-bisimilarity-is-not-propositional :
 classical-bisimilarity-is-not-propositional {ℓ} =
   Is-proposition ([ ℓ ] tt ∼ tt)    ↝⟨ (λ is-prop → _⇔_.to propositional⇔irrelevant is-prop) ⟩
   Proof-irrelevant ([ ℓ ] tt ∼ tt)  ↝⟨ (λ f → f tt∼tt₁ tt∼tt₂) ⟩
-  tt∼tt₁ ≡ tt∼tt₂                   ↝⟨ cong (λ R → proj₁ R tt tt) ⟩
+  tt∼tt₁ ≡ tt∼tt₂                   ↝⟨ cong (λ R → proj₁ R (tt , tt)) ⟩
   Unit ≡ (Unit ⊎ Unit)              ↝⟨ (λ eq → Fin 1          ↝⟨ inverse Unit↔Fin1 ⟩
                                                Unit           ↝⟨ ≡⇒↝ _ eq ⟩
                                                Unit ⊎ Unit    ↝⟨ Unit↔Fin1 ⊎-cong Unit↔Fin1 ⟩
@@ -206,8 +207,8 @@ classical-bisimilarity-is-not-propositional {ℓ} =
 
   tt∼tt₂ : [ ℓ ] tt ∼ tt
   tt∼tt₂ =
-    let _R_ , R-is-a-bisimulation , ttRtt = tt∼tt₁ in
-      (λ p q → (p R q) ⊎ (p R q))
+    let R , R-is-a-bisimulation , ttRtt = tt∼tt₁ in
+      (R ∪ R)
     , ×2-preserves-bisimulations R-is-a-bisimulation
     , inj₁ ttRtt
 

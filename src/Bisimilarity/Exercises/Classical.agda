@@ -17,11 +17,11 @@ open import Function-universe equality-with-J hiding (id; _∘_)
 
 import Bisimilarity.Classical
 import Bisimilarity.Classical.Equational-reasoning-instances
-open import Bisimilarity.Classical.Preliminaries
 open import Bisimilarity.Comparison
 import Bisimilarity.Exercises.Other
 open import Equational-reasoning
 open import Labelled-transition-system
+open import Relation
 
 module _ {Name : Set} where
 
@@ -35,23 +35,23 @@ module _ {Name : Set} where
   -- _∣_ is commutative.
 
   ∣-comm : ∀ {P Q} → P ∣ Q ∼ Q ∣ P
-  ∣-comm = _R_ , R-is-a-bisimulation , base
+  ∣-comm = R , R-is-a-bisimulation , base
     where
-    data _R_ : Proc → Proc → Set where
-      base : ∀ {P Q} → (P ∣ Q) R (Q ∣ P)
+    data R : Rel₂ (# 0) Proc where
+      base : ∀ {P Q} → R (P ∣ Q , Q ∣ P)
 
-    R-is-symmetric : ∀ {P Q} → P R Q → Q R P
+    R-is-symmetric : ∀ {P Q} → R (P , Q) → R (Q , P)
     R-is-symmetric base = base
 
-    R-is-a-bisimulation : Bisimulation _R_
+    R-is-a-bisimulation : Bisimulation R
     R-is-a-bisimulation =
       ⟪ lr , (λ PRQ tr →
                 Σ-map id (Σ-map id R-is-symmetric)
                   (lr (R-is-symmetric PRQ) tr)) ⟫
       where
       lr : ∀ {P P′ Q μ} →
-           P R Q → P [ μ ]⟶ P′ →
-           ∃ λ Q′ → Q [ μ ]⟶ Q′ × P′ R Q′
+           R (P , Q) → P [ μ ]⟶ P′ →
+           ∃ λ Q′ → Q [ μ ]⟶ Q′ × R (P′ , Q′)
       lr base (par-left  tr)  = _ , par-right tr , base
       lr base (par-right tr)  = _ , par-left  tr , base
       lr base (par-τ tr₁ tr₂) =
@@ -64,17 +64,17 @@ module _ {Name : Set} where
   -- _∣_ is associative.
 
   ∣-assoc : ∀ {P Q R} → P ∣ (Q ∣ R) ∼ (P ∣ Q) ∣ R
-  ∣-assoc = _S_ , S-is-a-bisimulation , base
+  ∣-assoc = S , S-is-a-bisimulation , base
     where
-    data _S_ : Proc → Proc → Set where
-      base : ∀ {P Q R} → (P ∣ (Q ∣ R)) S ((P ∣ Q) ∣ R)
+    data S : Rel₂ (# 0) Proc where
+      base : ∀ {P Q R} → S (P ∣ (Q ∣ R) , (P ∣ Q) ∣ R)
 
-    S-is-a-bisimulation : Bisimulation _S_
+    S-is-a-bisimulation : Bisimulation S
     S-is-a-bisimulation = ⟪ lr , rl ⟫
       where
       lr : ∀ {P P′ Q μ} →
-           P S Q → P [ μ ]⟶ P′ →
-           ∃ λ Q′ → Q [ μ ]⟶ Q′ × P′ S Q′
+           S (P , Q) → P [ μ ]⟶ P′ →
+           ∃ λ Q′ → Q [ μ ]⟶ Q′ × S (P′ , Q′)
       lr base (par-left tr)               = _ , par-left (par-left tr)    , base
       lr base (par-right (par-left tr))   = _ , par-left (par-right tr)   , base
       lr base (par-right (par-right tr))  = _ , par-right tr              , base
@@ -83,8 +83,8 @@ module _ {Name : Set} where
       lr base (par-τ tr₁ (par-right tr₂)) = _ , par-τ (par-left tr₁) tr₂  , base
 
       rl : ∀ {P Q Q′ μ} →
-           P S Q → Q [ μ ]⟶ Q′ →
-           ∃ λ P′ → P [ μ ]⟶ P′ × P′ S Q′
+           S (P , Q) → Q [ μ ]⟶ Q′ →
+           ∃ λ P′ → P [ μ ]⟶ P′ × S (P′ , Q′)
       rl base (par-left (par-left tr))    = _ , par-left tr               , base
       rl base (par-left (par-right tr))   = _ , par-right (par-left tr)   , base
       rl base (par-left (par-τ tr₁ tr₂))  = _ , par-τ tr₁ (par-left tr₂)  , base
@@ -95,24 +95,24 @@ module _ {Name : Set} where
   -- ∅ is a left identity of _∣_.
 
   ∣-left-identity : ∀ {P} → ∅ ∣ P ∼ P
-  ∣-left-identity = _R_ , R-is-a-bisimulation , base
+  ∣-left-identity = R , R-is-a-bisimulation , base
     where
-    data _R_ : Proc → Proc → Set where
-      base : ∀ {P} → (∅ ∣ P) R P
+    data R : Rel₂ (# 0) Proc where
+      base : ∀ {P} → R (∅ ∣ P , P)
 
-    R-is-a-bisimulation : Bisimulation _R_
+    R-is-a-bisimulation : Bisimulation R
     R-is-a-bisimulation = ⟪ lr , rl ⟫
       where
       lr : ∀ {P P′ Q μ} →
-           P R Q → P [ μ ]⟶ P′ →
-           ∃ λ Q′ → Q [ μ ]⟶ Q′ × P′ R Q′
+           R (P , Q) → P [ μ ]⟶ P′ →
+           ∃ λ Q′ → Q [ μ ]⟶ Q′ × R (P′ , Q′)
       lr base (par-right tr) = _ , tr , base
       lr base (par-left ())
       lr base (par-τ () _)
 
       rl : ∀ {P Q Q′ μ} →
-           P R Q → Q [ μ ]⟶ Q′ →
-           ∃ λ P′ → P [ μ ]⟶ P′ × P′ R Q′
+           R (P , Q) → Q [ μ ]⟶ Q′ →
+           ∃ λ P′ → P [ μ ]⟶ P′ × R (P′ , Q′)
       rl base tr = _ , par-right tr , base
 
   -- ∅ is a right identity of _∣_.
@@ -126,15 +126,16 @@ module _ {Name : Set} where
   -- _∣_ preserves bisimilarity.
 
   _∣-cong_ : ∀ {P P′ Q Q′} → P ∼ P′ → Q ∼ Q′ → P ∣ Q ∼ P′ ∣ Q′
-  (_L_ , L-bisim , PLP′) ∣-cong (_R_ , R-bisim , QRQ′) =
-    _LR_ , ⟪ lr , rl ⟫ , base PLP′ QRQ′
+  (L , L-bisim , PLP′) ∣-cong (R , R-bisim , QRQ′) =
+    LR , ⟪ lr , rl ⟫ , base PLP′ QRQ′
     where
-    data _LR_ : Proc → Proc → Set where
-      base : ∀ {P P′ Q Q′} → P L P′ → Q R Q′ → (P ∣ Q) LR (P′ ∣ Q′)
+    data LR : Rel₂ (# 0) Proc where
+      base : ∀ {P P′ Q Q′} →
+             L (P , P′) → R (Q , Q′) → LR (P ∣ Q , P′ ∣ Q′)
 
     lr : ∀ {P P′ Q μ} →
-         P LR Q → P [ μ ]⟶ P′ →
-         ∃ λ Q′ → Q [ μ ]⟶ Q′ × P′ LR Q′
+         LR (P , Q) → P [ μ ]⟶ P′ →
+         ∃ λ Q′ → Q [ μ ]⟶ Q′ × LR (P′ , Q′)
     lr (base PLP′ QRQ′) (par-left tr) =
       Σ-map (_∣ _) (Σ-map par-left (flip base QRQ′))
         (left-to-right L-bisim PLP′ tr)
@@ -149,8 +150,8 @@ module _ {Name : Set} where
         (left-to-right R-bisim QRQ′ tr₂)
 
     rl : ∀ {P Q Q′ μ} →
-         P LR Q → Q [ μ ]⟶ Q′ →
-         ∃ λ P′ → P [ μ ]⟶ P′ × P′ LR Q′
+         LR (P , Q) → Q [ μ ]⟶ Q′ →
+         ∃ λ P′ → P [ μ ]⟶ P′ × LR (P′ , Q′)
     rl (base PLP′ QRQ′) (par-left tr) =
       Σ-map (_∣ _) (Σ-map par-left (flip base QRQ′))
         (right-to-left L-bisim PLP′ tr)
@@ -168,24 +169,24 @@ module _ {Name : Set} where
   -- Exercise 6.1.2
 
   6-1-2 : ∀ {P} → ! P ∣ P ∼ ! P
-  6-1-2 {P} = _R_ , R-is-a-bisimulation , base
+  6-1-2 {P} = R , R-is-a-bisimulation , base
     where
-    data _R_ : Proc → Proc → Set where
-      base : (! P ∣ P) R (! P)
-      refl : ∀ {P} → P R P
+    data R : Rel₂ (# 0) Proc where
+      base : R (! P ∣ P , ! P)
+      refl : ∀ {P} → R (P , P)
 
-    R-is-a-bisimulation : Bisimulation _R_
+    R-is-a-bisimulation : Bisimulation R
     R-is-a-bisimulation = ⟪ lr , rl ⟫
       where
       lr : ∀ {P P′ Q μ} →
-           P R Q → P [ μ ]⟶ P′ →
-           ∃ λ Q′ → Q [ μ ]⟶ Q′ × P′ R Q′
+           R (P , Q) → P [ μ ]⟶ P′ →
+           ∃ λ Q′ → Q [ μ ]⟶ Q′ × R (P′ , Q′)
       lr base tr = _ , replication tr , refl
       lr refl tr = _ , tr             , refl
 
       rl : ∀ {P Q Q′ μ} →
-           P R Q → Q [ μ ]⟶ Q′ →
-           ∃ λ P′ → P [ μ ]⟶ P′ × P′ R Q′
+           R (P , Q) → Q [ μ ]⟶ Q′ →
+           ∃ λ P′ → P [ μ ]⟶ P′ × R (P′ , Q′)
       rl base (replication tr) = _ , tr , refl
       rl refl tr               = _ , tr , refl
 
@@ -210,10 +211,10 @@ module _ {Name : Set} where
 
   6-2-4 : ∀ {a} → ! ! a · ∼ ! a ·
   6-2-4 {a} =
-    _⇔_.to larger⇔smallest (bisimulation-up-to-∼⊆∼ R-is _ _ base)
+    _⇔_.to larger⇔smallest (bisimulation-up-to-∼⊆∼ R-is _ base)
     where
-    data _R_ : Proc → Proc → Set where
-      base : (! ! a ·) R (! a ·)
+    data R : Rel₂ (# 0) Proc where
+      base : R (! ! a · , ! a ·)
 
     impossible : ∀ {μ P q} {Q : Set q} →
                  ! ! a · [ μ ]⟶ P → μ ≡ τ → Q
@@ -222,7 +223,7 @@ module _ {Name : Set} where
        μ       ≡⟨ μ≡τ ⟩∎
        τ       ∎)
 
-    R-is : Bisimulation-up-to-bisimilarity lzero _R_
+    R-is : Bisimulation-up-to-bisimilarity lzero R
     R-is = ⟪ lr , rl ⟫
       where
       lemma = λ {P} P∼!a∣∅ →
@@ -232,8 +233,9 @@ module _ {Name : Set} where
         ! ! a ·
 
       lr : ∀ {P P′ Q μ} →
-           P R Q → P [ μ ]⟶ P′ →
-           ∃ λ Q′ → Q [ μ ]⟶ Q′ × (_∼_ ⊙ _R_ ⊙ _∼_) P′ Q′
+           R (P , Q) → P [ μ ]⟶ P′ →
+           ∃ λ Q′ → Q [ μ ]⟶ Q′ ×
+                    (Bisimilarity _ ⊙ R ⊙ Bisimilarity _) (P′ , Q′)
       lr {P′ = P′} base !!a⟶P′ with 6-1-3-2 !!a⟶P′
       ... | inj₂ (μ≡τ , _) = impossible !!a⟶P′ μ≡τ
       ... | inj₁ (P″ , !a⟶P″ , P′∼!!a∣P″) with 6-1-3-2 !a⟶P″
@@ -252,8 +254,9 @@ module _ {Name : Set} where
            ! a · ∣ ∅)
 
       rl : ∀ {P Q Q′ μ} →
-           P R Q → Q [ μ ]⟶ Q′ →
-           ∃ λ P′ → P [ μ ]⟶ P′ × (_∼_ ⊙ _R_ ⊙ _∼_) P′ Q′
+           R (P , Q) → Q [ μ ]⟶ Q′ →
+           ∃ λ P′ → P [ μ ]⟶ P′ ×
+                    (Bisimilarity _ ⊙ R ⊙ Bisimilarity _) (P′ , Q′)
       rl {Q′ = Q′} base !a⟶Q′ with 6-1-3-2 !a⟶Q′
       ... | inj₂ (refl , .∅ , Q″ , .a , action , a⟶Q″ , _) =
         ⊥-elim (names-are-not-inverted a⟶Q″)
@@ -276,17 +279,17 @@ module _ {Name : Set} where
 
   ·∣·∼·· : ∀ {a} → a · ∣ a · ∼ name a · (a ·)
   ·∣·∼·· {a} =
-    _⇔_.to larger⇔smallest (bisimulation-up-to-∪⊆∼ R-is _ _ base)
+    _⇔_.to larger⇔smallest (bisimulation-up-to-∪⊆∼ R-is _ base)
     where
-    data _R_ : Proc → Proc → Set where
-      base : (a · ∣ a ·) R (name a · (a ·))
+    data R : Rel₂ (# 0) Proc where
+      base : R (a · ∣ a · , name a · (a ·))
 
-    R-is : Bisimulation-up-to-∪ lzero _R_
+    R-is : Bisimulation-up-to-∪ lzero R
     R-is = ⟪ lr , rl ⟫
       where
       lr : ∀ {P P′ Q μ} →
-           P R Q → P [ μ ]⟶ P′ →
-           ∃ λ Q′ → Q [ μ ]⟶ Q′ × (_R_ ∪ _∼_) P′ Q′
+           R (P , Q) → P [ μ ]⟶ P′ →
+           ∃ λ Q′ → Q [ μ ]⟶ Q′ × (R ∪ Bisimilarity _) (P′ , Q′)
       lr base (par-left action) =
           _
         , (name a · (a ·)  [ name a ]⟶⟨ action ⟩
@@ -304,8 +307,8 @@ module _ {Name : Set} where
       lr base (par-τ′ a≡co-a action action) = ⊥-elim (id≢co a≡co-a)
 
       rl : ∀ {P Q Q′ μ} →
-           P R Q → Q [ μ ]⟶ Q′ →
-           ∃ λ P′ → P [ μ ]⟶ P′ × (_R_ ∪ _∼_) P′ Q′
+           R (P , Q) → Q [ μ ]⟶ Q′ →
+           ∃ λ P′ → P [ μ ]⟶ P′ × (R ∪ Bisimilarity _) (P′ , Q′)
       rl base action =
           _
         , (a · ∣ a ·  [ name a ]⟶⟨ par-right action ⟩

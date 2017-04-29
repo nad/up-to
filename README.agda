@@ -14,6 +14,10 @@ import Equational-reasoning
 
 import Labelled-transition-system
 
+-- Unary and binary relations.
+
+import Relation
+
 -- Indexed containers.
 
 import Indexed-container
@@ -27,7 +31,6 @@ import Bisimilarity.Step
 
 -- The classical definition of (strong) bisimilarity.
 
-import Bisimilarity.Classical.Preliminaries
 import Bisimilarity.Classical
 
 -- A parametrised coinductive definition that can be used to define

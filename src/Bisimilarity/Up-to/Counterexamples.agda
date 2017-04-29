@@ -14,17 +14,17 @@ open import Bijection equality-with-J using (_↔_)
 open import Fin equality-with-J
 open import Function-universe equality-with-J hiding (id; _∘_)
 
-open import Indexed-container using (⟦_⟧₂; force)
+open import Indexed-container using (⟦_⟧; force)
 open import Labelled-transition-system
 
 import Bisimilarity.Classical
-open import Bisimilarity.Classical.Preliminaries
 import Bisimilarity.Coinductive
 import Bisimilarity.Coinductive.Equational-reasoning-instances
 open import Bisimilarity.Comparison
 import Bisimilarity.Step
 import Bisimilarity.Up-to
 open import Equational-reasoning
+open import Relation
 
 private
 
@@ -48,7 +48,7 @@ private
 ¬size-preserving→monotone :
   ∀ {ℓ} →
   ∃ λ lts → let open Combination lts in
-  ¬ ((F : Trans ℓ Proc) →
+  ¬ ((F : Trans₂ ℓ Proc) →
      Bisimilarity-size-preserving F →
      Monotone F)
 ¬size-preserving→monotone {ℓ} =
@@ -59,24 +59,24 @@ private
   where
   open Combination one-loop
 
-  F : Trans ℓ Proc
-  F R x y = ¬ R x y
+  F : Trans₂ ℓ Proc
+  F R = ¬_ ∘ R
 
   ¬-F-mono : ¬ Monotone F
   ¬-F-mono =
-    Monotone F                                                           ↝⟨ (λ mono → mono {_}) ⟩
-    ((λ _ _ → ⊥) ⊆ (λ _ _ → ↑ _ ⊤) → F (λ _ _ → ⊥) ⊆ F (λ _ _ → ↑ _ ⊤))  ↔⟨⟩
-    ((λ _ _ → ⊥) ⊆ (λ _ _ → ↑ _ ⊤) → (λ _ _ → ¬ ⊥) ⊆ (λ _ _ → ¬ ↑ _ ⊤))  ↝⟨ _$ _ ⟩
-    (λ _ _ → ¬ ⊥) ⊆ (λ _ _ → ¬ ↑ _ ⊤)                                    ↝⟨ (_$ _) ∘ (_$ _) ⟩
-    (¬ ⊥ → ¬ ↑ _ ⊤)                                                      ↝⟨ _$ ⊥-elim ⟩
-    ¬ ↑ _ ⊤                                                              ↝⟨ _$ _ ⟩□
-    ⊥                                                                    □
+    Monotone F                                                   ↝⟨ (λ mono → mono {_}) ⟩
+    ((λ _ → ⊥) ⊆ (λ _ → ↑ _ ⊤) → F (λ _ → ⊥) ⊆ F (λ _ → ↑ _ ⊤))  ↔⟨⟩
+    ((λ _ → ⊥) ⊆ (λ _ → ↑ _ ⊤) → (λ _ → ¬ ⊥) ⊆ (λ _ → ¬ ↑ _ ⊤))  ↝⟨ _$ _ ⟩
+    (λ _ → ¬ ⊥) ⊆ (λ _ → ¬ ↑ _ ⊤)                                ↝⟨ (_$ _) ⟩
+    (¬ ⊥ → ¬ ↑ _ ⊤)                                              ↝⟨ _$ ⊥-elim ⟩
+    ¬ ↑ _ ⊤                                                      ↝⟨ _$ _ ⟩□
+    ⊥                                                            □
 
   total : ∀ {i x y} → [ i ] x ∼ y
   total = reflexive
 
   F-pres : Bisimilarity-size-preserving F
-  F-pres _ _ _ _ = total
+  F-pres _ _ _ = total
 
 -- Monotone, bisimilarity-size-preserving relation transformers are
 -- not necessarily step-compatible.
@@ -84,7 +84,7 @@ private
 ¬monotone→size-preserving→compatible :
   ∀ {ℓ} →
   ∃ λ lts → let open Combination lts in
-  ¬ ((F : Trans ℓ Proc) →
+  ¬ ((F : Trans₂ ℓ Proc) →
      Monotone F →
      Bisimilarity-size-preserving F →
      Step-compatible F)
@@ -116,34 +116,34 @@ private
 
   -- A relation transformer.
 
-  F : Trans ℓ Proc
-  F R true true = R false false
-  F R x    y    = R x y
+  F : Trans₂ ℓ Proc
+  F R (true , true) = R (false , false)
+  F R               = R
 
   -- F is monotone.
 
   mono : Monotone F
-  mono R⊆S true  true  = R⊆S _ _
-  mono R⊆S true  false = R⊆S _ _
-  mono R⊆S false true  = R⊆S _ _
-  mono R⊆S false false = R⊆S _ _
+  mono R⊆S (true  , true)  = R⊆S _
+  mono R⊆S (true  , false) = R⊆S _
+  mono R⊆S (false , true)  = R⊆S _
+  mono R⊆S (false , false) = R⊆S _
 
   -- Bisimilarity of size i is a pre-fixpoint of F (modulo a lifting).
 
-  pre : ∀ {i} → F ([ ↑ ℓ ]⊙ [ i ]_∼_) ⊆ [ i ]_∼_
-  pre true  true  = λ _ → true ■
-  pre true  false = lower
-  pre false true  = lower
-  pre false false = lower
+  pre : ∀ {i} → F (↑ ℓ ∘ Bisimilarity i) ⊆ Bisimilarity i
+  pre (true  , true)  = λ _ → true ■
+  pre (true  , false) = lower
+  pre (false , true)  = lower
+  pre (false , false) = lower
 
   -- A relation.
 
-  R : Rel ℓ Proc
-  R _ _ = ⊥
+  R : Rel₂ ℓ Proc
+  R _ = ⊥
 
   -- A lemma.
 
-  StepRff : Step R false false
+  StepRff : Step R (false , false)
   Step.left-to-right StepRff ()
   Step.right-to-left StepRff ()
 
@@ -151,14 +151,14 @@ private
 
   ¬comp : ¬ Step-compatible F
   ¬comp =
-    Step-compatible F                                        ↝⟨ (λ comp → comp R) ⟩
-    F (⟦ S̲t̲e̲p̲ ⟧₂ R) ⊆ ⟦ S̲t̲e̲p̲ ⟧₂ (F R)                        ↝⟨ (λ le → le true true) ⟩
-    (F (⟦ S̲t̲e̲p̲ ⟧₂ R) true true → ⟦ S̲t̲e̲p̲ ⟧₂ (F R) true true)  ↔⟨⟩
-    (⟦ S̲t̲e̲p̲ ⟧₂ R false false → ⟦ S̲t̲e̲p̲ ⟧₂ (F R) true true)    ↝⟨ _$ _↔_.to Step↔S̲t̲e̲p̲ StepRff ⟩
-    ⟦ S̲t̲e̲p̲ ⟧₂ (F R) true true                                ↝⟨ (λ step → S̲t̲e̲p̲.left-to-right {p = true} {q = true} step {p′ = false} _ ) ⟩
-    (∃ λ y → T (not y) × F R false y)                        ↔⟨⟩
-    (∃ λ y → T (not y) × R false y)                          ↝⟨ uncurry [ const proj₁ , const (⊥-elim ∘ proj₂) ] ⟩□
-    ⊥                                                        □
+    Step-compatible F                                              ↝⟨ (λ comp → comp R) ⟩
+    F (⟦ S̲t̲e̲p̲ ⟧ R) ⊆ ⟦ S̲t̲e̲p̲ ⟧ (F R)                                ↝⟨ (λ le → le (true , true)) ⟩
+    (F (⟦ S̲t̲e̲p̲ ⟧ R) (true , true) → ⟦ S̲t̲e̲p̲ ⟧ (F R) (true , true))  ↔⟨⟩
+    (⟦ S̲t̲e̲p̲ ⟧ R (false , false) → ⟦ S̲t̲e̲p̲ ⟧ (F R) (true , true))    ↝⟨ _$ _↔_.to Step↔S̲t̲e̲p̲ StepRff ⟩
+    ⟦ S̲t̲e̲p̲ ⟧ (F R) (true , true)                                   ↝⟨ (λ step → S̲t̲e̲p̲.left-to-right {p = true} {q = true} step {p′ = false} _ ) ⟩
+    (∃ λ y → T (not y) × F R (false , y))                          ↔⟨⟩
+    (∃ λ y → T (not y) × R (false , y))                            ↝⟨ uncurry [ const proj₁ , const (⊥-elim ∘ proj₂) ] ⟩□
+    ⊥                                                              □
 
 -- Up-to-technique is not closed under composition, not even for
 -- monotone relation transformers.
@@ -171,7 +171,7 @@ private
 ¬-∘-closure :
   ∀ {ℓ} →
   ∃ λ lts → let open Combination lts in
-  ¬ ({F G : Trans ℓ Proc} →
+  ¬ ({F G : Trans₂ ℓ Proc} →
      Monotone F →
      Monotone G →
      Up-to-technique F →
@@ -185,7 +185,7 @@ private
 
      Up-to-technique (F ∘ G)                                            ↝⟨ (λ up-to → up-to R̲ R̲-prog) ⟩
 
-     R̲ ⊆ _∼_                                                            ↝⟨ (λ le → le _ _ pp) ⟩
+     R̲ ⊆ Bisimilarity ∞                                                 ↝⟨ (λ le → le _ pp) ⟩
 
      p left ∼ p right                                                   ↝⟨ (λ rel → S̲t̲e̲p̲.left-to-right rel pq) ⟩
 
@@ -196,6 +196,7 @@ private
      (∃ λ y → q right [ qq left ]⟶ y × q left ∼′ y)                     ↝⟨ (λ { (_ , () , _) }) ⟩□
 
      ⊥                                                                  □)
+
   where
 
   ----------------------------------------------------------------------
@@ -239,19 +240,19 @@ private
 
   -- F and G both add (at most) one pair to the underlying relation.
 
-  data F (R : Rel ℓ Proc) : Rel ℓ Proc where
-    qq  : F R (q left) (q right)
-    [_] : ∀ {x y} → R x y → F R x y
+  data F (R : Rel₂ ℓ Proc) : Rel₂ ℓ Proc where
+    qq  : F R (q left , q right)
+    [_] : ∀ {x} → R x → F R x
 
-  data G (R : Rel ℓ Proc) : Rel ℓ Proc where
-    rr  : G R (r left) (r right)
-    [_] : ∀ {x y} → R x y → G R x y
+  data G (R : Rel₂ ℓ Proc) : Rel₂ ℓ Proc where
+    rr  : G R (r left , r right)
+    [_] : ∀ {x} → R x → G R x
 
   -- R̲ adds one pair to reflexivity.
 
-  data R̲ : Rel ℓ Proc where
-    pp   : R̲ (p left) (p right)
-    refl : ∀ {x} → R̲ x x
+  data R̲ : Rel₂ ℓ Proc where
+    pp   : R̲ (p left , p right)
+    refl : ∀ {x} → R̲ (x , x)
 
   -- R̲ progresses to F (G R̲).
 
@@ -278,140 +279,140 @@ private
     -- F is monotone.
 
     mono : Monotone F
-    mono R⊆S _ _ qq      = qq
-    mono R⊆S _ _ [ Rxy ] = [ R⊆S _ _ Rxy ]
+    mono R⊆S _ qq      = qq
+    mono R⊆S _ [ Rxy ] = [ R⊆S _ Rxy ]
 
     -- F is an up-to technique.
 
     module _ R (R-prog : Progression R (F R)) where
 
-      ¬rr : ∀ {s} → ¬ R (r s) (r (not s))
+      ¬rr : ∀ {s} → ¬ R (r s , r (not s))
       ¬rr rel with Progression.left-to-right R-prog rel rr
       ¬rr {true}  _ | _ , () , _
       ¬rr {false} _ | _ , () , _
 
-      ¬qq : ∀ {s} → ¬ R (q s) (q (not s))
+      ¬qq : ∀ {s} → ¬ R (q s , q (not s))
       ¬qq rel with Progression.left-to-right R-prog rel qq
       ¬qq {true}  _ | _ , () , _
       ¬qq {false} _ | _ , () , _
 
-      ¬pp : ∀ {s} → ¬ R (p s) (p (not s))
+      ¬pp : ∀ {s} → ¬ R (p s , p (not s))
       ¬pp rel with Progression.left-to-right R-prog rel pr
       ... | .(r _) , pr , [ rel′ ] = ¬rr rel′
 
-      ¬pq : ∀ {s₁ s₂} → ¬ R (p s₁) (q s₂)
+      ¬pq : ∀ {s₁ s₂} → ¬ R (p s₁ , q s₂)
       ¬pq rel with Progression.left-to-right R-prog rel pq
       ... | _ , () , _
 
-      ¬qp : ∀ {s₁ s₂} → ¬ R (q s₁) (p s₂)
+      ¬qp : ∀ {s₁ s₂} → ¬ R (q s₁ , p s₂)
       ¬qp rel with Progression.right-to-left R-prog rel pq
       ... | _ , () , _
 
-      ¬pr : ∀ {s₁ s₂} → ¬ R (p s₁) (r s₂)
+      ¬pr : ∀ {s₁ s₂} → ¬ R (p s₁ , r s₂)
       ¬pr rel with Progression.left-to-right R-prog rel pq
       ... | _ , () , _
 
-      ¬rp : ∀ {s₁ s₂} → ¬ R (r s₁) (p s₂)
+      ¬rp : ∀ {s₁ s₂} → ¬ R (r s₁ , p s₂)
       ¬rp rel with Progression.right-to-left R-prog rel pq
       ... | _ , () , _
 
-      ¬qr : ∀ {s₁ s₂} → ¬ R (q s₁) (r s₂)
+      ¬qr : ∀ {s₁ s₂} → ¬ R (q s₁ , r s₂)
       ¬qr rel with Progression.right-to-left R-prog rel rr
       ... | _ , () , _
 
-      ¬rq : ∀ {s₁ s₂} → ¬ R (r s₁) (q s₂)
+      ¬rq : ∀ {s₁ s₂} → ¬ R (r s₁ , q s₂)
       ¬rq rel with Progression.left-to-right R-prog rel rr
       ... | _ , () , _
 
-      up-to : R ⊆ _∼_
-      up-to (p left)  (p left)  rel = reflexive
-      up-to (p left)  (p right) rel = ⊥-elim (¬pp rel)
-      up-to (p right) (p left)  rel = ⊥-elim (¬pp rel)
-      up-to (p right) (p right) rel = reflexive
-      up-to (p _)     (q _)     rel = ⊥-elim (¬pq rel)
-      up-to (p _)     (r _)     rel = ⊥-elim (¬pr rel)
-      up-to (q _)     (p _)     rel = ⊥-elim (¬qp rel)
-      up-to (q left)  (q left)  rel = reflexive
-      up-to (q left)  (q right) rel = ⊥-elim (¬qq rel)
-      up-to (q right) (q left)  rel = ⊥-elim (¬qq rel)
-      up-to (q right) (q right) rel = reflexive
-      up-to (q _)     (r _)     rel = ⊥-elim (¬qr rel)
-      up-to (r _)     (p _)     rel = ⊥-elim (¬rp rel)
-      up-to (r _)     (q _)     rel = ⊥-elim (¬rq rel)
-      up-to (r left)  (r left)  rel = reflexive
-      up-to (r left)  (r right) rel = ⊥-elim (¬rr rel)
-      up-to (r right) (r left)  rel = ⊥-elim (¬rr rel)
-      up-to (r right) (r right) rel = reflexive
+      up-to : R ⊆ Bisimilarity ∞
+      up-to (p left  , p left)  rel = reflexive
+      up-to (p left  , p right) rel = ⊥-elim (¬pp rel)
+      up-to (p right , p left)  rel = ⊥-elim (¬pp rel)
+      up-to (p right , p right) rel = reflexive
+      up-to (p _     , q _)     rel = ⊥-elim (¬pq rel)
+      up-to (p _     , r _)     rel = ⊥-elim (¬pr rel)
+      up-to (q _     , p _)     rel = ⊥-elim (¬qp rel)
+      up-to (q left  , q left)  rel = reflexive
+      up-to (q left  , q right) rel = ⊥-elim (¬qq rel)
+      up-to (q right , q left)  rel = ⊥-elim (¬qq rel)
+      up-to (q right , q right) rel = reflexive
+      up-to (q _     , r _)     rel = ⊥-elim (¬qr rel)
+      up-to (r _     , p _)     rel = ⊥-elim (¬rp rel)
+      up-to (r _     , q _)     rel = ⊥-elim (¬rq rel)
+      up-to (r left  , r left)  rel = reflexive
+      up-to (r left  , r right) rel = ⊥-elim (¬rr rel)
+      up-to (r right , r left)  rel = ⊥-elim (¬rr rel)
+      up-to (r right , r right) rel = reflexive
 
   module G-lemmas where
 
     -- G is monotone.
 
     mono : Monotone G
-    mono R⊆S _ _ rr      = rr
-    mono R⊆S _ _ [ Rxy ] = [ R⊆S _ _ Rxy ]
+    mono R⊆S _ rr      = rr
+    mono R⊆S _ [ Rxy ] = [ R⊆S _ Rxy ]
 
     -- G is an up-to technique.
 
     module _ R (R-prog : Progression R (G R)) where
 
-      ¬rr : ∀ {s} → ¬ R (r s) (r (not s))
+      ¬rr : ∀ {s} → ¬ R (r s , r (not s))
       ¬rr rel with Progression.left-to-right R-prog rel rr
       ¬rr {true}  _ | _ , () , _
       ¬rr {false} _ | _ , () , _
 
-      ¬qq : ∀ {s} → ¬ R (q s) (q (not s))
+      ¬qq : ∀ {s} → ¬ R (q s , q (not s))
       ¬qq rel with Progression.left-to-right R-prog rel qq
       ¬qq {true}  _ | _ , () , _
       ¬qq {false} _ | _ , () , _
 
-      ¬pp : ∀ {s} → ¬ R (p s) (p (not s))
+      ¬pp : ∀ {s} → ¬ R (p s , p (not s))
       ¬pp rel with Progression.left-to-right R-prog rel pq
       ... | .(q _) , pq , [ rel′ ] = ¬qq rel′
 
-      ¬pq : ∀ {s₁ s₂} → ¬ R (p s₁) (q s₂)
+      ¬pq : ∀ {s₁ s₂} → ¬ R (p s₁ , q s₂)
       ¬pq rel with Progression.left-to-right R-prog rel pq
       ... | _ , () , _
 
-      ¬qp : ∀ {s₁ s₂} → ¬ R (q s₁) (p s₂)
+      ¬qp : ∀ {s₁ s₂} → ¬ R (q s₁ , p s₂)
       ¬qp rel with Progression.right-to-left R-prog rel pq
       ... | _ , () , _
 
-      ¬pr : ∀ {s₁ s₂} → ¬ R (p s₁) (r s₂)
+      ¬pr : ∀ {s₁ s₂} → ¬ R (p s₁ , r s₂)
       ¬pr rel with Progression.left-to-right R-prog rel pq
       ... | _ , () , _
 
-      ¬rp : ∀ {s₁ s₂} → ¬ R (r s₁) (p s₂)
+      ¬rp : ∀ {s₁ s₂} → ¬ R (r s₁ , p s₂)
       ¬rp rel with Progression.right-to-left R-prog rel pq
       ... | _ , () , _
 
-      ¬qr : ∀ {s₁ s₂} → ¬ R (q s₁) (r s₂)
+      ¬qr : ∀ {s₁ s₂} → ¬ R (q s₁ , r s₂)
       ¬qr rel with Progression.right-to-left R-prog rel rr
       ... | _ , () , _
 
-      ¬rq : ∀ {s₁ s₂} → ¬ R (r s₁) (q s₂)
+      ¬rq : ∀ {s₁ s₂} → ¬ R (r s₁ , q s₂)
       ¬rq rel with Progression.left-to-right R-prog rel rr
       ... | _ , () , _
 
-      up-to : R ⊆ _∼_
-      up-to (p left)  (p left)  rel = reflexive
-      up-to (p left)  (p right) rel = ⊥-elim (¬pp rel)
-      up-to (p right) (p left)  rel = ⊥-elim (¬pp rel)
-      up-to (p right) (p right) rel = reflexive
-      up-to (p _)     (q _)     rel = ⊥-elim (¬pq rel)
-      up-to (p _)     (r _)     rel = ⊥-elim (¬pr rel)
-      up-to (q _)     (p _)     rel = ⊥-elim (¬qp rel)
-      up-to (q left)  (q left)  rel = reflexive
-      up-to (q left)  (q right) rel = ⊥-elim (¬qq rel)
-      up-to (q right) (q left)  rel = ⊥-elim (¬qq rel)
-      up-to (q right) (q right) rel = reflexive
-      up-to (q _)     (r _)     rel = ⊥-elim (¬qr rel)
-      up-to (r _)     (p _)     rel = ⊥-elim (¬rp rel)
-      up-to (r _)     (q _)     rel = ⊥-elim (¬rq rel)
-      up-to (r left)  (r left)  rel = reflexive
-      up-to (r left)  (r right) rel = ⊥-elim (¬rr rel)
-      up-to (r right) (r left)  rel = ⊥-elim (¬rr rel)
-      up-to (r right) (r right) rel = reflexive
+      up-to : R ⊆ Bisimilarity ∞
+      up-to (p left  , p left)  rel = reflexive
+      up-to (p left  , p right) rel = ⊥-elim (¬pp rel)
+      up-to (p right , p left)  rel = ⊥-elim (¬pp rel)
+      up-to (p right , p right) rel = reflexive
+      up-to (p _     , q _)     rel = ⊥-elim (¬pq rel)
+      up-to (p _     , r _)     rel = ⊥-elim (¬pr rel)
+      up-to (q _     , p _)     rel = ⊥-elim (¬qp rel)
+      up-to (q left  , q left)  rel = reflexive
+      up-to (q left  , q right) rel = ⊥-elim (¬qq rel)
+      up-to (q right , q left)  rel = ⊥-elim (¬qq rel)
+      up-to (q right , q right) rel = reflexive
+      up-to (q _     , r _)     rel = ⊥-elim (¬qr rel)
+      up-to (r _     , p _)     rel = ⊥-elim (¬rp rel)
+      up-to (r _     , q _)     rel = ⊥-elim (¬rq rel)
+      up-to (r left  , r left)  rel = reflexive
+      up-to (r left  , r right) rel = ⊥-elim (¬rr rel)
+      up-to (r right , r left)  rel = ⊥-elim (¬rr rel)
+      up-to (r right , r right) rel = reflexive
 
 -- Up-to techniques are not necessarily bisimilarity-size-preserving,
 -- not even if they are monotone.
@@ -419,7 +420,7 @@ private
 ¬monotone→up-to→size-preserving :
   ∀ {ℓ} →
   ∃ λ lts → let open Combination lts in
-  ¬ ((F : Trans ℓ Proc) →
+  ¬ ((F : Trans₂ ℓ Proc) →
      Monotone F →
      Up-to-technique F →
      Bisimilarity-size-preserving F)

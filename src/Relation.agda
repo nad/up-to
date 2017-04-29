@@ -1,47 +1,56 @@
 ------------------------------------------------------------------------
--- Some preliminaries
+-- Unary and binary relations
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K #-}
 
-module Bisimilarity.Classical.Preliminaries where
+module Relation where
 
 open import Equality.Propositional
 open import Prelude
 
--- Homogeneous binary relations.
+-- Unary relations.
 
 Rel : ∀ {ℓ₁} ℓ₂ → Set ℓ₁ → Set (ℓ₁ ⊔ lsuc ℓ₂)
-Rel ℓ A = A → A → Set ℓ
+Rel ℓ A = A → Set ℓ
 
--- One kind of homogeneous binary relation transformers.
+-- Homogeneous binary relations.
+
+Rel₂ : ∀ {ℓ₁} ℓ₂ → Set ℓ₁ → Set (ℓ₁ ⊔ lsuc ℓ₂)
+Rel₂ ℓ A = Rel ℓ (A × A)
+
+-- One kind of unary relation transformer.
 
 Trans : ∀ {a} ℓ → Set a → Set (a ⊔ lsuc ℓ)
 Trans ℓ A = Rel ℓ A → Rel ℓ A
 
--- Composition of relations.
+-- One kind of binary relation transformer.
+
+Trans₂ : ∀ {a} ℓ → Set a → Set (a ⊔ lsuc ℓ)
+Trans₂ ℓ A = Trans ℓ (A × A)
+
+-- The converse of a binary relation.
+
+infixr 10 _⁻¹
+
+_⁻¹ : ∀ {a ℓ} {A : Set a} → Rel₂ ℓ A → Rel₂ ℓ A
+(R ⁻¹) (x , y) = R (y , x)
+
+-- Composition of binary relations.
 
 infixr 9 _⊙_
 
 _⊙_ : ∀ {a ℓ₁ ℓ₂} {A : Set a} →
-      Rel ℓ₁ A → Rel ℓ₂ A → Rel (a ⊔ ℓ₁ ⊔ ℓ₂) A
-_R_ ⊙ _S_ = λ x z → ∃ λ y → (x R y) × (y S z)
+      Rel₂ ℓ₁ A → Rel₂ ℓ₂ A → Rel₂ (a ⊔ ℓ₁ ⊔ ℓ₂) A
+(R ⊙ S) (x , z) = ∃ λ y → R (x , y) × S (y , z)
 
--- Postcomposition with a function.
-
-infixr 9 [_]⊙_
-
-[_]⊙_ : ∀ {a ℓ₁ ℓ₂} {A : Set a} →
-        (Set ℓ₁ → Set ℓ₂) → Rel ℓ₁ A → Rel ℓ₂ A
-[ f ]⊙ _R_ = λ x y → f (x R y)
-
--- Composition of a relation with itself.
+-- Composition of a binary relation with itself.
 
 infix 10 _^^_
 
 _^^_ : ∀ {a} {A : Set a} →
-       Rel a A → ℕ → Rel a A
-R ^^ zero  = _≡_
+       Rel₂ a A → ℕ → Rel₂ a A
+R ^^ zero  = uncurry _≡_
 R ^^ suc n = R ⊙ R ^^ n
 
 -- Union of relations.
@@ -50,30 +59,30 @@ infixr 7 _∪_
 
 _∪_ : ∀ {a ℓ₁ ℓ₂} {A : Set a} →
       Rel ℓ₁ A → Rel ℓ₂ A → Rel (ℓ₁ ⊔ ℓ₂) A
-_R_ ∪ _S_ = λ x y → x R y ⊎ x S y
+R ∪ S = λ x → R x ⊎ S x
 
--- Reflexive closure of relations.
+-- Reflexive closure of binary relations.
 
 _⁼ : ∀ {a ℓ} {A : Set a} →
-     Rel ℓ A → Rel (a ⊔ ℓ) A
-R ⁼ = R ∪ _≡_
+     Rel₂ ℓ A → Rel₂ (a ⊔ ℓ) A
+R ⁼ = R ∪ uncurry _≡_
 
--- Transitive closure of relations.
+-- Transitive closure of binary relations.
 
 _⁺ : ∀ {a} {A : Set a} →
-     Rel a A → Rel a A
-R ⁺ = λ x y → ∃ λ n → (R ^^ (1 + n)) x y
+     Rel₂ a A → Rel₂ a A
+(R ⁺) x = ∃ λ n → (R ^^ (1 + n)) x
 
--- Reflexive transitive closure of relations.
+-- Reflexive transitive closure of binary relations.
 
 _* : ∀ {a} {A : Set a} →
-     Rel a A → Rel a A
-R * = λ x y → ∃ λ n → (R ^^ n) x y
+     Rel₂ a A → Rel₂ a A
+(R *) x = ∃ λ n → (R ^^ n) x
 
 -- The reflexive transitive closure is transitive.
 
-*-trans : ∀ {a} {A : Set a} {_R_ : Rel a A} {x y z} →
-          (_R_ *) x y → (_R_ *) y z → (_R_ *) x z
+*-trans : ∀ {a} {A : Set a} {R : Rel₂ a A} {x y z} →
+          (R *) (x , y) → (R *) (y , z) → (R *) (x , z)
 *-trans (zero  , refl)           aR*b = aR*b
 *-trans (suc n , _ , aRb , bRⁿc) cR*d =
   Σ-map suc ((_ ,_) ∘ (aRb ,_))
@@ -85,7 +94,7 @@ infix 4 _⊆_
 
 _⊆_ : ∀ {a ℓ₁ ℓ₂} {A : Set a} →
       Rel ℓ₁ A → Rel ℓ₂ A → Set (a ⊔ ℓ₁ ⊔ ℓ₂)
-_R_ ⊆ _S_ = ∀ x y → x R y → x S y
+R ⊆ S = ∀ x → R x → S x
 
 -- Monotonicity of relation transformers.
 
@@ -113,7 +122,7 @@ infixr -2 _⊆⟨_⟩_ _⊆⟨⟩_
 _⊆⟨_⟩_ : ∀ {a p q r} {A : Set a}
          (P : Rel p A) {Q : Rel q A} {R : Rel r A} →
          P ⊆ Q → Q ⊆ R → P ⊆ R
-_ ⊆⟨ P⊆Q ⟩ Q⊆R = λ x y → Q⊆R x y ∘ P⊆Q x y
+_ ⊆⟨ P⊆Q ⟩ Q⊆R = λ x → Q⊆R x ∘ P⊆Q x
 
 _⊆⟨⟩_ : ∀ {a p q} {A : Set a}
         (P : Rel p A) {Q : Rel q A} →

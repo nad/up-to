@@ -25,13 +25,13 @@ open LTS delay-monad hiding (_[_]⟶_)
 
 open import Bisimilarity.Classical (weak delay-monad)
   using (Progression)
-open import Bisimilarity.Classical.Preliminaries
 open import Bisimilarity.Up-to (weak delay-monad)
 open import Bisimilarity.Weak.Coinductive delay-monad
 import Bisimilarity.Weak.Coinductive.Equational-reasoning-instances
 open import Bisimilarity.Weak.Coinductive.Equivalent
 import Bisimilarity.Weak.Coinductive.Other delay-monad as CWO
 import Bisimilarity.Weak.Delay-monad as W′
+open import Relation
 
 -- Everything is an up-to technique for weak bisimilarity for the
 -- delay monad (if A is a set, and assuming excluded middle).
@@ -40,14 +40,14 @@ everything-up-to :
   ∀ {ℓ} →
   Excluded-middle lzero →
   Is-set A →
-  (F : Trans ℓ (Delay A ∞)) →
+  (F : Trans₂ ℓ (Delay A ∞)) →
   Up-to-technique F
-everything-up-to {ℓ} em A-set F R R-prog = everything-up-to′
+everything-up-to {ℓ} em A-set F R R-prog = uncurry everything-up-to′
   where
   lemma :
-    ∀ {x y} {P : Rel ℓ (Delay A ∞)} →
+    ∀ {x y} {P : Rel₂ ℓ (Delay A ∞)} →
     (∀ {x′ z} → x [ just z ]⇒̂ x′ →
-     ∃ λ y′ → y [ just z ]⇒̂ y′ × P x′ y′) →
+     ∃ λ y′ → y [ just z ]⇒̂ y′ × P (x′ , y′)) →
     (∃ λ z → now z W.≈ x) →
     x ≈ y
   lemma {x} {y} hyp = uncurry λ z →
@@ -58,7 +58,7 @@ everything-up-to {ℓ} em A-set F R R-prog = everything-up-to′
     x CWO.≈ y                                ↝⟨ cwo⇒cw ⟩□
     x ≈ y                                    □
 
-  everything-up-to′ : ∀ x y → R x y → x ≈ y
+  everything-up-to′ : ∀ x y → R (x , y) → x ≈ y
   everything-up-to′ x y Rxy with P.⇑⊎⇓ em A-set x | P.⇑⊎⇓ em A-set y
   ... | inj₂ x⇓ | _       = lemma (Progression.left-to-right
                                      R-prog Rxy) x⇓

@@ -68,15 +68,6 @@ A →⋆ B = ∀ {i} → A i → B i
       Container I O → (I → Set ℓ₂) → (O → Set (ℓ₁ ⊔ ℓ₂))
 ⟦ C ⟧ Q o = ⟦ C o ⟧₁ Q
 
--- A variant of a special case of ⟦_⟧. Can be used when both index
--- sets are sigma types.
-
-⟦_⟧₂ : ∀ {ℓ₁ ℓ₂} {I₁ O₁ : Set ℓ₁} {I₂ : I₁ → Set ℓ₁} {O₂ : O₁ → Set ℓ₁} →
-       Container (Σ I₁ I₂) (Σ O₁ O₂) →
-       ((i₁ : I₁) → I₂ i₁ → Set ℓ₂) →
-       ((o₁ : O₁) → O₂ o₁ → Set (ℓ₁ ⊔ ℓ₂))
-⟦ C ⟧₂ = curry ∘ ⟦ C ⟧ ∘ uncurry
-
 -- Map functions.
 
 map₁ : ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} {C : Container₁ I} {A B : I → Set ℓ₂} →
