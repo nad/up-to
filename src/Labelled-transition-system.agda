@@ -487,6 +487,11 @@ module CCS (Name : Set) where
   ·-only : ∀ {μ₁ μ₂ P Q} → μ₁ · P [ μ₂ ]⟶ Q → μ₁ ≡ μ₂
   ·-only action = refl
 
+  -- The process μ · P can only transition to P.
+
+  ·-only⟶ : ∀ {μ₁ μ₂ P Q} → μ₁ · P [ μ₂ ]⟶ Q → Q ≡ P
+  ·-only⟶ action = refl
+
   -- A simple corollary.
 
   names-are-not-inverted :
