@@ -587,6 +587,32 @@ module CCS (Name : Set) where
   weaken-[] (ν a C)   = cong (ν a) (weaken-[] C)
   weaken-[] (! C)     = cong !_ (weaken-[] C)
 
+  -- A relation expressing that a certain process matches a certain
+  -- context.
+
+  data Matches {n} : Proc → Context n → Set where
+    hole   : ∀ {P} (x : Fin n) → Matches P (hole x)
+    ∅      : Matches ∅ ∅
+    _∣_    : ∀ {P₁ P₂ C₁ C₂} →
+             Matches P₁ C₁ → Matches P₂ C₂ → Matches (P₁ ∣ P₂) (C₁ ∣ C₂)
+    _⊕_    : ∀ {P₁ P₂ C₁ C₂} →
+             Matches P₁ C₁ → Matches P₂ C₂ → Matches (P₁ ⊕ P₂) (C₁ ⊕ C₂)
+    action : ∀ {μ P C} → Matches P C → Matches (μ · P) (μ · C)
+    ν      : ∀ {a P C} → Matches P C → Matches (ν a P) (ν a C)
+    !_     : ∀ {P C} → Matches P C → Matches (! P) (! C)
+
+  -- The process obtained by filling a context's holes matches the
+  -- context.
+
+  Matches-[] : ∀ {n Ps} (C : Context n) → Matches (C [ Ps ]) C
+  Matches-[] (hole x)  = hole x
+  Matches-[] ∅         = ∅
+  Matches-[] (C₁ ∣ C₂) = Matches-[] C₁ ∣ Matches-[] C₂
+  Matches-[] (C₁ ⊕ C₂) = Matches-[] C₁ ⊕ Matches-[] C₂
+  Matches-[] (μ · C)   = action (Matches-[] C)
+  Matches-[] (ν a C)   = ν (Matches-[] C)
+  Matches-[] (! C)     = ! Matches-[] C
+
 -- An LTS from Section 6.2.5 in "Enhancements of the bisimulation
 -- proof method" by Pous and Sangiorgi.
 
