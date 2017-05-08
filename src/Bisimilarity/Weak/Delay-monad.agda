@@ -112,11 +112,11 @@ mutual
                                                      ∞indirect→direct′ y⇒y′ x≈′y′
   ... | y′ , silent _ done                 , x≈′ly with right-to-left lx≈ly later⟶
   ...   | x′ , non-silent contradiction _    , _     = ⊥-elim (contradiction _)
-  ...   | x′ , silent _ (step _ later⟶ x⇒x′) , x′≈′y = DW.later-cong $
+  ...   | x′ , silent _ (step _ later⟶ x⇒x′) , x′≈′y = DW.Weakly-bisimilar.later-cong $
                                                        DW.∞symmetric $
                                                        ∞indirect→direct′ x⇒x′ $
                                                        symmetric x′≈′y
-  ...   | x′ , silent _ done                 , lx≈′y = DW.later-cong $
+  ...   | x′ , silent _ done                 , lx≈′y = DW.Weakly-bisimilar.later-cong $
                                                        DW.∞laterˡʳ⁻¹
                                                          (∞indirect→direct lx≈′y)
                                                          (∞indirect→direct x≈′ly)
