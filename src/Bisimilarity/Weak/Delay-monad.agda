@@ -140,6 +140,8 @@ mutual
 -- The direct definition of weak bisimilarity is logically
 -- equivalent to the "other" one obtained from the transition
 -- relation.
+--
+-- TODO: Are the two definitions isomorphic?
 
 direct⇔indirect : ∀ {i x y} → Weakly-bisimilar i x y ⇔ [ i ] x ≈ y
 direct⇔indirect = record
