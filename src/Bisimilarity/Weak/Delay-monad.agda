@@ -96,15 +96,15 @@ mutual
 
   indirect→direct : ∀ {i} x y → [ i ] x ≈ y → Weakly-bisimilar i x y
   indirect→direct {i} (now x) y =
-    [ i ] now x ≈ y                                   ↝⟨ (λ p → left-to-right p now⟶) ⟩
-    (∃ λ y′ → y [ later x ]⇒̂ y′ × [ i ] now x ≈′ y′)  ↝⟨ [just]⇒̂→≈now ∘ proj₁ ∘ proj₂ ⟩
-    Weakly-bisimilar i y (now x)                      ↝⟨ DW.symmetric ⟩□
-    Weakly-bisimilar i (now x) y                      □
+    [ i ] now x ≈ y                                  ↝⟨ (λ p → left-to-right p now⟶) ⟩
+    (∃ λ y′ → y [ just x ]⇒̂ y′ × [ i ] now x ≈′ y′)  ↝⟨ [just]⇒̂→≈now ∘ proj₁ ∘ proj₂ ⟩
+    Weakly-bisimilar i y (now x)                     ↝⟨ DW.symmetric ⟩□
+    Weakly-bisimilar i (now x) y                     □
 
   indirect→direct {i} x (now y) =
-    [ i ] x ≈ now y                                   ↝⟨ (λ p → right-to-left p now⟶) ⟩
-    (∃ λ x′ → x [ later y ]⇒̂ x′ × [ i ] x′ ≈′ now y)  ↝⟨ [just]⇒̂→≈now ∘ proj₁ ∘ proj₂ ⟩□
-    Weakly-bisimilar i x (now y)                      □
+    [ i ] x ≈ now y                                  ↝⟨ (λ p → right-to-left p now⟶) ⟩
+    (∃ λ x′ → x [ just y ]⇒̂ x′ × [ i ] x′ ≈′ now y)  ↝⟨ [just]⇒̂→≈now ∘ proj₁ ∘ proj₂ ⟩□
+    Weakly-bisimilar i x (now y)                     □
 
   indirect→direct (later x) (later y) lx≈ly with left-to-right lx≈ly later⟶
   ... | y′ , non-silent contradiction _    , _     = ⊥-elim (contradiction _)
