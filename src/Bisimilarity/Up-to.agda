@@ -62,15 +62,16 @@ Up-to-∪∼-monotone : Monotone Up-to-∪∼
 Up-to-∪∼-monotone R⊆S _ = ⊎-map (R⊆S _) id
 
 -- Up to union with bisimilarity is size-preserving.
+--
+-- The proof is similar to parts of the proof of Pous and Sangiorgi's
+-- Corollary 6.3.15.
 
 Up-to-∪∼-size-preserving : Size-preserving Up-to-∪∼
 Up-to-∪∼-size-preserving =
-  _⇔_.from (monotone→⇔ Up-to-∪∼-monotone)
-    (λ where
-       (p , q) (inj₁ p∼q) → p  ∼⟨ p∼q ⟩■
-                            q
-       (p , q) (inj₂ p∼q) → p  ∼⟨ p∼q ⟩■
-                            q)
+  ∪-closure
+    id-size-preserving
+    (const-size-preserving (Bisimilarity ∞  ⊆⟨ (λ _ → id) ⟩∎
+                            Bisimilarity ∞  ∎))
 
 -- Up to transitive closure.
 
