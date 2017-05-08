@@ -624,6 +624,7 @@ module CCS (Name : Set) where
 module 6-2-5 (Name : Set) where
 
   infixr 12 _·_
+  infix   5 _[_]
   infix   4 _[_]⟶_
 
   data Proc : Set where
@@ -643,6 +644,22 @@ module 6-2-5 (Name : Set) where
     ; silent? = λ _ → no λ ()
     ; _[_]⟶_  = _[_]⟶_
     }
+
+  -- Polyadic contexts.
+
+  data Context (n : ℕ) : Set where
+    hole : (x : Fin n) → Context n
+    op   : Context n → Context n
+    _·_  : (a : Name) → Context n → Context n
+    ∅    : Context n
+
+  -- Hole filling.
+
+  _[_] : ∀ {n} → Context n → (Fin n → Proc) → Proc
+  hole x [ ps ] = ps x
+  op C   [ ps ] = op (C [ ps ])
+  a · C  [ ps ] = a · (C [ ps ])
+  ∅      [ ps ] = ∅
 
 -- The delay monad.
 

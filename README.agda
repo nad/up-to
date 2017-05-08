@@ -51,19 +51,19 @@ import Bisimilarity.Coinductive.Equational-reasoning-instances
 
 import Bisimilarity.Comparison
 
--- Some exercises and results from "Enhancements of the bisimulation
--- proof method" by Pous and Sangiorgi.
-
-import Bisimilarity.Exercises.Other
-import Bisimilarity.Exercises.Classical
-import Bisimilarity.Exercises.Coinductive
-
 -- Up-to techniques.
 
 import Bisimilarity.Up-to
 import Bisimilarity.Up-to.CCS
 import Bisimilarity.Up-to.Delay-monad
 import Bisimilarity.Up-to.Counterexamples
+
+-- Some exercises and results from "Enhancements of the bisimulation
+-- proof method" by Pous and Sangiorgi.
+
+import Bisimilarity.Exercises.Other
+import Bisimilarity.Exercises.Classical
+import Bisimilarity.Exercises.Coinductive
 
 ------------------------------------------------------------------------
 -- Weak bisimilarity

@@ -22,6 +22,7 @@ open CCS Name
 open import Bisimilarity.Coinductive CCS
 import Bisimilarity.Coinductive.Equational-reasoning-instances
 open import Bisimilarity.Exercises.Coinductive
+  using (_[_]-cong; 6-1-3-2)
 open import Bisimilarity.Step CCS _[_]⟶_ using (Step; Step↔S̲t̲e̲p̲)
 open import Bisimilarity.Up-to CCS
 open import Relation
