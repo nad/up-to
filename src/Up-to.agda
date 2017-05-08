@@ -212,7 +212,8 @@ monotone→compatible→size-preserving {F} mono comp =
                     _ Fν′x)
 
 -- The following four lemmas correspond to Pous and Sangiorgi's
--- Proposition 6.3.11.
+-- Proposition 6.3.11 (except that they state the fourth one for
+-- arbitrary instead of binary unions).
 
 -- The identity function is size-preserving.
 
