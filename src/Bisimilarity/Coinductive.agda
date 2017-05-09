@@ -14,7 +14,7 @@ open LTS lts
 
 open import Bisimilarity.Coinductive.General lts _[_]⟶_ id public
 
--- Strong bisimilarity is a weak bisimulation (of a certain kind).
+-- Strong bisimilarity is a weak simulation (of a certain kind).
 
 strong-is-weak :
   ∀ {p p′ q μ} →

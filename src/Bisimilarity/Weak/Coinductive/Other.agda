@@ -81,7 +81,7 @@ syntax lr-result-with-action      p′≈q′ μ q q⇒̂q′ = p′≈q′ [ μ
 syntax lr-result-without-action-⟶ p′≈q′   q q⟶q′ = p′≈q′      ⟵⟨ q⟶q′ ⟩⇒̂ q
 syntax lr-result-with-action-⟶    p′≈q′ μ q q⟶q′ = p′≈q′ [ μ ]⟵⟨ q⟶q′ ⟩⇒̂ q
 
--- Weak bisimilarity is a weak bisimulation (of a certain kind).
+-- Weak bisimilarity is a weak simulation (of a certain kind).
 
 weak-is-weak :
   ∀ {p p′ q μ} →
