@@ -1,5 +1,6 @@
 ------------------------------------------------------------------------
--- The Step function, used to define strong and weak bisimilarity
+-- The Step function, used to define strong and weak bisimilarity as
+-- well as expansion
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K #-}
@@ -9,7 +10,7 @@ open import Labelled-transition-system
 module Bisimilarity.Step
          (lts : LTS)
          (open LTS lts)
-         (_[_]↝_ : Proc → Label → Proc → Set)
+         (_[_]↝₁_ _[_]↝₂_ : Proc → Label → Proc → Set)
          where
 
 open import Equality.Propositional
@@ -26,12 +27,15 @@ open import Relation
 private
  module Temporarily-private where
 
-  -- If _[_]↝_ is instantiated with _[_]⟶_, then this is basically the
-  -- function from Definition 6.3.1 in Pous and Sangiorgi's
-  -- "Enhancements of the bisimulation proof method", except that
-  -- clause (3) is omitted. Similarly, if _[_]↝_ is instantiated with
-  -- _[_]⇒̂_, then this is basically the function wb₁, again with the
-  -- exception that clause (3) is omitted.
+  -- If _[_]↝₁_ and _[_]↝₂_ are instantiated with _[_]⟶_, then this is
+  -- basically the function from Definition 6.3.1 in Pous and
+  -- Sangiorgi's "Enhancements of the bisimulation proof method",
+  -- except that clause (3) is omitted. Similarly, if the relations
+  -- are instantiated with _[_]⇒̂_, then this is basically the function
+  -- wb₁, again with the exception that clause (3) is omitted.
+  -- Finally, if _[_]↝₁_ is instantiated with _[_]⟶̂_ and _[_]↝₂_ is
+  -- instantiated with _[_]⇒̂_, then we get the expansion relation's
+  -- "step" function.
 
   record Step {r} (R : Rel₂ r Proc) (pq : Proc × Proc) : Set r where
     constructor ⟨_,_⟩
@@ -42,9 +46,9 @@ private
 
     field
       left-to-right : ∀ {p′ μ} →
-                      p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝ q′ × R (p′ , q′)
+                      p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝₁ q′ × R (p′ , q′)
       right-to-left : ∀ {q′ μ} →
-                      q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]↝ p′ × R (p′ , q′)
+                      q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]↝₂ p′ × R (p′ , q′)
 
 open Temporarily-private using (Step)
 
@@ -72,9 +76,9 @@ S̲t̲e̲p̲ : Container (Proc × Proc) (Proc × Proc)
 S̲t̲e̲p̲ =
   (λ { (p , q) → Magic  -- Included in order to aid type inference.
                    ×
-                 (∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝ q′)
+                 (∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝₁ q′)
                    ×
-                 (∀ {q′ μ} → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]↝ p′)
+                 (∀ {q′ μ} → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]↝₂ p′)
      })
     ◁
   (λ { {o = p , q} (_ , lr , rl) (p′ , q′) →
@@ -137,8 +141,8 @@ module S̲t̲e̲p̲ {r} {R : Rel₂ r Proc} {p q} where
   -- A "constructor".
 
   ⟨_,_⟩ :
-    (∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝ q′ × R (p′ , q′)) →
-    (∀ {q′ μ} → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]↝ p′ × R (p′ , q′)) →
+    (∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝₁ q′ × R (p′ , q′)) →
+    (∀ {q′ μ} → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]↝₂ p′ × R (p′ , q′)) →
     ⟦ S̲t̲e̲p̲ ⟧ R (p , q)
   ⟨ lr , rl ⟩ = _↔_.to Step↔S̲t̲e̲p̲ Step.⟨ lr , rl ⟩
 
@@ -146,12 +150,12 @@ module S̲t̲e̲p̲ {r} {R : Rel₂ r Proc} {p q} where
 
   left-to-right :
     ⟦ S̲t̲e̲p̲ ⟧ R (p , q) →
-    ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝ q′ × R (p′ , q′)
+    ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝₁ q′ × R (p′ , q′)
   left-to-right = Step.left-to-right ∘ _↔_.from Step↔S̲t̲e̲p̲
 
   right-to-left :
     ⟦ S̲t̲e̲p̲ ⟧ R (p , q) →
-    ∀ {q′ μ} → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]↝ p′ × R (p′ , q′)
+    ∀ {q′ μ} → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]↝₂ p′ × R (p′ , q′)
   right-to-left = Step.right-to-left ∘ _↔_.from Step↔S̲t̲e̲p̲
 
 open Temporarily-private public

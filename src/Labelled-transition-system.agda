@@ -23,12 +23,12 @@ open import Univalence-axiom equality-with-J
 -- me.
 --
 -- I don't know who first came up with the concept of a weak
--- transition. The definitions of _⇒_, _[_]⇒_ and _[_]⇒̂_ below are
--- based on definitions in "Enhancements of the bisimulation proof
+-- transition. The definitions of _⇒_, _[_]⇒_, _[_]⇒̂_ and _[_]⟶̂_ below
+-- are based on definitions in "Enhancements of the bisimulation proof
 -- method" by Pous and Sangiorgi.
 
 record LTS : Set₁ where
-  infix 4 _[_]⟶_ _⇒_ _[_]⇒_ _[_]⇒̂_
+  infix 4 _[_]⟶_ _⇒_ _[_]⇒_ _[_]⇒̂_ _[_]⟶̂_
   field
     -- Processes.
     Proc : Set
@@ -62,6 +62,12 @@ record LTS : Set₁ where
     silent     : Silent μ → p ⇒ q → p [ μ ]⇒̂ q
     non-silent : ¬ Silent μ → p [ μ ]⇒ q → p [ μ ]⇒̂ q
 
+  -- Weak transitions (yet another kind).
+
+  data _[_]⟶̂_ (p : Proc) (μ : Label) : Proc → Set where
+    done : Silent μ → p [ μ ]⟶̂ p
+    step : ∀ {q} → p [ μ ]⟶ q → p [ μ ]⟶̂ q
+
   -- Regular transitions can (sometimes) be turned into weak ones.
 
   ⟶→⇒ : ∀ {p μ q} → Silent μ → p [ μ ]⟶ q → p ⇒ q
@@ -74,6 +80,9 @@ record LTS : Set₁ where
   ⟶→⇒̂ {μ = μ} tr with silent? μ
   ... | yes s = silent s (⟶→⇒ s tr)
   ... | no ¬s = non-silent ¬s (⟶→[]⇒ tr)
+
+  ⟶→⟶̂ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]⟶̂ q
+  ⟶→⟶̂ = step
 
   -- Several transitivity-like properties.
 
@@ -113,6 +122,13 @@ record LTS : Set₁ where
   ⇒→⇒̂ {μ = μ} tr with silent? μ
   ... | yes s = silent s ([]⇒→⇒ s tr)
   ... | no ¬s = non-silent ¬s tr
+
+  ⟶̂→⇒̂ : ∀ {p μ q} → p [ μ ]⟶̂ q → p [ μ ]⇒̂ q
+  ⟶̂→⇒̂ (done s)  = silent s done
+  ⟶̂→⇒̂ (step tr) = ⟶→⇒̂ tr
+
+  ⟶̂→⇒ : ∀ {p q μ} → Silent μ → p [ μ ]⟶̂ q → p ⇒ q
+  ⟶̂→⇒ s = ⇒̂→⇒ s ∘ ⟶̂→⇒̂
 
   -- A lemma that can be used to show that some relation is a weak
   -- bisimulation (of a certain kind).
@@ -234,6 +250,10 @@ record LTS : Set₁ where
     map-⇒̂ (silent s p⇒p′)      = silent s (map-⇒ p⇒p′)
     map-⇒̂ (non-silent ¬s p⇒p′) = non-silent ¬s (map-[]⇒ p⇒p′)
 
+    map-⟶̂ : ∀ {p p′ μ} → p [ μ ]⟶̂ p′ → F p [ μ ]⟶̂ F p′
+    map-⟶̂ (done s)    = done s
+    map-⟶̂ (step p⟶p′) = step (f p⟶p′)
+
   -- Zip-like functions.
 
   module _
@@ -292,6 +312,19 @@ record LTS : Set₁ where
       (silent s₁ tr₁)      (non-silent ¬s₂ tr₂) → ⇒→⇒̂ (zip-[]⇒ʳ′ (hʳ s₁)      tr₁ tr₂)
       (non-silent ¬s₁ tr₁) (silent s₂ tr₂)      → ⇒→⇒̂ (zip-[]⇒ˡ′ (flip hˡ s₂) tr₁ tr₂)
       (non-silent ¬s₁ tr₁) (non-silent ¬s₂ tr₂) → ⇒→⇒̂ (zip-[]⇒   h            tr₁ tr₂)
+
+  zip-⟶̂ :
+    ∀ {F : Proc → Proc → Proc} {μ₁ μ₂ μ₃} →
+    (Silent μ₁ → Silent μ₂ → Silent μ₃) →
+    (∀ {p p′ q} → p [ μ₁ ]⟶ p′ → Silent μ₂ → F p q [ μ₃ ]⟶ F p′ q) →
+    (∀ {p q q′} → Silent μ₁ → q [ μ₂ ]⟶ q′ → F p q [ μ₃ ]⟶ F p q′) →
+    (∀ {p p′ q q′} →
+     p [ μ₁ ]⟶ p′ → q [ μ₂ ]⟶ q′ → F p q [ μ₃ ]⟶ F p′ q′) →
+    ∀ {p p′ q q′} → p [ μ₁ ]⟶̂ p′ → q [ μ₂ ]⟶̂ q′ → F p q [ μ₃ ]⟶̂ F p′ q′
+  zip-⟶̂ s f g h (done s₁)   (done s₂)   = done (s s₁ s₂)
+  zip-⟶̂ s f g h (done s₁)   (step q⟶q′) = step (g s₁ q⟶q′)
+  zip-⟶̂ s f g h (step p⟶p′) (done s₂)   = step (f p⟶p′ s₂)
+  zip-⟶̂ s f g h (step p⟶p′) (step q⟶q′) = step (h p⟶p′ q⟶q′)
 
 -- Transforms an LTS into one which uses weak transitions as
 -- transitions.
@@ -722,6 +755,10 @@ module Delay-monad (A : Set) where
   now[nothing]⇒̂ (silent _ tr)     = now⇒ tr
   now[nothing]⇒̂ (non-silent ¬s _) = ⊥-elim (¬s _)
 
+  now[nothing]⟶̂ : ∀ {x y} → now x [ nothing ]⟶̂ y → y ≡ now x
+  now[nothing]⟶̂ (done _)  = refl
+  now[nothing]⟶̂ (step tr) = now[nothing]⟶ tr
+
   -- If now x can make a just y-transition, then x is equal to y.
 
   now[just]⟶ : ∀ {x y z} → now x [ just y ]⟶ z → x ≡ y
@@ -734,6 +771,10 @@ module Delay-monad (A : Set) where
   now[just]⇒̂ : ∀ {x y z} → now x [ just y ]⇒̂ z → x ≡ y
   now[just]⇒̂ (silent () _)
   now[just]⇒̂ (non-silent _ tr) = now[just]⇒ tr
+
+  now[just]⟶̂ : ∀ {x y z} → now x [ just y ]⟶̂ z → x ≡ y
+  now[just]⟶̂ (done ())
+  now[just]⟶̂ (step tr) = now[just]⟶ tr
 
   -- The computation never can only transition to itself.
 
@@ -752,6 +793,10 @@ module Delay-monad (A : Set) where
   never⇒̂never (silent     _ ne⇒) = never⇒never ne⇒
   never⇒̂never (non-silent _ ne⇒) = never[]⇒never ne⇒
 
+  never⟶̂never : ∀ {μ x} → never [ μ ]⟶̂ x → x ≡ never
+  never⟶̂never (done _)   = refl
+  never⟶̂never (step ne⟶) = never⟶never ne⟶
+
   -- If never can make a μ-transition, then μ is silent.
 
   never⟶→silent : ∀ {μ x} → never [ μ ]⟶ x → Silent μ
@@ -765,6 +810,10 @@ module Delay-monad (A : Set) where
   never⇒̂→silent (silent s _)       = s
   never⇒̂→silent (non-silent _ ne⇒) = never[]⇒→silent ne⇒
 
+  never⟶̂→silent : ∀ {μ x} → never [ μ ]⟶̂ x → Silent μ
+  never⟶̂→silent (done s)   = s
+  never⟶̂→silent (step ne⟶) = never⟶→silent ne⟶
+
   -- If x can make a non-silent transition, with label just y, to z,
   -- then z is equal to now y.
 
@@ -777,6 +826,10 @@ module Delay-monad (A : Set) where
   [just]⇒̂ : ∀ {x y z} → x [ just y ]⇒̂ z → z ≡ now y
   [just]⇒̂ (silent () _)
   [just]⇒̂ (non-silent _ x⇒z) = [just]⇒ x⇒z
+
+  [just]⟶̂ : ∀ {x y z} → x [ just y ]⟶̂ z → z ≡ now y
+  [just]⟶̂ (done ())
+  [just]⟶̂ (step x⟶z) = [just]⟶ x⟶z
 
   -- If force x can make a [ μ ]⇒̂-transition to y, then later x can
   -- also make a [ μ ]⇒̂-transition to y.
@@ -818,6 +871,12 @@ module Delay-monad (A : Set) where
   drop-later-cong⇒̂ (non-silent ¬s x⇒y) =
     non-silent ¬s (drop-later-cong[]⇒ ¬s x⇒y)
 
+  drop-later-cong⟶̂ :
+    ∀ {x μ y} →
+    ¬ Silent μ → x [ μ ]⟶̂ y → drop-later x [ μ ]⟶̂ drop-later y
+  drop-later-cong⟶̂ _  (done s)   = done s
+  drop-later-cong⟶̂ ¬s (step x⟶y) = step (drop-later-cong⟶ ¬s x⟶y)
+
   -- If later x can make a transition to later y, then force x can
   -- make a transition (of the same kind) to force y.
 
@@ -852,6 +911,11 @@ module Delay-monad (A : Set) where
   drop-later⇒̂ :
     ∀ {μ x y} → later x [ μ ]⇒̂ later y → force x [ μ ]⇒̂ force y
   drop-later⇒̂ = drop-later-cong⇒̂
+
+  drop-later⟶̂ :
+    ∀ {μ x y} → later x [ μ ]⟶̂ later y → force x [ μ ]⟶̂ force y
+  drop-later⟶̂ (done s)     = done s
+  drop-later⟶̂ (step lx⟶ly) = step (drop-later⟶ lx⟶ly)
 
   -- If x makes silent transitions to both y and z, then one of y and
   -- z makes silent transitions to the other.

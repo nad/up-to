@@ -16,7 +16,7 @@ open import Prelude
 
 open LTS lts
 
-open import Bisimilarity.Step lts _[_]⟶_
+open import Bisimilarity.Step lts _[_]⟶_ _[_]⟶_
 open import Relation
 
 ------------------------------------------------------------------------

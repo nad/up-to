@@ -14,6 +14,8 @@ open import Prelude
 
 open import Bisimilarity.Coinductive lts
 import Bisimilarity.Coinductive.Equational-reasoning-instances
+open import Bisimilarity.Coinductive.Expansion lts
+import Bisimilarity.Coinductive.Expansion.Equational-reasoning-instances
 open import Bisimilarity.Weak.Coinductive.Other lts
 open import Equational-reasoning
 
@@ -61,6 +63,21 @@ instance
   convert∼′≈′ : ∀ {i} → Convertible [ i ]_∼′_ [ i ]_≈′_
   convert∼′≈′ = is-convertible ∼⇒≈′
 
+  convert≳≈ : ∀ {i} → Convertible [ i ]_≳_ [ i ]_≈_
+  convert≳≈ = is-convertible ≳⇒≈
+
+  convert≳′≈ : ∀ {i} → Convertible [ ssuc i ]_≳′_ [ i ]_≈_
+  convert≳′≈ = is-convertible (convert ∘ ≳⇒≈′)
+
+  convert≳≈′ : ∀ {i} → Convertible [ i ]_≳_ [ i ]_≈′_
+  convert≳≈′ {i} = is-convertible lemma
+    where
+    lemma : ∀ {p q} → [ i ] p ≳ q → [ i ] p ≈′ q
+    force (lemma p≳q) = ≳⇒≈ p≳q
+
+  convert≳′≈′ : ∀ {i} → Convertible [ i ]_≳′_ [ i ]_≈′_
+  convert≳′≈′ = is-convertible ≳⇒≈′
+
   trans≈≈ : Transitive _≈_ _≈_
   trans≈≈ = is-transitive transitive-≈
 
@@ -76,23 +93,23 @@ instance
     transitive-≈′ (convert p≈q) (convert q≈′r)
 
   trans∼≈ : ∀ {i} → Transitive _∼_ [ i ]_≈_
-  trans∼≈ = is-transitive transitive-∼≈
+  trans∼≈ = is-transitive (transitive-≳≈ ∘ convert)
 
   trans∼′≈ : ∀ {i} → Transitive _∼′_ [ i ]_≈_
-  trans∼′≈ = is-transitive (transitive-∼≈ ∘ convert)
+  trans∼′≈ = is-transitive (transitive-≳≈ ∘ convert)
 
   trans∼′≈′ : ∀ {i} → Transitive _∼′_ [ i ]_≈′_
   trans∼′≈′ {i} = is-transitive lemma
     where
     lemma : ∀ {p q r} → p ∼′ q → [ i ] q ≈′ r → [ i ] p ≈′ r
     force (lemma p∼′q q≈′r) =
-      transitive-∼≈ (convert p∼′q) (convert q≈′r)
+      transitive-≳≈ (convert p∼′q) (convert q≈′r)
 
   trans∼≈′ : ∀ {i} → Transitive _∼_ [ i ]_≈′_
   trans∼≈′ {i} = is-transitive lemma
     where
     lemma : ∀ {p q r} → p ∼ q → [ i ] q ≈′ r → [ i ] p ≈′ r
-    force (lemma p∼q q≈′r) = transitive-∼≈ p∼q (convert q≈′r)
+    force (lemma p∼q q≈′r) = transitive-≳≈ (convert p∼q) (convert q≈′r)
 
   trans≈∼ : ∀ {i} → Transitive′ [ i ]_≈_ _∼_
   trans≈∼ = is-transitive transitive-≈∼
@@ -101,9 +118,64 @@ instance
   trans≈∼′ = is-transitive (λ p≈q q∼′r →
     transitive-≈∼ p≈q (convert q∼′r))
 
-  trans≈′∼′ : ∀ {i} → Transitive′ [ i ]_≈′_ _∼′_
-  trans≈′∼′ = is-transitive transitive-≈∼′
-
   trans≈′∼ : ∀ {i} → Transitive′ [ i ]_≈′_ _∼_
-  trans≈′∼ = is-transitive λ p≈′q q∼r →
-    transitive-≈∼′ p≈′q (convert q∼r)
+  trans≈′∼ {i} = is-transitive lemma
+    where
+    lemma : ∀ {p q r} → [ i ] p ≈′ q → q ∼ r → [ i ] p ≈′ r
+    force (lemma p≈′q q∼r) = transitive-≈∼ (convert p≈′q) q∼r
+
+  trans≈′∼′ : ∀ {i} → Transitive′ [ i ]_≈′_ _∼′_
+  trans≈′∼′ {i} = is-transitive lemma
+    where
+    lemma : ∀ {p q r} → [ i ] p ≈′ q → q ∼′ r → [ i ] p ≈′ r
+    force (lemma p≈′q q∼r) = transitive-≈∼ (convert p≈′q) (convert q∼r)
+
+  trans≳≈ : ∀ {i} → Transitive _≳_ [ i ]_≈_
+  trans≳≈ = is-transitive transitive-≳≈
+
+  trans≳′≈ : ∀ {i} → Transitive _≳′_ [ i ]_≈_
+  trans≳′≈ = is-transitive (transitive-≳≈ ∘ convert)
+
+  trans≳′≈′ : ∀ {i} → Transitive _≳′_ [ i ]_≈′_
+  trans≳′≈′ {i} = is-transitive lemma
+    where
+    lemma : ∀ {p q r} → p ≳′ q → [ i ] q ≈′ r → [ i ] p ≈′ r
+    force (lemma p≳′q q≈′r) =
+      transitive-≳≈ (convert p≳′q) (convert q≈′r)
+
+  trans≳≈′ : ∀ {i} → Transitive _≳_ [ i ]_≈′_
+  trans≳≈′ {i} = is-transitive lemma
+    where
+    lemma : ∀ {p q r} → p ≳ q → [ i ] q ≈′ r → [ i ] p ≈′ r
+    force (lemma p≳q q≈′r) = transitive-≳≈ p≳q (convert q≈′r)
+
+  -- TODO: Can the following proof be made size-preserving in its
+  -- first argument?
+
+  trans≈≳ : Transitive′ _≈_ _≳_
+  trans≈≳ = is-transitive (λ p≈q → transitive p≈q ∘ convert)
+
+  trans≈≳′ : Transitive′ _≈_ _≳′_
+  trans≈≳′ = is-transitive (λ p≈q → transitive p≈q ∘ convert)
+
+  trans≈′≳′ : Transitive′ _≈′_ _≳′_
+  trans≈′≳′ = is-transitive (λ p≈′q → transitive p≈′q ∘ convert)
+
+  trans≈′≳ : Transitive′ _≈′_ _≳_
+  trans≈′≳ = is-transitive (λ p≈′q → transitive p≈′q ∘ convert)
+
+  trans≈≲ : ∀ {i} → Transitive′ [ i ]_≈_ _≲_
+  trans≈≲ = is-transitive transitive-≈≲
+
+  trans≈≲′ : ∀ {i} → Transitive′ [ i ]_≈_ _≲′_
+  trans≈≲′ = is-transitive (λ p≈q q≲r → transitive-≈≲ p≈q (force q≲r))
+
+  trans≈′≲ : ∀ {i} → Transitive′ [ i ]_≈′_ _≲_
+  trans≈′≲ {i} = is-transitive lemma
+    where
+    lemma : ∀ {p q r} → [ i ] p ≈′ q → q ≲ r → [ i ] p ≈′ r
+    force (lemma p≈′q q≳′r) =
+      transitive-≈≲ (convert p≈′q) q≳′r
+
+  trans≈′≲′ : ∀ {i} → Transitive′ [ i ]_≈′_ _≲′_
+  trans≈′≲′ = is-transitive (λ p≈′q q≲′r → transitive′ p≈′q (force q≲′r))

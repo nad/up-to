@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------
 -- A parametrised coinductive definition that can be used to define
--- both strong and weak bisimilarity
+-- strong and weak bisimilarity as well as expansion
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K #-}
@@ -10,8 +10,9 @@ open import Labelled-transition-system
 module Bisimilarity.Coinductive.General
          (lts : LTS)
          (open LTS lts)
-         (_[_]↝_ : Proc → Label → Proc → Set)
-         (⟶→↝ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]↝ q)
+         (_[_]↝₁_ _[_]↝₂_ : Proc → Label → Proc → Set)
+         (⟶→↝₁ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]↝₁ q)
+         (⟶→↝₂ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]↝₂ q)
          where
 
 open import Equality.Propositional hiding (Extensionality)
@@ -25,7 +26,8 @@ open import Function-universe equality-with-J as F hiding (id; _∘_)
 open import H-level equality-with-J
 open import H-level.Closure equality-with-J
 
-open import Bisimilarity.Step lts _[_]↝_ as Step public using (S̲t̲e̲p̲)
+open import Bisimilarity.Step lts _[_]↝₁_ _[_]↝₂_ as Step public
+  using (S̲t̲e̲p̲)
 open import Indexed-container hiding (⟨_⟩; Bisimilarity)
 open import Relation
 
@@ -53,41 +55,14 @@ _∼_ = [ ∞ ]_∼_
 _∼′_ : Proc → Proc → Set
 _∼′_ = [ ∞ ]_∼′_
 
--- Combinators that can perhaps make the code a bit nicer to read.
-
-infix -3 _⟶⟨_⟩ʳˡ_ _[_]⟶⟨_⟩ʳˡ_
-         lr-result-with-action lr-result-without-action
-
-_⟶⟨_⟩ʳˡ_ : ∀ {i p′ q′ μ} p → p [ μ ]↝ p′ → [ i ] p′ ∼′ q′ →
-           ∃ λ p′ → p [ μ ]↝ p′ × [ i ] p′ ∼′ q′
-_ ⟶⟨ p⟶p′ ⟩ʳˡ p′∼′q′ = _ , p⟶p′ , p′∼′q′
-
-_[_]⟶⟨_⟩ʳˡ_ : ∀ {i p′ q′} p μ → p [ μ ]↝ p′ → [ i ] p′ ∼′ q′ →
-              ∃ λ p′ → p [ μ ]↝ p′ × [ i ] p′ ∼′ q′
-_ [ _ ]⟶⟨ p⟶p′ ⟩ʳˡ p′∼′q′ = _ ⟶⟨ p⟶p′ ⟩ʳˡ p′∼′q′
-
-lr-result-without-action :
-  ∀ {i p′ q′ μ} → [ i ] p′ ∼′ q′ → ∀ q → q [ μ ]↝ q′ →
-  ∃ λ q′ → q [ μ ]↝ q′ × [ i ] p′ ∼′ q′
-lr-result-without-action p′∼′q′ _ q⟶q′ = _ , q⟶q′ , p′∼′q′
-
-lr-result-with-action :
-  ∀ {i p′ q′} → [ i ] p′ ∼′ q′ → ∀ μ q → q [ μ ]↝ q′ →
-  ∃ λ q′ → q [ μ ]↝ q′ × [ i ] p′ ∼′ q′
-lr-result-with-action p′∼′q′ _ _ q⟶q′ =
-  lr-result-without-action  p′∼′q′ _ q⟶q′
-
-syntax lr-result-without-action p′∼q′   q q⟶q′ = p′∼q′      ⟵⟨ q⟶q′ ⟩ q
-syntax lr-result-with-action    p′∼q′ μ q q⟶q′ = p′∼q′ [ μ ]⟵⟨ q⟶q′ ⟩ q
-
 -- Bisimilarity is reflexive.
 
 mutual
 
   reflexive-∼ : ∀ {p i} → [ i ] p ∼ p
   reflexive-∼ =
-    S̲t̲e̲p̲.⟨ (λ p⟶p′ → _ , ⟶→↝ p⟶p′ , reflexive-∼′)
-         , (λ q⟶q′ → _ , ⟶→↝ q⟶q′ , reflexive-∼′)
+    S̲t̲e̲p̲.⟨ (λ p⟶p′ → _ , ⟶→↝₁ p⟶p′ , reflexive-∼′)
+         , (λ q⟶q′ → _ , ⟶→↝₂ q⟶q′ , reflexive-∼′)
          ⟩
 
   reflexive-∼′ : ∀ {p i} → [ i ] p ∼′ p
@@ -95,19 +70,6 @@ mutual
 
 ≡⇒∼ : ∀ {p q} → p ≡ q → p ∼ q
 ≡⇒∼ refl = reflexive-∼
-
-mutual
-
-  -- Bisimilarity is symmetric.
-
-  symmetric-∼ : ∀ {i p q} → [ i ] p ∼ q → [ i ] q ∼ p
-  symmetric-∼ p∼q =
-    S̲t̲e̲p̲.⟨ Σ-map id (Σ-map id symmetric-∼′) ∘ S̲t̲e̲p̲.right-to-left p∼q
-         , Σ-map id (Σ-map id symmetric-∼′) ∘ S̲t̲e̲p̲.left-to-right p∼q
-         ⟩
-
-  symmetric-∼′ : ∀ {i p q} → [ i ] p ∼′ q → [ i ] q ∼′ p
-  force (symmetric-∼′ p∼q) = symmetric-∼ (force p∼q)
 
 -- Functions that can be used to aid the instance resolution
 -- mechanism.
@@ -144,7 +106,7 @@ infix 4 [_]_≡_ [_]_≡′_
    let q′₁ , q⟶q′₁ , p′∼q′₁ = S̲t̲e̲p̲.left-to-right p∼q₁ p⟶p′
        q′₂ , q⟶q′₂ , p′∼q′₂ = S̲t̲e̲p̲.left-to-right p∼q₂ p⟶p′
    in ∃ λ (q′₁≡q′₂ : q′₁ ≡ q′₂) →
-        subst (q [ μ ]↝_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
+        subst (q [ μ ]↝₁_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
           ×
         [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (p′ ,_)) q′₁≡q′₂ p′∼q′₁ ≡′ p′∼q′₂)
     ×
@@ -152,7 +114,7 @@ infix 4 [_]_≡_ [_]_≡′_
    let p′₁ , p⟶p′₁ , p′∼q′₁ = S̲t̲e̲p̲.right-to-left p∼q₁ q⟶q′
        p′₂ , p⟶p′₂ , p′∼q′₂ = S̲t̲e̲p̲.right-to-left p∼q₂ q⟶q′
    in ∃ λ (p′₁≡p′₂ : p′₁ ≡ p′₂) →
-        subst (p [ μ ]↝_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
+        subst (p [ μ ]↝₂_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
           ×
         [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (_, q′)) p′₁≡p′₂ p′∼q′₁ ≡′ p′∼q′₂)
 
@@ -473,10 +435,10 @@ infix 4 [_]_≡_ [_]_≡′_
                             ∃ λ μ → ∃ λ (q⟶q′′ : q [ μ ]⟶ q′) →
                             proj₁ (rl q⟶q′′) ≡ proj₁ (rl₁ q⟶q′))
                          eq (μ , q⟶q′ , refl))))                          ↝⟨ (∃-cong λ eq → ∀-cong ext λ _ → ∀-cong ext λ _ → ∀-cong ext λ _ →
-                                                                              ≡⇒↝ _ $ cong (([ _ ] f₁ _ ≡′_) ∘ f₂ ∘ inj₁) $ lemma₂ eq)
+                                                                              ≡⇒↝ _ $ cong (([ _ ] f₁ _ ≡′_) ∘ f₂ ∘ inj₁) $ lemma₂ _[_]↝₁_ eq)
                                                                                ×-cong
                                                                              (∃-cong λ eq → ∀-cong ext λ _ → ∀-cong ext λ _ → ∀-cong ext λ _ →
-                                                                              ≡⇒↝ _ $ cong (([ _ ] f₁ _ ≡′_) ∘ f₂ ∘ inj₂) $ lemma₂ eq) ⟩
+                                                                              ≡⇒↝ _ $ cong (([ _ ] f₁ _ ≡′_) ∘ f₂ ∘ inj₂) $ lemma₂ _[_]↝₂_ eq) ⟩
   (∃ λ (eq : (λ {p′ μ} → lr₁ {p′ = p′} {μ = μ}) ≡ lr₂) →
    ∀ p′ μ (p⟶p′ : p [ μ ]⟶ p′) →
    [ i ] f₁ (inj₁ (μ , p⟶p′ , refl)) ≡′
@@ -549,12 +511,12 @@ infix 4 [_]_≡_ [_]_≡′_
          f₂ (inj₂ (μ , q⟶q′ , sym (cong (λ rl → proj₁ (rl q⟶q′)) eq′))))  ↝⟨ (∃-cong λ eq →
                                                                               implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ p⟶p′ →
                                                                               ≡⇒↝ _ $ cong (λ eq → [ _ ] f₁ _ ≡′ f₂ (inj₁ (_ , p⟶p′ , sym eq))) $
-                                                                              lemma₃ eq)
+                                                                              lemma₃ _[_]↝₁_ eq)
                                                                                ×-cong
                                                                              (∃-cong λ eq →
                                                                               implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ q⟶q′ →
                                                                               ≡⇒↝ _ $ cong (λ eq → [ _ ] f₁ _ ≡′ f₂ (inj₂ (_ , q⟶q′ , sym eq))) $
-                                                                              lemma₃ eq) ⟩
+                                                                              lemma₃ _[_]↝₂_ eq) ⟩
   (∃ λ (eq : ∀ p′ → (λ {μ} → lr₁ {p′ = p′} {μ = μ}) ≡ lr₂) →
    ∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
    [ i ] f₁ (inj₁ (μ , p⟶p′ , refl)) ≡′
@@ -603,12 +565,12 @@ infix 4 [_]_≡_ [_]_≡′_
                                         (Eq.good-ext ext eq′)))))         ↝⟨ (∃-cong λ _ →
                                                                               implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ _ →
                                                                               ≡⇒↝ _ $ cong (λ eq → [ _ ] f₁ _ ≡′ f₂ (inj₁ (_ , _ , sym eq))) $
-                                                                              lemma₄ _)
+                                                                              lemma₄ _[_]↝₁_ _)
                                                                                ×-cong
                                                                              (∃-cong λ _ →
                                                                               implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ _ →
                                                                               ≡⇒↝ _ $ cong (λ eq → [ _ ] f₁ _ ≡′ f₂ (inj₂ (_ , _ , sym eq))) $
-                                                                              lemma₄ _) ⟩
+                                                                              lemma₄ _[_]↝₂_ _) ⟩
   (∃ λ (eq : ∀ p′ μ → lr₁ {p′ = p′} {μ = μ} ≡ lr₂) →
    ∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
    [ i ] f₁ (inj₁ (μ , p⟶p′ , refl)) ≡′
@@ -728,7 +690,7 @@ infix 4 [_]_≡_ [_]_≡′_
    let q′₁ , q⟶q′₁ = lr₁ p⟶p′
        q′₂ , q⟶q′₂ = lr₂ p⟶p′
    in ∃ λ (eq : ∃ λ (q′₁≡q′₂ : q′₁ ≡ q′₂) →
-                  subst (q [ μ ]↝_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂) →
+                  subst (q [ μ ]↝₁_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂) →
       [ i ] f₁ (inj₁ (μ , p⟶p′ , refl)) ≡′
             f₂ (inj₁ (μ , p⟶p′
                         , sym (cong proj₁ (uncurry Σ-≡,≡→≡ eq)))))
@@ -737,7 +699,7 @@ infix 4 [_]_≡_ [_]_≡′_
    let p′₁ , p⟶p′₁ = rl₁ q⟶q′
        p′₂ , p⟶p′₂ = rl₂ q⟶q′
    in ∃ λ (eq : ∃ λ (p′₁≡p′₂ : p′₁ ≡ p′₂) →
-                  subst (p [ μ ]↝_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂) →
+                  subst (p [ μ ]↝₂_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂) →
       [ i ] f₁ (inj₂ (μ , q⟶q′ , refl)) ≡′
             f₂ (inj₂ (μ , q⟶q′
                         , sym (cong proj₁ (uncurry Σ-≡,≡→≡ eq)))))        ↝⟨ (implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ _ →
@@ -753,7 +715,7 @@ infix 4 [_]_≡_ [_]_≡′_
    let q′₁ , q⟶q′₁ = lr₁ p⟶p′
        q′₂ , q⟶q′₂ = lr₂ p⟶p′
    in ∃ λ (eq : ∃ λ (q′₁≡q′₂ : q′₁ ≡ q′₂) →
-                  subst (q [ μ ]↝_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂) →
+                  subst (q [ μ ]↝₁_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂) →
       [ i ] f₁ (inj₁ (μ , p⟶p′ , refl)) ≡′
             f₂ (inj₁ (μ , p⟶p′ , sym (proj₁ eq))))
     ×
@@ -761,7 +723,7 @@ infix 4 [_]_≡_ [_]_≡′_
    let p′₁ , p⟶p′₁ = rl₁ q⟶q′
        p′₂ , p⟶p′₂ = rl₂ q⟶q′
    in ∃ λ (eq : ∃ λ (p′₁≡p′₂ : p′₁ ≡ p′₂) →
-                  subst (p [ μ ]↝_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂) →
+                  subst (p [ μ ]↝₂_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂) →
       [ i ] f₁ (inj₂ (μ , q⟶q′ , refl)) ≡′
             f₂ (inj₂ (μ , q⟶q′ , sym (proj₁ eq))))                        ↝⟨ (implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ _ →
                                                                               inverse Σ-assoc)
@@ -772,7 +734,7 @@ infix 4 [_]_≡_ [_]_≡′_
    let q′₁ , q⟶q′₁ = lr₁ p⟶p′
        q′₂ , q⟶q′₂ = lr₂ p⟶p′
    in ∃ λ (q′₁≡q′₂ : q′₁ ≡ q′₂) →
-        subst (q [ μ ]↝_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
+        subst (q [ μ ]↝₁_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
           ×
         [ i ] f₁ (inj₁ (μ , p⟶p′ , refl)) ≡′
               f₂ (inj₁ (μ , p⟶p′ , sym q′₁≡q′₂)))
@@ -781,7 +743,7 @@ infix 4 [_]_≡_ [_]_≡′_
    let p′₁ , p⟶p′₁ = rl₁ q⟶q′
        p′₂ , p⟶p′₂ = rl₂ q⟶q′
    in ∃ λ (p′₁≡p′₂ : p′₁ ≡ p′₂) →
-        subst (p [ μ ]↝_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
+        subst (p [ μ ]↝₂_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
           ×
         [ i ] f₁ (inj₂ (μ , q⟶q′ , refl)) ≡′
               f₂ (inj₂ (μ , q⟶q′ , sym p′₁≡p′₂)))                         ↝⟨ (implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ p⟶p′ →
@@ -795,7 +757,7 @@ infix 4 [_]_≡_ [_]_≡′_
    let q′₁ , q⟶q′₁ = lr₁ p⟶p′
        q′₂ , q⟶q′₂ = lr₂ p⟶p′
    in ∃ λ (q′₁≡q′₂ : q′₁ ≡ q′₂) →
-        subst (q [ μ ]↝_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
+        subst (q [ μ ]↝₁_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
           ×
         [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (p′ ,_)) q′₁≡q′₂
                     (f₁ (inj₁ (_ , p⟶p′ , refl))) ≡′
@@ -805,7 +767,7 @@ infix 4 [_]_≡_ [_]_≡′_
    let p′₁ , p⟶p′₁ = rl₁ q⟶q′
        p′₂ , p⟶p′₂ = rl₂ q⟶q′
    in ∃ λ (p′₁≡p′₂ : p′₁ ≡ p′₂) →
-        subst (p [ μ ]↝_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
+        subst (p [ μ ]↝₂_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
           ×
         [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (_, q′)) p′₁≡p′₂
                     (f₁ (inj₂ (_ , q⟶q′ , refl))) ≡′
@@ -815,7 +777,7 @@ infix 4 [_]_≡_ [_]_≡′_
    let q′₁ , q⟶q′₁ , p′∼q′₁ = S̲t̲e̲p̲.left-to-right (s₁ , f₁) p⟶p′
        q′₂ , q⟶q′₂ , p′∼q′₂ = S̲t̲e̲p̲.left-to-right (s₂ , f₂) p⟶p′
    in ∃ λ (q′₁≡q′₂ : q′₁ ≡ q′₂) →
-        subst (q [ μ ]↝_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
+        subst (q [ μ ]↝₁_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
           ×
         [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (p′ ,_)) q′₁≡q′₂ p′∼q′₁ ≡′ p′∼q′₂)
     ×
@@ -823,7 +785,7 @@ infix 4 [_]_≡_ [_]_≡′_
    let p′₁ , p⟶p′₁ , p′∼q′₁ = S̲t̲e̲p̲.right-to-left (s₁ , f₁) q⟶q′
        p′₂ , p⟶p′₂ , p′∼q′₂ = S̲t̲e̲p̲.right-to-left (s₂ , f₂) q⟶q′
    in ∃ λ (p′₁≡p′₂ : p′₁ ≡ p′₂) →
-        subst (p [ μ ]↝_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
+        subst (p [ μ ]↝₂_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
           ×
         [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (_, q′)) p′₁≡p′₂ p′∼q′₁ ≡′ p′∼q′₂)       □
 
@@ -889,7 +851,8 @@ infix 4 [_]_≡_ [_]_≡′_
                           (proj₂ eq)
                           pos))                                           ∎
 
-  lemma₂ = λ {p q} {f g : ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ (q [ μ ]↝_)}
+  lemma₂ = λ (_[_]↝_ : Proc → Label → Proc → Set)
+             {p q} {f g : ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ (q [ μ ]↝_)}
              (eq : (λ {p′ μ} → f {p′ = p′} {μ = μ}) ≡ g)
              {p′ μ} {p⟶p′ : p [ μ ]⟶ p′} →
 
@@ -970,7 +933,8 @@ infix 4 [_]_≡_ [_]_≡′_
     , sym (cong (λ lr → proj₁ (lr p⟶p′)) eq)
     )                                                   ∎
 
-  lemma₃ = λ {p q} {f g : ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ (q [ μ ]↝_)}
+  lemma₃ = λ (_[_]↝_ : Proc → Label → Proc → Set)
+             {p q} {f g : ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ (q [ μ ]↝_)}
              (eq : ∀ p′ → (λ {μ} → f {p′ = p′} {μ = μ}) ≡ g)
              {p′ μ} {p⟶p′ : p [ μ ]⟶ p′} →
 
@@ -982,7 +946,8 @@ infix 4 [_]_≡_ [_]_≡′_
 
     cong (λ lr → proj₁ (lr p′ p⟶p′)) (Eq.good-ext ext eq)       ∎
 
-  lemma₄ = λ {p q} {f g : ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ (q [ μ ]↝_)}
+  lemma₄ = λ (_[_]↝_ : Proc → Label → Proc → Set)
+             {p q} {f g : ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ (q [ μ ]↝_)}
              (eq : ∀ p′ μ → f {p′ = p′} {μ = μ} ≡ g)
              {p′ μ p⟶p′} →
 
@@ -1099,14 +1064,14 @@ module Bisimilarity-of-∼
      let q′₁ , q⟶q′₁ , p′∼q′₁ = S̲t̲e̲p̲.left-to-right p∼q₁ p⟶p′
          q′₂ , q⟶q′₂ , p′∼q′₂ = S̲t̲e̲p̲.left-to-right p∼q₂ p⟶p′
      in ∃ λ (q′₁≡q′₂ : q′₁ ≡ q′₂) →
-          subst (q [ μ ]↝_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
+          subst (q [ μ ]↝₁_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
             ×
           [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (p′ ,_)) q′₁≡q′₂ p′∼q′₁ ≡′ p′∼q′₂) →
     (∀ {q′ μ} (q⟶q′ : q [ μ ]⟶ q′) →
      let p′₁ , p⟶p′₁ , p′∼q′₁ = S̲t̲e̲p̲.right-to-left p∼q₁ q⟶q′
          p′₂ , p⟶p′₂ , p′∼q′₂ = S̲t̲e̲p̲.right-to-left p∼q₂ q⟶q′
      in ∃ λ (p′₁≡p′₂ : p′₁ ≡ p′₂) →
-          subst (p [ μ ]↝_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
+          subst (p [ μ ]↝₂_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
             ×
           [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (_, q′)) p′₁≡p′₂ p′∼q′₁ ≡′ p′∼q′₂) →
     [ i ] p∼q₁ ≡ p∼q₂
@@ -1120,7 +1085,7 @@ module Bisimilarity-of-∼
     let q′₁ , q⟶q′₁ , p′∼q′₁ = S̲t̲e̲p̲.left-to-right p∼q₁ p⟶p′
         q′₂ , q⟶q′₂ , p′∼q′₂ = S̲t̲e̲p̲.left-to-right p∼q₂ p⟶p′
     in ∃ λ (q′₁≡q′₂ : q′₁ ≡ q′₂) →
-         subst (q [ μ ]↝_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
+         subst (q [ μ ]↝₁_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
            ×
          [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (p′ ,_)) q′₁≡q′₂ p′∼q′₁ ≡′ p′∼q′₂
   left-to-right = proj₁ ∘ _↔_.to ([]≡↔ p∼q₁ p∼q₂)
@@ -1131,7 +1096,7 @@ module Bisimilarity-of-∼
     let p′₁ , p⟶p′₁ , p′∼q′₁ = S̲t̲e̲p̲.right-to-left p∼q₁ q⟶q′
         p′₂ , p⟶p′₂ , p′∼q′₂ = S̲t̲e̲p̲.right-to-left p∼q₂ q⟶q′
     in ∃ λ (p′₁≡p′₂ : p′₁ ≡ p′₂) →
-         subst (p [ μ ]↝_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
+         subst (p [ μ ]↝₂_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
            ×
          [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (_, q′)) p′₁≡p′₂ p′∼q′₁ ≡′ p′∼q′₂
   right-to-left = proj₂ ∘ _↔_.to ([]≡↔ p∼q₁ p∼q₂)

@@ -29,7 +29,8 @@ import Up-to
 ------------------------------------------------------------------------
 -- Strong bisimilarity
 
--- The Step function, used to define strong and weak bisimilarity.
+-- The Step function, used to define strong and weak bisimilarity as
+-- well as expansion.
 
 import Bisimilarity.Step
 
@@ -38,7 +39,7 @@ import Bisimilarity.Step
 import Bisimilarity.Classical
 
 -- A parametrised coinductive definition that can be used to define
--- both strong and weak bisimilarity.
+-- strong and weak bisimilarity as well as expansion.
 
 import Bisimilarity.Coinductive.General
 
@@ -64,6 +65,14 @@ import Bisimilarity.Up-to.Counterexamples
 import Bisimilarity.Exercises.Other
 import Bisimilarity.Exercises.Classical
 import Bisimilarity.Exercises.Coinductive
+
+------------------------------------------------------------------------
+-- Expansion
+
+-- A coinductive definition of the expansion ordering.
+
+import Bisimilarity.Coinductive.Expansion
+import Bisimilarity.Coinductive.Expansion.Equational-reasoning-instances
 
 ------------------------------------------------------------------------
 -- Weak bisimilarity

@@ -23,7 +23,7 @@ open import Labelled-transition-system
 open Labelled-transition-system.Delay-monad A
 open LTS delay-monad hiding (_[_]⟶_)
 
-open import Bisimilarity.Step (weak delay-monad) _[_]⇒̂_
+open import Bisimilarity.Step (weak delay-monad) _[_]⇒̂_ _[_]⇒̂_
 open import Bisimilarity.Up-to (weak delay-monad)
 open import Bisimilarity.Weak.Coinductive delay-monad
 import Bisimilarity.Weak.Coinductive.Equational-reasoning-instances

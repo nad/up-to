@@ -37,7 +37,7 @@ private
              Bisimulation; bisimulation⊆∼)
       renaming (_∼_ to _∼-cl_)
     open Bisimilarity.Coinductive lts public
-    open Bisimilarity.Step lts (LTS._[_]⟶_ lts) public
+    open Bisimilarity.Step lts (LTS._[_]⟶_ lts) (LTS._[_]⟶_ lts) public
       using (Step; Step↔S̲t̲e̲p̲)
     open Bisimilarity.Up-to lts public
     open LTS lts public hiding (_[_]⟶_)

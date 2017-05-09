@@ -89,6 +89,11 @@ mutual
 [just]⇒̂→≈now (silent () _)
 [just]⇒̂→≈now (non-silent _ tr) = [just]⇒→≈now tr
 
+[just]⟶̂→≈now : ∀ {i x x′ y} →
+               x [ just y ]⟶̂ x′ → Weakly-bisimilar i x (now y)
+[just]⟶̂→≈now (done ())
+[just]⟶̂→≈now (step tr) = [just]⇒̂→≈now (⟶→⇒̂ tr)
+
 mutual
 
   -- The "other" definition of weak bisimilarity obtained from the
@@ -281,3 +286,9 @@ size-preserving-later-cong⇔uninhabited = record
   []⇒-with-equal-labels→≈ ¬s x⇒x′ y⇒y′
 ⇒̂-with-equal-labels→≈ ¬s   (silent s _) = ⊥-elim (¬s s)
 ⇒̂-with-equal-labels→≈ ¬s _ (silent s _) = ⊥-elim (¬s s)
+
+⟶̂-with-equal-labels→≈ :
+  ∀ {x x′ y y′ μ} →
+  ¬ Silent μ → x [ μ ]⟶̂ x′ → y [ μ ]⟶̂ y′ → x ≈ y
+⟶̂-with-equal-labels→≈ ¬s x⟶̂x′ y⟶̂y′ =
+  ⇒̂-with-equal-labels→≈ ¬s (⟶̂→⇒̂ x⟶̂x′) (⟶̂→⇒̂ y⟶̂y′)
