@@ -20,11 +20,12 @@ private
     using (_∼_; _∼′_; [_]_∼_; [_]_∼′_)
 
 open import Bisimilarity.Coinductive.General lts _[_]⇒̂_ ⟶→⇒̂ public
-  using (Bisimilarity; Bisimilarity′;
-         S̲t̲e̲p̲; ⟨_,_⟩; left-to-right; right-to-left; force;
+  using (S̲t̲e̲p̲; ⟨_,_⟩; left-to-right; right-to-left; force;
          [_]_≡_; [_]_≡′_; []≡↔;
          Extensionality; extensionality)
-  renaming ( [_]_∼_ to [_]_≈_
+  renaming ( Bisimilarity to Weak-bisimilarity
+           ; Bisimilarity′ to Weak-bisimilarity′
+           ; [_]_∼_ to [_]_≈_
            ; [_]_∼′_ to [_]_≈′_
            ; _∼_ to _≈_
            ; _∼′_ to _≈′_
