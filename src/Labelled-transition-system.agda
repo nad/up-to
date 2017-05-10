@@ -247,15 +247,27 @@ record LTS : Set₁ where
     zip-⇒ done (step s q⟶q′ q′⇒q″) = step s (g q⟶q′) (zip-⇒ done q′⇒q″)
     zip-⇒ (step s p⟶p′ p′⇒p″) tr   = step s (f p⟶p′) (zip-⇒ p′⇒p″ tr)
 
+    zip-[]⇒ˡ′ :
+      ∀ {p p′ q q′ μ₁ μ₃} →
+      (∀ {p p′ q} → p [ μ₁ ]⟶ p′ → F p q [ μ₃ ]⟶ F p′ q) →
+      p [ μ₁ ]⇒ p′ → q ⇒ q′ → F p q [ μ₃ ]⇒ F p′ q′
+    zip-[]⇒ˡ′ h (steps p⇒p′ p′⟶p″ p″⇒p‴) q⇒q′ =
+      steps (zip-⇒ p⇒p′ q⇒q′) (h p′⟶p″) (zip-⇒ p″⇒p‴ done)
+
     zip-[]⇒ˡ : ∀ {p p′ q q′ μ} →
                p [ μ ]⇒ p′ → q ⇒ q′ → F p q [ μ ]⇒ F p′ q′
-    zip-[]⇒ˡ (steps p⇒p′ p′⟶p″ p″⇒p‴) q⇒q′ =
-      steps (zip-⇒ p⇒p′ q⇒q′) (f p′⟶p″) (zip-⇒ p″⇒p‴ done)
+    zip-[]⇒ˡ = zip-[]⇒ˡ′ f
+
+    zip-[]⇒ʳ′ :
+      ∀ {p p′ q q′ μ₂ μ₃} →
+      (∀ {p q q′} → q [ μ₂ ]⟶ q′ → F p q [ μ₃ ]⟶ F p q′) →
+      p ⇒ p′ → q [ μ₂ ]⇒ q′ → F p q [ μ₃ ]⇒ F p′ q′
+    zip-[]⇒ʳ′ h p⇒p′ (steps q⇒q′ q′⟶q″ q″⇒q‴) =
+      steps (zip-⇒ p⇒p′ q⇒q′) (h q′⟶q″) (zip-⇒ done q″⇒q‴)
 
     zip-[]⇒ʳ : ∀ {p p′ q q′ μ} →
                p ⇒ p′ → q [ μ ]⇒ q′ → F p q [ μ ]⇒ F p′ q′
-    zip-[]⇒ʳ p⇒p′ (steps q⇒q′ q′⟶q″ q″⇒q‴) =
-      steps (zip-⇒ p⇒p′ q⇒q′) (g q′⟶q″) (zip-⇒ done q″⇒q‴)
+    zip-[]⇒ʳ = zip-[]⇒ʳ′ g
 
     zip-[]⇒ :
       ∀ {μ₁ μ₂ μ₃} →
@@ -265,6 +277,21 @@ record LTS : Set₁ where
       p [ μ₁ ]⇒ p′ → q [ μ₂ ]⇒ q′ → F p q [ μ₃ ]⇒ F p′ q′
     zip-[]⇒ h (steps p⇒p′ p′⟶p″ p″⇒p‴) (steps q⇒q′ q′⟶q″ q″⇒q‴) =
       steps (zip-⇒ p⇒p′ q⇒q′) (h p′⟶p″ q′⟶q″) (zip-⇒ p″⇒p‴ q″⇒q‴)
+
+    zip-⇒̂ :
+      ∀ {μ₁ μ₂ μ₃} →
+      (Silent μ₁ → Silent μ₂ → Silent μ₃) →
+      (∀ {p p′ q} → p [ μ₁ ]⟶ p′ → Silent μ₂ → F p q [ μ₃ ]⟶ F p′ q) →
+      (∀ {p q q′} → Silent μ₁ → q [ μ₂ ]⟶ q′ → F p q [ μ₃ ]⟶ F p q′) →
+      (∀ {p p′ q q′} →
+       p [ μ₁ ]⟶ p′ → q [ μ₂ ]⟶ q′ → F p q [ μ₃ ]⟶ F p′ q′) →
+      ∀ {p p′ q q′} →
+      p [ μ₁ ]⇒̂ p′ → q [ μ₂ ]⇒̂ q′ → F p q [ μ₃ ]⇒̂ F p′ q′
+    zip-⇒̂ fs hˡ hʳ h = λ where
+      (silent s₁ tr₁)      (silent s₂ tr₂)      → silent (fs s₁ s₂) (zip-⇒ tr₁ tr₂)
+      (silent s₁ tr₁)      (non-silent ¬s₂ tr₂) → ⇒→⇒̂ (zip-[]⇒ʳ′ (hʳ s₁)      tr₁ tr₂)
+      (non-silent ¬s₁ tr₁) (silent s₂ tr₂)      → ⇒→⇒̂ (zip-[]⇒ˡ′ (flip hˡ s₂) tr₁ tr₂)
+      (non-silent ¬s₁ tr₁) (non-silent ¬s₂ tr₂) → ⇒→⇒̂ (zip-[]⇒   h            tr₁ tr₂)
 
 -- Transforms an LTS into one which uses weak transitions as
 -- transitions.
@@ -514,17 +541,6 @@ module CCS (Name : Set) where
     μ₀ ≡ name a × μ₀ ≡ name (co a)  ↝⟨ uncurry trans ∘ Σ-map sym id ⟩
     name a ≡ name (co a)            ↝⟨ id≢co ∘ cancel-name ⟩□
     ⊥                               □)
-
-  -- par-τ can be lifted from _[_]⟶_ to _[_]⇒̂_.
-
-  par-τ-⇒̂ : ∀ {P P′ Q Q′ a} →
-            P [ name a ]⇒̂ P′ → Q [ name (co a) ]⇒̂ Q′ →
-            P ∣ Q [ τ ]⇒̂ P′ ∣ Q′
-  par-τ-⇒̂ (non-silent _ P⇒P′) (non-silent _ Q⇒Q′) =
-    ⇒→⇒̂ (zip-[]⇒ par-left par-right par-τ P⇒P′ Q⇒Q′)
-
-  par-τ-⇒̂ (silent () _)
-  par-τ-⇒̂ _ (silent () _)
 
   -- A simple lemma.
 

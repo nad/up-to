@@ -67,7 +67,11 @@ module _ {Name : Set} where
                                                      ∣-cong-≈′_))
                                        (left-to-right Q≈Q′ tr)
       lr P≈P′ Q≈Q′ (par-τ tr₁ tr₂) = Σ-zip _∣_
-                                           (Σ-zip par-τ-⇒̂ _∣-cong-≈′_)
+                                           (Σ-zip (zip-⇒̂ par-left
+                                                         par-right
+                                                         (λ ()) (λ _ ())
+                                                         (λ ()) par-τ)
+                                                  _∣-cong-≈′_)
                                        (left-to-right P≈P′ tr₁)
                                        (left-to-right Q≈Q′ tr₂)
 
