@@ -33,6 +33,9 @@ module _ {Name : Set} where
   open Bisimilarity.Coinductive CCS using (_∼_; ∼:_)
   open Bisimilarity.Weak.Coinductive.Other CCS
 
+  import Labelled-transition-system.Equational-reasoning-instances CCS
+    as Unused
+
   {-# DISPLAY LTS._[_]⟶_ p μ q = p [ μ ]⟶ q #-}
   {-# DISPLAY LTS._[_]⇒̂_ p μ q = p [ μ ]⇒̂ q #-}
   {-# DISPLAY Bisimilarity.Weak.Coinductive.Other.[_]_≈′_ i p q =
@@ -106,7 +109,8 @@ module _ {Name : Set} where
         (! name a · (b ·) ∣ ! co a ·) ∣ b ·  ∽⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩
         ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ b ·   ∼⟨ swap-rightmost ⟩ ∼:
         ((! a · ∣ ! b ·) ∣ b ·) ∣ ! co a ·   ∼⟨ lemma ∣-cong reflexive ⟩■
-        ((! a · ∣ ∅) ∣ ! b ·) ∣ ! co a ·     ⟵⟨ par-left (par-left (replication (par-right action))) ⟩⇒̂
+        ((! a · ∣ ∅) ∣ ! b ·) ∣ ! co a ·
+          ⇐̂[ name a ]                        ←⟨ par-left (par-left (replication (par-right action))) ⟩■
         (! a · ∣ ! b ·) ∣ ! co a ·
 
       ... | inj₂ (_ , .(b ·) , _ , .a , action , ab[a̅]⟶ , _) =
@@ -118,7 +122,8 @@ module _ {Name : Set} where
         ! name a · (b ·) ∣ (! co a · ∣ ∅)  ∼⟨ ∣-assoc ⟩
         (! name a · (b ·) ∣ ! co a ·) ∣ ∅  ∽⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩ ∼:
         ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ ∅   ∼⟨ symmetric ∣-assoc ⟩■
-        (! a · ∣ ! b ·) ∣ (! co a · ∣ ∅)   ⟵⟨ par-right (replication (par-right action)) ⟩⇒̂
+        (! a · ∣ ! b ·) ∣ (! co a · ∣ ∅)
+          ⇐̂[ name (co a) ]                 ←⟨ par-right (replication (par-right action)) ⟩■
         (! a · ∣ ! b ·) ∣ ! co a ·
 
       ... | inj₂ (_ , .∅ , _ , .(co a) , action , a̅[a̅̅]⟶ , _) =
@@ -133,8 +138,9 @@ module _ {Name : Set} where
         (! name a · (b ·) ∣ ! co a ·) ∣ (b · ∣ ∅)  ∽⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩
         ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ (b · ∣ ∅)   ∼⟨ swap-in-the-middle ⟩ ∼:
         ((! a · ∣ ! b ·) ∣ b ·) ∣ (! co a · ∣ ∅)   ∼⟨ lemma ∣-cong reflexive ⟩■
-        ((! a · ∣ ∅) ∣ ! b ·) ∣ (! co a · ∣ ∅)     [ τ ]⟵⟨ par-τ (par-left (replication (par-right action)))
-                                                                 (replication (par-right action)) ⟩⇒̂
+        ((! a · ∣ ∅) ∣ ! b ·) ∣ (! co a · ∣ ∅)
+          ⇐̂[ τ ]                                   ←⟨ par-τ (par-left (replication (par-right action)))
+                                                            (replication (par-right action)) ⟩■
         (! a · ∣ ! b ·) ∣ ! co a ·
 
       ... | _ | inj₂ (() , _)
@@ -215,7 +221,8 @@ module _ {Name : Set} where
         ∃ λ P → ! name a · (b ·) ∣ ! co a · [ μ ]⇒̂ P × [ i ] P ≈′ Q
       rl {Q} tr with rl-lemma tr
       ... | !a∣!b∣!a̅∼Q , inj₁ refl =
-        ! name a · (b ·) ∣ ! co a ·          [ name a ]⟶⟨ par-left (replication (par-right action)) ⟩⇒̂
+        ! name a · (b ·) ∣ ! co a ·          →⟨ par-left (replication (par-right action)) ⟩■
+          ⇒̂[ name a ]
         (! name a · (b ·) ∣ b ·) ∣ ! co a ·  ∼⟨ swap-rightmost ⟩
         (! name a · (b ·) ∣ ! co a ·) ∣ b ·  ∽⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩
         ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ b ·   ∼⟨ swap-rightmost ⟩
@@ -224,27 +231,27 @@ module _ {Name : Set} where
         (! a · ∣ ! b ·) ∣ ! co a ·           ∼⟨ !a∣!b∣!a̅∼Q ⟩■
         Q
 
-      -- TODO: Better notation for multiple steps?
-
       ... | !a∣!b∣!a̅∼Q , inj₂ (inj₁ refl) =
-        ! name a · (b ·) ∣ ! co a ·              [ name b ]⇒̂⟨ non-silent (λ ()) (steps (⟶→⇒ refl (par-τ (replication (par-right action))
-                                                                                                        (replication (par-right action))))
-                                                                                       (par-left (par-right action))
-                                                                                       done) ⟩ʳˡ
-        (! name a · (b ·) ∣ ∅) ∣ (! co a · ∣ ∅)  ∼⟨ ∣-right-identity ∣-cong ∣-right-identity ⟩
-        (! name a · (b ·)) ∣ ! co a ·            ∽⟨ 6-5-4′ ⟩ ∼:
-        (! a · ∣ ! b ·) ∣ ! co a ·               ∼⟨ !a∣!b∣!a̅∼Q ⟩■
+        ! name a · (b ·) ∣ ! co a ·                  →⟨ par-τ (replication (par-right action))
+                                                              (replication (par-right action)) ⟩
+        (! name a · (b ·) ∣ (b ·)) ∣ (! co a · ∣ ∅)  →⟨ par-left (par-right action) ⟩■
+          ⇒̂[ name b ]
+        (! name a · (b ·) ∣ ∅) ∣ (! co a · ∣ ∅)      ∼⟨ ∣-right-identity ∣-cong ∣-right-identity ⟩
+        (! name a · (b ·)) ∣ ! co a ·                ∽⟨ 6-5-4′ ⟩ ∼:
+        (! a · ∣ ! b ·) ∣ ! co a ·                   ∼⟨ !a∣!b∣!a̅∼Q ⟩■
         Q
 
       ... | !a∣!b∣!a̅∼Q , inj₂ (inj₂ (inj₁ refl)) =
-        ! name a · (b ·) ∣ ! co a ·        [ name (co a) ]⟶⟨ par-right (replication (par-right action)) ⟩⇒̂
+        ! name a · (b ·) ∣ ! co a ·        →⟨ par-right (replication (par-right action)) ⟩■
+          ⇒̂[ name (co a) ]
         ! name a · (b ·) ∣ (! co a · ∣ ∅)  ∼⟨ reflexive ∣-cong ∣-right-identity ⟩
         ! name a · (b ·) ∣ ! co a ·        ∽⟨ 6-5-4′ ⟩ ∼:
         (! a · ∣ ! b ·) ∣ ! co a ·         ∼⟨ !a∣!b∣!a̅∼Q ⟩■
         Q
 
       ... | !a∣!b∣!a̅∼Q , inj₂ (inj₂ (inj₂ refl)) =
-        ! name a · (b ·) ∣ ! co a ·  [ τ ]⇒̂⟨ silent refl done ⟩ʳˡ
+        ! name a · (b ·) ∣ ! co a ·  ■
+          ⇒̂[ τ ]
         ! name a · (b ·) ∣ ! co a ·  ∽⟨ 6-5-4′ ⟩ ∼:
         (! a · ∣ ! b ·) ∣ ! co a ·   ∼⟨ !a∣!b∣!a̅∼Q ⟩■
         Q

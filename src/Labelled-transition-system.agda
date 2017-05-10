@@ -68,6 +68,51 @@ record LTS : Set₁ where
     done : Silent μ → p [ μ ]⟶̂ p
     step : ∀ {q} → p [ μ ]⟶ q → p [ μ ]⟶̂ q
 
+  -- Functions that can be used to aid the instance resolution
+  -- mechanism.
+
+  infix -2 ⟶:_ ⇒:_ []⇒:_ ⇒̂:_ ⟶̂:_
+
+  ⟶:_ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]⟶ q
+  ⟶:_ = id
+
+  ⇒:_ : ∀ {p q} → p ⇒ q → p ⇒ q
+  ⇒:_ = id
+
+  []⇒:_ : ∀ {p μ q} → p [ μ ]⇒ q → p [ μ ]⇒ q
+  []⇒:_ = id
+
+  ⇒̂:_ : ∀ {p μ q} → p [ μ ]⇒̂ q → p [ μ ]⇒̂ q
+  ⇒̂:_ = id
+
+  ⟶̂:_ : ∀ {p μ q} → p [ μ ]⟶̂ q → p [ μ ]⟶̂ q
+  ⟶̂:_ = id
+
+  -- An "equational" reasoning combinator that is not subsumed by the
+  -- combinators in Equational-reasoning, because the types of the two
+  -- main arguments and the result use three different relations.
+
+  infixr -2 ⟶⇒→[]⇒
+
+  ⟶⇒→[]⇒ : ∀ p μ {q r} → p [ μ ]⟶ q → q ⇒ r → p [ μ ]⇒ r
+  ⟶⇒→[]⇒ _ _ = steps done
+
+  syntax ⟶⇒→[]⇒ p μ p⟶q q⇒r = p [ μ ]⇒⟨ p⟶q ⟩ q⇒r
+
+  -- Combinators that can be used to add visible type information to
+  -- an expression.
+
+  infix -1 step-with-action step-without-action
+
+  step-with-action : ∀ p μ q → p [ μ ]⟶ q → p [ μ ]⟶ q
+  step-with-action _ _ _ p⟶q = p⟶q
+
+  step-without-action : ∀ p {μ} q → p [ μ ]⟶ q → p [ μ ]⟶ q
+  step-without-action _ _ p⟶q = p⟶q
+
+  syntax step-with-action    p μ q p⟶q = p [ μ ]⟶⟨ p⟶q ⟩ q
+  syntax step-without-action p   q p⟶q = p      ⟶⟨ p⟶q ⟩ q
+
   -- Regular transitions can (sometimes) be turned into weak ones.
 
   ⟶→⇒ : ∀ {p μ q} → Silent μ → p [ μ ]⟶ q → p ⇒ q
@@ -122,6 +167,10 @@ record LTS : Set₁ where
   ⇒→⇒̂ {μ = μ} tr with silent? μ
   ... | yes s = silent s ([]⇒→⇒ s tr)
   ... | no ¬s = non-silent ¬s tr
+
+  ⇒̂→[]⇒ : ∀ {p q μ} → ¬ Silent μ → p [ μ ]⇒̂ q → p [ μ ]⇒ q
+  ⇒̂→[]⇒ ¬s (silent s _)      = ⊥-elim (¬s s)
+  ⇒̂→[]⇒ _  (non-silent _ tr) = tr
 
   ⟶̂→⇒̂ : ∀ {p μ q} → p [ μ ]⟶̂ q → p [ μ ]⇒̂ q
   ⟶̂→⇒̂ (done s)  = silent s done
@@ -216,20 +265,6 @@ record LTS : Set₁ where
       }
     ; left-inverse-of = λ _ → refl
     }
-
-  -- Combinators that can be used to add visible type information to
-  -- an expression.
-
-  infix -1 step-with-action step-without-action
-
-  step-with-action : ∀ p μ q → p [ μ ]⟶ q → p [ μ ]⟶ q
-  step-with-action _ _ _ p⟶q = p⟶q
-
-  step-without-action : ∀ p {μ} q → p [ μ ]⟶ q → p [ μ ]⟶ q
-  step-without-action _ _ p⟶q = p⟶q
-
-  syntax step-with-action    p μ q p⟶q = p [ μ ]⟶⟨ p⟶q ⟩ q
-  syntax step-without-action p   q p⟶q = p      ⟶⟨ p⟶q ⟩ q
 
   -- Map-like functions.
 

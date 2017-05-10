@@ -8,8 +8,9 @@ module Equational-reasoning where
 
 open import Prelude
 
-infix  -1 _■ finally
-infixr -2 step-∼ _∼⟨⟩_ step-∽
+infix  -1 _■ finally₁ finally₁→ finally₁← finally₂ finally₂→ finally₂←
+infixr -2 step-∼ step-∼→ _∼⟨⟩_ step-∽ step-∽→
+infixl -2 step-∼← step-∽←
 
 ------------------------------------------------------------------------
 -- Reflexivity
@@ -78,13 +79,18 @@ open Transitive ⦃ … ⦄ public
 -- The idea behind this optimisation came up in discussions with Ulf
 -- Norell.
 
-step-∼ : ∀ {a b p q} {A : Set a} {B : Set b}
-           {P : A → A → Set p} {Q : A → B → Set q}
-           ⦃ t : Transitive P Q ⦄ x {y z} →
-         Q y z → P x y → Q x z
+step-∼ step-∼→ step-∼← :
+  ∀ {a b p q} {A : Set a} {B : Set b}
+    {P : A → A → Set p} {Q : A → B → Set q}
+    ⦃ t : Transitive P Q ⦄ x {y z} →
+  Q y z → P x y → Q x z
 step-∼ _ = flip transitive
+step-∼→  = step-∼
+step-∼←  = step-∼
 
-syntax step-∼ x Qyz Pxy = x ∼⟨ Pxy ⟩ Qyz
+syntax step-∼  x Qyz Pxy = x ∼⟨ Pxy ⟩ Qyz
+syntax step-∼→ x Qyz Pxy = x →⟨ Pxy ⟩ Qyz
+syntax step-∼← x Qyz Pxy = Qyz ←⟨ Pxy ⟩ x
 
 -- Another variant of transitivity.
 --
@@ -101,13 +107,18 @@ record Transitive′ {a b p q} {A : Set a} {B : Set b}
 
 open Transitive′ ⦃ … ⦄ public
 
-step-∽ : ∀ {a b p q} {A : Set a} {B : Set b}
-           {P : A → B → Set p} {Q : B → B → Set q}
-           ⦃ t : Transitive′ P Q ⦄ x {y z} →
-         Q y z → P x y → P x z
+step-∽ step-∽→ step-∽← :
+  ∀ {a b p q} {A : Set a} {B : Set b}
+    {P : A → B → Set p} {Q : B → B → Set q}
+    ⦃ t : Transitive′ P Q ⦄ x {y z} →
+  Q y z → P x y → P x z
 step-∽ _ = flip transitive′
+step-∽→  = step-∽
+step-∽←  = step-∽
 
-syntax step-∽ x Qyz Pxy = x ∽⟨ Pxy ⟩ Qyz
+syntax step-∽  x Qyz Pxy = x ∽⟨ Pxy ⟩ Qyz
+syntax step-∽→ x Qyz Pxy = x →∽⟨ Pxy ⟩ Qyz
+syntax step-∽← x Qyz Pxy = Qyz ←∽⟨ Pxy ⟩ x
 
 ------------------------------------------------------------------------
 -- A finally combinator
@@ -130,10 +141,28 @@ record Convertible {a b p q} {A : Set a} {B : Set b}
 
 open Convertible ⦃ … ⦄ public
 
-finally : ∀ {a b p q} {A : Set a} {B : Set b}
-            {P : A → B → Set p} {Q : A → B → Set q}
-            ⦃ c : Convertible P Q ⦄ x y →
-          P x y → Q x y
-finally _ _ = convert
+finally₂ finally₂→ finally₂← :
+  ∀ {a b p q} {A : Set a} {B : Set b}
+    {P : A → B → Set p} {Q : A → B → Set q}
+    ⦃ c : Convertible P Q ⦄ x y →
+  P x y → Q x y
+finally₂ _ _ = convert
+finally₂→    = finally₂
+finally₂←    = finally₂
 
-syntax finally x y x∼y = x ∼⟨ x∼y ⟩■ y
+syntax finally₂  x y x∼y = x ∼⟨ x∼y ⟩■ y
+syntax finally₂→ x y x→y = x →⟨ x→y ⟩■ y
+syntax finally₂← x y x→y = y ←⟨ x→y ⟩■ x
+
+finally₁ finally₁→ finally₁← :
+  ∀ {a b p q} {A : Set a} {B : Set b}
+    {P : A → B → Set p} {Q : A → B → Set q}
+    ⦃ c : Convertible P Q ⦄ x {y} →
+  P x y → Q x y
+finally₁ _ = convert
+finally₁→  = finally₁
+finally₁←  = finally₁
+
+syntax finally₁  x x∼y = x ∼⟨ x∼y ⟩■
+syntax finally₁→ x x→y = x →⟨ x→y ⟩■
+syntax finally₁← x x→y = ←⟨ x→y ⟩■ x

@@ -43,53 +43,18 @@ open import Bisimilarity.Coinductive.General
 
 -- Combinators that can perhaps make the code a bit nicer to read.
 
-infix -3 _⇒̂⟨_⟩ʳˡ_ _[_]⇒̂⟨_⟩ʳˡ_ _⟶⟨_⟩⇒̂_ _[_]⟶⟨_⟩⇒̂_
-         lr-result-with-action lr-result-without-action
-         lr-result-with-action-⟶ lr-result-without-action-⟶
+infix -3 lr-result rl-result
 
-_⇒̂⟨_⟩ʳˡ_ : ∀ {i p′ q′ μ} p → p [ μ ]⇒̂ p′ → [ i ] p′ ≈′ q′ →
-           ∃ λ p′ → p [ μ ]⇒̂ p′ × [ i ] p′ ≈′ q′
-_ ⇒̂⟨ p⇒̂p′ ⟩ʳˡ p′≈′q′ = _ , p⇒̂p′ , p′≈′q′
+lr-result : ∀ {i p′ q q′} μ → [ i ] p′ ≈′ q′ → q [ μ ]⇒̂ q′ →
+            ∃ λ q′ → q [ μ ]⇒̂ q′ × [ i ] p′ ≈′ q′
+lr-result _ p′≈′q′ q⇒̂q′ = _ , q⇒̂q′ , p′≈′q′
 
-_[_]⇒̂⟨_⟩ʳˡ_ : ∀ {i p′ q′} p μ → p [ μ ]⇒̂ p′ → [ i ] p′ ≈′ q′ →
-              ∃ λ p′ → p [ μ ]⇒̂ p′ × [ i ] p′ ≈′ q′
-_ [ _ ]⇒̂⟨ p⇒̂p′ ⟩ʳˡ p′≈′q′ = _ ⇒̂⟨ p⇒̂p′ ⟩ʳˡ p′≈′q′
+rl-result : ∀ {i p p′ q′} μ → p [ μ ]⇒̂ p′ → [ i ] p′ ≈′ q′ →
+            ∃ λ p′ → p [ μ ]⇒̂ p′ × [ i ] p′ ≈′ q′
+rl-result _ p⇒̂p′ p′≈′q′ = _ , p⇒̂p′ , p′≈′q′
 
-_⟶⟨_⟩⇒̂_ : ∀ {i p′ q′ μ} p → p [ μ ]⟶ p′ → [ i ] p′ ≈′ q′ →
-          ∃ λ p′ → p [ μ ]⇒̂ p′ × [ i ] p′ ≈′ q′
-_ ⟶⟨ p⟶p′ ⟩⇒̂ p′≈′q′ = _ ⇒̂⟨ ⟶→⇒̂ p⟶p′ ⟩ʳˡ p′≈′q′
-
-_[_]⟶⟨_⟩⇒̂_ : ∀ {i p′ q′} p μ → p [ μ ]⟶ p′ → [ i ] p′ ≈′ q′ →
-             ∃ λ p′ → p [ μ ]⇒̂ p′ × [ i ] p′ ≈′ q′
-_ [ _ ]⟶⟨ p⟶p′ ⟩⇒̂ p′≈′q′ = _ ⟶⟨ p⟶p′ ⟩⇒̂ p′≈′q′
-
-lr-result-without-action :
-  ∀ {i p′ q′ μ} → [ i ] p′ ≈′ q′ → ∀ q → q [ μ ]⇒̂ q′ →
-  ∃ λ q′ → q [ μ ]⇒̂ q′ × [ i ] p′ ≈′ q′
-lr-result-without-action p′≈′q′ _ q⇒̂q′ = _ , q⇒̂q′ , p′≈′q′
-
-lr-result-with-action :
-  ∀ {i p′ q′} → [ i ] p′ ≈′ q′ → ∀ μ q → q [ μ ]⇒̂ q′ →
-  ∃ λ q′ → q [ μ ]⇒̂ q′ × [ i ] p′ ≈′ q′
-lr-result-with-action p′≈′q′ _ _ q⇒̂q′ =
-  lr-result-without-action  p′≈′q′ _ q⇒̂q′
-
-lr-result-without-action-⟶ :
-  ∀ {i p′ q′ μ} → [ i ] p′ ≈′ q′ → ∀ q → q [ μ ]⟶ q′ →
-  ∃ λ q′ → q [ μ ]⇒̂ q′ × [ i ] p′ ≈′ q′
-lr-result-without-action-⟶ p′≈′q′ _ q⟶q′ =
-  p′≈′q′ ⇐̂⟨ ⟶→⇒̂ q⟶q′ ⟩ _
-
-lr-result-with-action-⟶ :
-  ∀ {i p′ q′} → [ i ] p′ ≈′ q′ → ∀ μ q → q [ μ ]⟶ q′ →
-  ∃ λ q′ → q [ μ ]⇒̂ q′ × [ i ] p′ ≈′ q′
-lr-result-with-action-⟶ p′≈′q′ _ _ q⟶q′ =
-  lr-result-without-action-⟶  p′≈′q′ _ q⟶q′
-
-syntax lr-result-without-action   p′≈q′   q q⇒̂q′ = p′≈q′      ⇐̂⟨ q⇒̂q′ ⟩ q
-syntax lr-result-with-action      p′≈q′ μ q q⇒̂q′ = p′≈q′ [ μ ]⇐̂⟨ q⇒̂q′ ⟩ q
-syntax lr-result-without-action-⟶ p′≈q′   q q⟶q′ = p′≈q′      ⟵⟨ q⟶q′ ⟩⇒̂ q
-syntax lr-result-with-action-⟶    p′≈q′ μ q q⟶q′ = p′≈q′ [ μ ]⟵⟨ q⟶q′ ⟩⇒̂ q
+syntax lr-result μ p′≈′q′ q⇒̂q′ = p′≈′q′ ⇐̂[ μ ] q⇒̂q′
+syntax rl-result μ p⇒̂p′ p′≈′q′ = p⇒̂p′ ⇒̂[ μ ] p′≈′q′
 
 -- Processes that are related by the expansion ordering are weakly
 -- bisimilar.

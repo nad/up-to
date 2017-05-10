@@ -13,6 +13,7 @@ import Equational-reasoning
 -- Labelled transition systems.
 
 import Labelled-transition-system
+import Labelled-transition-system.Equational-reasoning-instances
 
 -- Unary and binary relations.
 

@@ -196,7 +196,7 @@ module _ {Name : Set} where
   open Bisimilarity.Exercises.Other.6-1-3-2 (record
          { _∼_       = _∼_
          ; step-∼    = step-∼
-         ; finally-∼ = Equational-reasoning.finally
+         ; finally-∼ = Equational-reasoning.finally₂
          ; reflexive = reflexive
          ; symmetric = symmetric
          ; ∣-comm    = ∣-comm
