@@ -268,26 +268,54 @@ record LTS : Set₁ where
 
   -- Map-like functions.
 
-  module _ {F : Proc → Proc}
-           (f : ∀ {p p′ μ} → p [ μ ]⟶ p′ → F p [ μ ]⟶ F p′)
-           where
+  map-⇒′ :
+    {F : Proc → Proc} →
+    (∀ {p p′ μ} → Silent μ → p [ μ ]⟶ p′ → F p [ μ ]⟶ F p′) →
+    ∀ {p p′} → p ⇒ p′ → F p ⇒ F p′
+  map-⇒′ f done                = done
+  map-⇒′ f (step s p⟶p′ p′⇒p″) =
+    step s (f s p⟶p′) (map-⇒′ f p′⇒p″)
 
-    map-⇒ : ∀ {p p′} → p ⇒ p′ → F p ⇒ F p′
-    map-⇒ done                = done
-    map-⇒ (step s p⟶p′ p′⇒p″) =
-      step s (f p⟶p′) (map-⇒ p′⇒p″)
+  map-⇒ :
+    {F : Proc → Proc} →
+    (∀ {p p′ μ} → p [ μ ]⟶ p′ → F p [ μ ]⟶ F p′) →
+    ∀ {p p′} → p ⇒ p′ → F p ⇒ F p′
+  map-⇒ f = map-⇒′ (λ _ → f)
 
-    map-[]⇒ : ∀ {p p′ μ} → p [ μ ]⇒ p′ → F p [ μ ]⇒ F p′
-    map-[]⇒ (steps p⇒p′ p′⟶p″ p″⇒p‴) =
-      steps (map-⇒ p⇒p′) (f p′⟶p″) (map-⇒ p″⇒p‴)
+  map-[]⇒′ :
+    ∀ {μ} {F : Proc → Proc} →
+    (∀ {p p′ μ} → Silent μ → p [ μ ]⟶ p′ → F p [ μ ]⟶ F p′) →
+    (∀ {p p′} → p [ μ ]⟶ p′ → F p [ μ ]⟶ F p′) →
+    ∀ {p p′} → p [ μ ]⇒ p′ → F p [ μ ]⇒ F p′
+  map-[]⇒′ f g (steps p⇒p′ p′⟶p″ p″⇒p‴) =
+    steps (map-⇒′ f p⇒p′) (g p′⟶p″) (map-⇒′ f p″⇒p‴)
 
-    map-⇒̂ : ∀ {p p′ μ} → p [ μ ]⇒̂ p′ → F p [ μ ]⇒̂ F p′
-    map-⇒̂ (silent s p⇒p′)      = silent s (map-⇒ p⇒p′)
-    map-⇒̂ (non-silent ¬s p⇒p′) = non-silent ¬s (map-[]⇒ p⇒p′)
+  map-[]⇒ :
+    {F : Proc → Proc} →
+    (∀ {p p′ μ} → p [ μ ]⟶ p′ → F p [ μ ]⟶ F p′) →
+    ∀ {p p′ μ} → p [ μ ]⇒ p′ → F p [ μ ]⇒ F p′
+  map-[]⇒ f = map-[]⇒′ (λ _ → f) f
 
-    map-⟶̂ : ∀ {p p′ μ} → p [ μ ]⟶̂ p′ → F p [ μ ]⟶̂ F p′
-    map-⟶̂ (done s)    = done s
-    map-⟶̂ (step p⟶p′) = step (f p⟶p′)
+  map-⇒̂′ :
+    ∀ {μ} {F : Proc → Proc} →
+    (∀ {p p′ μ} → Silent μ → p [ μ ]⟶ p′ → F p [ μ ]⟶ F p′) →
+    (∀ {p p′} → p [ μ ]⟶ p′ → F p [ μ ]⟶ F p′) →
+    ∀ {p p′} → p [ μ ]⇒̂ p′ → F p [ μ ]⇒̂ F p′
+  map-⇒̂′ f g (silent s p⇒p′)      = silent s (map-⇒′ f p⇒p′)
+  map-⇒̂′ f g (non-silent ¬s p⇒p′) = non-silent ¬s (map-[]⇒′ f g p⇒p′)
+
+  map-⇒̂ :
+    {F : Proc → Proc} →
+    (∀ {p p′ μ} → p [ μ ]⟶ p′ → F p [ μ ]⟶ F p′) →
+    ∀ {p p′ μ} → p [ μ ]⇒̂ p′ → F p [ μ ]⇒̂ F p′
+  map-⇒̂ f = map-⇒̂′ (λ _ → f) f
+
+  map-⟶̂ :
+    ∀ {μ p p′} {F : Proc → Proc} →
+    (p [ μ ]⟶ p′ → F p [ μ ]⟶ F p′) →
+    p [ μ ]⟶̂ p′ → F p [ μ ]⟶̂ F p′
+  map-⟶̂ f (done s)    = done s
+  map-⟶̂ f (step p⟶p′) = step (f p⟶p′)
 
   -- Zip-like functions.
 
