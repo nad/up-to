@@ -59,8 +59,8 @@ Up-to-context-size-preserving =
       C [ ps ]  ∼⟨ C [ ps∼qs ]-cong ⟩■
       C [ qs ])
 
--- Note that up to context is not compatible (assuming that Name
--- contains at least two distinct values).
+-- Note that up to context is not compatible (assuming that Name is
+-- inhabited).
 --
 -- This counterexample is a minor variant of one due to Pous and
 -- Sangiorgi, who state that up to context would have been compatible
@@ -68,15 +68,16 @@ Up-to-context-size-preserving =
 -- (see Remark 6.4.2 in "Enhancements of the bisimulation proof
 -- method").
 
-¬-Up-to-context-compatible :
-  (a b : Name) → a ≢ b →
-  ¬ Compatible Up-to-context
-¬-Up-to-context-compatible a′ b′ a′≢b′ comp = contradiction
+¬-Up-to-context-compatible : Name → ¬ Compatible Up-to-context
+¬-Up-to-context-compatible x comp = contradiction
   where
-  a = a′ , true
-  b = b′ , true
+  a = x , true
+  b = x , false
   c = a
   d = a
+
+  a≢b : ¬ a ≡ b
+  a≢b ()
 
   data R : Rel₂ (# 0) Proc where
     base : R (! name a · (b ·) , ! name a · (c ·))
@@ -117,7 +118,7 @@ Up-to-context-size-preserving =
       Ps x ∼ ! name a · (b ·) ∣ b ·               ↝⟨ subst (_∼ _) (sym !ab≡C[Ps]) ⟩
       ! name a · (b ·) ∼ ! name a · (b ·) ∣ b ·   ↝⟨ (λ !ab∼!ab∣b → Σ-map id proj₁ $ S̲t̲e̲p̲.right-to-left !ab∼!ab∣b (par-right action)) ⟩
       (∃ λ P′ → ! name a · (b ·) [ name b ]⟶ P′)  ↝⟨ cancel-name ∘ !-only ·-only ∘ proj₂ ⟩
-      a ≡ b                                       ↝⟨ a′≢b′ ∘ cong proj₁ ⟩□
+      a ≡ b                                       ↝⟨ a≢b ⟩□
       ⊥                                           □
 
     helper (! hole x) with PsSQs x
@@ -126,7 +127,7 @@ Up-to-context-size-preserving =
       Ps x ∼ ! name a · (b ·) ∣ b ·             ↝⟨ subst (_∼ _) (sym $ cong (λ { (! P) → P; _ → ∅ }) !ab≡C[Ps]) ⟩
       name a · (b ·) ∼ ! name a · (b ·) ∣ b ·   ↝⟨ (λ ab∼!ab∣b → Σ-map id proj₁ $ S̲t̲e̲p̲.right-to-left ab∼!ab∣b (par-right action)) ⟩
       (∃ λ P′ → name a · (b ·) [ name b ]⟶ P′)  ↝⟨ cancel-name ∘ ·-only ∘ proj₂ ⟩
-      a ≡ b                                     ↝⟨ a′≢b′ ∘ cong proj₁ ⟩□
+      a ≡ b                                     ↝⟨ a≢b ⟩□
       ⊥                                         □
 
     helper (! action (hole x)) with PsSQs x
@@ -135,7 +136,7 @@ Up-to-context-size-preserving =
       Ps x ∼ ! name a · (b ·) ∣ b ·  ↝⟨ subst (_∼ _) (sym $ cong (λ { (! (_ · P)) → P; _ → ∅ }) !ab≡C[Ps]) ⟩
       b · ∼ ! name a · (b ·) ∣ b ·   ↝⟨ (λ b∼!ab∣b → Σ-map id proj₁ $ S̲t̲e̲p̲.right-to-left b∼!ab∣b (par-left (replication (par-right action)))) ⟩
       (∃ λ P′ → b · [ name a ]⟶ P′)  ↝⟨ cancel-name ∘ ·-only ∘ proj₂ ⟩
-      b ≡ a                          ↝⟨ a′≢b′ ∘ cong proj₁ ∘ sym ⟩□
+      b ≡ a                          ↝⟨ a≢b ∘ sym ⟩□
       ⊥                              □
 
     helper (! action (action (hole x))) with PsSQs x
@@ -150,7 +151,7 @@ Up-to-context-size-preserving =
                                            $⟨ !ac≡C[Qs] ⟩
       ! name a · (c ·) ≡ C [ Qs ]          ↔⟨⟩
       ! name a · (c ·) ≡ ! name a · (b ·)  ↝⟨ cong (λ { (! (_ · name x · _)) → x; _ → a }) ⟩
-      c ≡ b                                ↝⟨ a′≢b′ ∘ cong proj₁ ⟩
+      c ≡ b                                ↝⟨ a≢b ⟩
       ⊥                                    □
 
   R⊆StepS : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ S
