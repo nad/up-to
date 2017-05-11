@@ -76,6 +76,10 @@ import Bisimilarity.Exercises.Coinductive
 import Bisimilarity.Coinductive.Expansion
 import Bisimilarity.Coinductive.Expansion.Equational-reasoning-instances
 
+-- Lemmas related to expansion and CCS.
+
+import Bisimilarity.Coinductive.Expansion.CCS
+
 ------------------------------------------------------------------------
 -- Weak bisimilarity
 

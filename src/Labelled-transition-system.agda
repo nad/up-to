@@ -576,6 +576,38 @@ module CCS (Name : Set) where
     ν      : ∀ {a C} → Weakly-guarded C → Weakly-guarded (ν a C)
     !_     : ∀ {C} → Weakly-guarded C → Weakly-guarded (! C)
 
+  -- Turns processes into contexts without holes.
+
+  context : ∀ {n} → Proc → Context n
+  context ∅         = ∅
+  context (P₁ ∣ P₂) = context P₁ ∣ context P₂
+  context (P₁ ⊕ P₂) = context P₁ ⊕ context P₂
+  context (μ · P)   = μ · context P
+  context (ν a P)   = ν a (context P)
+  context (! P)     = ! context P
+
+  -- Non-degenerate contexts.
+
+  mutual
+
+    data Non-degenerate {n : ℕ} : Context n → Set where
+      hole   : ∀ {x} → Non-degenerate (hole x)
+      ∅      : Non-degenerate ∅
+      _∣_    : ∀ {C₁ C₂} →
+               Non-degenerate C₁ → Non-degenerate C₂ →
+               Non-degenerate (C₁ ∣ C₂)
+      _⊕_    : ∀ {C₁ C₂} →
+               Non-degenerate-summand C₁ → Non-degenerate-summand C₂ →
+               Non-degenerate (C₁ ⊕ C₂)
+      action : ∀ {μ C} → Non-degenerate C → Non-degenerate (μ · C)
+      ν      : ∀ {a C} → Non-degenerate C → Non-degenerate (ν a C)
+      !_     : ∀ {C} → Non-degenerate C → Non-degenerate (! C)
+
+    data Non-degenerate-summand {n : ℕ} : Context n → Set where
+      process : ∀ P → Non-degenerate-summand (context P)
+      action  : ∀ {μ C} →
+                Non-degenerate C → Non-degenerate-summand (μ · C)
+
   ----------------------------------------------------------------------
   -- A bunch of simple lemmas
 
@@ -703,6 +735,16 @@ module CCS (Name : Set) where
   weaken-[] (μ · C)   = cong (μ ·_) (weaken-[] C)
   weaken-[] (ν a C)   = cong (ν a) (weaken-[] C)
   weaken-[] (! C)     = cong !_ (weaken-[] C)
+
+  -- The result of filling the holes in the context "context P" is P.
+
+  context-[] : ∀ {n} {Ps : Fin n → Proc} P → context P [ Ps ] ≡ P
+  context-[] ∅         = refl
+  context-[] (P₁ ∣ P₂) = cong₂ _∣_ (context-[] P₁) (context-[] P₂)
+  context-[] (P₁ ⊕ P₂) = cong₂ _⊕_ (context-[] P₁) (context-[] P₂)
+  context-[] (μ · P)   = cong (μ ·_) (context-[] P)
+  context-[] (ν a P)   = cong (ν a) (context-[] P)
+  context-[] (! P)     = cong !_ (context-[] P)
 
   -- A relation expressing that a certain process matches a certain
   -- context.
