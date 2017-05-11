@@ -6,10 +6,11 @@
 
 module Equational-reasoning where
 
+open import Equality.Propositional
 open import Prelude
 
 infix  -1 _■ finally₁ finally₁→ finally₁← finally₂ finally₂→ finally₂←
-infixr -2 step-∼ step-∼→ _∼⟨⟩_ step-∽ step-∽→
+infixr -2 _∼⟨⟩_ _∼≡⟨_⟩_ step-∼ step-∼→ step-∽ step-∽→
 infixl -2 step-∼← step-∽←
 
 ------------------------------------------------------------------------
@@ -36,6 +37,15 @@ _∼⟨⟩_ : ∀ {a p} {A : Set a} {P : A → A → Set p}
           ⦃ p : Reflexive P ⦄ x {y} →
         P x y → P x y
 _ ∼⟨⟩ p = p
+
+-- A transitivity-like combinator. This combinator can be used when
+-- two arguments are propositionally equal. (The Reflexive instance
+-- argument is used to make type inference easier.)
+
+_∼≡⟨_⟩_ : ∀ {a p} {A : Set a} {P : A → A → Set p}
+            ⦃ p : Reflexive P ⦄ x {y z} →
+          x ≡ y → P y z → P x z
+_ ∼≡⟨ refl ⟩ p = p
 
 ------------------------------------------------------------------------
 -- Symmetry
