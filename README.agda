@@ -38,6 +38,7 @@ import Bisimilarity.Step
 -- The classical definition of (strong) bisimilarity.
 
 import Bisimilarity.Classical
+import Bisimilarity.Classical.Equational-reasoning-instances
 
 -- A parametrised coinductive definition that can be used to define
 -- strong and weak bisimilarity as well as expansion.
