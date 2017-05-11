@@ -62,7 +62,7 @@ import Bisimilarity.Up-to.Delay-monad
 import Bisimilarity.Up-to.Counterexamples
 
 -- Some exercises and results from "Enhancements of the bisimulation
--- proof method" by Pous and Sangiorgi.
+-- proof method" by Pous and Sangiorgi, as well as other results.
 
 import Bisimilarity.Exercises.Other
 import Bisimilarity.Exercises.Classical

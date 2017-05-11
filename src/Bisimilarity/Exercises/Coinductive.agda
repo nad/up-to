@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------
 -- Some exercises and results from "Enhancements of the bisimulation
--- proof method" by Pous and Sangiorgi
+-- proof method" by Pous and Sangiorgi, as well as other results
 --
 -- Implemented using the coinductive definition of bisimilarity.
 ------------------------------------------------------------------------
@@ -791,7 +791,7 @@ module _ {Name : Set} where
     force (6-2-16′ w ∼C[Ps] ∼C[Qs] x) = 6-2-16 w ∼C[Ps] ∼C[Qs] x
 
   ----------------------------------------------------------------------
-  -- A lemma related to _⊕_
+  -- Some lemmas related to _⊕_
 
   -- _⊕_ is idempotent.
 
@@ -817,6 +817,22 @@ module _ {Name : Set} where
 
   ⊕-idempotent′ : ∀ {P} → P ⊕ P ∼′ P
   force ⊕-idempotent′ = ⊕-idempotent
+
+  -- _⊕_ is commutative.
+
+  ⊕-comm : ∀ {P Q} → P ⊕ Q ∼ Q ⊕ P
+  ⊕-comm = ⟨ lr , Σ-map id (Σ-map id symmetric) ∘ lr ⟩
+    where
+    lr : ∀ {P Q R μ} →
+         P ⊕ Q [ μ ]⟶ R → ∃ λ R′ → Q ⊕ P [ μ ]⟶ R′ × R ∼′ R′
+    lr {P} {Q} {R} = λ where
+      (choice-left  P⟶R) →
+        R      ■ ⟵⟨ choice-right P⟶R ⟩
+        Q ⊕ P
+
+      (choice-right Q⟶R) →
+        R      ■ ⟵⟨ choice-left Q⟶R ⟩
+        Q ⊕ P
 
   ----------------------------------------------------------------------
   -- Lemma 6.2.17
