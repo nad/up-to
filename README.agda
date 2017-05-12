@@ -133,3 +133,4 @@ import Bisimilarity.Weak.Delay-monad
 -- Up-to techniques.
 
 import Bisimilarity.Weak.Coinductive.Other.Up-to
+import Bisimilarity.Weak.Coinductive.Other.Up-to.CCS
