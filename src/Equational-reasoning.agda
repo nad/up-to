@@ -9,9 +9,11 @@ module Equational-reasoning where
 open import Equality.Propositional
 open import Prelude
 
-infix  -1 _■ finally₁ finally₁→ finally₁← finally₂ finally₂→ finally₂←
-infixr -2 _∼⟨⟩_ _∼≡⟨_⟩_ step-∼ step-∼→ step-∽ step-∽→
-infixl -2 step-∼← step-∽←
+infix  -1 _■
+          finally₁ finally₁∽ finally₁→ finally₁←
+          finally₂ finally₂∽ finally₂→ finally₂←
+infixr -2 step-⟨⟩∼ step-≡∼ step-∼ step-∼→ step-∼′ step-∼→′
+infixl -2 step-⟨⟩∽ step-≡∽ step-∽ step-∼← step-∽′ step-∼←′
 
 ------------------------------------------------------------------------
 -- Reflexivity
@@ -29,23 +31,45 @@ _■ : ∀ {a p} {A : Set a} {P : A → A → Set p} ⦃ r : Reflexive P ⦄
      (x : A) → P x x
 _ ■ = reflexive
 
--- A transitivity-like combinator. This combinator can be used when
+-- Transitivity-like combinators. These combinators can be used when
 -- two arguments are definitionally equal. (The Reflexive instance
 -- argument is used to make type inference easier.)
 
-_∼⟨⟩_ : ∀ {a p} {A : Set a} {P : A → A → Set p}
-          ⦃ p : Reflexive P ⦄ x {y} →
-        P x y → P x y
-_ ∼⟨⟩ p = p
+step-⟨⟩∼ step-⟨⟩∽ :
+  ∀ {a p} {A : Set a} {P : A → A → Set p}
+    ⦃ p : Reflexive P ⦄ x {y} →
+  P x y → P x y
+step-⟨⟩∼ _ p = p
+step-⟨⟩∽     = step-⟨⟩∼
 
--- A transitivity-like combinator. This combinator can be used when
+syntax step-⟨⟩∼ x Pxy = x ∼⟨⟩ Pxy
+syntax step-⟨⟩∽ x Pxy = Pxy ∽⟨⟩ x
+
+-- Transitivity-like combinators. These combinators can be used when
 -- two arguments are propositionally equal. (The Reflexive instance
 -- argument is used to make type inference easier.)
 
-_∼≡⟨_⟩_ : ∀ {a p} {A : Set a} {P : A → A → Set p}
-            ⦃ p : Reflexive P ⦄ x {y z} →
-          x ≡ y → P y z → P x z
-_ ∼≡⟨ refl ⟩ p = p
+-- It can be easier for Agda to type-check typical "equational"
+-- reasoning chains if the transitivity proof gets the equality
+-- arguments in the opposite order, because then the y argument is
+-- (perhaps more) known once the proof of P x y is type-checked.
+--
+-- This optimisation can be quite effective for some examples, but did
+-- not seem to have much effect when I applied it to the current code
+-- base.
+--
+-- The idea behind this optimisation came up in discussions with Ulf
+-- Norell.
+
+step-≡∼ step-≡∽ :
+  ∀ {a p} {A : Set a} {P : A → A → Set p}
+    ⦃ p : Reflexive P ⦄ x {y z} →
+  P y z → x ≡ y → P x z
+step-≡∼ _ p refl = p
+step-≡∽          = step-≡∼
+
+syntax step-≡∼ x Pyz x≡y = x ∼≡⟨ x≡y ⟩ Pyz
+syntax step-≡∽ x Pyz x≡y = Pyz ∽≡⟨ x≡y ⟩ x
 
 ------------------------------------------------------------------------
 -- Symmetry
@@ -77,28 +101,18 @@ record Transitive {a b p q} {A : Set a} {B : Set b}
 
 open Transitive ⦃ … ⦄ public
 
--- It can be easier for Agda to type-check typical "equational"
--- reasoning chains if the transitivity proof gets the equality
--- arguments in the opposite order, because then the y argument is
--- (perhaps more) known once the proof of P x y is type-checked.
---
--- This optimisation can be quite effective for some examples, but did
--- not seem to have much effect when I applied it to the current code
--- base.
---
--- The idea behind this optimisation came up in discussions with Ulf
--- Norell.
-
-step-∼ step-∼→ step-∼← :
+step-∼ step-∽ step-∼→ step-∼← :
   ∀ {a b p q} {A : Set a} {B : Set b}
     {P : A → A → Set p} {Q : A → B → Set q}
     ⦃ t : Transitive P Q ⦄ x {y z} →
   Q y z → P x y → Q x z
 step-∼ _ = flip transitive
+step-∽   = step-∼
 step-∼→  = step-∼
 step-∼←  = step-∼
 
 syntax step-∼  x Qyz Pxy = x ∼⟨ Pxy ⟩ Qyz
+syntax step-∽  x Qyz Pxy = Qyz ∽⟨ Pxy ⟩ x
 syntax step-∼→ x Qyz Pxy = x →⟨ Pxy ⟩ Qyz
 syntax step-∼← x Qyz Pxy = Qyz ←⟨ Pxy ⟩ x
 
@@ -117,18 +131,20 @@ record Transitive′ {a b p q} {A : Set a} {B : Set b}
 
 open Transitive′ ⦃ … ⦄ public
 
-step-∽ step-∽→ step-∽← :
+step-∼′ step-∽′ step-∼→′ step-∼←′ :
   ∀ {a b p q} {A : Set a} {B : Set b}
     {P : A → B → Set p} {Q : B → B → Set q}
     ⦃ t : Transitive′ P Q ⦄ x {y z} →
   Q y z → P x y → P x z
-step-∽ _ = flip transitive′
-step-∽→  = step-∽
-step-∽←  = step-∽
+step-∼′ _ = flip transitive′
+step-∽′   = step-∼′
+step-∼→′  = step-∼′
+step-∼←′  = step-∼′
 
-syntax step-∽  x Qyz Pxy = x ∽⟨ Pxy ⟩ Qyz
-syntax step-∽→ x Qyz Pxy = x →∽⟨ Pxy ⟩ Qyz
-syntax step-∽← x Qyz Pxy = Qyz ←∽⟨ Pxy ⟩ x
+syntax step-∼′  x Qyz Pxy = x ∼′⟨ Pxy ⟩ Qyz
+syntax step-∽′  x Qyz Pxy = Qyz ∽′⟨ Pxy ⟩ x
+syntax step-∼→′ x Qyz Pxy = x →′⟨ Pxy ⟩ Qyz
+syntax step-∼←′ x Qyz Pxy = Qyz ←′⟨ Pxy ⟩ x
 
 ------------------------------------------------------------------------
 -- A finally combinator
@@ -151,28 +167,32 @@ record Convertible {a b p q} {A : Set a} {B : Set b}
 
 open Convertible ⦃ … ⦄ public
 
-finally₂ finally₂→ finally₂← :
+finally₂ finally₂∽ finally₂→ finally₂← :
   ∀ {a b p q} {A : Set a} {B : Set b}
     {P : A → B → Set p} {Q : A → B → Set q}
     ⦃ c : Convertible P Q ⦄ x y →
   P x y → Q x y
 finally₂ _ _ = convert
+finally₂∽    = finally₂
 finally₂→    = finally₂
 finally₂←    = finally₂
 
 syntax finally₂  x y x∼y = x ∼⟨ x∼y ⟩■ y
+syntax finally₂∽ x y x∼y = y ∽⟨ x∼y ⟩■ x
 syntax finally₂→ x y x→y = x →⟨ x→y ⟩■ y
 syntax finally₂← x y x→y = y ←⟨ x→y ⟩■ x
 
-finally₁ finally₁→ finally₁← :
+finally₁ finally₁∽ finally₁→ finally₁← :
   ∀ {a b p q} {A : Set a} {B : Set b}
     {P : A → B → Set p} {Q : A → B → Set q}
     ⦃ c : Convertible P Q ⦄ x {y} →
   P x y → Q x y
 finally₁ _ = convert
+finally₁∽  = finally₁
 finally₁→  = finally₁
 finally₁←  = finally₁
 
 syntax finally₁  x x∼y = x ∼⟨ x∼y ⟩■
+syntax finally₁∽ x x∼y = ∽⟨ x∼y ⟩■ x
 syntax finally₁→ x x→y = x →⟨ x→y ⟩■
 syntax finally₁← x x→y = ←⟨ x→y ⟩■ x

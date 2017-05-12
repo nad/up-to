@@ -189,7 +189,7 @@ mutual
     ... | inj₁ (P″ , P⟶P″ , Q∼!P∣P″) with left-to-right P≳P′ P⟶P″
     ...   | _  , done refl , P″≳′P′ =
       Q          ∼⟨ Q∼!P∣P″ ⟩
-      ! P  ∣ P″  ∽⟨ !-cong′ P≳P′ ∣-cong′ˡʳ P″≳′P′ ⟩ S.∼:
+      ! P  ∣ P″  ∼′⟨ !-cong′ P≳P′ ∣-cong′ˡʳ P″≳′P′ ⟩ S.∼:
       ! P′ ∣ P′  ∼⟨ S.6-1-2 ⟩■
       ! P′
         ⟵̂[ τ ]
@@ -295,7 +295,7 @@ mutual
       ! P        →⟨ silent μs done ⟩■
         ⇒̂[ μ ]
       ! P        ∼⟨ symmetric S.6-1-2 ⟩
-      ! P ∣ P    ∽⟨ !-cong′ P≳P′ ∣-cong′ˡʳ P≳′P″ ⟩ S.∼:
+      ! P ∣ P    ∼′⟨ !-cong′ P≳P′ ∣-cong′ˡʳ P≳′P″ ⟩ S.∼:
       ! P′ ∣ P″  ∼⟨ symmetric Q′∼!P′∣P″ ⟩■
       Q′
 
@@ -303,14 +303,14 @@ mutual
       ! P        →⟨ ⟶→⇒ μ′s (replication (par-right P⟶R)) ⟩
       ! P ∣ R    →⟨ silent μs (map-⇒ par-right R⇒Q) ⟩■
         ⇒̂[ μ ]
-      ! P ∣ Q    ∽⟨ !-cong′ P≳P′ ∣-cong′ˡʳ Q≳′P″ ⟩ S.∼:
+      ! P ∣ Q    ∼′⟨ !-cong′ P≳P′ ∣-cong′ˡʳ Q≳′P″ ⟩ S.∼:
       ! P′ ∣ P″  ∼⟨ symmetric Q′∼!P′∣P″ ⟩■
       Q′
 
     ...   | Q , non-silent ¬μs P⇒Q , Q≳′P″ =
       ! P        →⟨ non-silent ¬μs (rl-lemma₁ P⇒Q) ⟩■
         ⇒̂[ μ ]
-      ! P ∣ Q    ∽⟨ !-cong′ P≳P′ ∣-cong′ˡʳ Q≳′P″ ⟩ S.∼:
+      ! P ∣ Q    ∼′⟨ !-cong′ P≳P′ ∣-cong′ˡʳ Q≳′P″ ⟩ S.∼:
       ! P′ ∣ P″  ∼⟨ symmetric Q′∼!P′∣P″ ⟩■
       Q′
 
@@ -326,7 +326,7 @@ mutual
       ! P               →⟨ !P⇒R ⟩■
         ⇒̂[ τ ]
       R                 ∼⟨ R∼[!P∣Q₁]∣Q₂ ⟩
-      (! P ∣ Q₁) ∣ Q₂   ∽⟨ ≳′: (!-cong′ P≳P′ ∣-cong′ˡʳ Q₁≳′P″) ∣-cong′ˡʳ Q₂≳′P‴ ⟩ S.∼:
+      (! P ∣ Q₁) ∣ Q₂   ∼′⟨ ≳′: (!-cong′ P≳P′ ∣-cong′ˡʳ Q₁≳′P″) ∣-cong′ˡʳ Q₂≳′P‴ ⟩ S.∼:
       (! P′ ∣ P″) ∣ P‴  ∼⟨ symmetric Q′∼!P′∣P″∣P‴ ⟩■
       Q′
 
@@ -386,7 +386,7 @@ force (!-cong″ P≳P′) = !-cong force P≳P′
   ⊕-congˡ : ∀ {P P′ Q} → P ≳ P′ → P ⊕ Q ≳ P′ ⊕ Q
   ⊕-congˡ {P} {P′} {Q} P≳P′ =
     P ⊕ Q   ∼⟨ S.⊕-comm ⟩
-    Q ⊕ P   ∽⟨ ⊕-congʳ P≳P′ ⟩ S.∼:
+    Q ⊕ P   ∼′⟨ ⊕-congʳ P≳P′ ⟩ S.∼:
     Q ⊕ P′  ∼⟨ S.⊕-comm ⟩■
     P′ ⊕ Q
 
@@ -434,7 +434,7 @@ force (⊕·-cong′ Q≳Q′) = ⊕·-cong Q≳Q′
           [ i ] P ≳ P′ → [ i ] μ · P ⊕ Q ≳ μ · P′ ⊕ Q
 ·⊕-cong {P = P} {P′} {μ} {Q} P≳P′ =
   μ · P ⊕ Q   ∼⟨ S.⊕-comm ⟩
-  Q ⊕ μ · P   ∽⟨ ⊕·-cong P≳P′ ⟩ S.∼:
+  Q ⊕ μ · P   ∼′⟨ ⊕·-cong P≳P′ ⟩ S.∼:
   Q ⊕ μ · P′  ∼⟨ S.⊕-comm ⟩■
   μ · P′ ⊕ Q
 
@@ -536,13 +536,13 @@ mutual
 
     (process P₁) (action {μ = μ₂} {C = C₂} D₂) Ps≳Qs →
       (context P₁ [ Ps ]) ⊕ (μ₂ · C₂ [ Ps ])  ∼≡⟨ cong (_⊕ _) (context-[] P₁) ⟩
-      P₁ ⊕ (μ₂ · C₂ [ Ps ])                   ∽⟨ ⊕·-cong (D₂ [ Ps≳Qs ]-cong) ⟩ S.∼:
+      P₁ ⊕ (μ₂ · C₂ [ Ps ])                   ∼′⟨ ⊕·-cong (D₂ [ Ps≳Qs ]-cong) ⟩ S.∼:
       P₁ ⊕ (μ₂ · C₂ [ Qs ])                   ∼≡⟨ sym $ cong (_⊕ _) (context-[] P₁) ⟩
       (context P₁ [ Qs ]) ⊕ (μ₂ · C₂ [ Qs ])  ■
 
     (action {μ = μ₁} {C = C₁} D₁) (process P₂) Ps≳Qs →
       (μ₁ · C₁ [ Ps ]) ⊕ (context P₂ [ Ps ])  ∼≡⟨ cong (_ ⊕_) (context-[] P₂) ⟩
-      (μ₁ · C₁ [ Ps ]) ⊕ P₂                   ∽⟨ ·⊕-cong (D₁ [ Ps≳Qs ]-cong) ⟩ S.∼:
+      (μ₁ · C₁ [ Ps ]) ⊕ P₂                   ∼′⟨ ·⊕-cong (D₁ [ Ps≳Qs ]-cong) ⟩ S.∼:
       (μ₁ · C₁ [ Qs ]) ⊕ P₂                   ∼≡⟨ sym $ cong (_ ⊕_) (context-[] P₂) ⟩
       (μ₁ · C₁ [ Qs ]) ⊕ (context P₂ [ Qs ])  ■
 

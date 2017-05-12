@@ -106,7 +106,7 @@ module _ {Name : Set} where
       ... | inj₁ (.(b ·) , action , P∼!ab∣b) =
         P ∣ ! co a ·                         ∼⟨ P∼!ab∣b ∣-cong reflexive ⟩
         (! name a · (b ·) ∣ b ·) ∣ ! co a ·  ∼⟨ swap-rightmost ⟩
-        (! name a · (b ·) ∣ ! co a ·) ∣ b ·  ∽⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩
+        (! name a · (b ·) ∣ ! co a ·) ∣ b ·  ∼′⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩
         ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ b ·   ∼⟨ swap-rightmost ⟩ ∼:
         ((! a · ∣ ! b ·) ∣ b ·) ∣ ! co a ·   ∼⟨ lemma ∣-cong reflexive ⟩■
         ((! a · ∣ ∅) ∣ ! b ·) ∣ ! co a ·
@@ -120,7 +120,7 @@ module _ {Name : Set} where
       ... | inj₁ (.∅ , action , Q∼!a̅∣∅) =
         ! name a · (b ·) ∣ Q               ∼⟨ reflexive ∣-cong Q∼!a̅∣∅ ⟩
         ! name a · (b ·) ∣ (! co a · ∣ ∅)  ∼⟨ ∣-assoc ⟩
-        (! name a · (b ·) ∣ ! co a ·) ∣ ∅  ∽⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩ ∼:
+        (! name a · (b ·) ∣ ! co a ·) ∣ ∅  ∼′⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩ ∼:
         ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ ∅   ∼⟨ symmetric ∣-assoc ⟩■
         (! a · ∣ ! b ·) ∣ (! co a · ∣ ∅)
           ⇐̂[ name (co a) ]                 ←⟨ par-right (replication (par-right action)) ⟩■
@@ -135,7 +135,7 @@ module _ {Name : Set} where
           | inj₁ (.∅ , action , Q∼!a̅∣∅) =
         P ∣ Q                                      ∼⟨ P∼!ab∣b ∣-cong Q∼!a̅∣∅ ⟩
         (! name a · (b ·) ∣ b ·) ∣ (! co a · ∣ ∅)  ∼⟨ swap-in-the-middle ⟩
-        (! name a · (b ·) ∣ ! co a ·) ∣ (b · ∣ ∅)  ∽⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩
+        (! name a · (b ·) ∣ ! co a ·) ∣ (b · ∣ ∅)  ∼′⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩
         ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ (b · ∣ ∅)   ∼⟨ swap-in-the-middle ⟩ ∼:
         ((! a · ∣ ! b ·) ∣ b ·) ∣ (! co a · ∣ ∅)   ∼⟨ lemma ∣-cong reflexive ⟩■
         ((! a · ∣ ∅) ∣ ! b ·) ∣ (! co a · ∣ ∅)
@@ -224,7 +224,7 @@ module _ {Name : Set} where
         ! name a · (b ·) ∣ ! co a ·          →⟨ par-left (replication (par-right action)) ⟩■
           ⇒̂[ name a ]
         (! name a · (b ·) ∣ b ·) ∣ ! co a ·  ∼⟨ swap-rightmost ⟩
-        (! name a · (b ·) ∣ ! co a ·) ∣ b ·  ∽⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩
+        (! name a · (b ·) ∣ ! co a ·) ∣ b ·  ∼′⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩
         ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ b ·   ∼⟨ swap-rightmost ⟩
         ((! a · ∣ ! b ·) ∣ b ·) ∣ ! co a ·   ∼⟨ symmetric ∣-assoc ∣-cong reflexive ⟩
         (! a · ∣ (! b · ∣ b ·)) ∣ ! co a ·   ∼⟨ (reflexive ∣-cong 6-1-2) ∣-cong reflexive ⟩ ∼:
@@ -237,7 +237,7 @@ module _ {Name : Set} where
         (! name a · (b ·) ∣ (b ·)) ∣ (! co a · ∣ ∅)  →⟨ par-left (par-right action) ⟩■
           ⇒̂[ name b ]
         (! name a · (b ·) ∣ ∅) ∣ (! co a · ∣ ∅)      ∼⟨ ∣-right-identity ∣-cong ∣-right-identity ⟩
-        (! name a · (b ·)) ∣ ! co a ·                ∽⟨ 6-5-4′ ⟩ ∼:
+        (! name a · (b ·)) ∣ ! co a ·                ∼′⟨ 6-5-4′ ⟩ ∼:
         (! a · ∣ ! b ·) ∣ ! co a ·                   ∼⟨ !a∣!b∣!a̅∼Q ⟩■
         Q
 
@@ -245,14 +245,14 @@ module _ {Name : Set} where
         ! name a · (b ·) ∣ ! co a ·        →⟨ par-right (replication (par-right action)) ⟩■
           ⇒̂[ name (co a) ]
         ! name a · (b ·) ∣ (! co a · ∣ ∅)  ∼⟨ reflexive ∣-cong ∣-right-identity ⟩
-        ! name a · (b ·) ∣ ! co a ·        ∽⟨ 6-5-4′ ⟩ ∼:
+        ! name a · (b ·) ∣ ! co a ·        ∼′⟨ 6-5-4′ ⟩ ∼:
         (! a · ∣ ! b ·) ∣ ! co a ·         ∼⟨ !a∣!b∣!a̅∼Q ⟩■
         Q
 
       ... | !a∣!b∣!a̅∼Q , inj₂ (inj₂ (inj₂ refl)) =
         ! name a · (b ·) ∣ ! co a ·  ■
           ⇒̂[ τ ]
-        ! name a · (b ·) ∣ ! co a ·  ∽⟨ 6-5-4′ ⟩ ∼:
+        ! name a · (b ·) ∣ ! co a ·  ∼′⟨ 6-5-4′ ⟩ ∼:
         (! a · ∣ ! b ·) ∣ ! co a ·   ∼⟨ !a∣!b∣!a̅∼Q ⟩■
         Q
 
