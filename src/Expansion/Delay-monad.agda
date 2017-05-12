@@ -4,7 +4,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Bisimilarity.Coinductive.Expansion.Delay-monad {A : Set} where
+module Expansion.Delay-monad {A : Set} where
 
 open import Delay-monad
 open import Delay-monad.Expansion as DE using (force)
@@ -21,9 +21,9 @@ open LTS delay-monad hiding (_[_]⟶_)
 
 open import Bisimilarity.Coinductive delay-monad using ([_]_∼_)
 import Bisimilarity.Coinductive.Delay-monad as SD
-open import Bisimilarity.Coinductive.Expansion delay-monad
-import Bisimilarity.Coinductive.Expansion.Equational-reasoning-instances
 open import Equational-reasoning
+open import Expansion delay-monad
+import Expansion.Equational-reasoning-instances
 
 ------------------------------------------------------------------------
 -- The direct and the indirect definitions of expansion are pointwise

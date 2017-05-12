@@ -14,10 +14,10 @@ open import Prelude
 
 open import Bisimilarity.Coinductive lts
 import Bisimilarity.Coinductive.Equational-reasoning-instances
-open import Bisimilarity.Coinductive.Expansion lts
-import Bisimilarity.Coinductive.Expansion.Equational-reasoning-instances
 open import Bisimilarity.Weak.Coinductive.Other lts
 open import Equational-reasoning
+open import Expansion lts
+import Expansion.Equational-reasoning-instances
 
 instance
 

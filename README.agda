@@ -77,16 +77,16 @@ import Bisimilarity.Exercises.Coinductive
 
 -- A coinductive definition of the expansion ordering.
 
-import Bisimilarity.Coinductive.Expansion
-import Bisimilarity.Coinductive.Expansion.Equational-reasoning-instances
+import Expansion
+import Expansion.Equational-reasoning-instances
 
 -- Lemmas related to expansion and CCS.
 
-import Bisimilarity.Coinductive.Expansion.CCS
+import Expansion.CCS
 
 -- Some results related to expansion for the delay monad.
 
-import Bisimilarity.Coinductive.Expansion.Delay-monad
+import Expansion.Delay-monad
 
 ------------------------------------------------------------------------
 -- Weak bisimilarity
@@ -119,7 +119,7 @@ import Bisimilarity.Weak.Coinductive.Equivalent
 -- Some exercises and results from "Enhancements of the bisimulation
 -- proof method" by Pous and Sangiorgi.
 
-import Bisimilarity.Weak.Exercises.Coinductive
+import Bisimilarity.Weak.Exercises
 
 -- Some results about various forms of coinductively defined weak
 -- bisimilarity for the delay monad.

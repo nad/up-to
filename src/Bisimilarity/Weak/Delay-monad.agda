@@ -23,9 +23,6 @@ open LTS delay-monad hiding (_[_]⟶_)
 
 open import Bisimilarity.Coinductive delay-monad using ([_]_∼_)
 import Bisimilarity.Coinductive.Delay-monad as SD
-open import Bisimilarity.Coinductive.Expansion delay-monad as BE
-  using ([_]_≳_; _≳_)
-import Bisimilarity.Coinductive.Expansion.Delay-monad as ED
 open import Bisimilarity.Weak.Coinductive delay-monad as BW
   using (force)
 import
@@ -35,6 +32,8 @@ open import Bisimilarity.Weak.Coinductive.Other delay-monad
 import
   Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
 open import Equational-reasoning
+open import Expansion delay-monad as BE using ([_]_≳_; _≳_)
+import Expansion.Delay-monad as ED
 
 ------------------------------------------------------------------------
 -- Several definitions of weak bisimilarity are pointwise logically

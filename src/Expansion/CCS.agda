@@ -4,7 +4,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Bisimilarity.Coinductive.Expansion.CCS {Name : Set} where
+module Expansion.CCS {Name : Set} where
 
 open import Equality.Propositional
 open import Prelude
@@ -19,10 +19,10 @@ open LTS CCS hiding (_[_]⟶_)
 import Bisimilarity.Coinductive CCS as S
 import Bisimilarity.Coinductive.Equational-reasoning-instances
 open import Bisimilarity.Coinductive CCS using (_∼_)
-open import Bisimilarity.Coinductive.Expansion CCS
-import Bisimilarity.Coinductive.Expansion.Equational-reasoning-instances
 import Bisimilarity.Exercises.Coinductive as S
 open import Equational-reasoning
+open import Expansion CCS
+import Expansion.Equational-reasoning-instances
 import Labelled-transition-system.Equational-reasoning-instances CCS
   as Unused
 

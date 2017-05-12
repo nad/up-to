@@ -12,15 +12,15 @@ open import Prelude
 
 import Bisimilarity.Coinductive
 import Bisimilarity.Coinductive.Equational-reasoning-instances
-import Bisimilarity.Coinductive.Expansion
-import Bisimilarity.Coinductive.Expansion.Equational-reasoning-instances
 open import Equational-reasoning
+import Expansion
+import Expansion.Equational-reasoning-instances
 
 open LTS lts
 private
   open module SB = Bisimilarity.Coinductive lts
     using (_∼_; _∼′_; [_]_∼_; [_]_∼′_)
-  open module E = Bisimilarity.Coinductive.Expansion lts
+  open module E = Expansion lts
     using (_≳_; _≳′_; _≲_; [_]_≳_; [_]_≳′_)
 
 open import Bisimilarity.Coinductive.General

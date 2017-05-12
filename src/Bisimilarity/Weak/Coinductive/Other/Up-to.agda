@@ -11,13 +11,12 @@ module Bisimilarity.Weak.Coinductive.Other.Up-to (lts : LTS) where
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 
-open import Bisimilarity.Coinductive.Expansion lts
-  using (Expansion; ≳:_)
-import Bisimilarity.Coinductive.Expansion.Equational-reasoning-instances
 open import Bisimilarity.Weak.Coinductive.Other lts
 import
   Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
 open import Equational-reasoning
+open import Expansion lts using (Expansion; ≳:_)
+import Expansion.Equational-reasoning-instances
 open import Relation
 import Up-to
 

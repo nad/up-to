@@ -8,7 +8,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Bisimilarity.Weak.Exercises.Coinductive where
+module Bisimilarity.Weak.Exercises where
 
 open import Equality.Propositional
 open import Prelude

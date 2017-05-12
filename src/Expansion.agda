@@ -9,7 +9,7 @@
 
 open import Labelled-transition-system
 
-module Bisimilarity.Coinductive.Expansion (lts : LTS) where
+module Expansion (lts : LTS) where
 
 open import Prelude
 
@@ -130,7 +130,7 @@ mutual
   -- Note that the transitivity proof is not claimed to be fully
   -- size-preserving. For a proof showing that it cannot, in general,
   -- be size-preserving in the first argument, see
-  -- Bisimilarity.Coinductive.Expansion.Delay-monad.size-preserving-transitivityˡ⇔uninhabited.
+  -- Expansion.Delay-monad.size-preserving-transitivityˡ⇔uninhabited.
 
   transitive-≳ : ∀ {i p q r} → p ≳ q → [ i ] q ≳ r → [ i ] p ≳ r
   transitive-≳ {i} = λ p≳q q≳r → S̲t̲e̲p̲.⟨ lr p≳q q≳r , rl p≳q q≳r ⟩
@@ -198,7 +198,7 @@ mutual
 --
 -- For a proof showing that it cannot, in general, be size-preserving
 -- in the first argument, see
--- Bisimilarity.Coinductive.Expansion.Delay-monad.size-preserving-transitivity-∼≳ˡ⇔uninhabited.
+-- Expansion.Delay-monad.size-preserving-transitivity-∼≳ˡ⇔uninhabited.
 
 transitive-∼≳ : ∀ {i p q r} →
                 p ∼ q → [ i ] q ≳ r → [ i ] p ≳ r
