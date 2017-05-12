@@ -116,8 +116,12 @@ import Bisimilarity.Weak.Comparison
 
 import Bisimilarity.Weak.Coinductive.Equivalent
 
--- Some exercises and results from "Enhancements of the bisimulation
--- proof method" by Pous and Sangiorgi.
+-- A lemma related to weak bisimilarity and CCS.
+
+import Bisimilarity.Weak.CCS
+
+-- An example from "Enhancements of the bisimulation proof method" by
+-- Pous and Sangiorgi.
 
 import Bisimilarity.Weak.Exercises
 
