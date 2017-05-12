@@ -21,6 +21,10 @@ open import Labelled-transition-system
 open Labelled-transition-system.Delay-monad A
 open LTS delay-monad hiding (_[_]⟶_)
 
+open import Bisimilarity.Coinductive delay-monad using ([_]_∼_)
+import Bisimilarity.Coinductive.Delay-monad as SD
+open import Bisimilarity.Coinductive.Expansion delay-monad as BE
+  using ([_]_≳_; _≳_)
 import Bisimilarity.Coinductive.Expansion.Delay-monad as ED
 open import Bisimilarity.Weak.Coinductive delay-monad as BW
   using (force)
@@ -31,6 +35,10 @@ open import Bisimilarity.Weak.Coinductive.Other delay-monad
 import
   Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
 open import Equational-reasoning
+
+------------------------------------------------------------------------
+-- Several definitions of weak bisimilarity are pointwise logically
+-- equivalent
 
 -- Emulations of the constructors DW.later-cong, DW.laterˡ and
 -- DW.laterʳ.
@@ -142,37 +150,9 @@ direct⇔indirect′ {x} {y} =
   x ≈ y     ↝⟨ inverse cw⇔cwo ⟩□
   x BW.≈ y  □
 
--- There is a transitivity proof (for the "other" indirect
--- definition of weak bisimilarity) that preserves the size of the
--- second argument iff A is uninhabited.
-
-size-preserving-transitivityʳ⇔uninhabited :
-  (∀ {i} {x y z : Delay A ∞} → x ≈ y → [ i ] y ≈ z → [ i ] x ≈ z) ⇔
-  ¬ A
-size-preserving-transitivityʳ⇔uninhabited =
-  (∀ {i} {x y z : Delay A ∞} → x ≈ y → [ i ] y ≈ z → [ i ] x ≈ z)  ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
-                                                                      implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
-                                                                      →-cong-⇔ direct⇔indirect $ →-cong-⇔ direct⇔indirect direct⇔indirect ⟩
-  (∀ {i} {x y z : Delay A ∞} →
-   x DW.≈ y → Weakly-bisimilar i y z → Weakly-bisimilar i x z)     ↝⟨ DW.size-preserving-transitivityʳ⇔uninhabited ⟩□
-
-  ¬ A                                                              □
-
--- There is a transitivity proof (for the "other" indirect
--- definition of weak bisimilarity) that preserves the size of the
--- first argument iff A is uninhabited.
-
-size-preserving-transitivityˡ⇔uninhabited :
-  (∀ {i} {x y z : Delay A ∞} → [ i ] x ≈ y → y ≈ z → [ i ] x ≈ z) ⇔
-  ¬ A
-size-preserving-transitivityˡ⇔uninhabited =
-  (∀ {i} {x y z : Delay A ∞} → [ i ] x ≈ y → y ≈ z → [ i ] x ≈ z)  ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
-                                                                      implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
-                                                                      →-cong-⇔ direct⇔indirect $ →-cong-⇔ direct⇔indirect direct⇔indirect ⟩
-  (∀ {i} {x y z : Delay A ∞} →
-   Weakly-bisimilar i x y → y DW.≈ z → Weakly-bisimilar i x z)     ↝⟨ DW.size-preserving-transitivityˡ⇔uninhabited ⟩□
-
-  ¬ A                                                              □
+------------------------------------------------------------------------
+-- A non-existence result for the "first" indirect definition of weak
+-- bisimilarity
 
 private
 
@@ -184,31 +164,14 @@ private
     (∀ x y → x DW.≈ y)  ↝⟨ ∀-cong-→ (λ _ → ∀-cong-→ λ _ → _⇔_.to direct⇔indirect′) ⟩
     (∀ x y → x BW.≈ y)  □
 
--- The function cwo⇒cw translating from the "other" indirect
--- definition of weak bisimilarity to the first indirect one can be
--- made size-preserving iff A is uninhabited.
-
-size-preserving-cwo⇒cw⇔uninhabited :
-  (∀ {i p q} → [ i ] p ≈ q → BW.[ i ] p ≈ q) ⇔ ¬ A
-size-preserving-cwo⇒cw⇔uninhabited = record
-  { to =
-      (∀ {i p q} → [ i ] p ≈ q → BW.[ i ] p ≈ q)                       ↝⟨ (λ cwo⇒cw x≈y y≈z → cw⇒cwo (transitive (cwo⇒cw x≈y) (cwo⇒cw y≈z))) ⟩
-      (∀ {i} {x y z : Delay A ∞} → x ≈ y → [ i ] y ≈ z → [ i ] x ≈ z)  ↝⟨ _⇔_.to size-preserving-transitivityʳ⇔uninhabited ⟩□
-      ¬ A                                                              □
-  ; from =
-      ¬ A                                         ↝⟨ uninhabited→trivial ⟩
-      (∀ x y → x BW.≈ y)                          ↝⟨ (λ trivial {_ _ _} _ → trivial _ _) ⟩□
-      (∀ {i p q} → [ i ] p ≈ q → BW.[ i ] p ≈ q)  □
-  }
-
--- One can define a size-preserving "later-cong" function for the
--- "first" indirect definition of weak bisimilarity iff A is
+-- One can define a size-preserving "later-cong" function iff A is
 -- uninhabited.
 
-size-preserving-later-cong⇔uninhabited :
-  (∀ {i x y} → BW.[ i ] force x ≈′ force y → BW.[ i ] later x ≈ later y)
-    ⇔
-  ¬ A
+Later-cong =
+  ∀ {i x y} →
+  BW.[ i ] force x ≈′ force y → BW.[ i ] later x ≈ later y
+
+size-preserving-later-cong⇔uninhabited : Later-cong ⇔ ¬ A
 size-preserving-later-cong⇔uninhabited = record
   { to   = Later-cong                ↝⟨ (λ later-cong → now≈never (λ {i} → later-cong {i})) ⟩
            (∀ x → now x BW.≈ never)  ↝⟨ ∀-cong-→ (λ _ → _⇔_.from direct⇔indirect′) ⟩
@@ -219,8 +182,6 @@ size-preserving-later-cong⇔uninhabited = record
            Later-cong          □
   }
   where
-  Later-cong =
-    ∀ {i x y} → BW.[ i ] force x ≈′ force y → BW.[ i ] later x ≈ later y
 
   module _ (later-cong : Later-cong) where
 
@@ -234,6 +195,153 @@ size-preserving-later-cong⇔uninhabited = record
 
       now≈never′ : ∀ {i} x → BW.[ i ] now x ≈′ never
       force (now≈never′ x) = now≈never x
+
+------------------------------------------------------------------------
+-- Some non-existence results for the "other" indirect definition of
+-- weak bisimilarity
+
+-- There is a transitivity proof that takes weak bisimilarity and
+-- expansion to expansion iff A is uninhabited.
+
+Transitivity-≈≳ = {x y z : Delay A ∞} → x ≈ y → y ≳ z → x ≳ z
+Transitivity-≳≈ = {x y z : Delay A ∞} → x ≳ y → y ≈ z → x ≳ z
+
+transitive-≈≳⇔uninhabited : Transitivity-≈≳ ⇔ ¬ A
+transitive-≈≳⇔uninhabited =
+  Transitivity-≈≳     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
+                         →-cong-⇔ direct⇔indirect (→-cong-⇔ ED.direct⇔indirect ED.direct⇔indirect) ⟩
+  DE.Transitivity-≈≳  ↝⟨ DE.transitive-≈≳⇔uninhabited ⟩□
+  ¬ A                 □
+
+transitive-≳≈⇔uninhabited : Transitivity-≳≈ ⇔ ¬ A
+transitive-≳≈⇔uninhabited =
+  Transitivity-≳≈     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
+                         →-cong-⇔ ED.direct⇔indirect (→-cong-⇔ direct⇔indirect ED.direct⇔indirect) ⟩
+  DE.Transitivity-≳≈  ↝⟨ DE.transitive-≳≈⇔uninhabited ⟩□
+  ¬ A                 □
+
+-- There is a transitivity proof that preserves the size of the second
+-- argument iff A is uninhabited.
+
+Transitivityʳ =
+  ∀ {i} {x y z : Delay A ∞} →
+  x ≈ y → [ i ] y ≈ z → [ i ] x ≈ z
+
+size-preserving-transitivityʳ⇔uninhabited : Transitivityʳ ⇔ ¬ A
+size-preserving-transitivityʳ⇔uninhabited =
+  Transitivityʳ     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
+                       →-cong-⇔ direct⇔indirect $ →-cong-⇔ direct⇔indirect direct⇔indirect ⟩
+  DW.Transitivityʳ  ↝⟨ DW.size-preserving-transitivityʳ⇔uninhabited ⟩□
+  ¬ A               □
+
+-- There is a transitivity proof that preserves the size of the first
+-- argument iff A is uninhabited.
+
+Transitivityˡ =
+  ∀ {i} {x y z : Delay A ∞} →
+  [ i ] x ≈ y → y ≈ z → [ i ] x ≈ z
+
+size-preserving-transitivityˡ⇔uninhabited : Transitivityˡ ⇔ ¬ A
+size-preserving-transitivityˡ⇔uninhabited =
+  Transitivityˡ     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
+                       →-cong-⇔ direct⇔indirect $ →-cong-⇔ direct⇔indirect direct⇔indirect ⟩
+  DW.Transitivityˡ  ↝⟨ DW.size-preserving-transitivityˡ⇔uninhabited ⟩□
+  ¬ A               □
+
+-- There is a transitivity proof that preserves the size of the second
+-- argument, a strong bisimilarity, iff A is uninhabited.
+
+Transitivity-≈∼ʳ =
+  ∀ {i} {x y z : Delay A ∞} →
+  x ≈ y → [ i ] y ∼ z → [ i ] x ≈ z
+
+size-preserving-transitivity-≈∼ʳ⇔uninhabited : Transitivity-≈∼ʳ ⇔ ¬ A
+size-preserving-transitivity-≈∼ʳ⇔uninhabited =
+  Transitivity-≈∼ʳ     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
+                          →-cong-⇔ direct⇔indirect $ →-cong-⇔ SD.direct⇔indirect direct⇔indirect ⟩
+  DW.Transitivity-≈∼ʳ  ↝⟨ DW.size-preserving-transitivity-≈∼ʳ⇔uninhabited ⟩□
+  ¬ A                  □
+
+-- There is a transitivity proof that preserves the size of the first
+-- argument, a strong bisimilarity, iff A is uninhabited.
+
+Transitivity-∼≈ˡ =
+  ∀ {i} {x y z : Delay A ∞} →
+  [ i ] x ∼ y → y ≈ z → [ i ] x ≈ z
+
+size-preserving-transitivity-∼≈ˡ⇔uninhabited : Transitivity-∼≈ˡ ⇔ ¬ A
+size-preserving-transitivity-∼≈ˡ⇔uninhabited =
+  Transitivity-∼≈ˡ     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
+                          →-cong-⇔ SD.direct⇔indirect $ →-cong-⇔ direct⇔indirect direct⇔indirect ⟩
+  DW.Transitivity-∼≈ˡ  ↝⟨ DW.size-preserving-transitivity-∼≈ˡ⇔uninhabited ⟩□
+  ¬ A                  □
+
+-- There is a transitivity-like proof that preserves the size of the
+-- first argument, an expansion, iff A is uninhabited.
+
+Transitivity-≳≈ˡ =
+  ∀ {i} {x y z : Delay A ∞} →
+  [ i ] x ≳ y → y ≈ z → [ i ] x ≈ z
+
+size-preserving-transitivity-≳≈ˡ⇔uninhabited : Transitivity-≳≈ˡ ⇔ ¬ A
+size-preserving-transitivity-≳≈ˡ⇔uninhabited =
+  Transitivity-≳≈ˡ     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
+                          →-cong-⇔ ED.direct⇔indirect (→-cong-⇔ direct⇔indirect direct⇔indirect) ⟩
+  DE.Transitivity-≳≈ˡ  ↝⟨ DE.size-preserving-transitivity-≳≈ˡ⇔uninhabited ⟩□
+  ¬ A                  □
+
+-- There is a transitivity-like proof that preserves the size of the
+-- second argument, an expansion, iff A is uninhabited.
+
+Transitivity-≈≲ʳ =
+  ∀ {i} {x y z : Delay A ∞} →
+  x ≈ y → [ i ] z ≳ y → [ i ] x ≈ z
+
+size-preserving-transitivity-≈≲ʳ⇔uninhabited : Transitivity-≈≲ʳ ⇔ ¬ A
+size-preserving-transitivity-≈≲ʳ⇔uninhabited =
+  Transitivity-≈≲ʳ     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
+                          →-cong-⇔ direct⇔indirect (→-cong-⇔ ED.direct⇔indirect direct⇔indirect) ⟩
+  DE.Transitivity-≈≲ʳ  ↝⟨ DE.size-preserving-transitivity-≈≲ʳ⇔uninhabited ⟩□
+  ¬ A                  □
+
+-- There is a transitivity-like proof that preserves the size of the
+-- first argument, and takes an expansion as the second argument, iff
+-- A is uninhabited.
+
+Transitivity-≈≳ˡ =
+  ∀ {i} {x y z : Delay A ∞} →
+  [ i ] x ≈ y → y ≳ z → [ i ] x ≈ z
+
+size-preserving-transitivity-≈≳ˡ⇔uninhabited : Transitivity-≈≳ˡ ⇔ ¬ A
+size-preserving-transitivity-≈≳ˡ⇔uninhabited =
+  Transitivity-≈≳ˡ     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
+                          →-cong-⇔ direct⇔indirect (→-cong-⇔ ED.direct⇔indirect direct⇔indirect) ⟩
+  DE.Transitivity-≈≳ˡ  ↝⟨ DE.size-preserving-transitivity-≈≳ˡ⇔uninhabited ⟩□
+  ¬ A                  □
+
+------------------------------------------------------------------------
+-- A non-existence result for both indirect definitions of weak
+-- bisimilarity
+
+-- The function cwo⇒cw translating from the "other" indirect
+-- definition of weak bisimilarity to the first indirect one can be
+-- made size-preserving iff A is uninhabited.
+
+size-preserving-cwo⇒cw⇔uninhabited :
+  (∀ {i p q} → [ i ] p ≈ q → BW.[ i ] p ≈ q) ⇔ ¬ A
+size-preserving-cwo⇒cw⇔uninhabited = record
+  { to =
+      (∀ {i p q} → [ i ] p ≈ q → BW.[ i ] p ≈ q)  ↝⟨ (λ cwo⇒cw x≈y y≈z → cw⇒cwo (transitive (cwo⇒cw x≈y) (cwo⇒cw y≈z))) ⟩
+      Transitivityʳ                               ↝⟨ _⇔_.to size-preserving-transitivityʳ⇔uninhabited ⟩□
+      ¬ A                                         □
+  ; from =
+      ¬ A                                         ↝⟨ uninhabited→trivial ⟩
+      (∀ x y → x BW.≈ y)                          ↝⟨ (λ trivial {_ _ _} _ → trivial _ _) ⟩□
+      (∀ {i p q} → [ i ] p ≈ q → BW.[ i ] p ≈ q)  □
+  }
+
+------------------------------------------------------------------------
+-- More lemmas
 
 -- If x and y both make non-silent transitions of the same kind,
 -- then they are weakly bisimilar.

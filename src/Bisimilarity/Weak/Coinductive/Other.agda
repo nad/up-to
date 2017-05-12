@@ -141,7 +141,12 @@ mutual
 -- The following variants of transitivity are partially
 -- size-preserving.
 --
--- TODO: Can one or more of them be made fully size-preserving?
+-- For proofs showing that they cannot, in general, be size-preserving
+-- in the "other" argument, see the following lemmas in
+-- Bisimilarity.Weak.Delay-monad:
+-- size-preserving-transitivity-≳≈ˡ⇔uninhabited,
+-- size-preserving-transitivity-≈≲ʳ⇔uninhabited and
+-- size-preserving-transitivity-≈∼ʳ⇔uninhabited.
 
 mutual
 

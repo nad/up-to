@@ -149,8 +149,9 @@ instance
     lemma : ∀ {p q r} → p ≳ q → [ i ] q ≈′ r → [ i ] p ≈′ r
     force (lemma p≳q q≈′r) = transitive-≳≈ p≳q (convert q≈′r)
 
-  -- TODO: Can the following proof be made size-preserving in its
-  -- first argument?
+  -- For a proof showing that the following lemma cannot, in general,
+  -- be made size-preserving in its first argument, see
+  -- Bisimilarity.Weak.Delay-monad.size-preserving-transitivity-≈≳ˡ⇔uninhabited.
 
   trans≈≳ : Transitive′ _≈_ _≳_
   trans≈≳ = is-transitive (λ p≈q → transitive p≈q ∘ convert)
