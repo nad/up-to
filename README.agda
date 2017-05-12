@@ -54,6 +54,10 @@ import Bisimilarity.Coinductive.Equational-reasoning-instances
 
 import Bisimilarity.Comparison
 
+-- Some results related to strong bisimilarity for the delay monad.
+
+import Bisimilarity.Coinductive.Delay-monad
+
 -- Up-to techniques.
 
 import Bisimilarity.Up-to
