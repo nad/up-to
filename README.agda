@@ -125,3 +125,7 @@ import Bisimilarity.Weak.Exercises.Coinductive
 -- bisimilarity for the delay monad.
 
 import Bisimilarity.Weak.Delay-monad
+
+-- Up-to techniques.
+
+import Bisimilarity.Weak.Coinductive.Other.Up-to
