@@ -21,7 +21,7 @@ open LTS CCS hiding (Proc; _[_]⟶_)
 open import Bisimilarity.Coinductive CCS using (_∼_; ∼:_)
 import Bisimilarity.Coinductive.Equational-reasoning-instances
 open import Bisimilarity.Exercises.Coinductive
-open import Bisimilarity.Weak.CCS
+import Bisimilarity.Weak.CCS as W
 open import Bisimilarity.Weak.Coinductive.Other CCS
 import
   Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
@@ -51,7 +51,7 @@ mutual
     ... | inj₁ (.(b ·) , action , P∼!ab∣b) =
       P ∣ ! co a ·                         ∼⟨ P∼!ab∣b ∣-cong reflexive ⟩
       (! name a · (b ·) ∣ b ·) ∣ ! co a ·  ∼⟨ swap-rightmost ⟩
-      (! name a · (b ·) ∣ ! co a ·) ∣ b ·  ∼′⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩
+      (! name a · (b ·) ∣ ! co a ·) ∣ b ·  ∼′⟨ 6-5-4′ W.∣-cong′ reflexive ⟩
       ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ b ·   ∼⟨ swap-rightmost ⟩ ∼:
       ((! a · ∣ ! b ·) ∣ b ·) ∣ ! co a ·   ∼⟨ lemma ∣-cong reflexive ⟩■
       ((! a · ∣ ∅) ∣ ! b ·) ∣ ! co a ·
@@ -65,7 +65,7 @@ mutual
     ... | inj₁ (.∅ , action , Q∼!a̅∣∅) =
       ! name a · (b ·) ∣ Q               ∼⟨ reflexive ∣-cong Q∼!a̅∣∅ ⟩
       ! name a · (b ·) ∣ (! co a · ∣ ∅)  ∼⟨ ∣-assoc ⟩
-      (! name a · (b ·) ∣ ! co a ·) ∣ ∅  ∼′⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩ ∼:
+      (! name a · (b ·) ∣ ! co a ·) ∣ ∅  ∼′⟨ 6-5-4′ W.∣-cong′ reflexive ⟩ ∼:
       ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ ∅   ∼⟨ symmetric ∣-assoc ⟩■
       (! a · ∣ ! b ·) ∣ (! co a · ∣ ∅)
         ⇐̂[ name (co a) ]                 ←⟨ par-right (replication (par-right action)) ⟩■
@@ -80,7 +80,7 @@ mutual
         | inj₁ (.∅ , action , Q∼!a̅∣∅) =
       P ∣ Q                                      ∼⟨ P∼!ab∣b ∣-cong Q∼!a̅∣∅ ⟩
       (! name a · (b ·) ∣ b ·) ∣ (! co a · ∣ ∅)  ∼⟨ swap-in-the-middle ⟩
-      (! name a · (b ·) ∣ ! co a ·) ∣ (b · ∣ ∅)  ∼′⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩
+      (! name a · (b ·) ∣ ! co a ·) ∣ (b · ∣ ∅)  ∼′⟨ 6-5-4′ W.∣-cong′ reflexive ⟩
       ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ (b · ∣ ∅)   ∼⟨ swap-in-the-middle ⟩ ∼:
       ((! a · ∣ ! b ·) ∣ b ·) ∣ (! co a · ∣ ∅)   ∼⟨ lemma ∣-cong reflexive ⟩■
       ((! a · ∣ ∅) ∣ ! b ·) ∣ (! co a · ∣ ∅)
@@ -169,7 +169,7 @@ mutual
       ! name a · (b ·) ∣ ! co a ·          →⟨ par-left (replication (par-right action)) ⟩■
         ⇒̂[ name a ]
       (! name a · (b ·) ∣ b ·) ∣ ! co a ·  ∼⟨ swap-rightmost ⟩
-      (! name a · (b ·) ∣ ! co a ·) ∣ b ·  ∼′⟨ 6-5-4′ ∣-cong-≈′ reflexive ⟩
+      (! name a · (b ·) ∣ ! co a ·) ∣ b ·  ∼′⟨ 6-5-4′ W.∣-cong′ reflexive ⟩
       ((! a · ∣ ! b ·) ∣ ! co a ·) ∣ b ·   ∼⟨ swap-rightmost ⟩
       ((! a · ∣ ! b ·) ∣ b ·) ∣ ! co a ·   ∼⟨ symmetric ∣-assoc ∣-cong reflexive ⟩
       (! a · ∣ (! b · ∣ b ·)) ∣ ! co a ·   ∼⟨ (reflexive ∣-cong 6-1-2) ∣-cong reflexive ⟩ ∼:

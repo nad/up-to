@@ -116,7 +116,7 @@ import Bisimilarity.Weak.Comparison
 
 import Bisimilarity.Weak.Coinductive.Equivalent
 
--- A lemma related to weak bisimilarity and CCS.
+-- Lemmas related to weak bisimilarity and CCS.
 
 import Bisimilarity.Weak.CCS
 
