@@ -8,6 +8,7 @@
 module Bisimilarity.Weak.Delay-monad {A : Set} where
 
 open import Delay-monad
+import Delay-monad.Expansion as DE
 open import Delay-monad.Weak-bisimilarity as DW
   using (Weakly-bisimilar; ∞Weakly-bisimilar; force)
 open import Equality.Propositional
@@ -20,6 +21,7 @@ open import Labelled-transition-system
 open Labelled-transition-system.Delay-monad A
 open LTS delay-monad hiding (_[_]⟶_)
 
+import Bisimilarity.Coinductive.Expansion.Delay-monad as ED
 open import Bisimilarity.Weak.Coinductive delay-monad as BW
   using (force)
 import
@@ -69,31 +71,6 @@ mutual
                      ∞Weakly-bisimilar i x y → [ i ] x ≈′ y
   force (direct→indirect′ p) = direct→indirect (force p)
 
--- If x makes a sequence of zero or more silent transitions to y,
--- then x is weakly bisimilar to y.
-
-⇒→≈ : ∀ {i x y} → x ⇒ y → Weakly-bisimilar i x y
-⇒→≈ done               = DW.reflexive _
-⇒→≈ (step _ now⟶ tr)   = ⇒→≈ tr
-⇒→≈ (step _ later⟶ tr) = DW.laterˡ (⇒→≈ tr)
-
--- If x makes a non-silent weak transition with the label y, then x
--- is weakly bisimilar to now y.
-
-[just]⇒→≈now : ∀ {i x x′ y} →
-               x [ just y ]⇒ x′ → Weakly-bisimilar i x (now y)
-[just]⇒→≈now (steps tr now⟶ _) = ⇒→≈ tr
-
-[just]⇒̂→≈now : ∀ {i x x′ y} →
-               x [ just y ]⇒̂ x′ → Weakly-bisimilar i x (now y)
-[just]⇒̂→≈now (silent () _)
-[just]⇒̂→≈now (non-silent _ tr) = [just]⇒→≈now tr
-
-[just]⟶̂→≈now : ∀ {i x x′ y} →
-               x [ just y ]⟶̂ x′ → Weakly-bisimilar i x (now y)
-[just]⟶̂→≈now (done ())
-[just]⟶̂→≈now (step tr) = [just]⇒̂→≈now (⟶→⇒̂ tr)
-
 mutual
 
   -- The "other" definition of weak bisimilarity obtained from the
@@ -102,16 +79,17 @@ mutual
   indirect→direct : ∀ {i} x y → [ i ] x ≈ y → Weakly-bisimilar i x y
   indirect→direct {i} (now x) y =
     [ i ] now x ≈ y                                  ↝⟨ (λ p → left-to-right p now⟶) ⟩
-    (∃ λ y′ → y [ just x ]⇒̂ y′ × [ i ] now x ≈′ y′)  ↝⟨ [just]⇒̂→≈now ∘ proj₁ ∘ proj₂ ⟩
+    (∃ λ y′ → y [ just x ]⇒̂ y′ × [ i ] now x ≈′ y′)  ↝⟨ DE.≳→≈ ∘ ED.[just]⇒̂→≳now ∘ proj₁ ∘ proj₂ ⟩
     Weakly-bisimilar i y (now x)                     ↝⟨ DW.symmetric ⟩□
     Weakly-bisimilar i (now x) y                     □
 
   indirect→direct {i} x (now y) =
     [ i ] x ≈ now y                                  ↝⟨ (λ p → right-to-left p now⟶) ⟩
-    (∃ λ x′ → x [ just y ]⇒̂ x′ × [ i ] x′ ≈′ now y)  ↝⟨ [just]⇒̂→≈now ∘ proj₁ ∘ proj₂ ⟩□
+    (∃ λ x′ → x [ just y ]⇒̂ x′ × [ i ] x′ ≈′ now y)  ↝⟨ DE.≳→≈ ∘ ED.[just]⇒̂→≳now ∘ proj₁ ∘ proj₂ ⟩□
     Weakly-bisimilar i x (now y)                     □
 
-  indirect→direct (later x) (later y) lx≈ly with left-to-right lx≈ly later⟶
+  indirect→direct (later x) (later y) lx≈ly
+    with left-to-right lx≈ly later⟶
   ... | y′ , non-silent contradiction _    , _     = ⊥-elim (contradiction _)
   ... | y′ , silent _ (step _ later⟶ y⇒y′) , x≈′y′ = DW.later-cong $
                                                      ∞indirect→direct′ y⇒y′ x≈′y′
@@ -274,9 +252,9 @@ size-preserving-later-cong⇔uninhabited = record
   (steps {p′ = x′} x⇒x′ x′⟶x″ x″⇒x‴)
   (steps {p′ = y′} y⇒y′ y′⟶y″ y″⇒y‴) =
 
-  x   ∼⟨ direct→indirect (⇒→≈ x⇒x′) ⟩
+  x   ∼⟨ direct→indirect (DE.≳→≈ (ED.⇒→≳ x⇒x′)) ⟩
   x′  ∼⟨ ⟶-with-equal-labels→≈ ¬s x′⟶x″ y′⟶y″ ⟩
-  y′  ∼⟨ symmetric (direct→indirect (⇒→≈ y⇒y′)) ⟩■
+  y′  ∼⟨ symmetric (direct→indirect (DE.≳→≈ (ED.⇒→≳ y⇒y′))) ⟩■
   y
 
 ⇒̂-with-equal-labels→≈ :

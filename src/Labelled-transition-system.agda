@@ -936,6 +936,15 @@ module Delay-monad (A : Set) where
   [just]⟶̂ (done ())
   [just]⟶̂ (step x⟶z) = [just]⟶ x⟶z
 
+  -- In some cases x is also equal to now y.
+
+  [just]⟶→≡now : ∀ {x y z} → x [ just y ]⟶ z → x ≡ now y
+  [just]⟶→≡now now⟶ = refl
+
+  [just]⟶̂→≡now : ∀ {x y z} → x [ just y ]⟶̂ z → x ≡ now y
+  [just]⟶̂→≡now (done ())
+  [just]⟶̂→≡now (step x⟶z) = [just]⟶→≡now x⟶z
+
   -- If force x can make a [ μ ]⇒̂-transition to y, then later x can
   -- also make a [ μ ]⇒̂-transition to y.
 

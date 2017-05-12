@@ -84,6 +84,10 @@ import Bisimilarity.Coinductive.Expansion.Equational-reasoning-instances
 
 import Bisimilarity.Coinductive.Expansion.CCS
 
+-- Some results related to expansion for the delay monad.
+
+import Bisimilarity.Coinductive.Expansion.Delay-monad
+
 ------------------------------------------------------------------------
 -- Weak bisimilarity
 
