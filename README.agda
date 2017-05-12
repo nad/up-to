@@ -107,7 +107,7 @@ import
   Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
 
 -- A comparison of the classical definition of weak bisimilarity and
--- one of the coinductive ones
+-- one of the coinductive ones.
 
 import Bisimilarity.Weak.Comparison
 
