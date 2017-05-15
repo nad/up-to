@@ -40,7 +40,8 @@ everything-up-to :
   Is-set A →
   (F : Trans₂ (# 0) (Delay A ∞)) →
   Up-to-technique F
-everything-up-to em A-set F {R = R} R-prog = uncurry everything-up-to′
+everything-up-to em A-set F {R = R} R-prog {x = x , y} =
+  everything-up-to′ x y
   where
   lemma :
     ∀ {x y} {P : Rel₂ (# 0) (Delay A ∞)} →
@@ -58,9 +59,9 @@ everything-up-to em A-set F {R = R} R-prog = uncurry everything-up-to′
 
   everything-up-to′ : ∀ x y → R (x , y) → x ≈ y
   everything-up-to′ x y Rxy with P.⇑⊎⇓ em A-set x | P.⇑⊎⇓ em A-set y
-  ... | inj₂ x⇓ | _       = lemma (S̲t̲e̲p̲.left-to-right (R-prog _ Rxy)) x⇓
+  ... | inj₂ x⇓ | _       = lemma (S̲t̲e̲p̲.left-to-right (R-prog Rxy)) x⇓
   ... | _       | inj₂ y⇓ = symmetric
-                              (lemma (S̲t̲e̲p̲.right-to-left (R-prog _ Rxy))
+                              (lemma (S̲t̲e̲p̲.right-to-left (R-prog Rxy))
                                      y⇓)
   ... | inj₁ x⇑ | inj₁ y⇑ =
     x      ∼⟨ symmetric (_⇔_.to W′.direct⇔indirect′ x⇑) ⟩

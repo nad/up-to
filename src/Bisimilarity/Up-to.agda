@@ -36,8 +36,8 @@ Up-to-bisimilarity R = Bisimilarity ∞ ⊙ R ⊙ Bisimilarity ∞
 -- Up to bisimilarity is monotone.
 
 Up-to-bisimilarity-monotone : Monotone Up-to-bisimilarity
-Up-to-bisimilarity-monotone R⊆S _ =
-  Σ-map id (Σ-map id (Σ-map id (Σ-map (R⊆S _) id)))
+Up-to-bisimilarity-monotone R⊆S =
+  Σ-map id (Σ-map id (Σ-map id (Σ-map R⊆S id)))
 
 -- Up to bisimilarity is size-preserving.
 --
@@ -50,7 +50,7 @@ Up-to-bisimilarity-size-preserving : Size-preserving Up-to-bisimilarity
 Up-to-bisimilarity-size-preserving =
   _⇔_.from (monotone→⇔ Up-to-bisimilarity-monotone)
     (λ where
-       (p , q) (r , p∼r , s , r∼s , s∼q) →
+       {x = p , q} (r , p∼r , s , r∼s , s∼q) →
          p  ∼⟨ p∼r ⟩
          r  ∼⟨ r∼s ⟩
          s  ∼⟨ s∼q ⟩■
@@ -64,7 +64,7 @@ Up-to-∪∼ R = R ∪ Bisimilarity ∞
 -- Up to union with bisimilarity is monotone.
 
 Up-to-∪∼-monotone : Monotone Up-to-∪∼
-Up-to-∪∼-monotone R⊆S _ = ⊎-map (R⊆S _) id
+Up-to-∪∼-monotone R⊆S = ⊎-map R⊆S id
 
 -- Up to union with bisimilarity is size-preserving.
 --
@@ -75,7 +75,7 @@ Up-to-∪∼-size-preserving : Size-preserving Up-to-∪∼
 Up-to-∪∼-size-preserving =
   ∪-closure
     id-size-preserving
-    (const-size-preserving (Bisimilarity ∞  ⊆⟨ (λ _ → id) ⟩∎
+    (const-size-preserving (Bisimilarity ∞  ⊆⟨ id ⟩∎
                             Bisimilarity ∞  ∎))
 
 -- Up to transitive closure.
@@ -86,13 +86,12 @@ Up-to-* R = R *
 -- Up to transitive closure is monotone.
 
 Up-to-*-monotone : Monotone Up-to-*
-Up-to-*-monotone R⊆S _ = Σ-map id (λ {n} → ^^-mono R⊆S n _)
+Up-to-*-monotone R⊆S = Σ-map id (λ {n} → ^^-mono R⊆S n)
   where
   ^^-mono : ∀ {R S} → R ⊆ S →
             ∀ n → R ^^ n ⊆ S ^^ n
-  ^^-mono R⊆S zero    _ = id
-  ^^-mono R⊆S (suc n) _ =
-    Σ-map id (Σ-map (R⊆S _) (^^-mono R⊆S n _))
+  ^^-mono R⊆S zero    = id
+  ^^-mono R⊆S (suc n) = Σ-map id (Σ-map R⊆S (^^-mono R⊆S n))
 
 -- Up to transitive closure is size-preserving.
 
@@ -101,8 +100,8 @@ Up-to-*-size-preserving =
   _⇔_.from (monotone→⇔ Up-to-*-monotone) drop-*
   where
   drop-* : ∀ {i} → Bisimilarity i * ⊆ Bisimilarity i
-  drop-* (p , .p) (zero  , refl)           = p ■
-  drop-* (p , r)  (suc n , q , p∼q , ∼ⁿqr) =
+  drop-* {x = p , .p} (zero  , refl)           = p ■
+  drop-* {x = p , r}  (suc n , q , p∼q , ∼ⁿqr) =
     p  ∼⟨ p∼q ⟩
-    q  ∼⟨ drop-* _ (n , ∼ⁿqr) ⟩■
+    q  ∼⟨ drop-* (n , ∼ⁿqr) ⟩■
     r

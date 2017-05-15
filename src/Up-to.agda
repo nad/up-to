@@ -37,7 +37,7 @@ Up-to-technique F = ∀ {R} → R ⊆ ⟦ C ⟧ (F R) → R ⊆ ν C ∞
 -- b-compatibility.
 
 Compatible : Trans ℓ I → Set (lsuc ℓ)
-Compatible F = ∀ {R} → F (⟦ C ⟧ R) ⊆ ⟦ C ⟧ (F R)
+Compatible F = ∀ R → F (⟦ C ⟧ R) ⊆ ⟦ C ⟧ (F R)
 
 -- Monotone compatible functions are up-to techniques.
 --
@@ -70,7 +70,7 @@ module _
       Fⁿ⊆Step∘F¹⁺ⁿ (suc n) =
         F ^[ 1 + n ] R              ⊆⟨⟩
         F (F ^[ n ] R)              ⊆⟨ mono (Fⁿ⊆Step∘F¹⁺ⁿ n) ⟩
-        F (⟦ C ⟧ (F ^[ 1 + n ] R))  ⊆⟨ comp ⟩∎
+        F (⟦ C ⟧ (F ^[ 1 + n ] R))  ⊆⟨ comp _ ⟩∎
         ⟦ C ⟧ (F ^[ 2 + n ] R)      ∎
 
       -- An analogue of ⋃ₙ Fⁿ(R).
@@ -81,15 +81,15 @@ module _
       -- F^ωR is a bisimulation.
 
       F^ωR-bisim : F^ωR ⊆ ⟦ C ⟧ F^ωR
-      F^ωR-bisim pq = uncurry λ n →
+      F^ωR-bisim = uncurry λ n →
         (F ^[ n ] R              ⊆⟨ Fⁿ⊆Step∘F¹⁺ⁿ n ⟩
-         ⟦ C ⟧ (F ^[ 1 + n ] R)  ⊆⟨ (λ _ → map C (1 + n ,_)) ⟩∎
-         ⟦ C ⟧ F^ωR              ∎) pq
+         ⟦ C ⟧ (F ^[ 1 + n ] R)  ⊆⟨ map C (1 + n ,_) ⟩∎
+         ⟦ C ⟧ F^ωR              ∎)
 
   compatible→up-to : Up-to-technique F
   compatible→up-to {R = R} R-prog =
-    R              ⊆⟨ (λ _ → 0 ,_) ⟩
-    F^ωR R R-prog  ⊆⟨ (λ _ → unfold C (F^ωR-bisim R R-prog _)) ⟩∎
+    R              ⊆⟨ 0 ,_ ⟩
+    F^ωR R R-prog  ⊆⟨ unfold C (F^ωR-bisim R R-prog) ⟩∎
     ν C ∞          ∎
 
 -- F is size-preserving if, for any relation R, if R is contained in
@@ -121,21 +121,21 @@ module _
     -- F is also size-preserving for ν′.
 
     pres′ : ∀ {R : Rel ℓ I} {i} → R ⊆ ν′ C i → F R ⊆ ν′ C i
-    force (pres′ R⊆ν′ x FRx) =
-      pres (λ x′ Rx′ → force (R⊆ν′ x′ Rx′)) x FRx
+    force (pres′ R⊆ν′ FRx) =
+      pres (λ Rx′ → force (R⊆ν′ Rx′)) FRx
 
     size-preserving→up-to′ :
       ∀ {i} {R : Rel ℓ I} →
       R ⊆ ⟦ C ⟧ (F R) → R ⊆ ν C i
     size-preserving→up-to′ {i} {R} R⊆CFR =
       R               ⊆⟨ R⊆CFR ⟩
-      ⟦ C ⟧ (F R)     ⊆⟨ (λ _ → map C (pres′ size-preserving→up-to″ _)) ⟩
-      ⟦ C ⟧ (ν′ C i)  ⊆⟨ (λ _ → id) ⟩∎
+      ⟦ C ⟧ (F R)     ⊆⟨ map C (pres′ size-preserving→up-to″) ⟩
+      ⟦ C ⟧ (ν′ C i)  ⊆⟨ id ⟩∎
       ν C i           ∎
       where
       size-preserving→up-to″ : R ⊆ ν′ C i
-      force (size-preserving→up-to″ x Rx) =
-        size-preserving→up-to′ R⊆CFR x Rx
+      force (size-preserving→up-to″ Rx) =
+        size-preserving→up-to′ R⊆CFR Rx
 
   size-preserving→up-to : Up-to-technique F
   size-preserving→up-to = size-preserving→up-to′
@@ -156,7 +156,7 @@ monotone→⇔ :
   (∀ {i} → F (ν C i) ⊆ ν C i)
 monotone→⇔ {F} F-mono = record
   { to   = λ pres {i} →
-             F (ν C i)  ⊆⟨ pres (λ _ → id) ⟩∎
+             F (ν C i)  ⊆⟨ pres id ⟩∎
              ν C i      ∎
   ; from = λ drop {R i} R⊆ν →
              F R        ⊆⟨ F-mono R⊆ν ⟩
@@ -200,16 +200,16 @@ monotone→compatible→size-preserving {F} mono comp =
     lemma : ∀ {i} → F (ν C i) ⊆ ν C i
     lemma {i} =
       F (ν C i)           ⊆⟨⟩
-      F (⟦ C ⟧ (ν′ C i))  ⊆⟨ comp ⟩
-      ⟦ C ⟧ (F (ν′ C i))  ⊆⟨ (λ _ → map C (lemma′ _)) ⟩
-      ⟦ C ⟧ (ν′ C i)      ⊆⟨ (λ _ → id) ⟩∎
+      F (⟦ C ⟧ (ν′ C i))  ⊆⟨ comp _ ⟩
+      ⟦ C ⟧ (F (ν′ C i))  ⊆⟨ map C lemma′ ⟩
+      ⟦ C ⟧ (ν′ C i)      ⊆⟨ id ⟩∎
       ν C i               ∎
 
     lemma′ : ∀ {i} → F (ν′ C i) ⊆ ν′ C i
-    force (lemma′ {i} x Fν′x) {j = j} =
-      lemma x (mono (ν′ C i  ⊆⟨ (λ y ν′y → force ν′y) ⟩∎
-                     ν C j   ∎)
-                    _ Fν′x)
+    force (lemma′ {i} Fν′x) {j = j} =
+      lemma (mono (ν′ C i  ⊆⟨ (λ ν′y → force ν′y) ⟩∎
+                   ν C j   ∎)
+                  Fν′x)
 
 -- The following four lemmas correspond to Pous and Sangiorgi's
 -- Proposition 6.3.11 (except that they state the fourth one for
@@ -251,5 +251,5 @@ const-size-preserving R⊆∼ _ = R⊆∼
   Size-preserving G →
   Size-preserving (λ R → F R ∪ G R)
 ∪-closure {F} {G} F-pres G-pres {R = R} {i = i} =
-  R ⊆ ν C i          ↝⟨ (λ R⊆∼ _ → [ F-pres R⊆∼ _ , G-pres R⊆∼ _ ]) ⟩□
+  R ⊆ ν C i          ↝⟨ (λ R⊆∼ {_} → [ F-pres (R⊆∼ {_}) , G-pres (R⊆∼ {_}) ]) ⟩□
   F R ∪ G R ⊆ ν C i  □

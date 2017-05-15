@@ -94,7 +94,7 @@ infix 4 _⊆_
 
 _⊆_ : ∀ {a ℓ₁ ℓ₂} {A : Set a} →
       Rel ℓ₁ A → Rel ℓ₂ A → Set (a ⊔ ℓ₁ ⊔ ℓ₂)
-R ⊆ S = ∀ x → R x → S x
+R ⊆ S = ∀ {x} → R x → S x
 
 -- Monotonicity of relation transformers.
 
@@ -111,7 +111,7 @@ infixr -2 _⊆⟨_⟩_ _⊆⟨⟩_
 _⊆⟨_⟩_ : ∀ {a p q r} {A : Set a}
          (P : Rel p A) {Q : Rel q A} {R : Rel r A} →
          P ⊆ Q → Q ⊆ R → P ⊆ R
-_ ⊆⟨ P⊆Q ⟩ Q⊆R = λ x → Q⊆R x ∘ P⊆Q x
+_ ⊆⟨ P⊆Q ⟩ Q⊆R = Q⊆R ∘ P⊆Q
 
 _⊆⟨⟩_ : ∀ {a p q} {A : Set a}
         (P : Rel p A) {Q : Rel q A} →

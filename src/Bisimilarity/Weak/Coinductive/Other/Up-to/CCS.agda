@@ -47,9 +47,9 @@ Up-to-context R (p , q) =
 -- Up to context is monotone.
 
 Up-to-context-monotone : Monotone Up-to-context
-Up-to-context-monotone R⊆S _ =
+Up-to-context-monotone R⊆S =
   Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $
-  Σ-map id (R⊆S _ ∘_)
+  Σ-map id (R⊆S ∘_)
 
 -- Up to context is size-preserving.
 
@@ -57,7 +57,7 @@ Up-to-context-size-preserving : Size-preserving Up-to-context
 Up-to-context-size-preserving =
   _⇔_.from (monotone→⇔ Up-to-context-monotone)
   (λ where
-    .(C [ ps ] , C [ qs ]) (_ , C , D , ps , qs , refl , refl , ps∼qs) →
+     (_ , C , D , ps , qs , refl , refl , ps∼qs) →
 
       C [ ps ]  ∼⟨ D [ ps∼qs ]-cong ⟩■
       C [ qs ])
@@ -112,7 +112,7 @@ Up-to-context-size-preserving =
   drop-[] (_ , ! _   , _ , _ , _ , () , _)
 
   R⊆StepR : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ R
-  R⊆StepR _ (inj₁ base) = ⟨ lr , rl ⟩
+  R⊆StepR (inj₁ base) = ⟨ lr , rl ⟩
     where
     lr :
       ∀ {P μ} →
@@ -134,7 +134,7 @@ Up-to-context-size-preserving =
          ∅)
       , inj₂ refl
 
-  R⊆StepR (P , _) (inj₂ refl) =
+  R⊆StepR {P , _} (inj₂ refl) =
     ⟨ Σ-map id (Σ-map id inj₂)         ∘ lr
     , Σ-map id (Σ-map id (inj₂ ∘ sym)) ∘ lr
     ⟩
@@ -148,13 +148,13 @@ Up-to-context-size-preserving =
 
   [R]⊆Step[R] : Up-to-context R ⊆ ⟦ S̲t̲e̲p̲ ⟧ (Up-to-context R)
   [R]⊆Step[R] =
-    Up-to-context R             ⊆⟨ Up-to-context-monotone R⊆StepR ⟩
-    Up-to-context (⟦ S̲t̲e̲p̲ ⟧ R)  ⊆⟨ comp ⟩∎
+    Up-to-context R             ⊆⟨ Up-to-context-monotone (λ {x} → R⊆StepR {x}) ⟩
+    Up-to-context (⟦ S̲t̲e̲p̲ ⟧ R)  ⊆⟨ comp _ ⟩∎
     ⟦ S̲t̲e̲p̲ ⟧ (Up-to-context R)  ∎
 
   contradiction : ⊥
   contradiction =                                                       $⟨ !τa[R]!a ⟩
-    Up-to-context R (! τ · (a ·) , ! a ·)                               ↝⟨ [R]⊆Step[R] _ ⟩
+    Up-to-context R (! τ · (a ·) , ! a ·)                               ↝⟨ [R]⊆Step[R] ⟩
     ⟦ S̲t̲e̲p̲ ⟧ (Up-to-context R) (! τ · (a ·) , ! a ·)                    ↝⟨ (λ s → S̲t̲e̲p̲.left-to-right s (replication (par-right action))) ⟩
     (∃ λ P → ! a · [ τ ]⇒̂ P × Up-to-context R (! τ · (a ·) ∣ a · , P))  ↝⟨ (λ { (_ , !a⟶ , hyp) →
                                                                                   subst (Up-to-context R ∘ (_ ,_)) (!a[τ]⇒̂→≡ !a⟶) hyp }) ⟩

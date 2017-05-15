@@ -41,8 +41,8 @@ Up-to-expansion R = Expansion ∞ ⊙ R ⊙ Expansion ∞ ⁻¹
 -- Up to expansion is monotone.
 
 Up-to-expansion-monotone : Monotone Up-to-expansion
-Up-to-expansion-monotone R⊆S _ =
-  Σ-map id (Σ-map id (Σ-map id (Σ-map (R⊆S _) id)))
+Up-to-expansion-monotone R⊆S =
+  Σ-map id (Σ-map id (Σ-map id (Σ-map R⊆S id)))
 
 -- Up to expansion is size-preserving.
 
@@ -50,7 +50,7 @@ Up-to-expansion-size-preserving : Size-preserving Up-to-expansion
 Up-to-expansion-size-preserving =
   _⇔_.from (monotone→⇔ Up-to-expansion-monotone)
     (λ where
-       (p , q) (r , p≳r , s , r≈s , s≲q) →
+       {x = p , q} (r , p≳r , s , r≈s , s≲q) →
          p  ∼⟨ p≳r ⟩
          r  ∼′⟨ r≈s ⟩ ≳:
          s  ∽⟨ s≲q ⟩■

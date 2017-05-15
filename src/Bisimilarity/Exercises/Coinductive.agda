@@ -1294,8 +1294,8 @@ module _ {Name : Set} where
   -- Up to context is monotone.
 
   Up-to-context-monotone : Monotone Up-to-context
-  Up-to-context-monotone R⊆S _ =
-    Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id (R⊆S _)
+  Up-to-context-monotone R⊆S =
+    Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id R⊆S
 
   -- Up to bisimilarity and context.
 
@@ -1333,14 +1333,14 @@ module _ {Name : Set} where
       op··∅
 
     R⊆ : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ (Up-to-bisimilarity-and-context R)
-    R⊆ _ base =
+    R⊆ base =
       ⟨ (λ { action → a · ∅ , action , lemma })
       , (λ { action → ∅     , action , lemma })
       ⟩
 
     R⊈∼ : ¬ R ⊆ Bisimilarity ∞
     R⊈∼ =
-      R ⊆ Bisimilarity ∞  ↝⟨ (λ R⊆∼ → R⊆∼ _ base) ⟩
+      R ⊆ Bisimilarity ∞  ↝⟨ (λ R⊆∼ → R⊆∼ base) ⟩
       a · ∅ ∼ a · a · ∅   ↝⟨ a≁b·c ⟩□
       ⊥                   □
 
@@ -1356,7 +1356,8 @@ module _ {Name : Set} where
 
     (∀ {i P Q} (C : Context 1) → [ i ] P ∼ Q →
      [ i ] C [ (λ _ → P) ] ∼ C [ (λ _ → Q) ])                   ↝⟨ (λ []-cong → λ where
-                                                                      (P , Q) (_ , P∼C[R₁] , _ , (C , R₁ , R₂ , refl , refl , R₁∼R₂) , C[R₂]∼Q) →
+                                                                      {x = P , Q} (_ , P∼C[R₁] , _ ,
+                                                                                   (C , R₁ , R₂ , refl , refl , R₁∼R₂) , C[R₂]∼Q) →
 
                                                                         P                 ∼⟨ P∼C[R₁] ⟩
                                                                         C [ (λ _ → R₁) ]  ∼⟨ []-cong C R₁∼R₂ ⟩

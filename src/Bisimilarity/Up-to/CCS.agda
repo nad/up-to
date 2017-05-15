@@ -44,9 +44,9 @@ Up-to-context R (p , q) =
 -- Up to context is monotone.
 
 Up-to-context-monotone : Monotone Up-to-context
-Up-to-context-monotone R⊆S _ =
+Up-to-context-monotone R⊆S =
   Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id
-    (R⊆S _ ∘_)
+    (R⊆S ∘_)
 
 -- Up to context is size-preserving.
 
@@ -54,7 +54,7 @@ Up-to-context-size-preserving : Size-preserving Up-to-context
 Up-to-context-size-preserving =
   _⇔_.from (monotone→⇔ Up-to-context-monotone)
   (λ where
-    .(C [ ps ] , C [ qs ]) (_ , C , ps , qs , refl , refl , ps∼qs) →
+     (_ , C , ps , qs , refl , refl , ps∼qs) →
 
       C [ ps ]  ∼⟨ C [ ps∼qs ]-cong ⟩■
       C [ qs ])
@@ -155,7 +155,7 @@ Up-to-context-size-preserving =
       ⊥                                    □
 
   R⊆StepS : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ S
-  R⊆StepS _ base = S̲t̲e̲p̲.⟨ lr , rl ⟩
+  R⊆StepS base = S̲t̲e̲p̲.⟨ lr , rl ⟩
     where
     lr : ∀ {P′ μ} →
          ! name a · (b ·) [ μ ]⟶ P′ →
@@ -199,8 +199,8 @@ Up-to-context-size-preserving =
 
   [R]⊆Step[S] : Up-to-context R ⊆ ⟦ S̲t̲e̲p̲ ⟧ (Up-to-context S)
   [R]⊆Step[S] =
-    Up-to-context R             ⊆⟨ Up-to-context-monotone R⊆StepS ⟩
-    Up-to-context (⟦ S̲t̲e̲p̲ ⟧ S)  ⊆⟨ comp ⟩∎
+    Up-to-context R             ⊆⟨ Up-to-context-monotone (λ {x} → R⊆StepS {x}) ⟩
+    Up-to-context (⟦ S̲t̲e̲p̲ ⟧ S)  ⊆⟨ comp _ ⟩∎
     ⟦ S̲t̲e̲p̲ ⟧ (Up-to-context S)  ∎
 
   contradiction : ⊥
@@ -208,7 +208,7 @@ Up-to-context-size-preserving =
                                                               $⟨ d!ab[R]d!ac ⟩
     Up-to-context R ( name d · (! name a · (b ·))
                     , name d · (! name a · (c ·))
-                    )                                         ↝⟨ [R]⊆Step[S] _ ⟩
+                    )                                         ↝⟨ [R]⊆Step[S] ⟩
 
     ⟦ S̲t̲e̲p̲ ⟧ (Up-to-context S) ( name d · (! name a · (b ·))
                                , name d · (! name a · (c ·))

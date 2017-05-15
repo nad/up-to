@@ -211,7 +211,7 @@ module _ {Name : Set} where
 
   6-2-4 : ∀ {a} → ! ! a · ∼ ! a ·
   6-2-4 {a} =
-    _⇔_.to larger⇔smallest (bisimulation-up-to-∼⊆∼ R-is _ base)
+    _⇔_.to larger⇔smallest (bisimulation-up-to-∼⊆∼ R-is base)
     where
     data R : Rel₂ (# 0) Proc where
       base : R (! ! a · , ! a ·)
@@ -279,7 +279,7 @@ module _ {Name : Set} where
 
   ·∣·∼·· : ∀ {a} → a · ∣ a · ∼ name a · (a ·)
   ·∣·∼·· {a} =
-    _⇔_.to larger⇔smallest (bisimulation-up-to-∪⊆∼ R-is _ base)
+    _⇔_.to larger⇔smallest (bisimulation-up-to-∪⊆∼ R-is base)
     where
     data R : Rel₂ (# 0) Proc where
       base : R (a · ∣ a · , name a · (a ·))
