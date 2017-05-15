@@ -2,7 +2,7 @@
 -- Indexed containers
 ------------------------------------------------------------------------
 
--- Roughly following "Indexed containers" by Altenkirch, Ghani,
+-- Some parts are based on "Indexed containers" by Altenkirch, Ghani,
 -- Hancock, McBride and Morris (JFP, 2015).
 
 {-# OPTIONS --without-K #-}
@@ -18,6 +18,7 @@ open import Bijection equality-with-J as Bijection using (_↔_)
 import Equivalence equality-with-J as Eq
 open import Function-universe equality-with-J hiding (id; _∘_)
 open import H-level.Closure equality-with-J
+open import Surjection equality-with-J using (_↠_)
 open import Univalence-axiom equality-with-J
 
 ------------------------------------------------------------------------
@@ -531,3 +532,96 @@ mutual
     ∀ {o} (x : X o) →
     ν′-bisimilar i (record { force = u x }) (unfold′ C f x)
   force (unfold′-unique C f u bisim x) = unfold-unique C f u bisim x
+
+------------------------------------------------------------------------
+-- An alternative definition of greatest fixpoints
+
+-- The greatest fixpoint of an indexed "endocontainer" (parametrised
+-- by a universe level).
+
+gfp : ∀ {ℓ₁} ℓ₂ {I : Set ℓ₁} → Container I I → I → Set (lsuc (ℓ₁ ⊔ ℓ₂))
+gfp {ℓ₁} ℓ₂ {I} C i = ∃ λ (R : I → Set (ℓ₁ ⊔ ℓ₂)) → R →⋆ ⟦ C ⟧ R × R i
+
+-- The greatest fixpoint is greater than or equal to every
+-- sufficiently small post-fixpoint.
+
+gfp-unfold :
+  ∀ {ℓ₁ ℓ₂} ℓ₃ {I : Set ℓ₁} {C : Container I I} {X : I → Set ℓ₂} →
+  (X →⋆ ⟦ C ⟧ X) →
+  X →⋆ gfp (ℓ₂ ⊔ ℓ₃) C
+gfp-unfold {ℓ₁} ℓ₃ {C = C} {X} f x =
+  ↑ (ℓ₁ ⊔ ℓ₃) ∘ X , map C lift ∘ f ∘ lower , lift x
+
+-- The greatest fixpoint is a post-fixpoint.
+
+gfp-out : ∀ {ℓ₁} ℓ₂ {I : Set ℓ₁} {C : Container I I} →
+          gfp ℓ₂ C →⋆ ⟦ C ⟧ (gfp ℓ₂ C)
+gfp-out ℓ₂ {C = C} (R , R→⋆CR , Ri) =
+  map C (λ Ri → R , (λ {_} → R→⋆CR) , Ri) (R→⋆CR Ri)
+
+  -- It is possible to use gfp-unfold ℓ₂ R→⋆CR as the second argument
+  -- to map above. However, the extra lifting would break the proof
+  -- gfp→⋆ν∘ν→⋆gfp given below.
+
+-- The first definition of greatest fixpoints is contained in the
+-- second one.
+
+ν→⋆gfp : ∀ {ℓ₁} ℓ₂ {I : Set ℓ₁} {C : Container I I} →
+         ν C ∞ →⋆ gfp ℓ₂ C
+ν→⋆gfp ℓ₂ = gfp-unfold ℓ₂ ν-out
+
+-- The second definition of greatest fixpoints is contained in the first one.
+
+gfp→⋆ν : ∀ {ℓ₁} ℓ₂ {I : Set ℓ₁} {C : Container I I} {i} →
+         gfp ℓ₂ C →⋆ ν C i
+gfp→⋆ν ℓ₂ = unfold _ (gfp-out ℓ₂)
+
+-- Thus the two definitions of greatest fixpoints are pointwise
+-- logically equivalent.
+
+gfp⇔ν : ∀ {ℓ₁} ℓ₂ {I : Set ℓ₁} {C : Container I I} {i} →
+        gfp ℓ₂ C i ⇔ ν C ∞ i
+gfp⇔ν ℓ₂ = record
+  { to   = gfp→⋆ν ℓ₂
+  ; from = ν→⋆gfp ℓ₂
+  }
+
+-- The function gfp→⋆ν is a left inverse of ν→⋆gfp.
+
+gfp→⋆ν∘ν→⋆gfp :
+  ∀ {ℓ₁} ℓ₂ {I : Set ℓ₁} {C : Container I I} {i} (x : ν C ∞ i) {i} →
+  ν-bisimilar i (gfp→⋆ν ℓ₂ (ν→⋆gfp ℓ₂ x)) x
+gfp→⋆ν∘ν→⋆gfp {ℓ₁} ℓ₂ {I} {C} x =
+  _↔_.from (ν-bisimilar↔ (gfp→⋆ν ℓ₂ (ν→⋆gfp ℓ₂ x)) x)
+    ( refl
+    , λ p → gfp→⋆ν∘ν→⋆gfp′ (proj₂ x p)
+    )
+  where
+  gfp→⋆ν∘ν→⋆gfp′ :
+    ∀ {i} (x : ν′ C ∞ i) {i} →
+    ν′-bisimilar i (unfold′ _ (gfp-out ℓ₂) (ν→⋆gfp ℓ₂ (force x))) x
+  force (gfp→⋆ν∘ν→⋆gfp′ x) = gfp→⋆ν∘ν→⋆gfp ℓ₂ (force x)
+
+-- There is a split surjection from the second definition of greatest
+-- fixpoints to the first one (assuming extensionality).
+
+gfp↠ν :
+  ∀ {ℓ₁} ℓ₂ {I : Set ℓ₁} {C : Container I I} →
+  ν′-extensionality C →
+  ∀ {i} → gfp ℓ₂ C i ↠ ν C ∞ i
+gfp↠ν ℓ₂ ext = record
+  { logical-equivalence = gfp⇔ν ℓ₂
+  ; right-inverse-of    = λ x →
+      ν-extensionality ext (gfp→⋆ν∘ν→⋆gfp ℓ₂ x)
+  }
+
+-- The larger versions of gfp are logically equivalent to the smallest
+-- one.
+
+larger⇔smallest :
+  ∀ {ℓ₁} ℓ₂ {I : Set ℓ₁} {C : Container I I} {i} →
+  gfp ℓ₂ C i ⇔ gfp lzero C i
+larger⇔smallest {ℓ₁} ℓ₂ {C = C} {i} =
+  gfp ℓ₂ C i     ↝⟨ gfp⇔ν ℓ₂ ⟩
+  ν C ∞ i        ↝⟨ inverse $ gfp⇔ν lzero ⟩□
+  gfp lzero C i  □
