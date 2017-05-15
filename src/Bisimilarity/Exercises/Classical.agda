@@ -13,6 +13,7 @@ open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 
+open import Bijection equality-with-J using (_↔_)
 open import Function-universe equality-with-J hiding (id; _∘_)
 
 import Bisimilarity.Classical
@@ -35,7 +36,7 @@ module _ {Name : Set} where
   -- _∣_ is commutative.
 
   ∣-comm : ∀ {P Q} → P ∣ Q ∼ Q ∣ P
-  ∣-comm = R , R-is-a-bisimulation , base
+  ∣-comm = ⟨ R , R-is-a-bisimulation , base ⟩
     where
     data R : Rel₂ (# 0) Proc where
       base : ∀ {P Q} → R (P ∣ Q , Q ∣ P)
@@ -64,7 +65,7 @@ module _ {Name : Set} where
   -- _∣_ is associative.
 
   ∣-assoc : ∀ {P Q R} → P ∣ (Q ∣ R) ∼ (P ∣ Q) ∣ R
-  ∣-assoc = S , S-is-a-bisimulation , base
+  ∣-assoc = ⟨ S , S-is-a-bisimulation , base ⟩
     where
     data S : Rel₂ (# 0) Proc where
       base : ∀ {P Q R} → S (P ∣ (Q ∣ R) , (P ∣ Q) ∣ R)
@@ -95,7 +96,7 @@ module _ {Name : Set} where
   -- ∅ is a left identity of _∣_.
 
   ∣-left-identity : ∀ {P} → ∅ ∣ P ∼ P
-  ∣-left-identity = R , R-is-a-bisimulation , base
+  ∣-left-identity = ⟨ R , R-is-a-bisimulation , base ⟩
     where
     data R : Rel₂ (# 0) Proc where
       base : ∀ {P} → R (∅ ∣ P , P)
@@ -126,8 +127,10 @@ module _ {Name : Set} where
   -- _∣_ preserves bisimilarity.
 
   _∣-cong_ : ∀ {P P′ Q Q′} → P ∼ P′ → Q ∼ Q′ → P ∣ Q ∼ P′ ∣ Q′
-  (L , L-bisim , PLP′) ∣-cong (R , R-bisim , QRQ′) =
-    LR , ⟪ lr , rl ⟫ , base PLP′ QRQ′
+  P∼P′ ∣-cong Q∼Q′ with _↔_.to Bisimilarity↔ P∼P′
+                      | _↔_.to Bisimilarity↔ Q∼Q′
+  ... | L , L-bisim , PLP′
+      | R , R-bisim , QRQ′ = ⟨ LR , ⟪ lr , rl ⟫ , base PLP′ QRQ′ ⟩
     where
     data LR : Rel₂ (# 0) Proc where
       base : ∀ {P P′ Q Q′} →
@@ -169,7 +172,7 @@ module _ {Name : Set} where
   -- Exercise 6.1.2
 
   6-1-2 : ∀ {P} → ! P ∣ P ∼ ! P
-  6-1-2 {P} = R , R-is-a-bisimulation , base
+  6-1-2 {P} = ⟨ R , R-is-a-bisimulation , base ⟩
     where
     data R : Rel₂ (# 0) Proc where
       base : R (! P ∣ P , ! P)

@@ -24,6 +24,7 @@ import Bisimilarity.Classical.Equational-reasoning-instances
 import Bisimilarity.Coinductive
 import Bisimilarity.Coinductive.Equational-reasoning-instances
 open import Equational-reasoning
+open import Indexed-container as IC hiding (⟨_⟩; larger⇔smallest)
 open import Labelled-transition-system
 open import Relation
 
@@ -38,71 +39,19 @@ module _ {lts : LTS} where
   -- Classically bisimilar processes are coinductively bisimilar.
 
   cl⇒co : ∀ {ℓ i p q} → Cl.[ ℓ ] p ∼ q → Co.[ i ] p ∼ q
-  cl⇒co (_R_ , R-is-a-bisimulation , pRq) =
-    Co.⟨ (λ p⟶p′ →
-            let q′ , q⟶q′ , p′Rq′ =
-                  Cl.left-to-right
-                    R-is-a-bisimulation pRq p⟶p′
-            in q′ , q⟶q′ , cl⇒co′ (_R_ , R-is-a-bisimulation , p′Rq′))
-       , (λ q⟶q′ →
-            let r′ , r⟶r′ , p′Rq′ =
-                  Cl.right-to-left
-                    R-is-a-bisimulation pRq q⟶q′
-            in r′ , r⟶r′ , cl⇒co′ (_R_ , R-is-a-bisimulation , p′Rq′))
-       ⟩
-    where
-    cl⇒co′ : ∀ {ℓ i p q} → Cl.[ ℓ ] p ∼ q → Co.[ i ] p ∼′ q
-    Co.force (cl⇒co′ p∼q) = cl⇒co p∼q
-
-  -- Coinductive bisimilarity is a bisimulation.
-
-  coinductive-bisimilarity-is-a-bisimulation :
-    Cl.Bisimulation (Co.Bisimilarity ∞)
-  coinductive-bisimilarity-is-a-bisimulation =
-    Cl.⟪ (λ p∼q p⟶p′ →
-            Σ-map id (Σ-map id (λ p∼q → Co.force p∼q))
-              (Co.left-to-right p∼q p⟶p′))
-       ,  (λ p∼q q⟶q′ →
-            Σ-map id (Σ-map id (λ p∼q → Co.force p∼q))
-              (Co.right-to-left p∼q q⟶q′))
-       ⟫
+  cl⇒co = gfp⊆ν _
 
   -- Coinductively bisimilar processes are classically bisimilar.
 
   co⇒cl : ∀ {ℓ p q} → p Co.∼ q → Cl.[ ℓ ] p ∼ q
-  co⇒cl p∼q =
-      ↑ _ ∘ Co.Bisimilarity ∞
-    , Cl.↑-preserves-bisimulations
-        coinductive-bisimilarity-is-a-bisimulation
-    , lift p∼q
+  co⇒cl = ν⊆gfp _
 
   -- The function cl⇒co is a left inverse of co⇒cl.
 
   cl⇒co∘co⇒cl : ∀ {ℓ i p q}
                 (p∼q : p Co.∼ q) →
                 Co.[ i ] cl⇒co (co⇒cl {ℓ = ℓ} p∼q) ≡ p∼q
-  cl⇒co∘co⇒cl {ℓ} {i} {p} {q} p∼q =
-    Co.Bisimilarity-of-∼.⟨ cl⇒co (co⇒cl p∼q)
-                         , p∼q
-                         , (λ p⟶p′ → refl , refl , lemma₁ p⟶p′)
-                         , (λ q⟶q′ → refl , refl , lemma₂ q⟶q′)
-                         ⟩
-    where
-    lemma₁ :
-      ∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
-      Co.[ i ] proj₂ (proj₂ (Co.left-to-right
-                               (cl⇒co (co⇒cl {ℓ = ℓ} p∼q)) p⟶p′)) ≡′
-               proj₂ (proj₂ (Co.left-to-right p∼q p⟶p′))
-    Co.force (lemma₁ p⟶p′) =
-      cl⇒co∘co⇒cl (Co.force (proj₂ (proj₂ (Co.left-to-right p∼q p⟶p′))))
-
-    lemma₂ :
-      ∀ {q′ μ} (q⟶q′ : q [ μ ]⟶ q′) →
-      Co.[ i ] proj₂ (proj₂ (Co.right-to-left
-                               (cl⇒co (co⇒cl {ℓ = ℓ} p∼q)) q⟶q′)) ≡′
-               proj₂ (proj₂ (Co.right-to-left p∼q q⟶q′))
-    Co.force (lemma₂ q⟶q′) =
-      cl⇒co∘co⇒cl (Co.force (proj₂ (proj₂ (Co.right-to-left p∼q q⟶q′))))
+  cl⇒co∘co⇒cl p∼q = gfp⊆ν∘ν⊆gfp _ p∼q
 
   -- If there are two processes that are not equal, but bisimilar,
   -- then co⇒cl is not a left inverse of cl⇒co.
@@ -123,19 +72,13 @@ module _ {lts : LTS} where
 
   classical⇔coinductive :
     ∀ {ℓ p q} → Cl.[ ℓ ] p ∼ q ⇔ p Co.∼ q
-  classical⇔coinductive = record
-    { to   = cl⇒co
-    ; from = co⇒cl
-    }
+  classical⇔coinductive = gfp⇔ν _
 
   -- The larger classical versions of bisimilarity are logically
   -- equivalent to the smallest one.
 
   larger⇔smallest : ∀ {ℓ p q} → Cl.[ ℓ ] p ∼ q ⇔ p Cl.∼ q
-  larger⇔smallest {ℓ} {p} {q} =
-    Cl.[ ℓ ] p ∼ q  ↝⟨ classical⇔coinductive ⟩
-    p Co.∼ q        ↝⟨ inverse classical⇔coinductive ⟩□
-    p Cl.∼ q        □
+  larger⇔smallest = IC.larger⇔smallest _
 
   -- There is a split surjection from the classical definition of
   -- bisimilarity to the coinductive one (assuming extensionality).
@@ -143,10 +86,7 @@ module _ {lts : LTS} where
   classical↠coinductive :
     Co.Extensionality →
     ∀ {ℓ p q} → Cl.[ ℓ ] p ∼ q ↠ p Co.∼ q
-  classical↠coinductive ext = record
-    { logical-equivalence = classical⇔coinductive
-    ; right-inverse-of    = Co.extensionality ext ∘ cl⇒co∘co⇒cl
-    }
+  classical↠coinductive ext = gfp↠ν _ ext
 
 -- There is at least one LTS for which there is a split surjection
 -- from the coinductive definition of bisimilarity to the classical
@@ -209,10 +149,11 @@ classical-bisimilarity-is-not-propositional {ℓ} =
 
   tt∼tt₂ : [ ℓ ] tt ∼ tt
   tt∼tt₂ =
-    let R , R-is-a-bisimulation , ttRtt = tt∼tt₁ in
-      (R ∪ R)
+    let R , R-is-a-bisimulation , ttRtt = _↔_.to Bisimilarity↔ tt∼tt₁ in
+    ⟨ (R ∪ R)
     , ×2-preserves-bisimulations R-is-a-bisimulation
     , inj₁ ttRtt
+    ⟩
 
   Unit = ↑ _ (tt ≡ tt)
 

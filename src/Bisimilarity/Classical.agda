@@ -12,11 +12,16 @@ open import Labelled-transition-system
 module Bisimilarity.Classical (lts : LTS) where
 
 open import Equality.Propositional
+open import Interval using (ext)
 open import Prelude
+
+open import Bijection equality-with-J using (_↔_)
+open import Function-universe equality-with-J as F hiding (id; _∘_)
 
 open LTS lts
 
-open import Bisimilarity.Step lts _[_]⟶_ _[_]⟶_
+open import Bisimilarity.Step lts _[_]⟶_ _[_]⟶_ as S hiding (⟨_,_⟩)
+open import Indexed-container hiding (⟨_⟩; Bisimilarity)
 open import Relation
 
 ------------------------------------------------------------------------
@@ -24,23 +29,25 @@ open import Relation
 
 -- Progressions.
 
-record Progression {r s}
-                   (R : Rel₂ r Proc)
-                   (S : Rel₂ s Proc) : Set (r ⊔ s) where
-  field
-    progression : R ⊆ Step S
+Progression : ∀ {r s} → Rel₂ r Proc → Rel₂ s Proc → Set (r ⊔ s)
+Progression R S = R ⊆ Step S
+
+module Progression
+        {r s} {R : Rel₂ r Proc} {S : Rel₂ s Proc}
+        (P : Progression R S)
+        where
 
   -- Some "projections".
 
   left-to-right :
     ∀ {p p′ q μ} →
     R (p , q) → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]⟶ q′ × S (p′ , q′)
-  left-to-right pRq = Step.left-to-right (progression pRq)
+  left-to-right pRq = Step.left-to-right (P pRq)
 
   right-to-left :
     ∀ {p q q′ μ} →
     R (p , q) → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]⟶ p′ × S (p′ , q′)
-  right-to-left pRq = Step.right-to-left (progression pRq)
+  right-to-left pRq = Step.right-to-left (P pRq)
 
 open Progression public
 
@@ -53,8 +60,7 @@ open Progression public
   (∀ {p q q′ μ} →
    R (p , q) → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]⟶ p′ × S (p′ , q′)) →
   Progression R S
-Progression.progression ⟪ lr , rl ⟫ =
-  λ pRq → ⟨ lr pRq , rl pRq ⟩
+⟪ lr , rl ⟫ = λ pRq → S.⟨ lr pRq , rl pRq ⟩
 
 -- Bisimulations.
 
@@ -64,8 +70,7 @@ Bisimulation R = Progression R R
 -- Bisimilarity.
 
 Bisimilarity : ∀ ℓ → Rel₂ (lsuc ℓ) Proc
-Bisimilarity ℓ pq =
-  ∃ λ (R : Rel₂ ℓ Proc) → Bisimulation R × R pq
+Bisimilarity ℓ = gfp ℓ S̲t̲e̲p̲
 
 infix 4 [_]_∼_ _∼_
 
@@ -75,6 +80,23 @@ infix 4 [_]_∼_ _∼_
 _∼_ : Proc → Proc → Set₁
 p ∼ q = [ lzero ] p ∼ q
 
+-- An unfolding lemma for Bisimilarity.
+
+Bisimilarity↔ :
+  ∀ {ℓ pq} →
+  Bisimilarity ℓ pq ↔ ∃ λ (R : Rel₂ ℓ Proc) → Bisimulation R × R pq
+Bisimilarity↔ {ℓ} {pq} =
+  Bisimilarity ℓ pq                                ↔⟨⟩
+  gfp ℓ S̲t̲e̲p̲ pq                                    ↔⟨⟩
+  (∃ λ (R : Rel₂ ℓ Proc) → R ⊆ ⟦ S̲t̲e̲p̲ ⟧ R × R pq)  ↝⟨ (∃-cong λ _ → (implicit-∀-cong ext $ ∀-cong ext λ _ → inverse Step↔S̲t̲e̲p̲) ×-cong F.id) ⟩
+  (∃ λ (R : Rel₂ ℓ Proc) → Bisimulation R × R pq)  □
+
+-- A "constructor".
+
+⟨_,_,_⟩ : ∀ {ℓ p q} →
+          (R : Rel₂ ℓ Proc) → Bisimulation R → R (p , q) → [ ℓ ] p ∼ q
+⟨ R , bisim , pRq ⟩ = _↔_.from Bisimilarity↔ (R , bisim , pRq)
+
 ------------------------------------------------------------------------
 -- Bisimilarity is an equivalence relation
 
@@ -82,29 +104,34 @@ p ∼ q = [ lzero ] p ∼ q
 
 reflexive-∼ : ∀ {ℓ p} → [ ℓ ] p ∼ p
 reflexive-∼ {ℓ} =
-    (λ { (p , q) → ↑ ℓ (p ≡ q) })
+  ⟨ (λ { (p , q) → ↑ ℓ (p ≡ q) })
   , ⟪ (λ { (lift p≡q) p⟶p′ →
            _ , subst (_[ _ ]⟶ _) p≡q       p⟶p′ , lift refl })
     , (λ { (lift p≡q) q⟶q′ →
            _ , subst (_[ _ ]⟶ _) (sym p≡q) q⟶q′ , lift refl })
     ⟫
   , lift refl
+  ⟩
 
 -- Symmetry.
 
 symmetric-∼ : ∀ {ℓ p q} → [ ℓ ] p ∼ q → [ ℓ ] q ∼ p
-symmetric-∼ (R , R-is-a-bisimulation , pRq) =
-    R ⁻¹
+symmetric-∼ p∼q with _↔_.to Bisimilarity↔ p∼q
+... | R , R-is-a-bisimulation , pRq =
+  ⟨ R ⁻¹
   , ⟪ right-to-left R-is-a-bisimulation
     , left-to-right R-is-a-bisimulation
     ⟫
   , pRq
+  ⟩
 
 -- Transitivity.
 
 transitive-∼ : ∀ {ℓ p q r} → [ ℓ ] p ∼ q → [ ℓ ] q ∼ r → [ ℓ ] p ∼ r
-transitive-∼ (R₁ , R-is₁ , pR₁q) (R₂ , R-is₂ , qR₂r) =
-    R₁ ⊙ R₂
+transitive-∼ p∼q q∼r with _↔_.to Bisimilarity↔ p∼q
+                        | _↔_.to Bisimilarity↔ q∼r
+... | R₁ , R-is₁ , pR₁q | R₂ , R-is₂ , qR₂r =
+  ⟨ R₁ ⊙ R₂
   , ⟪ (λ { (q , pR₁q , qR₂r) p⟶p′ →
            let q′ , q⟶q′ , p′R₁q′ = left-to-right R-is₁ pR₁q p⟶p′
                r′ , r⟶r′ , q′R₂r′ = left-to-right R-is₂ qR₂r q⟶q′
@@ -114,7 +141,8 @@ transitive-∼ (R₁ , R-is₁ , pR₁q) (R₂ , R-is₂ , qR₂r) =
              p′ , p⟶p′ , p′R₁q′ = right-to-left R-is₁ pR₁q q⟶q′
          in p′ , p⟶p′ , (q′ , p′R₁q′ , q′R₂r′) })
     ⟫
-  , _ , pR₁q , qR₂r
+  , (_ , pR₁q , qR₂r)
+  ⟩
 
 -- A function that can be used to aid the instance resolution
 -- mechanism.
@@ -131,28 +159,21 @@ infix -2 ∼:_
 
 bisimilarity-is-a-bisimulation :
   ∀ {ℓ} → Bisimulation (Bisimilarity ℓ)
-bisimilarity-is-a-bisimulation =
-  ⟪ (λ { (_R_ , R-is-a-bisimulation , pRq) p⟶p′ →
-         let q′ , q⟶q′ , p′Rq′ =
-               left-to-right R-is-a-bisimulation pRq p⟶p′ in
-           q′
-         , q⟶q′
-         , (_R_ , R-is-a-bisimulation , p′Rq′) })
-  , (λ { (_R_ , R-is-a-bisimulation , pRq) q⟶q′ →
-         let p′ , p⟶p′ , p′Rq′ =
-               right-to-left R-is-a-bisimulation pRq q⟶q′ in
-           p′
-         , p⟶p′
-         , (_R_ , R-is-a-bisimulation , p′Rq′) })
-  ⟫
+bisimilarity-is-a-bisimulation {ℓ} =
+  Bisimilarity ℓ             ⊆⟨ gfp-out _ ⟩
+  ⟦ S̲t̲e̲p̲ ⟧ (Bisimilarity ℓ)  ⊆⟨ _↔_.from Step↔S̲t̲e̲p̲ ⟩∎
+  Step (Bisimilarity ℓ)      ∎
 
 -- Bisimilarity is larger than every bisimulation.
 
 bisimulation⊆∼ :
   ∀ {ℓ} {R : Rel₂ ℓ Proc} →
   Bisimulation R → R ⊆ Bisimilarity ℓ
-bisimulation⊆∼ {R = R} R-is-a-bisimulation pRq =
-  R , R-is-a-bisimulation , pRq
+bisimulation⊆∼ {ℓ} {R} R-is-a-bisimulation =
+  gfp-unfold ℓ
+     (R           ⊆⟨ R-is-a-bisimulation ⟩
+      Step R      ⊆⟨ _↔_.to Step↔S̲t̲e̲p̲ ⟩∎
+      ⟦ S̲t̲e̲p̲ ⟧ R  ∎)
 
 ------------------------------------------------------------------------
 -- Bisimulations up to bisimilarity

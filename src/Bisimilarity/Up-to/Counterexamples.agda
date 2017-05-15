@@ -33,8 +33,7 @@ private
   module Combination (lts : LTS) where
 
     open Bisimilarity.Classical lts public
-      using (Progression; progression; ⟪_,_⟫;
-             Bisimulation; bisimulation⊆∼)
+      using (Progression; ⟪_,_⟫; Bisimulation; bisimulation⊆∼)
       renaming (_∼_ to _∼-cl_)
     open Bisimilarity.Coinductive lts public
     open Bisimilarity.Step lts (LTS._[_]⟶_ lts) (LTS._[_]⟶_ lts) public
@@ -244,25 +243,27 @@ private
   -- R̲ progresses to F (G R̲).
 
   R̲-prog : Progression R̲ (F (G R̲))
-  R̲-prog =
-    ⟪ flip (λ where
-              pq pp   → _ , pq , qq
-              pq refl → _ , pq , [ [ refl ] ]
-              pr pp   → _ , pr , [ rr       ]
-              pr refl → _ , pr , [ [ refl ] ]
-              qq refl → _ , qq , [ [ refl ] ]
-              rr refl → _ , rr , [ [ refl ] ])
-    , flip (λ where
-              pq pp   → _ , pq , qq
-              pq refl → _ , pq , [ [ refl ] ]
-              pr pp   → _ , pr , [ rr       ]
-              pr refl → _ , pr , [ [ refl ] ]
-              qq refl → _ , qq , [ [ refl ] ]
-              rr refl → _ , rr , [ [ refl ] ])
-    ⟫
+  R̲-prog pp   = Step.⟨ (λ where
+                          pq → _ , pq , qq
+                          pr → _ , pr , [ rr ])
+                     , (λ where
+                          pq → _ , pq , qq
+                          pr → _ , pr , [ rr ])
+                     ⟩
+  R̲-prog refl = Step.⟨ (λ where
+                          pq → _ , pq , [ [ refl ] ]
+                          pr → _ , pr , [ [ refl ] ]
+                          qq → _ , qq , [ [ refl ] ]
+                          rr → _ , rr , [ [ refl ] ])
+                     , (λ where
+                          pq → _ , pq , [ [ refl ] ]
+                          pr → _ , pr , [ [ refl ] ]
+                          qq → _ , qq , [ [ refl ] ]
+                          rr → _ , rr , [ [ refl ] ])
+                     ⟩
 
   R̲-prog′ : R̲ ⊆ ⟦ S̲t̲e̲p̲ ⟧ (F (G R̲))
-  R̲-prog′ Rx = _↔_.to Step↔S̲t̲e̲p̲ (progression R̲-prog Rx)
+  R̲-prog′ Rx = _↔_.to Step↔S̲t̲e̲p̲ (R̲-prog Rx)
 
   module F-lemmas where
 
@@ -277,7 +278,7 @@ private
     module _ {R} (R-prog′ : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ (F R)) where
 
       R-prog : Progression R (F R)
-      progression R-prog Rx = _↔_.from Step↔S̲t̲e̲p̲ (R-prog′ Rx)
+      R-prog Rx = _↔_.from Step↔S̲t̲e̲p̲ (R-prog′ Rx)
 
       ¬rr : ∀ {s} → ¬ R (r s , r (not s))
       ¬rr rel with Progression.left-to-right R-prog rel rr
@@ -350,7 +351,7 @@ private
     module _ {R} (R-prog′ : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ (G R)) where
 
       R-prog : Progression R (G R)
-      progression R-prog Rx = _↔_.from Step↔S̲t̲e̲p̲ (R-prog′ Rx)
+      R-prog Rx = _↔_.from Step↔S̲t̲e̲p̲ (R-prog′ Rx)
 
       ¬rr : ∀ {s} → ¬ R (r s , r (not s))
       ¬rr rel with Progression.left-to-right R-prog rel rr
