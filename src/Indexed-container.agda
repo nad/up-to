@@ -72,11 +72,13 @@ A →⋆ B = ∀ {i} → A i → B i
 
 -- Map functions.
 
-map₁ : ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} {C : Container₁ I} {A B : I → Set ℓ₂} →
+map₁ : ∀ {ℓ₁ ℓ₂ ℓ₃} {I : Set ℓ₁} {C : Container₁ I}
+         {A : I → Set ℓ₂} {B : I → Set ℓ₃} →
        A →⋆ B → ⟦ C ⟧₁ A → ⟦ C ⟧₁ B
 map₁ f = Σ-map id (λ g {_} → f ∘ g {i = _})
 
-map : ∀ {ℓ₁ ℓ₂} {I O : Set ℓ₁} (C : Container I O) {A B : I → Set ℓ₂} →
+map : ∀ {ℓ₁ ℓ₂ ℓ₃} {I O : Set ℓ₁} (C : Container I O)
+        {A : I → Set ℓ₂} {B : I → Set ℓ₃} →
       A →⋆ B → ⟦ C ⟧ A →⋆ ⟦ C ⟧ B
 map _ f = map₁ f
 
@@ -122,13 +124,13 @@ mutual
   -- pre-fixpoint.
 
   fold :
-    ∀ {ℓ} {I : Set ℓ} (C : Container I I) {X : I → Set ℓ} →
+    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : I → Set ℓ₂} →
     (⟦ C ⟧ X →⋆ X) →
     ∀ {i} → μ C i →⋆ X
   fold C f x = f (map C (fold′ C f) x)
 
   fold′ :
-    ∀ {ℓ} {I : Set ℓ} (C : Container I I) {X : I → Set ℓ} →
+    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : I → Set ℓ₂} →
     (⟦ C ⟧ X →⋆ X) →
     ∀ {i} → μ′ C i →⋆ X
   fold′ C f ⟨ x ⟩ = fold C f x
@@ -173,13 +175,13 @@ mutual
   -- post-fixpoint.
 
   unfold :
-    ∀ {ℓ} {I : Set ℓ} (C : Container I I) {X : I → Set ℓ} →
+    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : I → Set ℓ₂} →
     (X →⋆ ⟦ C ⟧ X) →
     ∀ {i} → X →⋆ ν C i
   unfold C f x = map C (unfold′ C f) (f x)
 
   unfold′ :
-    ∀ {ℓ} {I : Set ℓ} (C : Container I I) {X : I → Set ℓ} →
+    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : I → Set ℓ₂} →
     (X →⋆ ⟦ C ⟧ X) →
     ∀ {i} → X →⋆ ν′ C i
   force (unfold′ C f x) = unfold C f x
@@ -472,7 +474,7 @@ mutual
 -- The unfold and unfold′ functions make certain diagrams commute.
 
 unfold′-commute :
-  ∀ {ℓ} {I : Set ℓ} (C : Container I I) {X : I → Set ℓ}
+  ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : I → Set ℓ₂}
   (f : X →⋆ ⟦ C ⟧ X) →
   ∀ {i o} (x : X o) →
   ν′-bisimilar i
@@ -481,7 +483,7 @@ unfold′-commute :
 force (unfold′-commute C f x) = reflexive-ν (unfold C f x)
 
 unfold-commute :
-  ∀ {ℓ} {I : Set ℓ} (C : Container I I) {X : I → Set ℓ}
+  ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : I → Set ℓ₂}
   (f : X →⋆ ⟦ C ⟧ X) →
   ∀ {i o} (x : X o) →
   ν-bisimilar i
@@ -499,7 +501,7 @@ mutual
   -- Uniqueness properties for unfold and unfold′.
 
   unfold-unique :
-    ∀ {ℓ} {I : Set ℓ} (C : Container I I) {X : I → Set ℓ}
+    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : I → Set ℓ₂}
     (f : X →⋆ ⟦ C ⟧ X) (u : X →⋆ ν C ∞) {i} →
     (∀ {o} (x : X o) →
      ν-bisimilar i (u x) (ν-in C (map C u (f x)))) →
@@ -522,7 +524,7 @@ mutual
                  ⟩
 
   unfold′-unique :
-    ∀ {ℓ} {I : Set ℓ} (C : Container I I) {X : I → Set ℓ}
+    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : I → Set ℓ₂}
     (f : X →⋆ ⟦ C ⟧ X) (u : X →⋆ ν C ∞) {i} →
     (∀ {o} (x : X o) →
      ν-bisimilar i (u x) (ν-in C (map C u (f x)))) →
