@@ -28,6 +28,19 @@ import Indexed-container
 import Up-to
 
 ------------------------------------------------------------------------
+-- Similarity
+
+-- The one-sided Step function, used to define similarity and the
+-- two-sided step function.
+
+import Similarity.Step
+
+-- A parametrised coinductive definition that can be used to define
+-- various forms of similarity.
+
+import Similarity.General
+
+------------------------------------------------------------------------
 -- Strong bisimilarity
 
 -- The Step function, used to define strong and weak bisimilarity as
