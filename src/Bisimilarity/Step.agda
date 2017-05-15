@@ -114,7 +114,7 @@ Step↔S̲t̲e̲p̲ {R = R} {pq} = record
 
   to₂ :
     (s : Step R pq) →
-    Container.Position S̲t̲e̲p̲ (to₁ s) →⋆ R
+    Container.Position S̲t̲e̲p̲ (to₁ s) ⊆ R
   to₂ Step.⟨ lr , _ ⟩ (inj₁ (_ , p⟶p′ , refl)) = proj₂ (proj₂ (lr p⟶p′))
   to₂ Step.⟨ _ , rl ⟩ (inj₂ (_ , q⟶q′ , refl)) = proj₂ (proj₂ (rl q⟶q′))
 
@@ -130,7 +130,7 @@ Step↔S̲t̲e̲p̲ {R = R} {pq} = record
 
   to₂∘from :
     ∀ {p′q′} {s : Container.Shape S̲t̲e̲p̲ pq}
-    (f : Container.Position S̲t̲e̲p̲ s →⋆ R) →
+    (f : Container.Position S̲t̲e̲p̲ s ⊆ R) →
     (pos : Container.Position S̲t̲e̲p̲ s p′q′) →
     to₂ (from (s , f)) pos ≡ f pos
   to₂∘from f (inj₁ (_ , _ , refl)) = refl

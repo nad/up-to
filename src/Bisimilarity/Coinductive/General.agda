@@ -87,10 +87,10 @@ infix -2 ∼:_ ∼′:_
 infix 4 [_]_≡_ [_]_≡′_
 
 [_]_≡_ : ∀ {p q} → Size → (_ _ : ν S̲t̲e̲p̲ ∞ (p , q)) → Set
-[_]_≡_ = ν-bisimilar
+[_]_≡_ = curry ∘ ν-bisimilar
 
 [_]_≡′_ : ∀ {p q} → Size → (_ _ : ν′ S̲t̲e̲p̲ ∞ (p , q)) → Set
-[_]_≡′_ = ν′-bisimilar
+[_]_≡′_ = curry ∘ ν′-bisimilar
 
 -- An alternative characterisation of bisimilarity of bisimilarity
 -- proofs.
