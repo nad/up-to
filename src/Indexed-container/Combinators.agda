@@ -25,10 +25,12 @@ reindex₂ : ∀ {ℓ} {I O₁ O₂ : Set ℓ} →
            (O₂ → O₁) → Container I O₁ → Container I O₂
 reindex₂ f C = C ∘ f
 
-⟦reindex₂⟧ : ∀ {ℓ x} {I O₁ O₂ : Set ℓ} {f : O₂ → O₁}
-             (C : Container I O₁) {X : Rel x I} {o} →
-             ⟦ reindex₂ f C ⟧ X o ↔ ⟦ C ⟧ X (f o)
-⟦reindex₂⟧ C = Bijection.id
+-- An unfolding lemma for ⟦ reindex₂ f C ⟧.
+
+⟦reindex₂⟧↔ : ∀ {ℓ x} {I O₁ O₂ : Set ℓ} (f : O₂ → O₁)
+              (C : Container I O₁) {X : Rel x I} {o} →
+              ⟦ reindex₂ f C ⟧ X o ↔ ⟦ C ⟧ X (f o)
+⟦reindex₂⟧↔ f C = Bijection.id
 
 -- An unfolding lemma for ⟦ reindex₂ f C ⟧₂.
 
@@ -67,10 +69,12 @@ reindex₁ f C =
   where
   open Container
 
-⟦reindex₁⟧ : ∀ {ℓ x} {I₁ I₂ O : Set ℓ} {f : I₁ → I₂}
-             (C : Container I₁ O) {X : Rel x I₂} {o} →
-             ⟦ reindex₁ f C ⟧ X o ↔ ⟦ C ⟧ (X ∘ f) o
-⟦reindex₁⟧ {f = f} C {X} {o} =
+-- An unfolding lemma for ⟦ reindex₁ f C ⟧.
+
+⟦reindex₁⟧↔ : ∀ {ℓ x} {I₁ I₂ O : Set ℓ} {f : I₁ → I₂}
+              (C : Container I₁ O) {X : Rel x I₂} {o} →
+              ⟦ reindex₁ f C ⟧ X o ↔ ⟦ C ⟧ (X ∘ f) o
+⟦reindex₁⟧↔ {f = f} C {X} {o} =
   ⟦ reindex₁ f C ⟧ X o                                 ↝⟨ (∃-cong λ _ → Bijection.implicit-Π↔Π) ⟩
 
   (∃ λ (s : Shape C o) →
@@ -227,10 +231,12 @@ C₁ ⊗ C₂ =
   where
   open Container
 
-⟦⊗⟧ : ∀ {ℓ x} {I O : Set ℓ}
-      (C₁ C₂ : Container I O) {X : Rel x I} {o} →
-      ⟦ C₁ ⊗ C₂ ⟧ X o ↔ ⟦ C₁ ⟧ X o × ⟦ C₂ ⟧ X o
-⟦⊗⟧ C₁ C₂ {X} {o} =
+-- An unfolding lemma for ⟦ C₁ ⊗ C₂ ⟧.
+
+⟦⊗⟧↔ : ∀ {ℓ x} {I O : Set ℓ}
+       (C₁ C₂ : Container I O) {X : Rel x I} {o} →
+       ⟦ C₁ ⊗ C₂ ⟧ X o ↔ ⟦ C₁ ⟧ X o × ⟦ C₂ ⟧ X o
+⟦⊗⟧↔ C₁ C₂ {X} {o} =
   ⟦ C₁ ⊗ C₂ ⟧ X o                                                  ↔⟨⟩
 
   (∃ λ (s : Shape C₁ o × Shape C₂ o) →

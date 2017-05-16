@@ -83,12 +83,12 @@ Step↔S̲t̲e̲p̲ {R = R} {pq} =
   ⟦ One-sided.S̲t̲e̲p̲ _[_]↝₁_ ⟧ R pq
     ×
   ⟦ reindex₂ swap (One-sided.S̲t̲e̲p̲ _[_]↝₂_) ⟧ (R ∘ swap) pq         ↝⟨ (∃-cong λ _ → inverse $
-                                                                       ⟦reindex₁⟧ (reindex₂ swap (One-sided.S̲t̲e̲p̲ _[_]↝₂_))) ⟩
+                                                                       ⟦reindex₁⟧↔ (reindex₂ swap (One-sided.S̲t̲e̲p̲ _[_]↝₂_))) ⟩
   ⟦ One-sided.S̲t̲e̲p̲ _[_]↝₁_ ⟧ R pq
     ×
   ⟦ reindex₁ swap (reindex₂ swap (One-sided.S̲t̲e̲p̲ _[_]↝₂_)) ⟧ R pq  ↝⟨ inverse $
-                                                                      ⟦⊗⟧ (One-sided.S̲t̲e̲p̲ _[_]↝₁_)
-                                                                          (reindex₁ swap (reindex₂ swap (One-sided.S̲t̲e̲p̲ _[_]↝₂_))) ⟩□
+                                                                      ⟦⊗⟧↔ (One-sided.S̲t̲e̲p̲ _[_]↝₁_)
+                                                                           (reindex₁ swap (reindex₂ swap (One-sided.S̲t̲e̲p̲ _[_]↝₂_))) ⟩□
   ⟦ S̲t̲e̲p̲ ⟧ R pq                                                    □
   where
   lemma = record
