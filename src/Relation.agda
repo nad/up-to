@@ -53,6 +53,14 @@ _^^_ : ∀ {a} {A : Set a} →
 R ^^ zero  = uncurry _≡_
 R ^^ suc n = R ⊙ R ^^ n
 
+-- Intersection of relations.
+
+infixr 8 _∩_
+
+_∩_ : ∀ {a ℓ₁ ℓ₂} {A : Set a} →
+      Rel ℓ₁ A → Rel ℓ₂ A → Rel (ℓ₁ ⊔ ℓ₂) A
+R ∩ S = λ x → R x × S x
+
 -- Union of relations.
 
 infixr 7 _∪_
