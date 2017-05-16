@@ -30,8 +30,9 @@ open import Bisimilarity.Up-to (weak delay-monad)
 open import Bisimilarity.Weak.Coinductive delay-monad
 import Bisimilarity.Weak.Coinductive.Other delay-monad as CWO
 
--- Everything is an up-to technique for weak bisimilarity for the
--- delay monad (if A is a set, and assuming excluded middle).
+-- Everything is an up-to technique for (one notion of) weak
+-- bisimilarity for the delay monad (if A is a set, and assuming
+-- excluded middle).
 
 everything-up-to :
   Excluded-middle lzero →
