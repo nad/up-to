@@ -239,42 +239,42 @@ module _ {Name : Set} where
            R (P , Q) → P [ μ ]⟶ P′ →
            ∃ λ Q′ → Q [ μ ]⟶ Q′ ×
                     (Bisimilarity _ ⊙ R ⊙ Bisimilarity _) (P′ , Q′)
-      lr {P′ = P′} base !!a⟶P′ with 6-1-3-2 !!a⟶P′
-      ... | inj₂ (μ≡τ , _) = impossible !!a⟶P′ μ≡τ
-      ... | inj₁ (P″ , !a⟶P″ , P′∼!!a∣P″) with 6-1-3-2 !a⟶P″
-      ...   | inj₂ (μ≡τ , _) = impossible !!a⟶P′ μ≡τ
-      ...   | inj₁ (.∅ , action , P″∼!a∣∅) =
-          _
-        , (! a ·      [ name a ]⟶⟨ replication (par-right action) ⟩
-           ! a · ∣ ∅)
-        , _
-        , (P′            ∼⟨ P′∼!!a∣P″ ⟩
-           ! ! a · ∣ P″  ∼⟨ ∼: lemma P″∼!a∣∅ ⟩■
-           ! ! a ·)
-        , _
-        , base
-        , (! a ·      ∼⟨ symmetric ∣-right-identity ⟩■
-           ! a · ∣ ∅)
+      lr {P′ = P′} base !!a⟶P′ = case 6-1-3-2 !!a⟶P′ of λ where
+        (inj₂ (μ≡τ , _)) → impossible !!a⟶P′ μ≡τ
+        (inj₁ (P″ , !a⟶P″ , P′∼!!a∣P″)) → case 6-1-3-2 !a⟶P″ of λ where
+          (inj₂ (μ≡τ , _)) → impossible !!a⟶P′ μ≡τ
+          (inj₁ (.∅ , action , P″∼!a∣∅)) →
+              _
+            , (! a ·      [ name a ]⟶⟨ replication (par-right action) ⟩
+               ! a · ∣ ∅)
+            , _
+            , (P′            ∼⟨ P′∼!!a∣P″ ⟩
+               ! ! a · ∣ P″  ∼⟨ ∼: lemma P″∼!a∣∅ ⟩■
+               ! ! a ·)
+            , _
+            , base
+            , (! a ·      ∼⟨ symmetric ∣-right-identity ⟩■
+               ! a · ∣ ∅)
 
       rl : ∀ {P Q Q′ μ} →
            R (P , Q) → Q [ μ ]⟶ Q′ →
            ∃ λ P′ → P [ μ ]⟶ P′ ×
                     (Bisimilarity _ ⊙ R ⊙ Bisimilarity _) (P′ , Q′)
-      rl {Q′ = Q′} base !a⟶Q′ with 6-1-3-2 !a⟶Q′
-      ... | inj₂ (refl , .∅ , Q″ , .a , action , a⟶Q″ , _) =
-        ⊥-elim (names-are-not-inverted a⟶Q″)
-      ... | inj₁ (.∅ , action , Q′∼!a∣∅) =
-          _
-        , (! ! a ·       [ name a ]⟶⟨ replication (par-right !a⟶Q′) ⟩
-           ! ! a · ∣ Q′)
-        , _
-        , (! ! a · ∣ Q′  ∼⟨ lemma Q′∼!a∣∅ ⟩■
-           ! ! a ·)
-        , _
-        , base
-        , (! a ·      ∼⟨ symmetric ∣-right-identity ⟩
-           ! a · ∣ ∅  ∼⟨ symmetric Q′∼!a∣∅ ⟩■
-           Q′)
+      rl {Q′ = Q′} base !a⟶Q′ = case 6-1-3-2 !a⟶Q′ of λ where
+        (inj₂ (refl , .∅ , Q″ , .a , action , a⟶Q″ , _)) →
+          ⊥-elim (names-are-not-inverted a⟶Q″)
+        (inj₁ (.∅ , action , Q′∼!a∣∅)) →
+            _
+          , (! ! a ·       [ name a ]⟶⟨ replication (par-right !a⟶Q′) ⟩
+             ! ! a · ∣ Q′)
+          , _
+          , (! ! a · ∣ Q′  ∼⟨ lemma Q′∼!a∣∅ ⟩■
+             ! ! a ·)
+          , _
+          , base
+          , (! a ·      ∼⟨ symmetric ∣-right-identity ⟩
+             ! a · ∣ ∅  ∼⟨ symmetric Q′∼!a∣∅ ⟩■
+             Q′)
 
   ----------------------------------------------------------------------
   -- A result mentioned in "Enhancements of the bisimulation proof

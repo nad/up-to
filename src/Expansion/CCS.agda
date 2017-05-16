@@ -92,13 +92,13 @@ module Cong-lemmas
     ∀ {a μ P P′ Q′} →
     R P P′ → ν a P′ [ μ ]⟶ Q′ →
     ∃ λ Q → ν a P [ μ ]⇒̂ Q × R′ Q Q′
-  ν-cong ν-cong′ {a} {μ} {P} P≳P′ (restriction {P′ = Q′} a∉μ P′⟶Q′)
-    with right-to-left P≳P′ P′⟶Q′
-  ... | Q , P⇒̂Q , Q≳′Q′ =
-    ν a P      →⟨ map-⇒̂′ (λ { refl → restriction _ }) (restriction a∉μ) P⇒̂Q ⟩■
-      ⇒̂[ μ ]′
-    ν a Q      ∼⟨ ν-cong′ Q≳′Q′ ⟩■
-    ν a Q′
+  ν-cong ν-cong′ {a} {μ} {P} P≳P′ (restriction {P′ = Q′} a∉μ P′⟶Q′) =
+    case right-to-left P≳P′ P′⟶Q′ of λ where
+      (Q , P⇒̂Q , Q≳′Q′) →
+        ν a P      →⟨ map-⇒̂′ (λ { refl → restriction _ }) (restriction a∉μ) P⇒̂Q ⟩■
+          ⇒̂[ μ ]′
+        ν a Q      ∼⟨ ν-cong′ Q≳′Q′ ⟩■
+        ν a Q′
 
   !-cong-lemma₁ : ∀ {P Q μ} → P [ μ ]⇒ Q → ! P [ μ ]⇒ ! P ∣ Q
   !-cong-lemma₁ {P} {Q} {μ} = λ where
@@ -175,48 +175,50 @@ module Cong-lemmas
     ∀ {P P′ Q′ μ} →
     R P P′ → ! P′ [ μ ]⟶ Q′ →
     ∃ λ Q → ! P [ μ ]⇒̂ Q × R′ Q Q′
-  !-cong _∣-cong′_ !-cong′_ {P} {P′} {Q′} {μ} P≳P′ !P′⟶Q′
-    with S.6-1-3-2 !P′⟶Q′
+  !-cong _∣-cong′_ !-cong′_ {P} {P′} {Q′} {μ} P≳P′ !P′⟶Q′ =
+    case S.6-1-3-2 !P′⟶Q′ of λ where
 
-  ... | inj₁ (P″ , P′⟶P″ , Q′∼!P′∣P″) with right-to-left P≳P′ P′⟶P″
-  ...   | _ , silent μs done , P≳′P″ =
-    ! P        →⟨ silent μs done ⟩■
-      ⇒̂[ μ ]′
-    ! P        ∼⟨ symmetric S.6-1-2 ⟩
-    ! P ∣ P    ∼′⟨ (!-cong′ (convert P≳P′)) ∣-cong′ P≳′P″ ⟩ S.∼:
-    ! P′ ∣ P″  ∼⟨ symmetric Q′∼!P′∣P″ ⟩■
-    Q′
+      (inj₁ (P″ , P′⟶P″ , Q′∼!P′∣P″)) →
+        case right-to-left P≳P′ P′⟶P″ of λ where
+          (_ , silent μs done , P≳′P″) →
+            ! P        →⟨ silent μs done ⟩■
+              ⇒̂[ μ ]′
+            ! P        ∼⟨ symmetric S.6-1-2 ⟩
+            ! P ∣ P    ∼′⟨ (!-cong′ (convert P≳P′)) ∣-cong′ P≳′P″ ⟩ S.∼:
+            ! P′ ∣ P″  ∼⟨ symmetric Q′∼!P′∣P″ ⟩■
+            Q′
 
-  ...   | Q , silent μs (step {q = R} {μ = μ′} μ′s P⟶R R⇒Q) , Q≳′P″ =
-    ! P        →⟨ ⟶→⇒ μ′s (replication (par-right P⟶R)) ⟩
-    ! P ∣ R    →⟨ silent μs (map-⇒ par-right R⇒Q) ⟩■
-      ⇒̂[ μ ]′
-    ! P ∣ Q    ∼′⟨ (!-cong′ (convert P≳P′)) ∣-cong′ Q≳′P″ ⟩ S.∼:
-    ! P′ ∣ P″  ∼⟨ symmetric Q′∼!P′∣P″ ⟩■
-    Q′
+          (Q , silent μs (step {q = R} {μ = μ′} μ′s P⟶R R⇒Q) , Q≳′P″) →
+            ! P        →⟨ ⟶→⇒ μ′s (replication (par-right P⟶R)) ⟩
+            ! P ∣ R    →⟨ silent μs (map-⇒ par-right R⇒Q) ⟩■
+              ⇒̂[ μ ]′
+            ! P ∣ Q    ∼′⟨ (!-cong′ (convert P≳P′)) ∣-cong′ Q≳′P″ ⟩ S.∼:
+            ! P′ ∣ P″  ∼⟨ symmetric Q′∼!P′∣P″ ⟩■
+            Q′
 
-  ...   | Q , non-silent ¬μs P⇒Q , Q≳′P″ =
-    ! P        →⟨ non-silent ¬μs (!-cong-lemma₁ P⇒Q) ⟩■
-      ⇒̂[ μ ]′
-    ! P ∣ Q    ∼′⟨ (!-cong′ (convert P≳P′)) ∣-cong′ Q≳′P″ ⟩ S.∼:
-    ! P′ ∣ P″  ∼⟨ symmetric Q′∼!P′∣P″ ⟩■
-    Q′
+          (Q , non-silent ¬μs P⇒Q , Q≳′P″) →
+            ! P        →⟨ non-silent ¬μs (!-cong-lemma₁ P⇒Q) ⟩■
+              ⇒̂[ μ ]′
+            ! P ∣ Q    ∼′⟨ (!-cong′ (convert P≳P′)) ∣-cong′ Q≳′P″ ⟩ S.∼:
+            ! P′ ∣ P″  ∼⟨ symmetric Q′∼!P′∣P″ ⟩■
+            Q′
 
-  !-cong _∣-cong′_ !-cong′_ {P} {P′} {Q′} {μ} P≳P′ !P′⟶Q′
-    | inj₂ (refl , P″ , P‴ , a , P′⟶P″ , P′⟶P‴ , Q′∼!P′∣P″∣P‴)
-    with right-to-left P≳P′ P′⟶P″ | right-to-left P≳P′ P′⟶P‴
-  ... | _ , silent () _ , _ | _
-  ... | _ | _ , silent () _ , _
+      (inj₂ (refl , P″ , P‴ , a , P′⟶P″ , P′⟶P‴ , Q′∼!P′∣P″∣P‴)) →
+        case right-to-left P≳P′ P′⟶P″ ,′
+             right-to-left P≳P′ P′⟶P‴ of λ where
+          ((_ , silent () _ , _) , _)
+          (_ , (_ , silent () _ , _))
 
-  ... | Q₁ , non-silent _ P⇒Q₁ , Q₁≳′P″
-      | Q₂ , non-silent _ P⇒Q₂ , Q₂≳′P‴ with !-cong-lemma₂ P⇒Q₁ P⇒Q₂
-  ...   | R , !P⇒R , R∼[!P∣Q₁]∣Q₂ =
-    ! P               →⟨ !P⇒R ⟩■
-      ⇒̂[ τ ]′
-    R                 ∼⟨ R∼[!P∣Q₁]∣Q₂ ⟩
-    (! P ∣ Q₁) ∣ Q₂   ∼′⟨ ((!-cong′ (convert P≳P′)) ∣-cong′ Q₁≳′P″) ∣-cong′ Q₂≳′P‴ ⟩ S.∼:
-    (! P′ ∣ P″) ∣ P‴  ∼⟨ symmetric Q′∼!P′∣P″∣P‴ ⟩■
-    Q′
+          ((Q₁ , non-silent _ P⇒Q₁ , Q₁≳′P″) ,
+           (Q₂ , non-silent _ P⇒Q₂ , Q₂≳′P‴)) →
+            case !-cong-lemma₂ P⇒Q₁ P⇒Q₂ of λ where
+              (R , !P⇒R , R∼[!P∣Q₁]∣Q₂) →
+                ! P               →⟨ !P⇒R ⟩■
+                  ⇒̂[ τ ]′
+                R                 ∼⟨ R∼[!P∣Q₁]∣Q₂ ⟩
+                (! P ∣ Q₁) ∣ Q₂   ∼′⟨ ((!-cong′ (convert P≳P′)) ∣-cong′ Q₁≳′P″) ∣-cong′ Q₂≳′P‴ ⟩ S.∼:
+                (! P′ ∣ P″) ∣ P‴  ∼⟨ symmetric Q′∼!P′∣P″∣P‴ ⟩■
+                Q′
 
   ⊕·-cong :
     ∀ {P Q Q′ S′ μ μ′} →
@@ -419,36 +421,37 @@ mutual
     lr : ∀ {Q μ} →
          ! P [ μ ]⟶ Q →
          ∃ λ Q′ → ! P′ [ μ ]⟶̂ Q′ × [ i ] Q ≳′ Q′
-    lr {Q} {μ} !P⟶Q with S.6-1-3-2 !P⟶Q
+    lr {Q} {μ} !P⟶Q = case S.6-1-3-2 !P⟶Q of λ where
 
-    ... | inj₁ (P″ , P⟶P″ , Q∼!P∣P″) with left-to-right P≳P′ P⟶P″
-    ...   | _  , done refl , P″≳′P′ =
-      Q          ∼⟨ Q∼!P∣P″ ⟩
-      ! P  ∣ P″  ∼′⟨ !-cong′ (convert P≳P′) ∣-cong′ P″≳′P′ ⟩ S.∼:
-      ! P′ ∣ P′  ∼⟨ S.6-1-2 ⟩■
-      ! P′
-        ⟵̂[ τ ]
-      ! P′       ■
+      (inj₁ (P″ , P⟶P″ , Q∼!P∣P″)) → case left-to-right P≳P′ P⟶P″ of λ where
+        (_ , done refl , P″≳′P′) →
+          Q          ∼⟨ Q∼!P∣P″ ⟩
+          ! P  ∣ P″  ∼′⟨ !-cong′ (convert P≳P′) ∣-cong′ P″≳′P′ ⟩ S.∼:
+          ! P′ ∣ P′  ∼⟨ S.6-1-2 ⟩■
+          ! P′
+            ⟵̂[ τ ]
+          ! P′       ■
 
-    ...   | Q′ , step P′⟶Q′ , P″≳′Q′ =
-      Q          ∼⟨ Q∼!P∣P″ ⟩
-      ! P  ∣ P″  ∼⟨ !-cong′ (convert P≳P′) ∣-cong′ P″≳′Q′ ⟩■
-      ! P′ ∣ Q′
-        ⟵̂[ μ ]   ←⟨ replication (par-right P′⟶Q′) ⟩■
-      ! P′
+        (Q′ , step P′⟶Q′ , P″≳′Q′) →
+          Q          ∼⟨ Q∼!P∣P″ ⟩
+          ! P  ∣ P″  ∼⟨ !-cong′ (convert P≳P′) ∣-cong′ P″≳′Q′ ⟩■
+          ! P′ ∣ Q′
+            ⟵̂[ μ ]   ←⟨ replication (par-right P′⟶Q′) ⟩■
+          ! P′
 
-    lr {Q} {μ} !P⟶Q
-      | inj₂ (refl , P″ , P‴ , a , P⟶P″ , P⟶P‴ , Q≳!P∣P″∣P‴)
-      with left-to-right P≳P′ P⟶P″ | left-to-right P≳P′ P⟶P‴
-    ... | Q′ , step P′⟶Q′ , P″≳′Q′ | Q″ , step P′⟶Q″ , P‴≳′Q″ =
-      Q                 ∼⟨ Q≳!P∣P″∣P‴ ⟩
-      (! P ∣ P″) ∣ P‴   ∼⟨ (!-cong′ (convert P≳P′) ∣-cong′ P″≳′Q′) ∣-cong′ P‴≳′Q″ ⟩■
-      (! P′ ∣ Q′) ∣ Q″
-        ⟵̂[ μ ]          ←⟨ replication (par-τ (replication (par-right P′⟶Q′)) P′⟶Q″) ⟩■
-      ! P′
+      (inj₂ (refl , P″ , P‴ , a , P⟶P″ , P⟶P‴ , Q≳!P∣P″∣P‴)) →
+        case left-to-right P≳P′ P⟶P″ ,′
+             left-to-right P≳P′ P⟶P‴ of λ where
+          ((Q′ , step P′⟶Q′ , P″≳′Q′) ,
+           (Q″ , step P′⟶Q″ , P‴≳′Q″)) →
+            Q                 ∼⟨ Q≳!P∣P″∣P‴ ⟩
+            (! P ∣ P″) ∣ P‴   ∼⟨ (!-cong′ (convert P≳P′) ∣-cong′ P″≳′Q′) ∣-cong′ P‴≳′Q″ ⟩■
+            (! P′ ∣ Q′) ∣ Q″
+              ⟵̂[ μ ]          ←⟨ replication (par-τ (replication (par-right P′⟶Q′)) P′⟶Q″) ⟩■
+            ! P′
 
-    ... | _ , done () , _ | _
-    ... | _ | _ , done () , _
+          ((_ , done () , _) , _)
+          (_ , (_ , done () , _))
 
   !-cong′_ : ∀ {i P P′} → [ i ] P ≳′ P′ → [ i ] ! P ≳′ ! P′
   force (!-cong′ P≳P′) = !-cong (force P≳P′)

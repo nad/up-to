@@ -112,40 +112,40 @@ Up-to-context-size-preserving =
 
     helper : ¬ Matches (! name a · (b ·)) C
 
-    helper (hole x) with PsSQs x
-    ... | _ , Ps[x]∼!ab∣b , _ , base , _ =
+    helper (hole x) = case PsSQs x of λ where
+      (_ , Ps[x]∼!ab∣b , _ , base , _) →
+                                                    $⟨ Ps[x]∼!ab∣b ⟩
+        Ps x ∼ ! name a · (b ·) ∣ b ·               ↝⟨ subst (_∼ _) (sym !ab≡C[Ps]) ⟩
+        ! name a · (b ·) ∼ ! name a · (b ·) ∣ b ·   ↝⟨ (λ !ab∼!ab∣b → Σ-map id proj₁ $ S̲t̲e̲p̲.right-to-left !ab∼!ab∣b (par-right action)) ⟩
+        (∃ λ P′ → ! name a · (b ·) [ name b ]⟶ P′)  ↝⟨ cancel-name ∘ !-only ·-only ∘ proj₂ ⟩
+        a ≡ b                                       ↝⟨ a≢b ⟩□
+        ⊥                                           □
+
+    helper (! hole x) = case PsSQs x of λ where
+      (_ , Ps[x]∼!ab∣b , _ , base , _) →
                                                   $⟨ Ps[x]∼!ab∣b ⟩
-      Ps x ∼ ! name a · (b ·) ∣ b ·               ↝⟨ subst (_∼ _) (sym !ab≡C[Ps]) ⟩
-      ! name a · (b ·) ∼ ! name a · (b ·) ∣ b ·   ↝⟨ (λ !ab∼!ab∣b → Σ-map id proj₁ $ S̲t̲e̲p̲.right-to-left !ab∼!ab∣b (par-right action)) ⟩
-      (∃ λ P′ → ! name a · (b ·) [ name b ]⟶ P′)  ↝⟨ cancel-name ∘ !-only ·-only ∘ proj₂ ⟩
-      a ≡ b                                       ↝⟨ a≢b ⟩□
-      ⊥                                           □
+        Ps x ∼ ! name a · (b ·) ∣ b ·             ↝⟨ subst (_∼ _) (sym $ cong (λ { (! P) → P; _ → ∅ }) !ab≡C[Ps]) ⟩
+        name a · (b ·) ∼ ! name a · (b ·) ∣ b ·   ↝⟨ (λ ab∼!ab∣b → Σ-map id proj₁ $ S̲t̲e̲p̲.right-to-left ab∼!ab∣b (par-right action)) ⟩
+        (∃ λ P′ → name a · (b ·) [ name b ]⟶ P′)  ↝⟨ cancel-name ∘ ·-only ∘ proj₂ ⟩
+        a ≡ b                                     ↝⟨ a≢b ⟩□
+        ⊥                                         □
 
-    helper (! hole x) with PsSQs x
-    ... | _ , Ps[x]∼!ab∣b , _ , base , _ =
-                                                $⟨ Ps[x]∼!ab∣b ⟩
-      Ps x ∼ ! name a · (b ·) ∣ b ·             ↝⟨ subst (_∼ _) (sym $ cong (λ { (! P) → P; _ → ∅ }) !ab≡C[Ps]) ⟩
-      name a · (b ·) ∼ ! name a · (b ·) ∣ b ·   ↝⟨ (λ ab∼!ab∣b → Σ-map id proj₁ $ S̲t̲e̲p̲.right-to-left ab∼!ab∣b (par-right action)) ⟩
-      (∃ λ P′ → name a · (b ·) [ name b ]⟶ P′)  ↝⟨ cancel-name ∘ ·-only ∘ proj₂ ⟩
-      a ≡ b                                     ↝⟨ a≢b ⟩□
-      ⊥                                         □
+    helper (! action (hole x)) = case PsSQs x of λ where
+      (_ , Ps[x]∼!ab∣b , _ , base , _) →
+                                       $⟨ Ps[x]∼!ab∣b ⟩
+        Ps x ∼ ! name a · (b ·) ∣ b ·  ↝⟨ subst (_∼ _) (sym $ cong (λ { (! (_ · P)) → P; _ → ∅ }) !ab≡C[Ps]) ⟩
+        b · ∼ ! name a · (b ·) ∣ b ·   ↝⟨ (λ b∼!ab∣b → Σ-map id proj₁ $ S̲t̲e̲p̲.right-to-left b∼!ab∣b (par-left (replication (par-right action)))) ⟩
+        (∃ λ P′ → b · [ name a ]⟶ P′)  ↝⟨ cancel-name ∘ ·-only ∘ proj₂ ⟩
+        b ≡ a                          ↝⟨ a≢b ∘ sym ⟩□
+        ⊥                              □
 
-    helper (! action (hole x)) with PsSQs x
-    ... | _ , Ps[x]∼!ab∣b , _ , base , _ =
-                                     $⟨ Ps[x]∼!ab∣b ⟩
-      Ps x ∼ ! name a · (b ·) ∣ b ·  ↝⟨ subst (_∼ _) (sym $ cong (λ { (! (_ · P)) → P; _ → ∅ }) !ab≡C[Ps]) ⟩
-      b · ∼ ! name a · (b ·) ∣ b ·   ↝⟨ (λ b∼!ab∣b → Σ-map id proj₁ $ S̲t̲e̲p̲.right-to-left b∼!ab∣b (par-left (replication (par-right action)))) ⟩
-      (∃ λ P′ → b · [ name a ]⟶ P′)  ↝⟨ cancel-name ∘ ·-only ∘ proj₂ ⟩
-      b ≡ a                          ↝⟨ a≢b ∘ sym ⟩□
-      ⊥                              □
-
-    helper (! action (action (hole x))) with PsSQs x
-    ... | _ , Ps[x]∼!ab∣b , _ , base , _ =
-                                     $⟨ Ps[x]∼!ab∣b ⟩
-      Ps x ∼ ! name a · (b ·) ∣ b ·  ↝⟨ subst (_∼ _) (sym $ cong (λ { (! (_ · _ · P)) → P; _ → ∅ }) !ab≡C[Ps]) ⟩
-      ∅ ∼ ! name a · (b ·) ∣ b ·     ↝⟨ (λ ∅∼!ab∣b → Σ-map id proj₁ $ S̲t̲e̲p̲.right-to-left ∅∼!ab∣b (par-right action)) ⟩
-      (∃ λ P′ → ∅ [ name b ]⟶ P′)    ↝⟨ (λ ()) ∘ proj₂ ⟩□
-      ⊥                              □
+    helper (! action (action (hole x))) = case PsSQs x of λ where
+      (_ , Ps[x]∼!ab∣b , _ , base , _) →
+                                       $⟨ Ps[x]∼!ab∣b ⟩
+        Ps x ∼ ! name a · (b ·) ∣ b ·  ↝⟨ subst (_∼ _) (sym $ cong (λ { (! (_ · _ · P)) → P; _ → ∅ }) !ab≡C[Ps]) ⟩
+        ∅ ∼ ! name a · (b ·) ∣ b ·     ↝⟨ (λ ∅∼!ab∣b → Σ-map id proj₁ $ S̲t̲e̲p̲.right-to-left ∅∼!ab∣b (par-right action)) ⟩
+        (∃ λ P′ → ∅ [ name b ]⟶ P′)    ↝⟨ (λ ()) ∘ proj₂ ⟩□
+        ⊥                              □
 
     helper (! action (action ∅)) =
                                            $⟨ !ac≡C[Qs] ⟩
@@ -160,40 +160,40 @@ Up-to-context-size-preserving =
     lr : ∀ {P′ μ} →
          ! name a · (b ·) [ μ ]⟶ P′ →
          ∃ λ Q′ → ! name a · (c ·) [ μ ]⟶ Q′ × S (P′ , Q′)
-    lr {P′} !ab[μ]⟶P′ with 6-1-3-2 !ab[μ]⟶P′
-    lr {P′} !ab[μ]⟶P′ | inj₁ (.(b ·) , action , P′∼!ab∣b) =
-        ! name a · (c ·) ∣ c ·
-      , replication (par-right action)
-      , _
-      , (P′                      ∼⟨ P′∼!ab∣b ⟩■
-         ! name a · (b ·) ∣ b ·)
-      , _
-      , base
-      , (! name a · (c ·) ∣ c ·  ■)
+    lr {P′} {μ} !ab[μ]⟶P′ = case 6-1-3-2 !ab[μ]⟶P′ of λ where
+      (inj₁ (.(b ·) , action , P′∼!ab∣b)) →
+          ! name a · (c ·) ∣ c ·
+        , replication (par-right action)
+        , _
+        , (P′                      ∼⟨ P′∼!ab∣b ⟩■
+           ! name a · (b ·) ∣ b ·)
+        , _
+        , base
+        , (! name a · (c ·) ∣ c ·  ■)
 
-    lr {P′} {μ} !ab[μ]⟶P′ | inj₂ (μ≡τ , _) = ⊥-elim $ name≢τ (
-      name a  ≡⟨ !-only ·-only !ab[μ]⟶P′ ⟩
-      μ       ≡⟨ μ≡τ ⟩∎
-      τ       ∎)
+      (inj₂ (μ≡τ , _)) → ⊥-elim $ name≢τ (
+        name a  ≡⟨ !-only ·-only !ab[μ]⟶P′ ⟩
+        μ       ≡⟨ μ≡τ ⟩∎
+        τ       ∎)
 
     rl : ∀ {Q′ μ} →
          ! name a · (c ·) [ μ ]⟶ Q′ →
          ∃ λ P′ → ! name a · (b ·) [ μ ]⟶ P′ × S (P′ , Q′)
-    rl {Q′} !ab[μ]⟶Q′ with 6-1-3-2 !ab[μ]⟶Q′
-    rl {Q′} !ab[μ]⟶Q′ | inj₁ (.(c ·) , action , Q′∼!ac∣c) =
-        ! name a · (b ·) ∣ b ·
-      , replication (par-right action)
-      , _
-      , (! name a · (b ·) ∣ b ·  ■)
-      , _
-      , base
-      , (! name a · (c ·) ∣ c ·  ∼⟨ symmetric Q′∼!ac∣c ⟩■
-         Q′)
+    rl {Q′} {μ} !ac[μ]⟶Q′ = case 6-1-3-2 !ac[μ]⟶Q′ of λ where
+      (inj₁ (.(c ·) , action , Q′∼!ac∣c)) →
+          ! name a · (b ·) ∣ b ·
+        , replication (par-right action)
+        , _
+        , (! name a · (b ·) ∣ b ·  ■)
+        , _
+        , base
+        , (! name a · (c ·) ∣ c ·  ∼⟨ symmetric Q′∼!ac∣c ⟩■
+           Q′)
 
-    rl {Q′} {μ} !ac[μ]⟶Q′ | inj₂ (μ≡τ , _) = ⊥-elim $ name≢τ (
-      name a  ≡⟨ !-only ·-only !ac[μ]⟶Q′ ⟩
-      μ       ≡⟨ μ≡τ ⟩∎
-      τ       ∎)
+      (inj₂ (μ≡τ , _)) → ⊥-elim $ name≢τ (
+        name a  ≡⟨ !-only ·-only !ac[μ]⟶Q′ ⟩
+        μ       ≡⟨ μ≡τ ⟩∎
+        τ       ∎)
 
   -- Note the use of compatibility in [R]⊆Step[S].
 
