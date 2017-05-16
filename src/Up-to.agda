@@ -19,7 +19,7 @@ open import Function-universe equality-with-J hiding (id; _∘_)
 open import Relation
 
 ------------------------------------------------------------------------
--- General results
+-- Up-to techniques
 
 -- A relation transformer F is an up-to technique if every relation R
 -- that is contained in ⟦ C ⟧ (F R) is contained in ν C ∞.
@@ -30,6 +30,9 @@ open import Relation
 
 Up-to-technique : Trans ℓ I → Set (lsuc ℓ)
 Up-to-technique F = ∀ {R} → R ⊆ ⟦ C ⟧ (F R) → R ⊆ ν C ∞
+
+------------------------------------------------------------------------
+-- Compatibility
 
 -- Compatibility.
 --
@@ -91,6 +94,9 @@ module _
     R              ⊆⟨ 0 ,_ ⟩
     F^ωR R R-prog  ⊆⟨ unfold C (F^ωR-bisim R R-prog) ⟩∎
     ν C ∞          ∎
+
+------------------------------------------------------------------------
+-- Size-preserving functions (using sized types)
 
 -- F is size-preserving if, for any relation R, if R is contained in
 -- ν C i, then F R is contained in ν C i.
