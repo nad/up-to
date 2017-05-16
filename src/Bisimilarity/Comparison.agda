@@ -132,7 +132,7 @@ classical-bisimilarity-is-not-propositional :
 classical-bisimilarity-is-not-propositional {ℓ} =
   Is-proposition ([ ℓ ] tt ∼ tt)    ↝⟨ (λ is-prop → _⇔_.to propositional⇔irrelevant is-prop) ⟩
   Proof-irrelevant ([ ℓ ] tt ∼ tt)  ↝⟨ (λ f → f tt∼tt₁ tt∼tt₂) ⟩
-  tt∼tt₁ ≡ tt∼tt₂                   ↝⟨ cong (λ R → proj₁ R (tt , tt)) ⟩
+  tt∼tt₁ ≡ tt∼tt₂                   ↝⟨ cong (λ R → proj₁ R (tt , tt)) {x = tt∼tt₁} {y = tt∼tt₂} ⟩
   Unit ≡ (Unit ⊎ Unit)              ↝⟨ (λ eq → Fin 1          ↝⟨ inverse Unit↔Fin1 ⟩
                                                Unit           ↝⟨ ≡⇒↝ _ eq ⟩
                                                Unit ⊎ Unit    ↝⟨ Unit↔Fin1 ⊎-cong Unit↔Fin1 ⟩
