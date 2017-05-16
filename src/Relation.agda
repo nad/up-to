@@ -34,7 +34,7 @@ Trans₂ ℓ A = Trans ℓ (A × A)
 infixr 10 _⁻¹
 
 _⁻¹ : ∀ {a ℓ} {A : Set a} → Rel₂ ℓ A → Rel₂ ℓ A
-(R ⁻¹) (x , y) = R (y , x)
+R ⁻¹ = R ∘ swap
 
 -- Composition of binary relations.
 
