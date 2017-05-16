@@ -8,18 +8,81 @@ module Indexed-container.Combinators where
 
 open import Equality.Propositional hiding (Extensionality)
 open import Interval using (ext)
-open import Prelude
+open import Prelude hiding (id)
 
 open import Bijection equality-with-J as Bijection using (_↔_)
-open import Function-universe equality-with-J as F hiding (_∘_)
+open import Equivalence equality-with-J hiding (id; _∘_; inverse)
+open import Function-universe equality-with-J as F hiding (id; _∘_)
 
 open import Indexed-container
 open import Relation
 
--- A reindexing combinator.
+-- An identity combinator.
 --
 -- Taken from "Indexed containers" by Altenkirch, Ghani, Hancock,
 -- McBride and Morris (JFP, 2015).
+
+id : ∀ {i} {I : Set i} → Container I I
+id i = ↑ _ ⊤ ◁₁ λ _ i′ → i ≡ i′
+
+-- An unfolding lemma for ⟦ id ⟧.
+
+⟦id⟧↔ : ∀ {ℓ x} {I : Set ℓ} {X : Rel x I} {i} → ⟦ id ⟧ X i ↔ X i
+⟦id⟧↔ {X = X} {i} =
+  ↑ _ ⊤ × (λ i′ → i ≡ i′) ⊆ X  ↝⟨ drop-⊤-left-× (λ _ → Bijection.↑↔) ⟩
+  (λ i′ → i ≡ i′) ⊆ X          ↔⟨⟩
+  (∀ {i′} → i ≡ i′ → X i′)     ↝⟨ Bijection.implicit-Π↔Π ⟩
+  (∀ i′ → i ≡ i′ → X i′)       ↝⟨ inverse $ ∀-intro ext _ ⟩□
+  X i                          □
+
+-- An unfolding lemma for ⟦ id ⟧₂.
+
+⟦id⟧₂↔ :
+  ∀ {ℓ x} {I : Set ℓ} {X : Rel x I}
+  (R : ∀ {i} → Rel₂ ℓ (X i)) {i}
+  (x y : ⟦ id ⟧ X i) →
+
+  ⟦ id ⟧₂ R (x , y)
+    ↔
+  proj₁ x ≡ proj₁ y × R (proj₂ x refl , proj₂ y refl)
+
+⟦id⟧₂↔ R {i} x@(s , f) y@(t , g) =
+
+  ⟦ id ⟧₂ R (x , y)                               ↔⟨⟩
+
+  (∃ λ (eq : s ≡ t) →
+   ∀ {o} (p : i ≡ o) →
+   R (f p , g (subst (λ _ → i ≡ o) eq p)))        ↝⟨ ∃-cong (λ _ → Bijection.implicit-Π↔Π) ⟩
+
+  (∃ λ (eq : s ≡ t) →
+   ∀ o (p : i ≡ o) →
+   R (f p , g (subst (λ _ → i ≡ o) eq p)))        ↝⟨ ∃-cong (λ _ → inverse $ ∀-intro ext _) ⟩
+
+  (∃ λ (eq : s ≡ t) →
+   R (f refl , g (subst (λ _ → i ≡ i) eq refl)))  ↝⟨ ∃-cong (λ eq → ≡⇒↝ _ (cong (λ eq → R (f refl , g eq)) (subst-const eq))) ⟩
+
+  s ≡ t × R (f refl , g refl)                     □
+
+-- A second unfolding lemma for ⟦ id ⟧₂.
+
+⟦id⟧₂≡↔ :
+  ∀ {ℓ} {I : Set ℓ} {X : Rel ℓ I} {i} (x y : ⟦ id ⟧ X i) →
+  ⟦ id ⟧₂ (uncurry _≡_) (x , y) ↔ x ≡ y
+⟦id⟧₂≡↔ x@(s , f) y@(t , g) =
+
+  ⟦ id ⟧₂ (uncurry _≡_) (x , y)  ↝⟨ ⟦id⟧₂↔ (uncurry _≡_) x y ⟩
+
+  s ≡ t × f refl ≡ g refl        ↔⟨ ∃-cong (λ _ → ≃-≡ (↔⇒≃ $ inverse $ ∀-intro ext _)) ⟩
+
+  s ≡ t × (λ _ → f) ≡ (λ _ → g)  ↔⟨ ∃-cong (λ _ → ≃-≡ (↔⇒≃ Bijection.implicit-Π↔Π)) ⟩
+
+  s ≡ t × (λ {_} → f) ≡ g        ↝⟨ ≡×≡↔≡ ⟩
+
+  x ≡ y                          □
+
+-- A reindexing combinator.
+--
+-- Taken from "Indexed containers".
 
 reindex₂ : ∀ {ℓ} {I O₁ O₂ : Set ℓ} →
            (O₂ → O₁) → Container I O₁ → Container I O₂

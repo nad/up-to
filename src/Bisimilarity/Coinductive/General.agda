@@ -29,7 +29,7 @@ open import H-level.Closure equality-with-J
 open import Bisimilarity.Step lts _[_]↝₁_ _[_]↝₂_ as Step public
   using (S̲t̲e̲p̲)
 open import Indexed-container hiding (⟨_⟩; Bisimilarity)
-open import Indexed-container.Combinators
+open import Indexed-container.Combinators hiding (id)
 open import Relation
 import Similarity.Step lts _[_]↝₁_ as Step₁
 import Similarity.Step lts _[_]↝₂_ as Step₂
