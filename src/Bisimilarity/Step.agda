@@ -59,10 +59,7 @@ open Temporarily-private using (Step)
 -- The Step function, expressed as an indexed container.
 
 S̲t̲e̲p̲ : Container (Proc × Proc) (Proc × Proc)
-S̲t̲e̲p̲ =
-  One-sided.S̲t̲e̲p̲ _[_]↝₁_
-    ⊗
-  reindex₂ swap (reindex₁ swap (One-sided.S̲t̲e̲p̲ _[_]↝₂_))
+S̲t̲e̲p̲ = One-sided.S̲t̲e̲p̲ _[_]↝₁_ ⟷ One-sided.S̲t̲e̲p̲ _[_]↝₂_
 
 -- The definition of Step in terms of a container is pointwise
 -- isomorphic to the direct definition.
@@ -70,26 +67,17 @@ S̲t̲e̲p̲ =
 Step↔S̲t̲e̲p̲ :
   ∀ {r} {R : Rel₂ r Proc} {pq} → Step R pq ↔ ⟦ S̲t̲e̲p̲ ⟧ R pq
 Step↔S̲t̲e̲p̲ {R = R} {pq} =
-  Step R pq                                                        ↝⟨ lemma ⟩
+  Step R pq                                        ↝⟨ lemma ⟩
 
   One-sided.Step _[_]↝₁_ R pq
     ×
-  One-sided.Step _[_]↝₂_ (R ∘ swap) (swap pq)                      ↝⟨ One-sided.Step↔S̲t̲e̲p̲ _ ×-cong One-sided.Step↔S̲t̲e̲p̲ _ ⟩
+  One-sided.Step _[_]↝₂_ (R ∘ swap) (swap pq)      ↝⟨ One-sided.Step↔S̲t̲e̲p̲ _ ×-cong One-sided.Step↔S̲t̲e̲p̲ _ ⟩
 
   ⟦ One-sided.S̲t̲e̲p̲ _[_]↝₁_ ⟧ R pq
     ×
-  ⟦ One-sided.S̲t̲e̲p̲ _[_]↝₂_ ⟧ (R ∘ swap) (swap pq)                  ↔⟨⟩
+  ⟦ One-sided.S̲t̲e̲p̲ _[_]↝₂_ ⟧ (R ∘ swap) (swap pq)  ↝⟨ inverse $ ⟦⟷⟧↔ (One-sided.S̲t̲e̲p̲ _[_]↝₁_) (One-sided.S̲t̲e̲p̲ _[_]↝₂_) ⟩□
 
-  ⟦ One-sided.S̲t̲e̲p̲ _[_]↝₁_ ⟧ R pq
-    ×
-  ⟦ reindex₂ swap (One-sided.S̲t̲e̲p̲ _[_]↝₂_) ⟧ (R ∘ swap) pq         ↝⟨ (∃-cong λ _ → inverse $
-                                                                       ⟦reindex₁⟧↔ (reindex₂ swap (One-sided.S̲t̲e̲p̲ _[_]↝₂_))) ⟩
-  ⟦ One-sided.S̲t̲e̲p̲ _[_]↝₁_ ⟧ R pq
-    ×
-  ⟦ reindex₁ swap (reindex₂ swap (One-sided.S̲t̲e̲p̲ _[_]↝₂_)) ⟧ R pq  ↝⟨ inverse $
-                                                                      ⟦⊗⟧↔ (One-sided.S̲t̲e̲p̲ _[_]↝₁_)
-                                                                           (reindex₁ swap (reindex₂ swap (One-sided.S̲t̲e̲p̲ _[_]↝₂_))) ⟩□
-  ⟦ S̲t̲e̲p̲ ⟧ R pq                                                    □
+  ⟦ S̲t̲e̲p̲ ⟧ R pq                                    □
   where
   lemma = record
     { surjection = record

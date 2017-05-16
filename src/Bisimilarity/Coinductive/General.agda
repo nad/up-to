@@ -131,23 +131,8 @@ infix 4 [_]_≡_ [_]_≡′_
 
   [ i ] p∼q₁ ≡ p∼q₂                                                     ↝⟨ ν-bisimilar↔ p∼q₁ p∼q₂ ⟩
 
-  ⟦ S̲t̲e̲p̲₁ ⊗ reindex₂ swap (reindex₁ swap S̲t̲e̲p̲₂) ⟧₂ (ν′-bisimilar i)
-    (p∼q₁ , p∼q₂)                                                       ↝⟨ ⟦⊗⟧₂↔ S̲t̲e̲p̲₁ (reindex₂ swap (reindex₁ swap S̲t̲e̲p̲₂)) (ν′-bisimilar i)
-                                                                             p∼q₁ p∼q₂ ⟩
-  ⟦ S̲t̲e̲p̲₁ ⟧₂ (ν′-bisimilar i)
-    ((proj₁ s₁ , f₁ ∘ inj₁) , (proj₁ s₂ , f₂ ∘ inj₁))
-    ×
-  ⟦ reindex₂ swap (reindex₁ swap S̲t̲e̲p̲₂) ⟧₂ (ν′-bisimilar i)
-    ((proj₂ s₁ , f₁ ∘ inj₂) , (proj₂ s₂ , f₂ ∘ inj₂))                   ↔⟨⟩
+  ⟦ S̲t̲e̲p̲₁ ⟷ S̲t̲e̲p̲₂ ⟧₂ (ν′-bisimilar i) (p∼q₁ , p∼q₂)                     ↝⟨ ⟦⟷⟧₂↔ S̲t̲e̲p̲₁ S̲t̲e̲p̲₂ (ν′-bisimilar i) p∼q₁ p∼q₂ ⟩
 
-  ⟦ S̲t̲e̲p̲₁ ⟧₂ (ν′-bisimilar i)
-    ((proj₁ s₁ , f₁ ∘ inj₁) , (proj₁ s₂ , f₂ ∘ inj₁))
-    ×
-  ⟦ reindex₁ swap S̲t̲e̲p̲₂ ⟧₂ (ν′-bisimilar i)
-    ((proj₂ s₁ , f₁ ∘ inj₂) , (proj₂ s₂ , f₂ ∘ inj₂))                   ↝⟨ F.id
-                                                                             ×-cong
-                                                                           ⟦reindex₁⟧₂↔ S̲t̲e̲p̲₂ swap (ν′-bisimilar i)
-                                                                             (proj₂ s₁ , f₁ ∘ inj₂) (proj₂ s₂ , f₂ ∘ inj₂) ⟩
   ⟦ S̲t̲e̲p̲₁ ⟧₂ (ν′-bisimilar i)
     ((proj₁ s₁ , f₁ ∘ inj₁) , (proj₁ s₂ , f₂ ∘ inj₁))
     ×

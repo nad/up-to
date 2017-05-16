@@ -8,7 +8,8 @@ module Indexed-container.Combinators where
 
 open import Equality.Propositional hiding (Extensionality)
 open import Interval using (ext)
-open import Prelude hiding (id)
+open import Logical-equivalence using (_⇔_)
+open import Prelude as P hiding (id)
 
 open import Bijection equality-with-J as Bijection using (_↔_)
 open import Equivalence equality-with-J hiding (id; _∘_; inverse)
@@ -277,6 +278,75 @@ reindex₁ f C =
     , subst (λ s → Position C s (proj₁ p)) eq (proj₂ (proj₂ p))
     )                                                                     ∎
 
+-- A combined reindexing combinator.
+--
+-- The application reindex swap is similar to the overline function
+-- from Section 6.3.4.1 in Pous and Sangiorgi's "Enhancements of the
+-- bisimulation proof method".
+
+reindex : ∀ {ℓ} {I O : Set ℓ} →
+          (I → O) → Container I O → Container O I
+reindex f = reindex₂ f ∘ reindex₁ f
+
+-- An unfolding lemma for ⟦ reindex f C ⟧.
+
+⟦reindex⟧↔ : ∀ {ℓ x} {I O : Set ℓ} {f : I → O}
+             (C : Container I O) {X : Rel x O} {i} →
+             ⟦ reindex f C ⟧ X i ↔ ⟦ C ⟧ (X ∘ f) (f i)
+⟦reindex⟧↔ {f = f} C {X} {i} =
+  ⟦ reindex f C ⟧ X i                ↔⟨⟩
+  ⟦ reindex₂ f (reindex₁ f C) ⟧ X i  ↔⟨⟩
+  ⟦ reindex₁ f C ⟧ X (f i)           ↝⟨ ⟦reindex₁⟧↔ C ⟩□
+  ⟦ C ⟧ (X ∘ f) (f i)                □
+
+-- An unfolding lemma for ⟦ reindex f C ⟧₂.
+
+⟦reindex⟧₂↔ :
+  ∀ {ℓ x} {I O : Set ℓ} {X : Rel x O}
+  (C : Container I O) (f : I → O) (R : ∀ {o} → Rel₂ ℓ (X o)) {i}
+  (x y : ⟦ reindex f C ⟧ X i) →
+
+  ⟦ reindex f C ⟧₂ R (x , y)
+
+    ↔
+
+  ⟦ C ⟧₂ R ( (proj₁ x , λ p → proj₂ x (_ , refl , p))
+           , (proj₁ y , λ p → proj₂ y (_ , refl , p))
+           )
+
+⟦reindex⟧₂↔ C f R x y =
+
+  ⟦ reindex f C ⟧₂ R (x , y)                           ↔⟨⟩
+
+  ⟦ reindex₂ f (reindex₁ f C) ⟧₂ R (x , y)             ↔⟨⟩
+
+  ⟦ reindex₁ f C ⟧₂ R (x , y)                          ↝⟨ ⟦reindex₁⟧₂↔ C f R x y ⟩□
+
+  ⟦ C ⟧₂ R ( (proj₁ x , λ p → proj₂ x (_ , refl , p))
+           , (proj₁ y , λ p → proj₂ y (_ , refl , p))
+           )                                           □
+
+-- If f is an involution, then ν (reindex f C) i is pointwise
+-- logically equivalent to ν C i ∘ f.
+
+ν-reindex⇔ :
+  ∀ {ℓ} {I : Set ℓ} {C : Container I I} {f : I → I} →
+  f ∘ f ≡ P.id →
+  ∀ {i x} → ν (reindex f C) i x ⇔ ν C i (f x)
+ν-reindex⇔ {C = C} {f} idem {i} {x} =
+  ν (reindex f C) i x                     ↔⟨⟩
+  ⟦ reindex f C ⟧ (ν′ (reindex f C) i) x  ↔⟨ ⟦reindex⟧↔ C ⟩
+  ⟦ C ⟧ (ν′ (reindex f C) i ∘ f) (f x)    ↝⟨ ⟦ C ⟧-cong (record { to = to; from = from }) ⟩
+  ⟦ C ⟧ (ν′ C i ∘ f ∘ f) (f x)            ↔⟨ ≡⇒↝ bijection $ cong (λ g → ⟦ C ⟧ (ν′ C i ∘ g) (f x)) idem ⟩
+  ⟦ C ⟧ (ν′ C i) (f x)                    ↔⟨⟩
+  ν C i (f x)                             □
+  where
+  to : ∀ {i} → ν′ (reindex f C) i ⊆ ν′ C i ∘ f
+  force (to x) = _⇔_.to (ν-reindex⇔ idem) (force x)
+
+  from : ∀ {i} → ν′ C i ∘ f ⊆ ν′ (reindex f C) i
+  force (from x) = _⇔_.from (ν-reindex⇔ idem) (force x)
+
 -- A cartesian product combinator.
 --
 -- Similar to a construction in "Containers: Constructing strictly
@@ -466,3 +536,62 @@ C₁ ⊗ C₂ =
                    (cong proj₂ (cong₂ _,_ eq₁ eq₂)) p))               ≡⟨ cong (g ∘ inj₂) $ cong (flip (subst _) _) $ cong-proj₂-cong₂-, eq₁ eq₂ ⟩∎
 
     g (inj₂ (subst (λ s₂ → Position C₂ s₂ o) eq₂ p))                  ∎
+
+-- A combinator that is similar to the function ⟷ from Section 6.3.4.1
+-- in Pous and Sangiorgi's "Enhancements of the bisimulation proof
+-- method" (if the same container is used for both arguments).
+
+infix 1 _⟷_
+
+_⟷_ : ∀ {ℓ} {I : Set ℓ} →
+      (_ _ : Container (I × I) (I × I)) → Container (I × I) (I × I)
+C₁ ⟷ C₂ = C₁ ⊗ reindex swap C₂
+
+-- An unfolding lemma for ⟦ C₁ ⟷ C₂ ⟧.
+
+⟦⟷⟧↔ :
+  ∀ {ℓ x} {I : Set ℓ}
+  (C₁ C₂ : Container (I × I) (I × I)) {X : Rel₂ x I} {i} →
+  ⟦ C₁ ⟷ C₂ ⟧ X i ↔ ⟦ C₁ ⟧ X i × ⟦ C₂ ⟧ (X ∘ swap) (swap i)
+⟦⟷⟧↔ C₁ C₂ {X} {i} =
+  ⟦ C₁ ⟷ C₂ ⟧ X i                          ↔⟨⟩
+  ⟦ C₁ ⊗ reindex swap C₂ ⟧ X i             ↝⟨ ⟦⊗⟧↔ C₁ (reindex swap C₂) ⟩
+  ⟦ C₁ ⟧ X i × ⟦ reindex swap C₂ ⟧ X i     ↝⟨ ∃-cong (λ _ → ⟦reindex⟧↔ C₂) ⟩□
+  ⟦ C₁ ⟧ X i × ⟦ C₂ ⟧ (X ∘ swap) (swap i)  □
+
+-- An unfolding lemma for ⟦ C₁ ⟷ C₂ ⟧₂.
+
+⟦⟷⟧₂↔ :
+  ∀ {ℓ x} {I : Set ℓ} {X : Rel₂ x I}
+  (C₁ C₂ : Container (I × I) (I × I)) (R : ∀ {i} → Rel₂ ℓ (X i)) {i}
+  (x y : ⟦ C₁ ⟷ C₂ ⟧ X i) →
+
+  let (s₁ , s₂) , f = x
+      (t₁ , t₂) , g = y
+  in
+
+  ⟦ C₁ ⟷ C₂ ⟧₂ R (x , y)
+
+    ↔
+
+  ⟦ C₁ ⟧₂ R ((s₁ , f ∘ inj₁) , (t₁ , g ∘ inj₁))
+    ×
+  ⟦ C₂ ⟧₂ R ( (s₂ , λ p → f (inj₂ (_ , refl , p)))
+            , (t₂ , λ p → g (inj₂ (_ , refl , p)))
+            )
+
+⟦⟷⟧₂↔ C₁ C₂ R x@((s₁ , s₂) , f) y@((t₁ , t₂) , g) =
+
+  ⟦ C₁ ⟷ C₂ ⟧₂ R (x , y)                                      ↔⟨⟩
+
+  ⟦ C₁ ⊗ reindex swap C₂ ⟧₂ R (x , y)                         ↝⟨ ⟦⊗⟧₂↔ C₁ (reindex swap C₂) R _ (_ , g) ⟩
+
+  ⟦ C₁ ⟧₂ R ((s₁ , f ∘ inj₁) , (t₁ , g ∘ inj₁))
+    ×
+  ⟦ reindex swap C₂ ⟧₂ R ((s₂ , f ∘ inj₂) , (t₂ , g ∘ inj₂))  ↝⟨ ∃-cong (λ _ → ⟦reindex⟧₂↔ C₂ _ R _ (_ , g ∘ inj₂)) ⟩□
+
+  ⟦ C₁ ⟧₂ R ((s₁ , f ∘ inj₁) , (t₁ , g ∘ inj₁))
+    ×
+  ⟦ C₂ ⟧₂ R ( (s₂ , λ p → f (inj₂ (_ , refl , p)))
+            , (t₂ , λ p → g (inj₂ (_ , refl , p)))
+            )                                                 □
