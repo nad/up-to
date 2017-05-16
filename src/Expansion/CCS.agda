@@ -11,25 +11,22 @@ open import Prelude hiding (module W)
 
 open import Function-universe equality-with-J hiding (_∘_)
 
-open import Labelled-transition-system
-
-open CCS Name
-open LTS CCS hiding (Proc; _[_]⟶_)
-
-import Bisimilarity.Coinductive CCS as S
 import Bisimilarity.Coinductive.Equational-reasoning-instances
-open import Bisimilarity.Coinductive CCS using (_∼_)
-import Bisimilarity.Exercises.Coinductive as S
-open import Bisimilarity.Weak.Coinductive.Other CCS as W
-  using (_≈_; force)
+import Bisimilarity.Exercises.Coinductive.CCS as SE
 import
   Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
 open import Equational-reasoning
-open import Expansion CCS
 import Expansion.Equational-reasoning-instances
+open import Labelled-transition-system.CCS Name
+open import Relation
+
+import Bisimilarity.Coinductive CCS as S
+open import Bisimilarity.Coinductive CCS using (_∼_)
+open import Bisimilarity.Weak.Coinductive.Other CCS as W
+  using (_≈_; force)
+open import Expansion CCS
 import Labelled-transition-system.Equational-reasoning-instances CCS
   as Unused
-open import Relation
 
 -- Some lemmas used to prove the congruence lemmas below as well as
 -- similar results in Bisimilarity.Weak.CCS.
@@ -151,7 +148,7 @@ module Cong-lemmas
          ! P ∣ P₁″          [ τ ]⇒⟨ par-τ′ (sym $ co-involutive a) (replication (par-right P⟶Q₂′)) P₁″⟶Q₁′ ⟩
          (! P ∣ Q₂′) ∣ Q₁′  →⟨ zip-⇒ par-left par-right (map-⇒ par-right Q₂′⇒Q₂) Q₁′⇒Q₁ ⟩■
          (! P ∣ Q₂) ∣ Q₁)
-      , ((! P ∣ Q₂) ∣ Q₁  ∼⟨ S.swap-rightmost ⟩■
+      , ((! P ∣ Q₂) ∣ Q₁  ∼⟨ SE.swap-rightmost ⟩■
          (! P ∣ Q₁) ∣ Q₂)
 
     (steps {p′ = P₁″} {q′ = Q₁′}
@@ -176,14 +173,14 @@ module Cong-lemmas
     R P P′ → ! P′ [ μ ]⟶ Q′ →
     ∃ λ Q → ! P [ μ ]⇒̂ Q × R′ Q Q′
   !-cong _∣-cong′_ !-cong′_ {P} {P′} {Q′} {μ} P≳P′ !P′⟶Q′ =
-    case S.6-1-3-2 !P′⟶Q′ of λ where
+    case SE.6-1-3-2 !P′⟶Q′ of λ where
 
       (inj₁ (P″ , P′⟶P″ , Q′∼!P′∣P″)) →
         case right-to-left P≳P′ P′⟶P″ of λ where
           (_ , silent μs done , P≳′P″) →
             ! P        →⟨ silent μs done ⟩■
               ⇒̂[ μ ]′
-            ! P        ∼⟨ symmetric S.6-1-2 ⟩
+            ! P        ∼⟨ symmetric SE.6-1-2 ⟩
             ! P ∣ P    ∼′⟨ (!-cong′ (convert P≳P′)) ∣-cong′ P≳′P″ ⟩ S.∼:
             ! P′ ∣ P″  ∼⟨ symmetric Q′∼!P′∣P″ ⟩■
             Q′
@@ -421,13 +418,13 @@ mutual
     lr : ∀ {Q μ} →
          ! P [ μ ]⟶ Q →
          ∃ λ Q′ → ! P′ [ μ ]⟶̂ Q′ × [ i ] Q ≳′ Q′
-    lr {Q} {μ} !P⟶Q = case S.6-1-3-2 !P⟶Q of λ where
+    lr {Q} {μ} !P⟶Q = case SE.6-1-3-2 !P⟶Q of λ where
 
       (inj₁ (P″ , P⟶P″ , Q∼!P∣P″)) → case left-to-right P≳P′ P⟶P″ of λ where
         (_ , done refl , P″≳′P′) →
           Q          ∼⟨ Q∼!P∣P″ ⟩
           ! P  ∣ P″  ∼′⟨ !-cong′ (convert P≳P′) ∣-cong′ P″≳′P′ ⟩ S.∼:
-          ! P′ ∣ P′  ∼⟨ S.6-1-2 ⟩■
+          ! P′ ∣ P′  ∼⟨ SE.6-1-2 ⟩■
           ! P′
             ⟵̂[ τ ]
           ! P′       ■
@@ -506,9 +503,9 @@ mutual
   where
   ⊕-congˡ-≳≈ : ∀ {P P′ Q} → P ≳ P′ → P ⊕ Q ≈ P′ ⊕ Q
   ⊕-congˡ-≳≈ {P} {P′} {Q} P≳P′ =
-    P ⊕ Q   ∼⟨ S.⊕-comm ⟩
+    P ⊕ Q   ∼⟨ SE.⊕-comm ⟩
     Q ⊕ P   ∼′⟨ ⊕-congʳ-≳≈ P≳P′ ⟩ S.∼:
-    Q ⊕ P′  ∼⟨ S.⊕-comm ⟩■
+    Q ⊕ P′  ∼⟨ SE.⊕-comm ⟩■
     P′ ⊕ Q
 
 -- _⊕_ does not, in general, preserve the expansion relation in its
@@ -558,9 +555,9 @@ force (⊕·-cong′ Q≳Q′) = ⊕·-cong Q≳Q′
 ·⊕-cong : ∀ {i P P′ μ Q} →
           [ i ] P ≳ P′ → [ i ] μ · P ⊕ Q ≳ μ · P′ ⊕ Q
 ·⊕-cong {P = P} {P′} {μ} {Q} P≳P′ =
-  μ · P ⊕ Q   ∼⟨ S.⊕-comm ⟩
+  μ · P ⊕ Q   ∼⟨ SE.⊕-comm ⟩
   Q ⊕ μ · P   ∼′⟨ ⊕·-cong P≳P′ ⟩ S.∼:
-  Q ⊕ μ · P′  ∼⟨ S.⊕-comm ⟩■
+  Q ⊕ μ · P′  ∼⟨ SE.⊕-comm ⟩■
   μ · P′ ⊕ Q
 
 ·⊕-cong′ : ∀ {i P P′ μ Q} →

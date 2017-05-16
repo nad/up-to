@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------
--- An example from "Enhancements of the bisimulation proof method" by
--- Pous and Sangiorgi
+-- An example related to CCS from "Enhancements of the bisimulation
+-- proof method" by Pous and Sangiorgi
 --
 -- Implemented using coinductive definitions of strong and weak
 -- bisimilarity.
@@ -8,24 +8,21 @@
 
 {-# OPTIONS --without-K #-}
 
-module Bisimilarity.Weak.Exercises {Name : Set} where
+module Bisimilarity.Weak.CCS.Example {Name : Set} where
 
 open import Equality.Propositional
 open import Prelude
 
-open import Labelled-transition-system
-
-open CCS Name
-open LTS CCS hiding (Proc; _[_]⟶_)
-
-open import Bisimilarity.Coinductive CCS using (_∼_; ∼:_)
 import Bisimilarity.Coinductive.Equational-reasoning-instances
-open import Bisimilarity.Exercises.Coinductive
+open import Bisimilarity.Exercises.Coinductive.CCS
 import Bisimilarity.Weak.CCS as W
-open import Bisimilarity.Weak.Coinductive.Other CCS
 import
   Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
 open import Equational-reasoning
+open import Labelled-transition-system.CCS Name
+
+open import Bisimilarity.Coinductive CCS using (_∼_; ∼:_)
+open import Bisimilarity.Weak.Coinductive.Other CCS
 import Labelled-transition-system.Equational-reasoning-instances CCS
   as Unused
 

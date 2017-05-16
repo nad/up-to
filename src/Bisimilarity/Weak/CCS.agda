@@ -11,20 +11,17 @@ open import Prelude
 
 open import Function-universe equality-with-J hiding (id; _∘_)
 
-open import Labelled-transition-system
-
-open CCS Name
-open LTS CCS hiding (Proc; _[_]⟶_)
-
-import Bisimilarity.Coinductive CCS as S
 import Bisimilarity.Coinductive.Equational-reasoning-instances
-import Bisimilarity.Exercises.Coinductive as S
-open import Bisimilarity.Weak.Coinductive.Other CCS
+import Bisimilarity.Exercises.Coinductive.CCS as SE
 import
   Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
 open import Equational-reasoning
-open import Expansion CCS using (_≳_)
 import Expansion.CCS as E
+open import Labelled-transition-system.CCS Name
+
+import Bisimilarity.Coinductive CCS as S
+open import Bisimilarity.Weak.Coinductive.Other CCS
+open import Expansion CCS using (_≳_)
 
 private
   module CL {i} = E.Cong-lemmas [ i ]_≈′_ right-to-left
@@ -145,9 +142,9 @@ force (⊕·-cong′ Q≈Q′) = ⊕·-cong Q≈Q′
 ·⊕-cong : ∀ {i P P′ μ Q} →
           [ i ] P ≈ P′ → [ i ] μ · P ⊕ Q ≈ μ · P′ ⊕ Q
 ·⊕-cong {P = P} {P′} {μ} {Q} P≈P′ =
-  μ · P ⊕ Q   ∼⟨ S.⊕-comm ⟩
+  μ · P ⊕ Q   ∼⟨ SE.⊕-comm ⟩
   Q ⊕ μ · P   ∼′⟨ ⊕·-cong P≈P′ ⟩ S.∼:
-  Q ⊕ μ · P′  ∼⟨ S.⊕-comm ⟩■
+  Q ⊕ μ · P′  ∼⟨ SE.⊕-comm ⟩■
   μ · P′ ⊕ Q
 
 ·⊕-cong′ : ∀ {i P P′ μ Q} →

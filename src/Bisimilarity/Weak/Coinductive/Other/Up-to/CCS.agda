@@ -4,8 +4,6 @@
 
 {-# OPTIONS --without-K #-}
 
-open import Labelled-transition-system
-
 module Bisimilarity.Weak.Coinductive.Other.Up-to.CCS {Name : Set} where
 
 open import Equality.Propositional
@@ -14,19 +12,18 @@ open import Prelude
 
 open import Function-universe equality-with-J hiding (id; _∘_)
 
-open CCS Name
-open LTS CCS hiding (Proc; _[_]⟶_)
-
 open import Bisimilarity.Weak.CCS
-open import Bisimilarity.Weak.Coinductive.Other CCS
 import
   Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
-open import Bisimilarity.Weak.Coinductive.Other.Up-to CCS
 open import Equational-reasoning
 open import Indexed-container hiding (⟨_⟩)
+open import Labelled-transition-system.CCS Name
+open import Relation
+
+open import Bisimilarity.Weak.Coinductive.Other CCS
+open import Bisimilarity.Weak.Coinductive.Other.Up-to CCS
 import Labelled-transition-system.Equational-reasoning-instances CCS
   as Unused
-open import Relation
 
 -- Up to (non-degenerate) context for CCS (for polyadic contexts).
 

@@ -16,8 +16,7 @@ open import Prelude
 open import Function-universe equality-with-J hiding (id; _∘_)
 
 open import Labelled-transition-system
-
-open Labelled-transition-system.Delay-monad A
+open import Labelled-transition-system.Delay-monad A
 
 open import Bisimilarity.Coinductive delay-monad
 import Bisimilarity.Coinductive.Equational-reasoning-instances

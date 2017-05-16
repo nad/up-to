@@ -17,23 +17,21 @@ open import Prelude
 
 open import Function-universe equality-with-J hiding (id; _∘_)
 
-open import Labelled-transition-system
-open Labelled-transition-system.Delay-monad A
-open LTS delay-monad hiding (_[_]⟶_)
-
-open import Bisimilarity.Coinductive delay-monad using ([_]_∼_)
 import Bisimilarity.Coinductive.Delay-monad as SD
-open import Bisimilarity.Weak.Coinductive delay-monad as BW
-  using (force)
 import
   Bisimilarity.Weak.Coinductive.Equational-reasoning-instances
 open import Bisimilarity.Weak.Coinductive.Equivalent
-open import Bisimilarity.Weak.Coinductive.Other delay-monad
 import
   Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
 open import Equational-reasoning
-open import Expansion delay-monad as BE using ([_]_≳_; _≳_)
 import Expansion.Delay-monad as ED
+open import Labelled-transition-system.Delay-monad A
+
+open import Bisimilarity.Coinductive delay-monad using ([_]_∼_)
+open import Bisimilarity.Weak.Coinductive delay-monad as BW
+  using (force)
+open import Bisimilarity.Weak.Coinductive.Other delay-monad
+open import Expansion delay-monad as BE using ([_]_≳_; _≳_)
 
 ------------------------------------------------------------------------
 -- Several definitions of weak bisimilarity are pointwise logically

@@ -4,7 +4,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Bisimilarity.Up-to.Delay-monad {A : Set} where
+module Bisimilarity.Weak.Coinductive.Up-to.Delay-monad {A : Set} where
 
 open import Delay-monad
 import Delay-monad.Partial-order as P
@@ -17,20 +17,18 @@ open import Double-negation equality-with-J
 open import Function-universe equality-with-J hiding (id)
 open import H-level equality-with-J
 
+import Bisimilarity.Weak.Coinductive.Equational-reasoning-instances
+open import Bisimilarity.Weak.Coinductive.Equivalent
+import Bisimilarity.Weak.Delay-monad as W′
 open import Equational-reasoning
 open import Labelled-transition-system
-
-open Labelled-transition-system.Delay-monad A
-open LTS delay-monad hiding (_[_]⟶_)
+open import Labelled-transition-system.Delay-monad A
+open import Relation
 
 open import Bisimilarity.Step (weak delay-monad) _[_]⇒̂_ _[_]⇒̂_
 open import Bisimilarity.Up-to (weak delay-monad)
 open import Bisimilarity.Weak.Coinductive delay-monad
-import Bisimilarity.Weak.Coinductive.Equational-reasoning-instances
-open import Bisimilarity.Weak.Coinductive.Equivalent
 import Bisimilarity.Weak.Coinductive.Other delay-monad as CWO
-import Bisimilarity.Weak.Delay-monad as W′
-open import Relation
 
 -- Everything is an up-to technique for weak bisimilarity for the
 -- delay monad (if A is a set, and assuming excluded middle).

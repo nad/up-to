@@ -10,11 +10,6 @@ module README where
 
 import Equational-reasoning
 
--- Labelled transition systems.
-
-import Labelled-transition-system
-import Labelled-transition-system.Equational-reasoning-instances
-
 -- Unary and binary relations.
 
 import Relation
@@ -23,9 +18,34 @@ import Relation
 
 import Indexed-container
 
+-- Container combinators.
+
+import Indexed-container.Combinators
+
 -- Up-to techniques.
 
 import Up-to
+
+------------------------------------------------------------------------
+-- Labelled transition systems
+
+-- Labelled transition systems (LTSs).
+
+import Labelled-transition-system
+import Labelled-transition-system.Equational-reasoning-instances
+
+-- CCS.
+
+import Labelled-transition-system.CCS
+
+-- A labelled transition system for the delay monad.
+
+import Labelled-transition-system.Delay-monad
+
+-- An LTS from Section 6.2.5 of "Enhancements of the bisimulation
+-- proof method" by Pous and Sangiorgi.
+
+import Labelled-transition-system.6-2-5
 
 ------------------------------------------------------------------------
 -- Similarity
@@ -71,19 +91,19 @@ import Bisimilarity.Comparison
 
 import Bisimilarity.Coinductive.Delay-monad
 
+-- Some exercises and results from "Enhancements of the bisimulation
+-- proof method" by Pous and Sangiorgi, as well as other results.
+
+import Bisimilarity.Exercises.Other.CCS
+import Bisimilarity.Exercises.Classical.CCS
+import Bisimilarity.Exercises.Coinductive.CCS
+import Bisimilarity.Exercises.Coinductive.6-2-5
+
 -- Up-to techniques.
 
 import Bisimilarity.Up-to
 import Bisimilarity.Up-to.CCS
-import Bisimilarity.Up-to.Delay-monad
 import Bisimilarity.Up-to.Counterexamples
-
--- Some exercises and results from "Enhancements of the bisimulation
--- proof method" by Pous and Sangiorgi, as well as other results.
-
-import Bisimilarity.Exercises.Other
-import Bisimilarity.Exercises.Classical
-import Bisimilarity.Exercises.Coinductive
 
 ------------------------------------------------------------------------
 -- Expansion
@@ -133,10 +153,10 @@ import Bisimilarity.Weak.Coinductive.Equivalent
 
 import Bisimilarity.Weak.CCS
 
--- An example from "Enhancements of the bisimulation proof method" by
--- Pous and Sangiorgi.
+-- An example related to CCS from "Enhancements of the bisimulation
+-- proof method" by Pous and Sangiorgi.
 
-import Bisimilarity.Weak.Exercises
+import Bisimilarity.Weak.CCS.Example
 
 -- Some results about various forms of coinductively defined weak
 -- bisimilarity for the delay monad.
@@ -147,3 +167,4 @@ import Bisimilarity.Weak.Delay-monad
 
 import Bisimilarity.Weak.Coinductive.Other.Up-to
 import Bisimilarity.Weak.Coinductive.Other.Up-to.CCS
+import Bisimilarity.Weak.Coinductive.Up-to.Delay-monad

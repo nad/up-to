@@ -22,6 +22,7 @@ open import Function-universe equality-with-J hiding (_∘_)
 
 import Similarity.Step lts as One-sided
 open import Indexed-container hiding (⟨_⟩)
+open import Indexed-container.Combinators
 open import Relation
 
 private
