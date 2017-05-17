@@ -77,6 +77,25 @@ map : ∀ {ℓ₁ ℓ₂ ℓ₃} {I O : Set ℓ₁} (C : Container I O)
       A ⊆ B → ⟦ C ⟧ A ⊆ ⟦ C ⟧ B
 map _ f = map₁ f
 
+-- Some preservation lemmas.
+
+⟦⟧₁-cong : ∀ {k ℓ₁ ℓ₂ ℓ₃} {I : Set ℓ₁} {C : Container₁ I}
+             {A : Rel ℓ₂ I} {B : Rel ℓ₃ I} →
+           (∀ {i} → A i ↝[ k ] B i) → ⟦ C ⟧₁ A ↝[ k ] ⟦ C ⟧₁ B
+⟦⟧₁-cong {C = S ◁₁ P} {A} {B} A↝B =
+  (∃ λ (s : S) → P s ⊆ A)  ↝⟨ (∃-cong λ _ → implicit-∀-cong ext $ ∀-cong ext λ _ → A↝B) ⟩□
+  (∃ λ (s : S) → P s ⊆ B)  □
+
+⟦_⟧-cong : ∀ {k ℓ₁ ℓ₂ ℓ₃} {I O : Set ℓ₁} (C : Container I O)
+             {A : Rel ℓ₂ I} {B : Rel ℓ₃ I} →
+           (∀ {i} → A i ↝[ k ] B i) →
+           (∀ {o} → ⟦ C ⟧ A o ↝[ k ] ⟦ C ⟧ B o)
+⟦ C ⟧-cong {A} {B} A↝B {o} =
+  ⟦ C ⟧ A o   ↔⟨⟩
+  ⟦ C o ⟧₁ A  ↝⟨ ⟦⟧₁-cong A↝B ⟩
+  ⟦ C o ⟧₁ B  ↔⟨⟩
+  ⟦ C ⟧ B o   □
+
 ------------------------------------------------------------------------
 -- Least fixpoints
 
