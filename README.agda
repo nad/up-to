@@ -26,6 +26,10 @@ import Indexed-container.Combinators
 
 import Up-to
 
+-- Closure properties for Compatible and Size-preserving.
+
+import Up-to.Closure
+
 ------------------------------------------------------------------------
 -- Labelled transition systems
 
