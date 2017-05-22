@@ -117,34 +117,30 @@ Size-preserving F =
 -- see Bisimilarity.Up-to.Counterexamples.¬-∘-closure), whereas the
 -- former property is (see ∘-closure below).
 
-module _
-  {F    : Trans ℓ I}
-  (pres : Size-preserving F)
+size-preserving→up-to :
+  {F : Trans ℓ I} →
+  Size-preserving F → Up-to-technique F
+size-preserving→up-to {F} pres = size-preserving→up-to′
   where
 
-  private
+  -- F is also size-preserving for ν′.
 
-    -- F is also size-preserving for ν′.
+  pres′ : ∀ {R : Rel ℓ I} {i} → R ⊆ ν′ C i → F R ⊆ ν′ C i
+  force (pres′ R⊆ν′ FRx) =
+    pres (λ Rx′ → force (R⊆ν′ Rx′)) FRx
 
-    pres′ : ∀ {R : Rel ℓ I} {i} → R ⊆ ν′ C i → F R ⊆ ν′ C i
-    force (pres′ R⊆ν′ FRx) =
-      pres (λ Rx′ → force (R⊆ν′ Rx′)) FRx
-
-    size-preserving→up-to′ :
-      ∀ {i} {R : Rel ℓ I} →
-      R ⊆ ⟦ C ⟧ (F R) → R ⊆ ν C i
-    size-preserving→up-to′ {i} {R} R⊆CFR =
-      R               ⊆⟨ R⊆CFR ⟩
-      ⟦ C ⟧ (F R)     ⊆⟨ map C (pres′ size-preserving→up-to″) ⟩
-      ⟦ C ⟧ (ν′ C i)  ⊆⟨ id ⟩∎
-      ν C i           ∎
-      where
-      size-preserving→up-to″ : R ⊆ ν′ C i
-      force (size-preserving→up-to″ Rx) =
-        size-preserving→up-to′ R⊆CFR Rx
-
-  size-preserving→up-to : Up-to-technique F
-  size-preserving→up-to = size-preserving→up-to′
+  size-preserving→up-to′ :
+    ∀ {i} {R : Rel ℓ I} →
+    R ⊆ ⟦ C ⟧ (F R) → R ⊆ ν C i
+  size-preserving→up-to′ {i} {R} R⊆CFR =
+    R               ⊆⟨ R⊆CFR ⟩
+    ⟦ C ⟧ (F R)     ⊆⟨ map C (pres′ size-preserving→up-to″) ⟩
+    ⟦ C ⟧ (ν′ C i)  ⊆⟨ id ⟩∎
+    ν C i           ∎
+    where
+    size-preserving→up-to″ : R ⊆ ν′ C i
+    force (size-preserving→up-to″ Rx) =
+      size-preserving→up-to′ R⊆CFR Rx
 
 -- If F is monotone, then Size-preserving F is logically equivalent to
 -- a special case stating that, for any size i, ν C i should be a
