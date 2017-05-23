@@ -64,6 +64,9 @@ import Similarity.Step
 
 import Similarity.General
 
+-- For more information about similarity, see "Similarity, continued"
+-- below.
+
 ------------------------------------------------------------------------
 -- Strong bisimilarity
 
@@ -172,3 +175,20 @@ import Bisimilarity.Weak.Delay-monad
 import Bisimilarity.Weak.Coinductive.Other.Up-to
 import Bisimilarity.Weak.Coinductive.Other.Up-to.CCS
 import Bisimilarity.Weak.Coinductive.Up-to.Delay-monad
+
+------------------------------------------------------------------------
+-- Similarity, continued
+
+-- A coinductive definition of (strong) similarity.
+
+import Similarity.Strong
+import Similarity.Strong.Equational-reasoning-instances
+
+-- A coinductive definition of weak similarity.
+
+import Similarity.Weak
+import Similarity.Weak.Equational-reasoning-instances
+
+-- Up-to techniques.
+
+import Similarity.Weak.Up-to
