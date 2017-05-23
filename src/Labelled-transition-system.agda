@@ -178,7 +178,7 @@ record LTS : Set₁ where
   ⟶̂→⇒ s = ⇒̂→⇒ s ∘ ⟶̂→⇒̂
 
   -- A lemma that can be used to show that some relation is a weak
-  -- bisimulation (of a certain kind).
+  -- simulation (of a certain kind).
 
   is-weak :
     {_%_ _%′_ : Proc → Proc → Set}
