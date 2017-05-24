@@ -24,9 +24,30 @@ open import Relation
 -- A relation transformer F is an up-to technique if every relation R
 -- that is contained in ⟦ C ⟧ (F R) is contained in ν C ∞.
 --
--- This is roughly what Pous and Sangiorgi refer to as b-soundness in
--- "Enhancements of the bisimulation proof method", with b
--- corresponding to ⟦ C ⟧.
+-- In "Enhancements of the bisimulation proof method" Pous and
+-- Sangiorgi define that a monotone function F on a lattice (the
+-- lattice of binary relations on processes, ordered by inclusion) is
+-- b-sound, for a monotone function b, if gfp (b ∘ F) ⊆ gfp b, where
+-- gfp c = ⋃ { R | R ⊆ c R }. Note that
+--
+--   gfp (b ∘ F) ⊆ gfp b
+--     ⇔
+--   ⋃ { R | R ⊆ b (F R) } ⊆ gfp b
+--     ⇔
+--   ∀ R. R ⊆ b (F R) → R ⊆ gfp b.
+--
+-- The ⇒ direction of the last step is easy to verify. For the ⇐
+-- direction, note that
+--
+--   ⋃ { R | R ⊆ b (F R) }
+--     ⊆
+--   ⋃ { b (F R) | R ⊆ b (F R) }
+--     =
+--   b (F (⋃ { R | R ⊆ b (F R) })).
+--
+-- Thus, for monotone functions F the definition below is similar to
+-- Pous and Sangiorgi's definition of b-soundness, with ⟦ C ⟧ taking
+-- the place of b, and ν C ∞ taking the place of gfp b.
 
 Up-to-technique : Trans ℓ I → Set (lsuc ℓ)
 Up-to-technique F = ∀ {R} → R ⊆ ⟦ C ⟧ (F R) → R ⊆ ν C ∞
