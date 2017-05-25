@@ -602,7 +602,8 @@ gfp⇔ν ℓ₂ = record
   ; from = ν⊆gfp ℓ₂
   }
 
--- The function gfp⊆ν is a left inverse of ν⊆gfp.
+-- The function gfp⊆ν is a left inverse of ν⊆gfp (up to pointwise
+-- bisimilarity).
 
 gfp⊆ν∘ν⊆gfp :
   ∀ {ℓ₁} ℓ₂ {I : Set ℓ₁} {C : Container I I} {i} (x : ν C ∞ i) {i} →

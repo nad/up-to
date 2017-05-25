@@ -42,7 +42,8 @@ module _ {lts : LTS} where
   co⇒cl : ∀ {ℓ p q} → p Co.≈ q → Cl.[ ℓ ] p ≈ q
   co⇒cl = Comp.co⇒cl
 
-  -- The function cl⇒co is a left inverse of co⇒cl.
+  -- The function cl⇒co is a left inverse of co⇒cl (up to pointwise
+  -- bisimilarity).
 
   cl⇒co∘co⇒cl : ∀ {ℓ i p q}
                 (p≈q : p Co.≈ q) →
