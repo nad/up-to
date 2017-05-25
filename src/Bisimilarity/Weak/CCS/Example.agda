@@ -24,7 +24,6 @@ open import Labelled-transition-system.CCS Name
 open import Bisimilarity.Coinductive CCS using (_∼_; ∼:_)
 open import Bisimilarity.Weak.Coinductive.Other CCS
 import Labelled-transition-system.Equational-reasoning-instances CCS
-  as Unused
 
 mutual
 

@@ -23,7 +23,6 @@ open import Relation
 open import Bisimilarity.Weak.Coinductive.Other CCS
 open import Bisimilarity.Weak.Coinductive.Other.Up-to CCS
 import Labelled-transition-system.Equational-reasoning-instances CCS
-  as Unused
 
 -- Up to (non-degenerate) context for CCS (for polyadic contexts).
 

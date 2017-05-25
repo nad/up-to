@@ -26,7 +26,6 @@ open import Bisimilarity.Weak.Coinductive.Other CCS as W
   using (_≈_; force)
 open import Expansion CCS
 import Labelled-transition-system.Equational-reasoning-instances CCS
-  as Unused
 
 -- Some lemmas used to prove the congruence lemmas below as well as
 -- similar results in Bisimilarity.Weak.CCS.
