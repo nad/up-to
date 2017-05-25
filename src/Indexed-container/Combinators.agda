@@ -678,3 +678,97 @@ C₁ ⟷ C₂ = C₁ ⊗ reindex swap C₂
   ⟦ C₂ ⟧₂ R ( (s₂ , λ p → f (inj₂ (_ , refl , p)))
             , (t₂ , λ p → g (inj₂ (_ , refl , p)))
             )                                                 □
+
+-- The following three lemmas correspond to the second part of
+-- Exercise 6.3.24 in Pous and Sangiorgi's "Enhancements of the
+-- bisimulation proof method".
+
+-- Post-fixpoints of the container reindex₂ swap id ⊗ C are
+-- post-fixpoints of C ⟷ C.
+
+⊆reindex₂-swap-⊗→⊆⟷ :
+  ∀ {ℓ r} {I : Set ℓ} {C : Container (I × I) (I × I)} {R : Rel₂ r I} →
+  R ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ R → R ⊆ ⟦ C ⟷ C ⟧ R
+⊆reindex₂-swap-⊗→⊆⟷ {C = C} {R} R⊆ =
+  R                                  ⊆⟨ (λ x → lemma₁ x , lemma₂ x) ⟩
+  ⟦ C ⟧ R ∩ R ⊚ swap                 ⊆⟨ Σ-map P.id lemma₃ ⟩
+  ⟦ C ⟧ R ∩ ⟦ C ⟧ (R ⊚ swap) ⊚ swap  ⊆⟨ _↔_.from (⟦⟷⟧↔ C C) ⟩∎
+  ⟦ C ⟷ C ⟧ R                        ∎
+  where
+  lemma₀ =
+    R                                 ⊆⟨ R⊆ ⟩
+    ⟦ reindex₂ swap id ⊗ C ⟧ R        ⊆⟨ _↔_.to (⟦⊗⟧↔ (reindex₂ swap id) C) ⟩∎
+    ⟦ reindex₂ swap id ⟧ R ∩ ⟦ C ⟧ R  ∎
+
+  lemma₁ =
+    R                                 ⊆⟨ lemma₀ ⟩
+    ⟦ reindex₂ swap id ⟧ R ∩ ⟦ C ⟧ R  ⊆⟨ proj₂ ⟩∎
+    ⟦ C ⟧ R                           ∎
+
+  lemma₂ =
+    R                                 ⊆⟨ lemma₀ ⟩
+    ⟦ reindex₂ swap id ⟧ R ∩ ⟦ C ⟧ R  ⊆⟨ proj₁ ⟩
+    ⟦ reindex₂ swap id ⟧ R            ⊆⟨ P.id ⟩
+    ⟦ id ⟧ R ⊚ swap                   ⊆⟨ _↔_.to ⟦id⟧↔ ⟩∎
+    R ⊚ swap                          ∎
+
+  lemma₃ =
+    R                 ⊆⟨ lemma₁ ⟩
+    ⟦ C ⟧ R           ⊆⟨ map C lemma₂ ⟩∎
+    ⟦ C ⟧ (R ⊚ swap)  ∎
+
+-- The symmetric closure of a post-fixpoint of C ⟷ C is a
+-- post-fixpoint of reindex₂ swap id ⊗ C.
+
+⊆⟷→∪-swap⊆reindex₂-swap-⊗ :
+  ∀ {ℓ r} {I : Set ℓ} {C : Container (I × I) (I × I)} {R : Rel₂ r I} →
+  R ⊆ ⟦ C ⟷ C ⟧ R →
+  R ∪ R ⊚ swap ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ (R ∪ R ⊚ swap)
+⊆⟷→∪-swap⊆reindex₂-swap-⊗ {C = C} {R} R⊆ =
+  R ∪ R ⊚ swap                                                ⊆⟨ (λ x → lemma₁ x , lemma₂ x) ⟩
+  ⟦ reindex₂ swap id ⟧ (R ∪ R ⊚ swap) ∩ ⟦ C ⟧ (R ∪ R ⊚ swap)  ⊆⟨ _↔_.from (⟦⊗⟧↔ (reindex₂ swap id) C) ⟩∎
+  ⟦ reindex₂ swap id ⊗ C ⟧ (R ∪ R ⊚ swap)                     ∎
+  where
+  lemma₁ =
+    R ∪ R ⊚ swap                         ⊆⟨ [ inj₂ , inj₁ ] ⟩
+    R ⊚ swap ∪ R                         ⊆⟨ P.id ⟩
+    R ⊚ swap ∪ R ⊚ swap ⊚ swap           ⊆⟨ P.id ⟩
+    (R ∪ R ⊚ swap) ⊚ swap                ⊆⟨ _↔_.from ⟦id⟧↔ ⟩
+    ⟦ id ⟧ (R ∪ R ⊚ swap) ⊚ swap         ⊆⟨ P.id ⟩∎
+    ⟦ reindex₂ swap id ⟧ (R ∪ R ⊚ swap)  ∎
+
+  lemma₂ =
+    R ∪ R ⊚ swap                         ⊆⟨ ⊎-map R⊆ R⊆ ⟩
+
+    ⟦ C ⟷ C ⟧ R ∪ ⟦ C ⟷ C ⟧ R ⊚ swap     ⊆⟨ ⊎-map (_↔_.to (⟦⟷⟧↔ C C)) (_↔_.to (⟦⟷⟧↔ C C)) ⟩
+
+    ⟦ C ⟧ R ∩ ⟦ C ⟧ (R ⊚ swap) ⊚ swap ∪
+    ⟦ C ⟧ R ⊚ swap ∩ ⟦ C ⟧ (R ⊚ swap)    ⊆⟨ ⊎-map proj₁ proj₂ ⟩
+
+    ⟦ C ⟧ R ∪ ⟦ C ⟧ (R ⊚ swap)           ⊆⟨ [ map C inj₁ , map C inj₂ ] ⟩∎
+
+    ⟦ C ⟧ (R ∪ R ⊚ swap)                 ∎
+
+-- The greatest fixpoint of C ⟷ C is pointwise logically equivalent to
+-- the greatest fixpoint of reindex₂ swap id ⊗ C.
+--
+-- Note that this proof is not necessarily size-preserving. TODO:
+-- Figure out if the proof can be made size-preserving.
+
+ν-⟷⇔ :
+  ∀ {ℓ} {I : Set ℓ} {C : Container (I × I) (I × I)} {p} →
+  ν (C ⟷ C) ∞ p ⇔ ν (reindex₂ swap id ⊗ C) ∞ p
+ν-⟷⇔ {C = C} = record
+  { to =
+      let R = ν (C ⟷ C) ∞ in                                  $⟨ (λ {_} → ν-out) ⟩
+      R ⊆ ⟦ C ⟷ C ⟧ R                                         ↝⟨ ⊆⟷→∪-swap⊆reindex₂-swap-⊗ ⟩
+      R ∪ R ⊚ swap ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ (R ∪ R ⊚ swap)  ↝⟨ unfold _ ⟩
+      R ∪ R ⊚ swap ⊆ ν (reindex₂ swap id ⊗ C) ∞               ↝⟨ (λ hyp {_} x → hyp (inj₁ x)) ⟩□
+      R ⊆ ν (reindex₂ swap id ⊗ C) ∞                          □
+
+  ; from =
+      let R = ν (reindex₂ swap id ⊗ C) ∞ in  $⟨ (λ {_} → ν-out) ⟩
+      R ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ R         ↝⟨ ⊆reindex₂-swap-⊗→⊆⟷ ⟩
+      R ⊆ ⟦ C ⟷ C ⟧ R                        ↝⟨ unfold _ ⟩□
+      R ⊆ ν (C ⟷ C) ∞                        □
+  }
