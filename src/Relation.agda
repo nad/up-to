@@ -7,7 +7,10 @@
 module Relation where
 
 open import Equality.Propositional
+open import Interval using (ext)
 open import Prelude
+
+open import Function-universe equality-with-J hiding (_∘_)
 
 -- Unary relations.
 
@@ -132,3 +135,32 @@ finally-⊆ : ∀ {a p q} {A : Set a}
 finally-⊆ _ _ P⊆Q = P⊆Q
 
 syntax finally-⊆ P Q P⊆Q = P ⊆⟨ P⊆Q ⟩∎ Q ∎
+
+-- Preservation lemmas for _⊆_.
+
+infix 4 _⊆-cong_ _⊆-cong-→_
+
+_⊆-cong_ :
+  ∀ {k a r₁ r₂ s₁ s₂} {A : Set a}
+    {R₁ : Rel r₁ A} {S₁ : Rel s₁ A}
+    {R₂ : Rel r₂ A} {S₂ : Rel s₂ A} →
+  (∀ {x} → R₁ x ↝[ ⌊ k ⌋-sym ] R₂ x) →
+  (∀ {x} → S₁ x ↝[ ⌊ k ⌋-sym ] S₂ x) →
+  R₁ ⊆ S₁ ↝[ ⌊ k ⌋-sym ] R₂ ⊆ S₂
+R₁↝R₂ ⊆-cong S₁↝S₂ = implicit-∀-cong ext $ →-cong ext R₁↝R₂ S₁↝S₂
+
+_⊆-cong-→_ :
+  ∀ {a r₁ r₂ s₁ s₂} {A : Set a}
+    {R₁ : Rel r₁ A} {S₁ : Rel s₁ A}
+    {R₂ : Rel r₂ A} {S₂ : Rel s₂ A} →
+  (∀ {x} → R₂ x → R₁ x) →
+  (∀ {x} → S₁ x → S₂ x) →
+  R₁ ⊆ S₁ → R₂ ⊆ S₂
+R₂→R₁ ⊆-cong-→ S₁→S₂ = implicit-∀-cong ext $ →-cong-→ R₂→R₁ S₁→S₂
+
+⊆-congʳ :
+  ∀ {k a r s₁ s₂} {A : Set a}
+    {R : Rel r A} {S₁ : Rel s₁ A} {S₂ : Rel s₂ A} →
+  (∀ {x} → S₁ x ↝[ k ] S₂ x) →
+  R ⊆ S₁ ↝[ k ] R ⊆ S₂
+⊆-congʳ S₁↝S₂ = implicit-∀-cong ext $ ∀-cong ext λ _ → S₁↝S₂
