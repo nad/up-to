@@ -189,15 +189,15 @@ mutual
   -- post-fixpoint.
 
   unfold :
-    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : Rel ℓ₂ I} →
+    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : Rel ℓ₂ I} {i} →
     X ⊆ ⟦ C ⟧ X →
-    ∀ {i} → X ⊆ ν C i
+    X ⊆ ν C i
   unfold C f x = map C (unfold′ C f) (f x)
 
   unfold′ :
-    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : Rel ℓ₂ I} →
+    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : Rel ℓ₂ I} {i} →
     X ⊆ ⟦ C ⟧ X →
-    ∀ {i} → X ⊆ ν′ C i
+    X ⊆ ν′ C i
   force (unfold′ C f x) = unfold C f x
 
 ------------------------------------------------------------------------
@@ -494,7 +494,7 @@ unfold′-commute :
   ∀ {i o} (x : X o) →
   ν′-bisimilar i
     ( unfold′ C f x
-    , record { force = map C (unfold′ C f {i = ∞}) (f x) }
+    , record { force = map C (unfold′ C f) (f x) }
     )
 force (unfold′-commute C f x) = reflexive-ν (unfold C f x)
 
