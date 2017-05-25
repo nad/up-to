@@ -9,7 +9,7 @@ module Indexed-container.Combinators where
 open import Equality.Propositional hiding (Extensionality)
 open import Interval using (ext)
 open import Logical-equivalence using (_⇔_)
-open import Prelude as P hiding (id)
+open import Prelude as P hiding (id) renaming (_∘_ to _⊚_)
 
 open import Bijection equality-with-J as Bijection using (_↔_)
 open import Equivalence equality-with-J hiding (id; _∘_; inverse)
@@ -81,13 +81,96 @@ id i = ↑ _ ⊤ ◁₁ λ _ i′ → i ≡ i′
 
   x ≡ y                          □
 
+-- A composition combinator.
+
+_∘_ : ∀ {ℓ} {I J K : Set ℓ} →
+      Container J K → Container I J → Container I K
+C ∘ D =
+  ⟦ C ⟧ (Shape D)
+    ◁
+  (λ { (s , f) i →
+       ∃ λ j → ∃ λ (p : Position C s j) → Position D (f p) i })
+  where
+  open Container
+
+-- An unfolding lemma for ⟦ C ∘ D ⟧.
+
+⟦∘⟧↔ : ∀ {ℓ x} {I J K : Set ℓ} {X : Rel x I}
+       (C : Container J K) {D : Container I J} {k} →
+       ⟦ C ∘ D ⟧ X k ↔ ⟦ C ⟧ (⟦ D ⟧ X) k
+⟦∘⟧↔ {X = X} C {D} {k} =
+
+  ⟦ C ∘ D ⟧ X k                                                     ↔⟨⟩
+
+  (∃ λ { (s , f) →
+         ∀ {i} →
+         (∃ λ j → ∃ λ (p : Position C s j) → Position D (f p) i) →
+         X i })                                                     ↝⟨ inverse Σ-assoc ⟩
+
+  (∃ λ s →
+   ∃ λ (f : Position C s ⊆ Shape D) →
+     ∀ {i} →
+     (∃ λ j → ∃ λ (p : Position C s j) → Position D (f p) i) →
+     X i)                                                           ↝⟨ (∃-cong λ _ → ∃-cong λ _ → implicit-∀-cong ext currying) ⟩
+
+  (∃ λ s →
+   ∃ λ (f : Position C s ⊆ Shape D) →
+     ∀ {i} j →
+     (∃ λ (p : Position C s j) → Position D (f p) i) →
+     X i)                                                           ↝⟨ (∃-cong λ _ → ∃-cong λ _ → Bijection.implicit-Π↔Π) ⟩
+
+  (∃ λ s →
+   ∃ λ (f : Position C s ⊆ Shape D) →
+     ∀ i j →
+     (∃ λ (p : Position C s j) → Position D (f p) i) →
+     X i)                                                           ↝⟨ (∃-cong λ _ → ∃-cong λ _ → Π-comm) ⟩
+
+  (∃ λ s →
+   ∃ λ (f : Position C s ⊆ Shape D) →
+     ∀ j i →
+     (∃ λ (p : Position C s j) → Position D (f p) i) →
+     X i)                                                           ↝⟨ (∃-cong λ _ → ∃-cong λ _ → inverse Bijection.implicit-Π↔Π) ⟩
+
+  (∃ λ s →
+   ∃ λ (f : Position C s ⊆ Shape D) →
+     ∀ {j} i →
+     (∃ λ (p : Position C s j) → Position D (f p) i) →
+     X i)                                                           ↝⟨ (∃-cong λ _ → inverse implicit-ΠΣ-comm) ⟩
+
+  (∃ λ s → ∀ {j} →
+   ∃ λ (f : Position C s j → Shape D j) →
+     ∀ i →
+     (∃ λ (p : Position C s j) → Position D (f p) i) →
+     X i)                                                           ↝⟨ (∃-cong λ _ → implicit-∀-cong ext $ ∃-cong λ _ → ∀-cong ext λ _ →
+                                                                        currying) ⟩
+  (∃ λ s → ∀ {j} →
+   ∃ λ (f : Position C s j → Shape D j) →
+     ∀ i → (p : Position C s j) → Position D (f p) i → X i)         ↝⟨ (∃-cong λ _ → implicit-∀-cong ext $ ∃-cong λ _ → Π-comm) ⟩
+
+  (∃ λ s → ∀ {j} →
+   ∃ λ (f : Position C s j → Shape D j) →
+     (p : Position C s j) → ∀ i → Position D (f p) i → X i)         ↝⟨ (∃-cong λ _ → implicit-∀-cong ext $ inverse ΠΣ-comm) ⟩
+
+  (∃ λ s → ∀ {j} → Position C s j →
+   ∃ λ (s′ : Shape D j) → ∀ i → Position D s′ i → X i)              ↝⟨ (∃-cong λ _ → implicit-∀-cong ext $ ∀-cong ext λ _ → ∃-cong λ _ →
+                                                                        inverse Bijection.implicit-Π↔Π) ⟩
+  (∃ λ s → ∀ {j} → Position C s j →
+   ∃ λ (s′ : Shape D j) → Position D s′ ⊆ X)                        ↔⟨⟩
+
+  ⟦ C ⟧ (⟦ D ⟧ X) k                                                 □
+
+  where
+  open Container
+
+-- TODO: Define ⟦∘⟧₂↔ (an unfolding lemma for ⟦ C ∘ D ⟧₂).
+
 -- A reindexing combinator.
 --
 -- Taken from "Indexed containers".
 
 reindex₂ : ∀ {ℓ} {I O₁ O₂ : Set ℓ} →
            (O₂ → O₁) → Container I O₁ → Container I O₂
-reindex₂ f C = C ∘ f
+reindex₂ f C = C ⊚ f
 
 -- An unfolding lemma for ⟦ reindex₂ f C ⟧.
 
@@ -110,8 +193,8 @@ reindex₂ f C = C ∘ f
   ⟦ reindex₂ f C ⟧₂ R (x , y)                              ↔⟨⟩
 
   (∃ λ (eq : s ≡ t) →
-   ∀ {o} (p : Position (C ∘ f) s o) →
-   R (g p , h (subst (λ s → Position (C ∘ f) s o) eq p)))  ↔⟨⟩
+   ∀ {o} (p : Position (C ⊚ f) s o) →
+   R (g p , h (subst (λ s → Position (C ⊚ f) s o) eq p)))  ↔⟨⟩
 
   (∃ λ (eq : s ≡ t) →
    ∀ {o} (p : Position C s o) →
@@ -137,7 +220,7 @@ reindex₁ f C =
 
 ⟦reindex₁⟧↔ : ∀ {ℓ x} {I₁ I₂ O : Set ℓ} {f : I₁ → I₂}
               (C : Container I₁ O) {X : Rel x I₂} {o} →
-              ⟦ reindex₁ f C ⟧ X o ↔ ⟦ C ⟧ (X ∘ f) o
+              ⟦ reindex₁ f C ⟧ X o ↔ ⟦ C ⟧ (X ⊚ f) o
 ⟦reindex₁⟧↔ {f = f} C {X} {o} =
   ⟦ reindex₁ f C ⟧ X o                                 ↝⟨ (∃-cong λ _ → Bijection.implicit-Π↔Π) ⟩
 
@@ -156,7 +239,7 @@ reindex₁ f C =
   (∃ λ (s : Shape C o) →
    ∀ i → Position C s i → X (f i))                     ↝⟨ (∃-cong λ _ → inverse Bijection.implicit-Π↔Π) ⟩
 
-  ⟦ C ⟧ (X ∘ f) o                                      □
+  ⟦ C ⟧ (X ⊚ f) o                                      □
   where
   open Container
 
@@ -182,7 +265,7 @@ reindex₁ f C =
   (∃ λ (eq : s ≡ t) →
    ∀ {o} (p : ∃ λ o′ → f o′ ≡ o × Position C s o′) →
    R (g p , h (subst (λ s → ∃ λ o′ → f o′ ≡ o × Position C s o′) eq p)))  ↝⟨ (∃-cong λ eq → implicit-∀-cong ext $ ∀-cong ext λ _ →
-                                                                              ≡⇒↝ _ $ cong (R ∘ (g _ ,_) ∘ h) $
+                                                                              ≡⇒↝ _ $ cong (R ⊚ (g _ ,_) ⊚ h) $
                                                                               lemma eq) ⟩
   (∃ λ (eq : s ≡ t) →
    ∀ {o} (p : ∃ λ o′ → f o′ ≡ o × Position C s o′) →
@@ -254,23 +337,23 @@ reindex₁ f C =
             (cong₂ _,_ eq refl) (proj₂ p)
     )                                                                     ≡⟨ cong (_ ,_) $
                                                                              push-subst-, {y≡z = cong₂ _,_ eq refl}
-                                                                                          ((_≡ o) ∘ f ∘ proj₂) (uncurry (Position C)) ⟩
+                                                                                          ((_≡ o) ⊚ f ⊚ proj₂) (uncurry (Position C)) ⟩
     ( proj₁ p
-    , subst ((_≡ o) ∘ f ∘ proj₂)   (cong₂ _,_ eq refl) (proj₁ (proj₂ p))
+    , subst ((_≡ o) ⊚ f ⊚ proj₂)   (cong₂ _,_ eq refl) (proj₁ (proj₂ p))
     , subst (uncurry (Position C)) (cong₂ _,_ eq refl) (proj₂ (proj₂ p))
     )                                                                     ≡⟨ cong (λ eq′ → _ , eq′
                                                                                              , subst (uncurry (Position C)) (cong₂ _,_ eq refl) _) $
-                                                                             subst-∘ ((_≡ o) ∘ f) proj₂ (cong₂ _,_ eq refl) ⟩
+                                                                             subst-∘ ((_≡ o) ⊚ f) proj₂ (cong₂ _,_ eq refl) ⟩
     ( proj₁ p
-    , subst ((_≡ o) ∘ f)
+    , subst ((_≡ o) ⊚ f)
             (cong proj₂ (cong₂ _,_ eq refl)) (proj₁ (proj₂ p))
     , subst (uncurry (Position C)) (cong (_, _) eq) (proj₂ (proj₂ p))
-    )                                                                     ≡⟨ cong₂ (λ eq₁ eq₂ → _ , subst ((_≡ o) ∘ f) eq₁ _ , eq₂)
+    )                                                                     ≡⟨ cong₂ (λ eq₁ eq₂ → _ , subst ((_≡ o) ⊚ f) eq₁ _ , eq₂)
                                                                              (cong-proj₂-cong₂-, eq refl)
                                                                              (sym $ subst-∘ (uncurry (Position C)) (_, _) eq) ⟩
     ( proj₁ p
-    , subst ((_≡ o) ∘ f) refl (proj₁ (proj₂ p))
-    , subst (uncurry (Position C) ∘ (_, _)) eq (proj₂ (proj₂ p))
+    , subst ((_≡ o) ⊚ f) refl (proj₁ (proj₂ p))
+    , subst (uncurry (Position C) ⊚ (_, _)) eq (proj₂ (proj₂ p))
     )                                                                     ≡⟨⟩
 
     ( proj₁ p
@@ -286,18 +369,18 @@ reindex₁ f C =
 
 reindex : ∀ {ℓ} {I O : Set ℓ} →
           (I → O) → Container I O → Container O I
-reindex f = reindex₂ f ∘ reindex₁ f
+reindex f = reindex₂ f ⊚ reindex₁ f
 
 -- An unfolding lemma for ⟦ reindex f C ⟧.
 
 ⟦reindex⟧↔ : ∀ {ℓ x} {I O : Set ℓ} {f : I → O}
              (C : Container I O) {X : Rel x O} {i} →
-             ⟦ reindex f C ⟧ X i ↔ ⟦ C ⟧ (X ∘ f) (f i)
+             ⟦ reindex f C ⟧ X i ↔ ⟦ C ⟧ (X ⊚ f) (f i)
 ⟦reindex⟧↔ {f = f} C {X} {i} =
   ⟦ reindex f C ⟧ X i                ↔⟨⟩
   ⟦ reindex₂ f (reindex₁ f C) ⟧ X i  ↔⟨⟩
   ⟦ reindex₁ f C ⟧ X (f i)           ↝⟨ ⟦reindex₁⟧↔ C ⟩□
-  ⟦ C ⟧ (X ∘ f) (f i)                □
+  ⟦ C ⟧ (X ⊚ f) (f i)                □
 
 -- An unfolding lemma for ⟦ reindex f C ⟧₂.
 
@@ -327,24 +410,24 @@ reindex f = reindex₂ f ∘ reindex₁ f
            )                                           □
 
 -- If f is an involution, then ν (reindex f C) i is pointwise
--- logically equivalent to ν C i ∘ f.
+-- logically equivalent to ν C i ⊚ f.
 
 ν-reindex⇔ :
   ∀ {ℓ} {I : Set ℓ} {C : Container I I} {f : I → I} →
-  f ∘ f ≡ P.id →
+  f ⊚ f ≡ P.id →
   ∀ {i x} → ν (reindex f C) i x ⇔ ν C i (f x)
 ν-reindex⇔ {C = C} {f} idem {i} {x} =
   ν (reindex f C) i x                     ↔⟨⟩
   ⟦ reindex f C ⟧ (ν′ (reindex f C) i) x  ↔⟨ ⟦reindex⟧↔ C ⟩
-  ⟦ C ⟧ (ν′ (reindex f C) i ∘ f) (f x)    ↝⟨ ⟦ C ⟧-cong (record { to = to; from = from }) ⟩
-  ⟦ C ⟧ (ν′ C i ∘ f ∘ f) (f x)            ↔⟨ ≡⇒↝ bijection $ cong (λ g → ⟦ C ⟧ (ν′ C i ∘ g) (f x)) idem ⟩
+  ⟦ C ⟧ (ν′ (reindex f C) i ⊚ f) (f x)    ↝⟨ ⟦ C ⟧-cong (record { to = to; from = from }) ⟩
+  ⟦ C ⟧ (ν′ C i ⊚ f ⊚ f) (f x)            ↔⟨ ≡⇒↝ bijection $ cong (λ g → ⟦ C ⟧ (ν′ C i ⊚ g) (f x)) idem ⟩
   ⟦ C ⟧ (ν′ C i) (f x)                    ↔⟨⟩
   ν C i (f x)                             □
   where
-  to : ∀ {i} → ν′ (reindex f C) i ⊆ ν′ C i ∘ f
+  to : ∀ {i} → ν′ (reindex f C) i ⊆ ν′ C i ⊚ f
   force (to x) = _⇔_.to (ν-reindex⇔ idem) (force x)
 
-  from : ∀ {i} → ν′ C i ∘ f ⊆ ν′ (reindex f C) i
+  from : ∀ {i} → ν′ C i ⊚ f ⊆ ν′ (reindex f C) i
   force (from x) = _⇔_.from (ν-reindex⇔ idem) (force x)
 
 -- A cartesian product combinator.
@@ -414,9 +497,9 @@ C₁ ⊗ C₂ =
 
     ↔
 
-  ⟦ C₁ ⟧₂ R ((x₁ , f ∘ inj₁) , (y₁ , g ∘ inj₁))
+  ⟦ C₁ ⟧₂ R ((x₁ , f ⊚ inj₁) , (y₁ , g ⊚ inj₁))
     ×
-  ⟦ C₂ ⟧₂ R ((x₂ , f ∘ inj₂) , (y₂ , g ∘ inj₂))
+  ⟦ C₂ ⟧₂ R ((x₂ , f ⊚ inj₂) , (y₂ , g ⊚ inj₂))
 
 ⟦⊗⟧₂↔ C₁ C₂ R (x@(x₁ , x₂) , f) (y@(y₁ , y₂) , g) =
 
@@ -462,10 +545,10 @@ C₁ ⊗ C₂ =
       , g (subst (λ { (s₁ , s₂) → Position C₁ s₁ o ⊎ Position C₂ s₂ o })
                  (cong₂ _,_ eq₁ eq₂) (inj₂ p))
       )))                                                                 ↝⟨ (∃-cong λ eq₁ → ∃-cong λ eq₂ → implicit-∀-cong ext $
-                                                                              (∀-cong ext λ _ → ≡⇒↝ _ $ cong (R ∘ (f _ ,_)) $
+                                                                              (∀-cong ext λ _ → ≡⇒↝ _ $ cong (R ⊚ (f _ ,_)) $
                                                                                lemma₁ eq₁ eq₂)
                                                                                 ×-cong
-                                                                              (∀-cong ext λ _ → ≡⇒↝ _ $ cong (R ∘ (f _ ,_)) $
+                                                                              (∀-cong ext λ _ → ≡⇒↝ _ $ cong (R ⊚ (f _ ,_)) $
                                                                                lemma₂ eq₁ eq₂)) ⟩
   (∃ λ (eq₁ : x₁ ≡ y₁) →
    ∃ λ (eq₂ : x₂ ≡ y₂) →
@@ -504,9 +587,9 @@ C₁ ⊗ C₂ =
       , g (inj₂ (subst (λ s₂ → Container.Position C₂ s₂ o) eq p))
       )))                                                                 ↔⟨⟩
 
-  ⟦ C₁ ⟧₂ R ((x₁ , f ∘ inj₁) , (y₁ , g ∘ inj₁))
+  ⟦ C₁ ⟧₂ R ((x₁ , f ⊚ inj₁) , (y₁ , g ⊚ inj₁))
     ×
-  ⟦ C₂ ⟧₂ R ((x₂ , f ∘ inj₂) , (y₂ , g ∘ inj₂))                           □
+  ⟦ C₂ ⟧₂ R ((x₂ , f ⊚ inj₂) , (y₂ , g ⊚ inj₂))                           □
 
   where
   open Container
@@ -517,10 +600,10 @@ C₁ ⊗ C₂ =
              (cong₂ _,_ eq₁ eq₂) (inj₁ p))                            ≡⟨ cong g $ push-subst-inj₁ {y≡z = cong₂ _,_ eq₁ eq₂} _ _ ⟩
 
     g (inj₁ (subst (λ { (s₁ , s₂) → Position C₁ s₁ o })
-                   (cong₂ _,_ eq₁ eq₂) p))                            ≡⟨ cong (g ∘ inj₁) $ subst-∘ _ _ (cong₂ _,_ eq₁ eq₂) ⟩
+                   (cong₂ _,_ eq₁ eq₂) p))                            ≡⟨ cong (g ⊚ inj₁) $ subst-∘ _ _ (cong₂ _,_ eq₁ eq₂) ⟩
 
     g (inj₁ (subst (λ s₁ → Position C₁ s₁ o)
-                   (cong proj₁ (cong₂ _,_ eq₁ eq₂)) p))               ≡⟨ cong (g ∘ inj₁) $ cong (flip (subst _) _) $ cong-proj₁-cong₂-, eq₁ eq₂ ⟩∎
+                   (cong proj₁ (cong₂ _,_ eq₁ eq₂)) p))               ≡⟨ cong (g ⊚ inj₁) $ cong (flip (subst _) _) $ cong-proj₁-cong₂-, eq₁ eq₂ ⟩∎
 
     g (inj₁ (subst (λ s₁ → Position C₁ s₁ o) eq₁ p))                  ∎
 
@@ -530,10 +613,10 @@ C₁ ⊗ C₂ =
              (cong₂ _,_ eq₁ eq₂) (inj₂ p))                            ≡⟨ cong g $ push-subst-inj₂ {y≡z = cong₂ _,_ eq₁ eq₂} _ _ ⟩
 
     g (inj₂ (subst (λ { (s₁ , s₂) → Position C₂ s₂ o })
-                   (cong₂ _,_ eq₁ eq₂) p))                            ≡⟨ cong (g ∘ inj₂) $ subst-∘ _ _ (cong₂ _,_ eq₁ eq₂) ⟩
+                   (cong₂ _,_ eq₁ eq₂) p))                            ≡⟨ cong (g ⊚ inj₂) $ subst-∘ _ _ (cong₂ _,_ eq₁ eq₂) ⟩
 
     g (inj₂ (subst (λ s₂ → Position C₂ s₂ o)
-                   (cong proj₂ (cong₂ _,_ eq₁ eq₂)) p))               ≡⟨ cong (g ∘ inj₂) $ cong (flip (subst _) _) $ cong-proj₂-cong₂-, eq₁ eq₂ ⟩∎
+                   (cong proj₂ (cong₂ _,_ eq₁ eq₂)) p))               ≡⟨ cong (g ⊚ inj₂) $ cong (flip (subst _) _) $ cong-proj₂-cong₂-, eq₁ eq₂ ⟩∎
 
     g (inj₂ (subst (λ s₂ → Position C₂ s₂ o) eq₂ p))                  ∎
 
@@ -552,12 +635,12 @@ C₁ ⟷ C₂ = C₁ ⊗ reindex swap C₂
 ⟦⟷⟧↔ :
   ∀ {ℓ x} {I : Set ℓ}
   (C₁ C₂ : Container (I × I) (I × I)) {X : Rel₂ x I} {i} →
-  ⟦ C₁ ⟷ C₂ ⟧ X i ↔ ⟦ C₁ ⟧ X i × ⟦ C₂ ⟧ (X ∘ swap) (swap i)
+  ⟦ C₁ ⟷ C₂ ⟧ X i ↔ ⟦ C₁ ⟧ X i × ⟦ C₂ ⟧ (X ⊚ swap) (swap i)
 ⟦⟷⟧↔ C₁ C₂ {X} {i} =
   ⟦ C₁ ⟷ C₂ ⟧ X i                          ↔⟨⟩
   ⟦ C₁ ⊗ reindex swap C₂ ⟧ X i             ↝⟨ ⟦⊗⟧↔ C₁ (reindex swap C₂) ⟩
   ⟦ C₁ ⟧ X i × ⟦ reindex swap C₂ ⟧ X i     ↝⟨ ∃-cong (λ _ → ⟦reindex⟧↔ C₂) ⟩□
-  ⟦ C₁ ⟧ X i × ⟦ C₂ ⟧ (X ∘ swap) (swap i)  □
+  ⟦ C₁ ⟧ X i × ⟦ C₂ ⟧ (X ⊚ swap) (swap i)  □
 
 -- An unfolding lemma for ⟦ C₁ ⟷ C₂ ⟧₂.
 
@@ -574,7 +657,7 @@ C₁ ⟷ C₂ = C₁ ⊗ reindex swap C₂
 
     ↔
 
-  ⟦ C₁ ⟧₂ R ((s₁ , f ∘ inj₁) , (t₁ , g ∘ inj₁))
+  ⟦ C₁ ⟧₂ R ((s₁ , f ⊚ inj₁) , (t₁ , g ⊚ inj₁))
     ×
   ⟦ C₂ ⟧₂ R ( (s₂ , λ p → f (inj₂ (_ , refl , p)))
             , (t₂ , λ p → g (inj₂ (_ , refl , p)))
@@ -586,11 +669,11 @@ C₁ ⟷ C₂ = C₁ ⊗ reindex swap C₂
 
   ⟦ C₁ ⊗ reindex swap C₂ ⟧₂ R (x , y)                         ↝⟨ ⟦⊗⟧₂↔ C₁ (reindex swap C₂) R _ (_ , g) ⟩
 
-  ⟦ C₁ ⟧₂ R ((s₁ , f ∘ inj₁) , (t₁ , g ∘ inj₁))
+  ⟦ C₁ ⟧₂ R ((s₁ , f ⊚ inj₁) , (t₁ , g ⊚ inj₁))
     ×
-  ⟦ reindex swap C₂ ⟧₂ R ((s₂ , f ∘ inj₂) , (t₂ , g ∘ inj₂))  ↝⟨ ∃-cong (λ _ → ⟦reindex⟧₂↔ C₂ _ R _ (_ , g ∘ inj₂)) ⟩□
+  ⟦ reindex swap C₂ ⟧₂ R ((s₂ , f ⊚ inj₂) , (t₂ , g ⊚ inj₂))  ↝⟨ ∃-cong (λ _ → ⟦reindex⟧₂↔ C₂ _ R _ (_ , g ⊚ inj₂)) ⟩□
 
-  ⟦ C₁ ⟧₂ R ((s₁ , f ∘ inj₁) , (t₁ , g ∘ inj₁))
+  ⟦ C₁ ⟧₂ R ((s₁ , f ⊚ inj₁) , (t₁ , g ⊚ inj₁))
     ×
   ⟦ C₂ ⟧₂ R ( (s₂ , λ p → f (inj₂ (_ , refl , p)))
             , (t₂ , λ p → g (inj₂ (_ , refl , p)))

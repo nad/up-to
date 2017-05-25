@@ -14,7 +14,7 @@ open import Bijection equality-with-J using (_↔_)
 open import Function-universe equality-with-J hiding (id; _∘_)
 
 open import Indexed-container
-open import Indexed-container.Combinators hiding (id)
+open import Indexed-container.Combinators hiding (id; _∘_)
 open import Relation
 open import Up-to
 
