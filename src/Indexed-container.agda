@@ -168,37 +168,52 @@ mutual
 
 open ν′ public
 
--- The greatest fixpoint is a post-fixpoint.
+-- The greatest fixpoint ν C ∞ is a post-fixpoint.
 
 ν-out :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} →
-  ν C ∞ ⊆ ⟦ C ⟧ (ν C ∞)
+  ∀ {ℓ} {I : Set ℓ} {C : Container I I} {i} {j : Size< i} →
+  ν C i ⊆ ⟦ C ⟧ (ν C j)
 ν-out {C = C} = map C (λ x → force x)
 
 -- The greatest fixpoint is a pre-fixpoint.
 
 ν-in :
-  ∀ {ℓ} {I : Set ℓ} (C : Container I I) →
-  ⟦ C ⟧ (ν C ∞) ⊆ ν C ∞
-ν-in C =
-  map C {A = ν C ∞} (λ x → record { force = λ { {j = _} → x } })
+  ∀ {ℓ} {I : Set ℓ} (C : Container I I) {i} →
+  ⟦ C ⟧ (ν C i) ⊆ ν C i
+ν-in C {i} =
+  map C {A = ν C i} (λ x → record { force = λ { {_} → x } })
 
 mutual
 
-  -- The greatest fixpoint is greater than or equal to every
-  -- post-fixpoint.
+  -- Generalisations of unfold and unfold′ (see below) with more sized
+  -- types.
 
-  unfold :
-    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : Rel ℓ₂ I} {i} →
-    X ⊆ ⟦ C ⟧ X →
-    X ⊆ ν C i
-  unfold C f x = map C (unfold′ C f) (f x)
+  sized-unfold :
+    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) (X : Size → Rel ℓ₂ I) →
+    (∀ {i} {j : Size< i} → X i ⊆ ⟦ C ⟧ (X j)) →
+    ∀ {i} {j : Size< i} → X i ⊆ ν C j
+  sized-unfold C X f x = map C (sized-unfold′ C X f) (f x)
 
-  unfold′ :
-    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : Rel ℓ₂ I} {i} →
-    X ⊆ ⟦ C ⟧ X →
-    X ⊆ ν′ C i
-  force (unfold′ C f x) = unfold C f x
+  sized-unfold′ :
+    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) (X : Size → Rel ℓ₂ I) →
+    (∀ {i} {j : Size< i} → X i ⊆ ⟦ C ⟧ (X j)) →
+    ∀ {i} → X i ⊆ ν′ C i
+  force (sized-unfold′ C X f x) = sized-unfold C X f x
+
+-- The greatest fixpoint is greater than or equal to every
+-- post-fixpoint.
+
+unfold :
+  ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : Rel ℓ₂ I} {i} →
+  X ⊆ ⟦ C ⟧ X →
+  X ⊆ ν C i
+unfold C f = sized-unfold C _ (λ { {j = _} → f })
+
+unfold′ :
+  ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : Rel ℓ₂ I} {i} →
+  X ⊆ ⟦ C ⟧ X →
+  X ⊆ ν′ C i
+unfold′ C f = sized-unfold′ C _ (λ { {j = _} → f })
 
 ------------------------------------------------------------------------
 -- Bisimilarity
@@ -584,7 +599,7 @@ gfp-out ℓ₂ {C = C} (R , R⊆CR , Ri) =
 
 ν⊆gfp : ∀ {ℓ₁} ℓ₂ {I : Set ℓ₁} {C : Container I I} →
         ν C ∞ ⊆ gfp ℓ₂ C
-ν⊆gfp ℓ₂ = gfp-unfold ℓ₂ ν-out
+ν⊆gfp ℓ₂ = gfp-unfold ℓ₂ (ν-out {i = ∞})
 
 -- The second definition of greatest fixpoints is contained in the first one.
 
