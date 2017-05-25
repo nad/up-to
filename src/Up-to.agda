@@ -14,43 +14,60 @@ open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 
-open import Function-universe equality-with-J hiding (id; _∘_)
+open import Bijection equality-with-J using (_↔_)
+open import Function-universe equality-with-J as F hiding (id; _∘_)
 
+import Indexed-container.Combinators as C
 open import Relation
 
 ------------------------------------------------------------------------
 -- Up-to techniques
 
+-- This definition of soundness is based on the definition of
+-- "b-soundness" given by Pous and Sangiorgi in "Enhancements of the
+-- bisimulation proof method", with the following differences:
+--
+-- * The property is stated for an indexed container rather than a
+--   monotone function on a (particular) complete lattice.
+--
+-- * The extension ⟦ C ⟧ of the container C takes the place of b.
+--
+-- * The type-theoretic greatest fixpoint ν takes the place of a
+--   set-theoretic greatest fixpoint.
+
+Sound : Container I I → Set ℓ
+Sound F = ν (C C.∘ F) ∞ ⊆ ν C ∞
+
 -- A relation transformer F is an up-to technique if every relation R
 -- that is contained in ⟦ C ⟧ (F R) is contained in ν C ∞.
---
--- In "Enhancements of the bisimulation proof method" Pous and
--- Sangiorgi define that a monotone function F on a lattice (the
--- lattice of binary relations on processes, ordered by inclusion) is
--- b-sound, for a monotone function b, if gfp (b ∘ F) ⊆ gfp b, where
--- gfp c = ⋃ { R | R ⊆ c R }. Note that
---
---   gfp (b ∘ F) ⊆ gfp b
---     ⇔
---   ⋃ { R | R ⊆ b (F R) } ⊆ gfp b
---     ⇔
---   ∀ R. R ⊆ b (F R) → R ⊆ gfp b.
---
--- The ⇒ direction of the last step is easy to verify. For the ⇐
--- direction, note that
---
---   ⋃ { R | R ⊆ b (F R) }
---     ⊆
---   ⋃ { b (F R) | R ⊆ b (F R) }
---     =
---   b (F (⋃ { R | R ⊆ b (F R) })).
---
--- Thus, for monotone functions F the definition below is similar to
--- Pous and Sangiorgi's definition of b-soundness, with ⟦ C ⟧ taking
--- the place of b, and ν C ∞ taking the place of gfp b.
 
 Up-to-technique : Trans ℓ I → Set (lsuc ℓ)
 Up-to-technique F = ∀ {R} → R ⊆ ⟦ C ⟧ (F R) → R ⊆ ν C ∞
+
+-- The two definitions above are pointwise logically equivalent, if
+-- the second one is restricted to containers (in a certain way).
+
+Sound⇔ : ∀ F → Sound F ⇔ Up-to-technique ⟦ F ⟧
+Sound⇔ F = record
+  { to = λ sound {R} →
+
+      R ⊆ ⟦ C ⟧ (⟦ F ⟧ R)  ↔⟨ ⊆-congʳ (inverse $ C.⟦∘⟧↔ C) ⟩
+
+      R ⊆ ⟦ C C.∘ F ⟧ R    ↝⟨ unfold (C C.∘ F) ⟩
+
+      R ⊆ ν (C C.∘ F) ∞    ↝⟨ ⊆-congʳ sound ⟩□
+
+      R ⊆ ν C ∞            □
+
+  ; from = λ up-to → up-to (
+
+      ν (C C.∘ F) ∞                  ⊆⟨ ν-out ⟩
+
+      ⟦ C C.∘ F ⟧ (ν (C C.∘ F) ∞)    ⊆⟨ _↔_.to (C.⟦∘⟧↔ C) ⟩∎
+
+      ⟦ C ⟧ (⟦ F ⟧ (ν (C C.∘ F) ∞))  ∎)
+
+  }
 
 ------------------------------------------------------------------------
 -- Compatibility
