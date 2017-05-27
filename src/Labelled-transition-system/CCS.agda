@@ -194,6 +194,21 @@ names-are-not-inverted {a} {P} {Q} =
   name a ≡ name (co a)           ↝⟨ id≢co ∘ cancel-name ⟩□
   ⊥                              □
 
+-- If P₁ and P₂ can only make μ-transitions, then P₁ ∣ P₂ can only
+-- make μ-transitions.
+
+∣-only : ∀ {μ₀ P₁ P₂} →
+         (∀ {P′ μ} → P₁ [ μ ]⟶ P′ → μ₀ ≡ μ) →
+         (∀ {P′ μ} → P₂ [ μ ]⟶ P′ → μ₀ ≡ μ) →
+         ∀ {P′ μ} → P₁ ∣ P₂ [ μ ]⟶ P′ → μ₀ ≡ μ
+∣-only      only₁ only₂ (par-left tr)           = only₁ tr
+∣-only      only₁ only₂ (par-right tr)          = only₂ tr
+∣-only {μ₀} only₁ only₂ (par-τ {a = a} tr₁ tr₂) = ⊥-elim (
+                                  $⟨ only₁ tr₁ , only₂ tr₂ ⟩
+  μ₀ ≡ name a × μ₀ ≡ name (co a)  ↝⟨ uncurry trans ∘ Σ-map sym id ⟩
+  name a ≡ name (co a)            ↝⟨ id≢co ∘ cancel-name ⟩□
+  ⊥                               □)
+
 -- If P can only make μ-transitions, then ! P can only make
 -- μ-transitions.
 
@@ -207,6 +222,16 @@ names-are-not-inverted {a} {P} {Q} =
   μ₀ ≡ name a × μ₀ ≡ name (co a)  ↝⟨ uncurry trans ∘ Σ-map sym id ⟩
   name a ≡ name (co a)            ↝⟨ id≢co ∘ cancel-name ⟩□
   ⊥                               □)
+
+-- If P₁ and P₂ can only make μ-transitions, then P₁ ⊕ P₂ can only
+-- make μ-transitions.
+
+⊕-only : ∀ {μ₀ P₁ P₂} →
+         (∀ {P′ μ} → P₁ [ μ ]⟶ P′ → μ₀ ≡ μ) →
+         (∀ {P′ μ} → P₂ [ μ ]⟶ P′ → μ₀ ≡ μ) →
+         ∀ {P′ μ} → P₁ ⊕ P₂ [ μ ]⟶ P′ → μ₀ ≡ μ
+⊕-only only₁ only₂ (choice-left tr)  = only₁ tr
+⊕-only only₁ only₂ (choice-right tr) = only₂ tr
 
 -- A simple lemma.
 
