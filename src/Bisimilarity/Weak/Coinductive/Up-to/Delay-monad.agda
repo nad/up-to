@@ -1,5 +1,6 @@
 ------------------------------------------------------------------------
--- Up-to techniques for the delay monad
+-- Up-to techniques for the delay monad and the "first" definition of
+-- weak bisimilarity
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K #-}

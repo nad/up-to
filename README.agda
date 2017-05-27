@@ -106,7 +106,7 @@ import Bisimilarity.Exercises.Classical.CCS
 import Bisimilarity.Exercises.Coinductive.CCS
 import Bisimilarity.Exercises.Coinductive.6-2-5
 
--- Up-to techniques.
+-- Up-to techniques for strong bisimilarity.
 
 import Bisimilarity.Up-to
 import Bisimilarity.Up-to.CCS
@@ -170,10 +170,14 @@ import Bisimilarity.Weak.CCS.Example
 
 import Bisimilarity.Weak.Delay-monad
 
--- Up-to techniques.
+-- Up-to techniques for the "other" definition of weak bisimilarity.
 
 import Bisimilarity.Weak.Coinductive.Other.Up-to
 import Bisimilarity.Weak.Coinductive.Other.Up-to.CCS
+
+-- Up-to techniques for the delay monad and the "first" definition of
+-- weak bisimilarity.
+
 import Bisimilarity.Weak.Coinductive.Up-to.Delay-monad
 
 ------------------------------------------------------------------------

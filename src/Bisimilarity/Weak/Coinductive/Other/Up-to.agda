@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------
--- Up-to techniques
+-- Up-to techniques for the "other" definition of weak bisimilarity
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K #-}
