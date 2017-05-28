@@ -620,6 +620,25 @@ C₁ ⊗ C₂ =
 
     g (inj₂ (subst (λ s₂ → Position C₂ s₂ o) eq₂ p))                  ∎
 
+-- The greatest fixpoint ν (C₁ ⊗ C₂) i is contained in the
+-- intersection ν C₁ i ∩ ν C₂ i.
+
+ν-⊗⊆ :
+  ∀ {ℓ} {I : Set ℓ} {C₁ C₂ : Container I I} →
+  ∀ {i} → ν (C₁ ⊗ C₂) i ⊆ ν C₁ i ∩ ν C₂ i
+ν-⊗⊆ {C₁ = C₁} {C₂} {i} =
+  ν (C₁ ⊗ C₂) i                                      ⊆⟨⟩
+  ⟦ C₁ ⊗ C₂ ⟧ (ν′ (C₁ ⊗ C₂) i)                       ⊆⟨ _↔_.to (⟦⊗⟧↔ C₁ C₂) ⟩
+  ⟦ C₁ ⟧ (ν′ (C₁ ⊗ C₂) i) ∩ ⟦ C₂ ⟧ (ν′ (C₁ ⊗ C₂) i)  ⊆⟨ Σ-map (map C₁ ν-⊗⊆₁′) (map C₂ ν-⊗⊆₂′) ⟩
+  ⟦ C₁ ⟧ (ν′ C₁ i) ∩ ⟦ C₂ ⟧ (ν′ C₂ i)                ⊆⟨ P.id ⟩∎
+  ν C₁ i ∩ ν C₂ i                                    ∎
+  where
+  ν-⊗⊆₁′ : ν′ (C₁ ⊗ C₂) i ⊆ ν′ C₁ i
+  force (ν-⊗⊆₁′ x) = proj₁ (ν-⊗⊆ (force x))
+
+  ν-⊗⊆₂′ : ν′ (C₁ ⊗ C₂) i ⊆ ν′ C₂ i
+  force (ν-⊗⊆₂′ x) = proj₂ (ν-⊗⊆ (force x))
+
 -- A combinator that is similar to the function ⟷ from Section 6.3.4.1
 -- in Pous and Sangiorgi's "Enhancements of the bisimulation proof
 -- method" (if the same container is used for both arguments).
