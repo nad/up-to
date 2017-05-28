@@ -27,6 +27,9 @@ import Indexed-container.Combinators
 import Up-to
 
 -- Closure properties for Compatible and Size-preserving.
+--
+-- (Some negative results in this module depend on code presented
+-- further down.)
 
 import Up-to.Closure
 
