@@ -18,7 +18,9 @@ open import Similarity.Strong lts as S using ([_]_≤_; [_]_≤′_)
 open LTS lts
 
 open import Similarity.General lts _[_]⇒̂_ ⟶→⇒̂ public
-  renaming ( [_]_≤_ to [_]_≼_
+  renaming ( Similarity to Weak-similarity
+           ; Similarity′ to Weak-similarity′
+           ; [_]_≤_ to [_]_≼_
            ; [_]_≤′_ to [_]_≼′_
            ; _≤_ to _≼_
            ; _≤′_ to _≼′_

@@ -36,7 +36,7 @@ open Up-to S̲t̲e̲p̲ public
 
 Up-to-expansion-and-weak-similarity : Trans₂ (# 0) Proc
 Up-to-expansion-and-weak-similarity R =
-  Expansion ∞ ⊙ R ⊙ Similarity ∞
+  Expansion ∞ ⊙ R ⊙ Weak-similarity ∞
 
 -- The relation transformer is monotone.
 
