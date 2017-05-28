@@ -188,6 +188,10 @@ import Bisimilarity.Weak.Coinductive.Up-to.Delay-monad
 import Similarity.Strong
 import Similarity.Strong.Equational-reasoning-instances
 
+-- Lemmas related to strong similarity for CCS.
+
+import Similarity.Strong.CCS
+
 -- A coinductive definition of weak similarity.
 
 import Similarity.Weak
