@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------
--- Up-to techniques
+-- Up-to techniques, compatibility and size-preserving functions
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K #-}

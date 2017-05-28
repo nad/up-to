@@ -6,6 +6,9 @@
 
 module README where
 
+------------------------------------------------------------------------
+-- Some preliminaries
+
 -- Overloaded "equational" reasoning combinators.
 
 import Equational-reasoning
@@ -13,6 +16,9 @@ import Equational-reasoning
 -- Unary and binary relations.
 
 import Relation
+
+------------------------------------------------------------------------
+-- Containers
 
 -- Indexed containers.
 
@@ -22,7 +28,10 @@ import Indexed-container
 
 import Indexed-container.Combinators
 
--- Up-to techniques.
+------------------------------------------------------------------------
+-- Up-to techniques
+
+-- Up-to techniques, compatibility and size-preserving functions.
 
 import Up-to
 
