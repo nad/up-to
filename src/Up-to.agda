@@ -17,7 +17,8 @@ open import Prelude
 open import Bijection equality-with-J using (_↔_)
 open import Function-universe equality-with-J as F hiding (id; _∘_)
 
-import Indexed-container.Combinators as C
+open import Indexed-container.Combinators
+  hiding (id) renaming (_∘_ to _⊚_)
 open import Relation
 
 ------------------------------------------------------------------------
@@ -36,7 +37,7 @@ open import Relation
 --   set-theoretic greatest fixpoint.
 
 Sound : Container I I → Set ℓ
-Sound F = ν (C C.∘ F) ∞ ⊆ ν C ∞
+Sound F = ν (C ⊚ F) ∞ ⊆ ν C ∞
 
 -- A relation transformer F is an up-to technique if every relation R
 -- that is contained in ⟦ C ⟧ (F R) is contained in ν C ∞.
@@ -51,21 +52,21 @@ Sound⇔ : ∀ F → Sound F ⇔ Up-to-technique ⟦ F ⟧
 Sound⇔ F = record
   { to = λ sound {R} →
 
-      R ⊆ ⟦ C ⟧ (⟦ F ⟧ R)  ↔⟨ ⊆-congʳ (inverse $ C.⟦∘⟧↔ C) ⟩
+      R ⊆ ⟦ C ⟧ (⟦ F ⟧ R)  ↔⟨ ⊆-congʳ (inverse $ ⟦∘⟧↔ C) ⟩
 
-      R ⊆ ⟦ C C.∘ F ⟧ R    ↝⟨ unfold (C C.∘ F) ⟩
+      R ⊆ ⟦ C ⊚ F ⟧ R      ↝⟨ unfold (C ⊚ F) ⟩
 
-      R ⊆ ν (C C.∘ F) ∞    ↝⟨ ⊆-congʳ sound ⟩□
+      R ⊆ ν (C ⊚ F) ∞      ↝⟨ ⊆-congʳ sound ⟩□
 
       R ⊆ ν C ∞            □
 
   ; from = λ up-to → up-to (
 
-      ν (C C.∘ F) ∞                  ⊆⟨ ν-out ⟩
+      ν (C ⊚ F) ∞                  ⊆⟨ ν-out ⟩
 
-      ⟦ C C.∘ F ⟧ (ν (C C.∘ F) ∞)    ⊆⟨ _↔_.to (C.⟦∘⟧↔ C) ⟩∎
+      ⟦ C ⊚ F ⟧ (ν (C ⊚ F) ∞)      ⊆⟨ _↔_.to (⟦∘⟧↔ C) ⟩∎
 
-      ⟦ C ⟧ (⟦ F ⟧ (ν (C C.∘ F) ∞))  ∎)
+      ⟦ C ⟧ (⟦ F ⟧ (ν (C ⊚ F) ∞))  ∎)
 
   }
 
