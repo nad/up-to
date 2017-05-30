@@ -639,15 +639,23 @@ C₁ ⊗ C₂ =
   ν-⊗⊆₂′ : ν′ (C₁ ⊗ C₂) i ⊆ ν′ C₂ i
   force (ν-⊗⊆₂′ x) = proj₂ (ν-⊗⊆ (force x))
 
--- A combinator that is similar to the function ⟷ from Section 6.3.4.1
--- in Pous and Sangiorgi's "Enhancements of the bisimulation proof
--- method" (if the same container is used for both arguments).
+mutual
 
-infix 1 _⟷_
+  -- A combinator that is similar to the function ⟷ from
+  -- Section 6.3.4.1 in Pous and Sangiorgi's "Enhancements of the
+  -- bisimulation proof method".
 
-_⟷_ : ∀ {ℓ} {I : Set ℓ} →
-      (_ _ : Container (I × I) (I × I)) → Container (I × I) (I × I)
-C₁ ⟷ C₂ = C₁ ⊗ reindex swap C₂
+  ⟷[_] : ∀ {ℓ} {I : Set ℓ} →
+         Container (I × I) (I × I) → Container (I × I) (I × I)
+  ⟷[ C ] = C ⟷ C
+
+  -- A generalisation of ⟷[_].
+
+  infix 1 _⟷_
+
+  _⟷_ : ∀ {ℓ} {I : Set ℓ} →
+        (_ _ : Container (I × I) (I × I)) → Container (I × I) (I × I)
+  C₁ ⟷ C₂ = C₁ ⊗ reindex swap C₂
 
 -- An unfolding lemma for ⟦ C₁ ⟷ C₂ ⟧.
 
@@ -703,16 +711,16 @@ C₁ ⟷ C₂ = C₁ ⊗ reindex swap C₂
 -- bisimulation proof method".
 
 -- Post-fixpoints of the container reindex₂ swap id ⊗ C are
--- post-fixpoints of C ⟷ C.
+-- post-fixpoints of ⟷[ C ].
 
 ⊆reindex₂-swap-⊗→⊆⟷ :
   ∀ {ℓ r} {I : Set ℓ} {C : Container (I × I) (I × I)} {R : Rel₂ r I} →
-  R ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ R → R ⊆ ⟦ C ⟷ C ⟧ R
+  R ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ R → R ⊆ ⟦ ⟷[ C ] ⟧ R
 ⊆reindex₂-swap-⊗→⊆⟷ {C = C} {R} R⊆ =
   R                                  ⊆⟨ (λ x → lemma₁ x , lemma₂ x) ⟩
   ⟦ C ⟧ R ∩ R ⊚ swap                 ⊆⟨ Σ-map P.id lemma₃ ⟩
   ⟦ C ⟧ R ∩ ⟦ C ⟧ (R ⊚ swap) ⊚ swap  ⊆⟨ _↔_.from (⟦⟷⟧↔ C C) ⟩∎
-  ⟦ C ⟷ C ⟧ R                        ∎
+  ⟦ ⟷[ C ] ⟧ R                       ∎
   where
   lemma₀ =
     R                                 ⊆⟨ R⊆ ⟩
@@ -736,12 +744,12 @@ C₁ ⟷ C₂ = C₁ ⊗ reindex swap C₂
     ⟦ C ⟧ R           ⊆⟨ map C lemma₂ ⟩∎
     ⟦ C ⟧ (R ⊚ swap)  ∎
 
--- The symmetric closure of a post-fixpoint of C ⟷ C is a
+-- The symmetric closure of a post-fixpoint of ⟷[ C ] is a
 -- post-fixpoint of reindex₂ swap id ⊗ C.
 
 ⊆⟷→∪-swap⊆reindex₂-swap-⊗ :
   ∀ {ℓ r} {I : Set ℓ} {C : Container (I × I) (I × I)} {R : Rel₂ r I} →
-  R ⊆ ⟦ C ⟷ C ⟧ R →
+  R ⊆ ⟦ ⟷[ C ] ⟧ R →
   R ∪ R ⊚ swap ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ (R ∪ R ⊚ swap)
 ⊆⟷→∪-swap⊆reindex₂-swap-⊗ {C = C} {R} R⊆ =
   R ∪ R ⊚ swap                                                ⊆⟨ (λ x → lemma₁ x , lemma₂ x) ⟩
@@ -759,7 +767,7 @@ C₁ ⟷ C₂ = C₁ ⊗ reindex swap C₂
   lemma₂ =
     R ∪ R ⊚ swap                         ⊆⟨ ⊎-map R⊆ R⊆ ⟩
 
-    ⟦ C ⟷ C ⟧ R ∪ ⟦ C ⟷ C ⟧ R ⊚ swap     ⊆⟨ ⊎-map (_↔_.to (⟦⟷⟧↔ C C)) (_↔_.to (⟦⟷⟧↔ C C)) ⟩
+    ⟦ ⟷[ C ] ⟧ R ∪ ⟦ ⟷[ C ] ⟧ R ⊚ swap   ⊆⟨ ⊎-map (_↔_.to (⟦⟷⟧↔ C C)) (_↔_.to (⟦⟷⟧↔ C C)) ⟩
 
     ⟦ C ⟧ R ∩ ⟦ C ⟧ (R ⊚ swap) ⊚ swap ∪
     ⟦ C ⟧ R ⊚ swap ∩ ⟦ C ⟧ (R ⊚ swap)    ⊆⟨ ⊎-map proj₁ proj₂ ⟩
@@ -768,19 +776,19 @@ C₁ ⟷ C₂ = C₁ ⊗ reindex swap C₂
 
     ⟦ C ⟧ (R ∪ R ⊚ swap)                 ∎
 
--- The greatest fixpoint of C ⟷ C is pointwise logically equivalent to
--- the greatest fixpoint of reindex₂ swap id ⊗ C.
+-- The greatest fixpoint of ⟷[ C ] is pointwise logically equivalent
+-- to the greatest fixpoint of reindex₂ swap id ⊗ C.
 --
 -- Note that this proof is not necessarily size-preserving. TODO:
 -- Figure out if the proof can be made size-preserving.
 
 ν-⟷⇔ :
   ∀ {ℓ} {I : Set ℓ} {C : Container (I × I) (I × I)} {p} →
-  ν (C ⟷ C) ∞ p ⇔ ν (reindex₂ swap id ⊗ C) ∞ p
+  ν ⟷[ C ] ∞ p ⇔ ν (reindex₂ swap id ⊗ C) ∞ p
 ν-⟷⇔ {C = C} = record
   { to =
-      let R = ν (C ⟷ C) ∞ in                                  $⟨ (λ {_} → ν-out) ⟩
-      R ⊆ ⟦ C ⟷ C ⟧ R                                         ↝⟨ ⊆⟷→∪-swap⊆reindex₂-swap-⊗ ⟩
+      let R = ν ⟷[ C ] ∞ in                                   $⟨ (λ {_} → ν-out) ⟩
+      R ⊆ ⟦ ⟷[ C ] ⟧ R                                        ↝⟨ ⊆⟷→∪-swap⊆reindex₂-swap-⊗ ⟩
       R ∪ R ⊚ swap ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ (R ∪ R ⊚ swap)  ↝⟨ unfold _ ⟩
       R ∪ R ⊚ swap ⊆ ν (reindex₂ swap id ⊗ C) ∞               ↝⟨ (λ hyp {_} x → hyp (inj₁ x)) ⟩□
       R ⊆ ν (reindex₂ swap id ⊗ C) ∞                          □
@@ -788,6 +796,6 @@ C₁ ⟷ C₂ = C₁ ⊗ reindex swap C₂
   ; from =
       let R = ν (reindex₂ swap id ⊗ C) ∞ in  $⟨ (λ {_} → ν-out) ⟩
       R ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ R         ↝⟨ ⊆reindex₂-swap-⊗→⊆⟷ ⟩
-      R ⊆ ⟦ C ⟷ C ⟧ R                        ↝⟨ unfold _ ⟩□
-      R ⊆ ν (C ⟷ C) ∞                        □
+      R ⊆ ⟦ ⟷[ C ] ⟧ R                       ↝⟨ unfold _ ⟩□
+      R ⊆ ν ⟷[ C ] ∞                         □
   }
