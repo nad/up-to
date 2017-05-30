@@ -81,58 +81,41 @@ Sound⇔ F = record
 Compatible : Trans ℓ I → Set (lsuc ℓ)
 Compatible F = ∀ R → F (⟦ C ⟧ R) ⊆ ⟦ C ⟧ (F R)
 
+-- If F is monotone and compatible, and R is contained in ⟦ C ⟧ (F R),
+-- then F ^ω R is a post-fixpoint of ⟦ C ⟧.
+--
+-- The proof of Pous and Sangiorgi's Theorem 6.3.9 contains a similar
+-- result.
+
+compatible→^ω-post-fixpoint :
+  ∀ {F} →
+  Monotone F → Compatible F →
+  ∀ {R} → R ⊆ ⟦ C ⟧ (F R) → F ^ω R ⊆ ⟦ C ⟧ (F ^ω R)
+compatible→^ω-post-fixpoint {F} mono comp {R = R} R⊆ = uncurry λ n →
+  F ^[ n ] R              ⊆⟨ Fⁿ⊆∘F¹⁺ⁿ n ⟩
+  ⟦ C ⟧ (F ^[ 1 + n ] R)  ⊆⟨ map C (1 + n ,_) ⟩∎
+  ⟦ C ⟧ (F ^ω R)          ∎
+  where
+  Fⁿ⊆∘F¹⁺ⁿ : ∀ n → F ^[ n ] R ⊆ ⟦ C ⟧ (F ^[ suc n ] R)
+  Fⁿ⊆∘F¹⁺ⁿ zero =
+    R            ⊆⟨ R⊆ ⟩∎
+    ⟦ C ⟧ (F R)  ∎
+  Fⁿ⊆∘F¹⁺ⁿ (suc n) =
+    F ^[ 1 + n ] R              ⊆⟨⟩
+    F (F ^[ n ] R)              ⊆⟨ mono (Fⁿ⊆∘F¹⁺ⁿ n) ⟩
+    F (⟦ C ⟧ (F ^[ 1 + n ] R))  ⊆⟨ comp _ ⟩∎
+    ⟦ C ⟧ (F ^[ 2 + n ] R)      ∎
+
 -- Monotone compatible functions are up-to techniques.
 --
 -- This is basically Pous and Sangiorgi's Theorem 6.3.9.
 
-module _
-  {F    : Trans ℓ I}
-  (mono : Monotone F)
-  (comp : Compatible F)
-  where
-
-  private
-
-    -- Repeated composition of a function with itself.
-
-    infix 10 _^[_]_
-
-    _^[_]_ : ∀ {a} {A : Set a} → (A → A) → ℕ → A → A
-    f ^[ zero  ] x = x
-    f ^[ suc n ] x = f (f ^[ n ] x)
-
-    module _ (R : Rel ℓ I) (R-prog : R ⊆ ⟦ C ⟧ (F R)) where
-
-      -- A lemma.
-
-      Fⁿ⊆Step∘F¹⁺ⁿ : ∀ n → F ^[ n ] R ⊆ ⟦ C ⟧ (F ^[ suc n ] R)
-      Fⁿ⊆Step∘F¹⁺ⁿ zero =
-        R            ⊆⟨ R-prog ⟩∎
-        ⟦ C ⟧ (F R)  ∎
-      Fⁿ⊆Step∘F¹⁺ⁿ (suc n) =
-        F ^[ 1 + n ] R              ⊆⟨⟩
-        F (F ^[ n ] R)              ⊆⟨ mono (Fⁿ⊆Step∘F¹⁺ⁿ n) ⟩
-        F (⟦ C ⟧ (F ^[ 1 + n ] R))  ⊆⟨ comp _ ⟩∎
-        ⟦ C ⟧ (F ^[ 2 + n ] R)      ∎
-
-      -- An analogue of ⋃ₙ Fⁿ(R).
-
-      F^ωR : Rel ℓ I
-      F^ωR pq = ∃ λ n → (F ^[ n ] R) pq
-
-      -- F^ωR is a bisimulation.
-
-      F^ωR-bisim : F^ωR ⊆ ⟦ C ⟧ F^ωR
-      F^ωR-bisim = uncurry λ n →
-        (F ^[ n ] R              ⊆⟨ Fⁿ⊆Step∘F¹⁺ⁿ n ⟩
-         ⟦ C ⟧ (F ^[ 1 + n ] R)  ⊆⟨ map C (1 + n ,_) ⟩∎
-         ⟦ C ⟧ F^ωR              ∎)
-
-  compatible→up-to : Up-to-technique F
-  compatible→up-to {R = R} R-prog =
-    R              ⊆⟨ 0 ,_ ⟩
-    F^ωR R R-prog  ⊆⟨ unfold C (F^ωR-bisim R R-prog) ⟩∎
-    ν C ∞          ∎
+compatible→up-to :
+  ∀ {F} → Monotone F → Compatible F → Up-to-technique F
+compatible→up-to {F} mono comp {R = R} R⊆ =
+  R       ⊆⟨ 0 ,_ ⟩
+  F ^ω R  ⊆⟨ unfold C (compatible→^ω-post-fixpoint mono comp R⊆) ⟩∎
+  ν C ∞   ∎
 
 ------------------------------------------------------------------------
 -- Size-preserving functions (using sized types)

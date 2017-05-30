@@ -42,6 +42,10 @@ import Up-to
 
 import Up-to.Closure
 
+-- Up-to techniques via.
+
+import Up-to.Via
+
 ------------------------------------------------------------------------
 -- Labelled transition systems
 

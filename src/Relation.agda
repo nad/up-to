@@ -99,6 +99,21 @@ _* : ∀ {a} {A : Set a} →
   Σ-map suc ((_ ,_) ∘ (aRb ,_))
     (*-trans (n , bRⁿc) cR*d)
 
+-- Repeated composition of a function with itself.
+
+infix 10 _^[_]_
+
+_^[_]_ : ∀ {a} {A : Set a} → (A → A) → ℕ → A → A
+f ^[ zero  ] x = x
+f ^[ suc n ] x = f (f ^[ n ] x)
+
+-- An analogue of ⋃ₙ Fⁿ.
+
+infix 10 _^ω_
+
+_^ω_ : ∀ {a ℓ} {A : Set a} → Trans ℓ A → Trans ℓ A
+F ^ω R = λ x → ∃ λ n → (F ^[ n ] R) x
+
 -- Relation containment.
 
 infix 4 _⊆_
@@ -164,6 +179,12 @@ Monotone :
   ∀ {a ℓ} {A : Set a} →
   Trans ℓ A → Set (a ⊔ lsuc ℓ)
 Monotone F = ∀ {R S} → R ⊆ S → F R ⊆ F S
+
+-- A relation transformer is extensive if the input is always
+-- contained in the output.
+
+Extensive : ∀ {ℓ} {I : Set ℓ} → Trans ℓ I → Set (lsuc ℓ)
+Extensive G = ∀ R → R ⊆ G R
 
 -- A definition that turns into a notion of symmetry if the first
 -- argument is instantiated with the swap function. In that case this
