@@ -416,19 +416,19 @@ reindex f = reindex₂ f ⊚ reindex₁ f
   ∀ {ℓ} {I : Set ℓ} {C : Container I I} {f : I → I} →
   f ⊚ f ≡ P.id →
   ∀ {i x} → ν (reindex f C) i x ⇔ ν C i (f x)
-ν-reindex⇔ {C = C} {f} idem {i} {x} =
+ν-reindex⇔ {C = C} {f} inv {i} {x} =
   ν (reindex f C) i x                     ↔⟨⟩
   ⟦ reindex f C ⟧ (ν′ (reindex f C) i) x  ↔⟨ ⟦reindex⟧↔ C ⟩
   ⟦ C ⟧ (ν′ (reindex f C) i ⊚ f) (f x)    ↝⟨ ⟦ C ⟧-cong (record { to = to; from = from }) ⟩
-  ⟦ C ⟧ (ν′ C i ⊚ f ⊚ f) (f x)            ↔⟨ ≡⇒↝ bijection $ cong (λ g → ⟦ C ⟧ (ν′ C i ⊚ g) (f x)) idem ⟩
+  ⟦ C ⟧ (ν′ C i ⊚ f ⊚ f) (f x)            ↔⟨ ≡⇒↝ bijection $ cong (λ g → ⟦ C ⟧ (ν′ C i ⊚ g) (f x)) inv ⟩
   ⟦ C ⟧ (ν′ C i) (f x)                    ↔⟨⟩
   ν C i (f x)                             □
   where
   to : ∀ {i} → ν′ (reindex f C) i ⊆ ν′ C i ⊚ f
-  force (to x) = _⇔_.to (ν-reindex⇔ idem) (force x)
+  force (to x) = _⇔_.to (ν-reindex⇔ inv) (force x)
 
   from : ∀ {i} → ν′ C i ⊚ f ⊆ ν′ (reindex f C) i
-  force (from x) = _⇔_.from (ν-reindex⇔ idem) (force x)
+  force (from x) = _⇔_.from (ν-reindex⇔ inv) (force x)
 
 -- A cartesian product combinator.
 --

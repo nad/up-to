@@ -124,18 +124,18 @@ Size-preserving-reindex :
   (∀ R → F (R ∘ f) ⊆ F R ∘ f) →
   Size-preserving C F → Size-preserving (reindex f C) F
 Size-preserving-reindex {C = C} {F} {f}
-                        idem hyp pres {R = R} {i = i} R⊆ =
+                        inv hyp pres {R = R} {i = i} R⊆ =
 
-  F R                        ⊆⟨ (λ {x} → subst (λ g → F (R ∘ g) x) (sym idem)) ⟩
+  F R                        ⊆⟨ (λ {x} → subst (λ g → F (R ∘ g) x) (sym inv)) ⟩
   F (R ∘ f ∘ f)              ⊆⟨ hyp _ ⟩
   F (R ∘ f) ∘ f              ⊆⟨ pres (
 
       R ∘ f                       ⊆⟨ R⊆ ⟩
-      ν (reindex f C) i ∘ f       ⊆⟨ _⇔_.to (ν-reindex⇔ idem) ⟩
-      ν C i ∘ f ∘ f               ⊆⟨ (λ {x} → subst (λ g → ν C i (g x)) idem) ⟩∎
+      ν (reindex f C) i ∘ f       ⊆⟨ _⇔_.to (ν-reindex⇔ inv) ⟩
+      ν C i ∘ f ∘ f               ⊆⟨ (λ {x} → subst (λ g → ν C i (g x)) inv) ⟩∎
       ν C i                       ∎) ⟩
 
-  ν C i ∘ f                  ⊆⟨ _⇔_.from (ν-reindex⇔ idem) ⟩∎
+  ν C i ∘ f                  ⊆⟨ _⇔_.from (ν-reindex⇔ inv) ⟩∎
   ν (reindex f C) i          ∎
 
 -- Three negative results:
