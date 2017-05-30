@@ -44,13 +44,12 @@ Compatible-⊗ {C₁ = C₁} {C₂} {F} mono comp₁ comp₂ R =
   ⟦ C₁ ⟧ (F R) ∩ ⟦ C₂ ⟧ (F R)  ⊆⟨ _↔_.from (⟦⊗⟧↔ C₁ C₂) ⟩∎
   ⟦ C₁ ⊗ C₂ ⟧ (F R)            ∎
 
--- The function flip Compatible F is closed under reindex₁, assuming
--- that F satisfies certain properties.
+-- The function flip Compatible F is closed under reindex₁ f, assuming
+-- that F is monotone and f-symmetric.
 
 Compatible-reindex₁ :
   ∀ {ℓ} {I : Set ℓ} {C : Container I I} {F : Trans ℓ I} {f : I → I} →
-  Monotone F →
-  (∀ R → F (R ∘ f) ⊆ F R ∘ f) →
+  Monotone F → Symmetric f F →
   Compatible C F → Compatible (reindex₁ f C) F
 Compatible-reindex₁ {C = C} {F} {f} mono hyp comp R =
   F (⟦ reindex₁ f C ⟧ R)  ⊆⟨ mono (_↔_.to (⟦reindex₁⟧↔ C)) ⟩
@@ -59,12 +58,12 @@ Compatible-reindex₁ {C = C} {F} {f} mono hyp comp R =
   ⟦ C ⟧ (F R ∘ f)         ⊆⟨ _↔_.from (⟦reindex₁⟧↔ C) ⟩∎
   ⟦ reindex₁ f C ⟧ (F R)  ∎
 
--- The function flip Compatible F is closed under reindex₂, assuming
--- that F satisfies a certain property.
+-- The function flip Compatible F is closed under reindex₂ f, assuming
+-- that F is f-symmetric.
 
 Compatible-reindex₂ :
   ∀ {ℓ} {I : Set ℓ} {C : Container I I} {F : Trans ℓ I} {f : I → I} →
-  (∀ R → F (R ∘ f) ⊆ F R ∘ f) →
+  Symmetric f F →
   Compatible C F → Compatible (reindex₂ f C) F
 Compatible-reindex₂ {C = C} {F} {f} hyp comp R =
   F (⟦ reindex₂ f C ⟧ R)  ⊆⟨⟩
@@ -73,13 +72,12 @@ Compatible-reindex₂ {C = C} {F} {f} hyp comp R =
   ⟦ C ⟧ (F R) ∘ f         ⊆⟨ id ⟩∎
   ⟦ reindex₂ f C ⟧ (F R)  ∎
 
--- The function flip Compatible F is closed under reindex, assuming
--- that F satisfies certain properties.
+-- The function flip Compatible F is closed under reindex f, assuming
+-- that F is monotone and f-symmetric.
 
 Compatible-reindex :
   ∀ {ℓ} {I : Set ℓ} {C : Container I I} {F : Trans ℓ I} {f : I → I} →
-  Monotone F →
-  (∀ R → F (R ∘ f) ⊆ F R ∘ f) →
+  Monotone F → Symmetric f F →
   Compatible C F → Compatible (reindex f C) F
 Compatible-reindex {C = C} {F} {f} mono hyp =
   Compatible C F                            ↝⟨ Compatible-reindex₁ mono hyp ⟩
@@ -87,20 +85,13 @@ Compatible-reindex {C = C} {F} {f} mono hyp =
   Compatible (reindex₂ f (reindex₁ f C)) F  ↔⟨⟩
   Compatible (reindex f C) F                □
 
--- Symmetry. This definition corresponds to one of those given by Pous
--- and Sangiorgi in Section 6.3.4.1 of "Enhancements of the
--- bisimulation proof method".
-
-Symmetric : ∀ {ℓ} {I : Set ℓ} → Trans₂ ℓ I → Set (lsuc ℓ)
-Symmetric F = ∀ R → F (R ∘ swap) ⊆ F R ∘ swap
-
 -- The function flip Compatible F is closed under _⟷_, assuming that F
 -- is monotone and symmetric.
 
 Compatible-⟷ :
   ∀ {ℓ} {I : Set ℓ}
     {C₁ C₂ : Container (I × I) (I × I)} {F : Trans₂ ℓ I} →
-  Monotone F → Symmetric F →
+  Monotone F → Symmetric swap F →
   Compatible C₁ F → Compatible C₂ F → Compatible (C₁ ⟷ C₂) F
 Compatible-⟷ {C₁ = C₁} {C₂} {F} mono sym = curry (
   Compatible C₁ F × Compatible C₂ F                 ↝⟨ Σ-map id (Compatible-reindex mono sym) ⟩
@@ -112,7 +103,7 @@ Compatible-⟷ {C₁ = C₁} {C₂} {F} mono sym = curry (
 -- Closure properties for Size-preserving
 
 -- The function flip Size-preserving F is closed under reindex,
--- assuming that F satisfies certain properties.
+-- assuming that F is f-symmetric for an involutory function f.
 --
 -- Note that the assumptions are different from the ones asked for in
 -- Compatible-reindex: monotonicity of F has been replaced by the
@@ -120,8 +111,7 @@ Compatible-⟷ {C₁ = C₁} {C₂} {F} mono sym = curry (
 
 Size-preserving-reindex :
   ∀ {ℓ} {I : Set ℓ} {C : Container I I} {F : Trans ℓ I} {f : I → I} →
-  f ∘ f ≡ id →
-  (∀ R → F (R ∘ f) ⊆ F R ∘ f) →
+  f ∘ f ≡ id → Symmetric f F →
   Size-preserving C F → Size-preserving (reindex f C) F
 Size-preserving-reindex {C = C} {F} {f}
                         inv hyp pres {R = R} {i = i} R⊆ =
@@ -153,12 +143,12 @@ Size-preserving-reindex {C = C} {F} {f}
 ¬-Size-preserving-⟷/⊗ :
   ¬ ({I : Set} {C₁ C₂ : Container (I × I) (I × I)}
      {F : Trans₂ (# 0) I} →
-     Monotone F → Symmetric F →
+     Monotone F → Symmetric swap F →
      Size-preserving C₁ F → Size-preserving C₂ F →
      Size-preserving (C₁ ⟷ C₂) F)
     ×
   ¬ ({F : Trans₂ (# 0) Proc} →
-     Monotone F → Symmetric F →
+     Monotone F → Symmetric swap F →
      Size-preserving S.S̲t̲e̲p̲ F →
      Size-preserving B.S̲t̲e̲p̲ F)
     ×
@@ -170,12 +160,12 @@ Size-preserving-reindex {C = C} {F} {f}
 
     (({I : Set} {C₁ C₂ : Container (I × I) (I × I)}
       {F : Trans₂ (# 0) I} →
-      Monotone F → Symmetric F →
+      Monotone F → Symmetric swap F →
       Size-preserving C₁ F → Size-preserving C₂ F →
       Size-preserving (C₁ ⟷ C₂) F)                   ↝⟨ (λ closed mono symm pres → closed mono symm pres pres) ⟩
 
      ({F : Trans₂ (# 0) Proc} →
-      Monotone F → Symmetric F →
+      Monotone F → Symmetric swap F →
       Size-preserving S.S̲t̲e̲p̲ F →
       Size-preserving B.S̲t̲e̲p̲ F)                      ↝⟨ contradiction₂ ⟩□
 
@@ -208,7 +198,7 @@ Size-preserving-reindex {C = C} {F} {f}
   mono : Monotone F
   mono R⊆S = ⊎-map R⊆S id
 
-  symm : Symmetric F
+  symm : Symmetric swap F
   symm R =
     F (R ∘ swap)                                              ⊆⟨⟩
     R ∘ swap ∪ (_≡ (m₁ , m₂))        ∪ (_≡ (m₂ , m₁))         ⊆⟨ ⊎-map id P.[ inj₂ ∘ lemma , inj₁ ∘ lemma ] ⟩
@@ -236,10 +226,10 @@ Size-preserving-reindex {C = C} {F} {f}
 
   contradiction₂ =
     ({F : Trans₂ (# 0) Proc} →
-     Monotone F → Symmetric F →
+     Monotone F → Symmetric swap F →
      Size-preserving S.S̲t̲e̲p̲ F →
-     Size-preserving B.S̲t̲e̲p̲ F)   ↝⟨ (λ closed → closed mono symm pres) ⟩
+     Size-preserving B.S̲t̲e̲p̲ F)        ↝⟨ (λ closed → closed mono symm pres) ⟩
 
-    Size-preserving B.S̲t̲e̲p̲ F     ↝⟨ contradiction ⟩□
+    Size-preserving B.S̲t̲e̲p̲ F          ↝⟨ contradiction ⟩□
 
-    ⊥                            □
+    ⊥                                 □

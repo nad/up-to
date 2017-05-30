@@ -10,7 +10,7 @@ open import Equality.Propositional
 open import Interval using (ext)
 open import Prelude
 
-open import Function-universe equality-with-J hiding (_∘_)
+open import Function-universe equality-with-J hiding (id; _∘_)
 
 -- Unary relations.
 
@@ -107,13 +107,6 @@ _⊆_ : ∀ {a ℓ₁ ℓ₂} {A : Set a} →
       Rel ℓ₁ A → Rel ℓ₂ A → Set (a ⊔ ℓ₁ ⊔ ℓ₂)
 R ⊆ S = ∀ {x} → R x → S x
 
--- Monotonicity of relation transformers.
-
-Monotone :
-  ∀ {a ℓ} {A : Set a} →
-  Trans ℓ A → Set (a ⊔ lsuc ℓ)
-Monotone F = ∀ {R S} → R ⊆ S → F R ⊆ F S
-
 -- "Equational" reasoning combinators.
 
 infix  -1 finally-⊆
@@ -164,3 +157,31 @@ R₂→R₁ ⊆-cong-→ S₁→S₂ = implicit-∀-cong ext $ →-cong-→ R₂
   (∀ {x} → S₁ x ↝[ k ] S₂ x) →
   R ⊆ S₁ ↝[ k ] R ⊆ S₂
 ⊆-congʳ S₁↝S₂ = implicit-∀-cong ext $ ∀-cong ext λ _ → S₁↝S₂
+
+-- Monotonicity of relation transformers.
+
+Monotone :
+  ∀ {a ℓ} {A : Set a} →
+  Trans ℓ A → Set (a ⊔ lsuc ℓ)
+Monotone F = ∀ {R S} → R ⊆ S → F R ⊆ F S
+
+-- A definition that turns into a notion of symmetry if the first
+-- argument is instantiated with the swap function. In that case this
+-- definition is similar to one of those given by Pous and Sangiorgi
+-- in Section 6.3.4.1 of "Enhancements of the bisimulation proof
+-- method".
+
+Symmetric : ∀ {ℓ} {I : Set ℓ} → (I → I) → Trans ℓ I → Set (lsuc ℓ)
+Symmetric f F = ∀ R → F (R ∘ f) ⊆ F R ∘ f
+
+-- If f is an involution, then the inclusion in Symmetric f F holds
+-- also in the other direction.
+
+involution→other-symmetry :
+  ∀ {ℓ} {I : Set ℓ} (F : Trans ℓ I) {f : I → I} →
+  f ∘ f ≡ id → Symmetric f F → ∀ R → F R ∘ f ⊆ F (R ∘ f)
+involution→other-symmetry F {f} inv symm R =
+  F R ∘ f            ⊆⟨ (λ {x} → subst (λ g → F (R ∘ g) (f x)) (sym inv)) ⟩
+  F (R ∘ f ∘ f) ∘ f  ⊆⟨ symm _ ⟩
+  F (R ∘ f) ∘ f ∘ f  ⊆⟨ (λ {x} → subst (λ g → F (R ∘ f) (g x)) inv) ⟩∎
+  F (R ∘ f)          ∎
