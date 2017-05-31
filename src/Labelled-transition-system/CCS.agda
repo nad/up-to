@@ -233,6 +233,14 @@ names-are-not-inverted {a} {P} {Q} =
 ⊕-only only₁ only₂ (choice-left tr)  = only₁ tr
 ⊕-only only₁ only₂ (choice-right tr) = only₂ tr
 
+-- If P can only make μ-transitions, then ν a P can only make
+-- μ-transitions.
+
+ν-only : ∀ {μ₀ a P} →
+         (∀ {P′ μ} → P [ μ ]⟶ P′ → μ₀ ≡ μ) →
+         ∀ {P′ μ} → ν a P [ μ ]⟶ P′ → μ₀ ≡ μ
+ν-only only (restriction _ tr) = only tr
+
 -- A simple lemma.
 
 ·⊕·-co :
