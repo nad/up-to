@@ -33,8 +33,7 @@ private
   module Combination (lts : LTS) where
 
     open Bisimilarity.Classical lts public
-      using (Progression; ⟪_,_⟫; Bisimulation; bisimulation⊆∼)
-      renaming (_∼_ to _∼-cl_)
+      using (Progression)
     open Bisimilarity.Coinductive lts public
     open Bisimilarity.Step lts (LTS._[_]⟶_ lts) (LTS._[_]⟶_ lts) public
       using (Step; Step↔S̲t̲e̲p̲)
@@ -146,7 +145,7 @@ private
     (⟦ S̲t̲e̲p̲ ⟧ R (false , false) → ⟦ S̲t̲e̲p̲ ⟧ (F R) (true , true))    ↝⟨ _$ _↔_.to Step↔S̲t̲e̲p̲ StepRff ⟩
     ⟦ S̲t̲e̲p̲ ⟧ (F R) (true , true)                                   ↝⟨ (λ step → S̲t̲e̲p̲.left-to-right {p = true} {q = true} step {p′ = false} _ ) ⟩
     (∃ λ y → T (not y) × F R (false , y))                          ↔⟨⟩
-    (∃ λ y → T (not y) × R (false , y))                            ↝⟨ uncurry [ const proj₁ , const (⊥-elim ∘ proj₂) ] ⟩□
+    (∃ λ y → T (not y) × ⊥)                                        ↝⟨ proj₂ ∘ proj₂ ⟩□
     ⊥                                                              □
 
 -- Up-to-technique is not closed under composition, not even for
