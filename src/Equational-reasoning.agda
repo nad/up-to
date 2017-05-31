@@ -12,8 +12,10 @@ open import Prelude
 infix  -1 _■
           finally₁ finally₁∽ finally₁→ finally₁←
           finally₂ finally₂∽ finally₂→ finally₂←
-infixr -2 step-⟨⟩∼ step-≡∼ step-∼ step-∼→ step-∼′ step-∼→′
-infixl -2 step-⟨⟩∽ step-≡∽ step-∽ step-∼← step-∽′ step-∼←′
+          finally₁-≡∼ finally₁-≡∽ finally₁-≡→ finally₁-≡←
+          finally₂-≡∼ finally₂-≡∽ finally₂-≡→ finally₂-≡←
+infixr -2 step-⟨⟩∼ step-≡∼ step-≡→ step-∼ step-∼→ step-∼′ step-∼→′
+infixl -2 step-⟨⟩∽ step-≡∽ step-≡← step-∽ step-∼← step-∽′ step-∼←′
 
 ------------------------------------------------------------------------
 -- Reflexivity
@@ -61,15 +63,49 @@ syntax step-⟨⟩∽ x Pxy = Pxy ∽⟨⟩ x
 -- The idea behind this optimisation came up in discussions with Ulf
 -- Norell.
 
-step-≡∼ step-≡∽ :
+step-≡∼ step-≡∽ step-≡→ step-≡← :
   ∀ {a p} {A : Set a} {P : A → A → Set p}
-    ⦃ p : Reflexive P ⦄ x {y z} →
+    ⦃ r : Reflexive P ⦄ x {y z} →
   P y z → x ≡ y → P x z
 step-≡∼ _ p refl = p
 step-≡∽          = step-≡∼
+step-≡→          = step-≡∼
+step-≡←          = step-≡∼
 
 syntax step-≡∼ x Pyz x≡y = x ∼≡⟨ x≡y ⟩ Pyz
 syntax step-≡∽ x Pyz x≡y = Pyz ∽≡⟨ x≡y ⟩ x
+syntax step-≡→ x Pyz x≡y = x →≡⟨ x≡y ⟩ Pyz
+syntax step-≡← x Pyz x≡y = Pyz ←≡⟨ x≡y ⟩ x
+
+finally₂-≡∼ finally₂-≡∽ finally₂-≡→ finally₂-≡← :
+  ∀ {a p} {A : Set a}
+    {P : A → A → Set p}
+    ⦃ r : Reflexive P ⦄ x y →
+  x ≡ y → P x y
+finally₂-≡∼ _ _ refl = reflexive
+finally₂-≡∽          = finally₂-≡∼
+finally₂-≡→          = finally₂-≡∼
+finally₂-≡←          = finally₂-≡∼
+
+syntax finally₂-≡∼ x y x≡y = x ∼≡⟨ x≡y ⟩■ y
+syntax finally₂-≡∽ x y x≡y = y ∽≡⟨ x≡y ⟩■ x
+syntax finally₂-≡→ x y x≡y = x →≡⟨ x≡y ⟩■ y
+syntax finally₂-≡← x y x≡y = y ←≡⟨ x≡y ⟩■ x
+
+finally₁-≡∼ finally₁-≡∽ finally₁-≡→ finally₁-≡← :
+  ∀ {a p} {A : Set a}
+    {P : A → A → Set p}
+    ⦃ r : Reflexive P ⦄ x {y} →
+  x ≡ y → P x y
+finally₁-≡∼ _ refl = reflexive
+finally₁-≡∽        = finally₁-≡∼
+finally₁-≡→        = finally₁-≡∼
+finally₁-≡←        = finally₁-≡∼
+
+syntax finally₁-≡∼ x x≡y = x ∼≡⟨ x≡y ⟩■
+syntax finally₁-≡∽ x x≡y = ∽≡⟨ x≡y ⟩■ x
+syntax finally₁-≡→ x x≡y = x →≡⟨ x≡y ⟩■
+syntax finally₁-≡← x x≡y = ←≡⟨ x≡y ⟩■ x
 
 ------------------------------------------------------------------------
 -- Symmetry
