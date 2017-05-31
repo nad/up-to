@@ -83,6 +83,8 @@ id i = ↑ _ ⊤ ◁₁ λ _ i′ → i ≡ i′
 
 -- A composition combinator.
 
+infixr 9 _∘_
+
 _∘_ : ∀ {ℓ} {I J K : Set ℓ} →
       Container J K → Container I J → Container I K
 C ∘ D =
