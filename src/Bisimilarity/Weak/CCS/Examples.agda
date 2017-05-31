@@ -253,97 +253,41 @@ mutual
 ¬-6-5-8-2 x =
   (∀ {a b P} →
    ! ν (proj₁ a) (name b · (a ·) ∣ name (co a) · P) ≈
-   ! name b · ν (proj₁ a) P)                                            ↝⟨ (λ hyp → hyp {_}) ⟩
+   ! name b · ν (proj₁ a) P)                                          ↝⟨ (λ hyp → hyp {a = a} {b = co a}) ⟩
 
-  (! ν (proj₁ a) (name a · (a ·) ∣ co a ·) ≈ ! name a · ν (proj₁ a) ∅)  ↝⟨ (λ hyp → Σ-map id proj₁ $ W.right-to-left hyp
-                                                                                                       (replication (par-right action))) ⟩
-  ∃ (! ν (proj₁ a) (name a · (a ·) ∣ co a ·) [ name a ]⇒̂_)              ↝⟨ !P₁⇒̂ ∘ proj₂ ⟩□
+  (! ν (proj₁ a) (name (co a) · (a ·) ∣ co a ·) ≈
+   ! name (co a) · ν (proj₁ a) ∅)                                     ↝⟨ (λ hyp → Σ-map id proj₁ $ W.right-to-left hyp
+                                                                                                     (replication (par-right action))) ⟩
+  ∃ (! ν (proj₁ a) (name (co a) · (a ·) ∣ co a ·) [ name (co a) ]⇒̂_)  ↝⟨ !P⇒̂ ∘ proj₂ ⟩□
 
-  ⊥                                                                     □
+  ⊥                                                                   □
   where
   a = x , true
 
-  P₁ = ν (proj₁ a) (name a · (a ·) ∣ co a ·)
-  P₂ = ν (proj₁ a) (a · ∣ ∅)
+  P = ν (proj₁ a) (name (co a) · (a ·) ∣ co a ·)
 
-  P₁⟶ : ∀ {μ P} → P₁ [ μ ]⟶ P → τ ≡ μ × P ≡ P₂
-  P₁⟶ (restriction a≢a (par-left action))        = ⊥-elim (a≢a refl)
-  P₁⟶ (restriction a≢a (par-right action))       = ⊥-elim (a≢a refl)
-  P₁⟶ (restriction _   (par-τ′ _ action action)) = refl , refl
+  P⟶ : ∀ {μ Q} → ¬ P [ μ ]⟶ Q
+  P⟶ (restriction x≢x (par-left action))     = ⊥-elim (x≢x refl)
+  P⟶ (restriction x≢x (par-right action))    = ⊥-elim (x≢x refl)
+  P⟶ (restriction _
+         (par-τ′ co-a≡co-co-a action action)) =
+    ⊥-elim (id≢co co-a≡co-co-a)
 
-  P₂⟶ : ∀ {μ P} → ¬ P₂ [ μ ]⟶ P
-  P₂⟶ (restriction a≢a (par-left action))    = ⊥-elim (a≢a refl)
-  P₂⟶ (restriction _   (par-right ()))
-  P₂⟶ (restriction _   (par-τ′ _ action ()))
+  !P⟶ : ∀ {μ Q} → ¬ ! P [ μ ]⟶ Q
+  !P⟶ (replication (par-left tr))  = !P⟶ tr
+  !P⟶ (replication (par-right tr)) = P⟶ tr
+  !P⟶ (replication (par-τ _ tr))   = P⟶ tr
 
-  !P₁⟶ : ∀ {μ Q} → ! P₁ [ μ ]⟶ Q → τ ≡ μ × Q ∼ ! P₁ ∣ P₂
-  !P₁⟶ (replication (par-left {P′ = Q} tr)) =
-    flip (Σ-map id) (!P₁⟶ tr) λ Q∼ →
-      Q ∣ P₁            ∼⟨ Q∼ ∣-cong (_ ■) ⟩
-      (! P₁ ∣ P₂) ∣ P₁  ∼⟨ swap-rightmost ⟩
-      (! P₁ ∣ P₁) ∣ P₂  ∼⟨ 6-1-2 ∣-cong (_ ■) ⟩■
-      ! P₁ ∣ P₂
+  !P⇒ : ∀ {Q} → ! P ⇒ Q → Q ≡ ! P
+  !P⇒ done          = refl
+  !P⇒ (step _ tr _) = ⊥-elim (!P⟶ tr)
 
-  !P₁⟶ (replication (par-right {Q′ = Q} tr)) =
-    flip (Σ-map id) (P₁⟶ tr) λ Q≡ →
-      ! P₁ ∣ Q  ∼≡⟨ cong (_ ∣_) Q≡ ⟩■
-      ! P₁ ∣ P₂
+  !P[]⇒ : ∀ {μ Q} → ¬ ! P [ μ ]⇒ Q
+  !P[]⇒ (steps trs tr _) rewrite !P⇒ trs = !P⟶ tr
 
-  !P₁⟶ (replication (par-τ tr₁ tr₂)) = ⊥-elim (
-                      $⟨ tr₂ ⟩
-    P₁ [ name _ ]⟶ _  ↝⟨ proj₁ ∘ P₁⟶ ⟩
-    τ ≡ name _        ↝⟨ name≢τ ∘ sym ⟩□
-    ⊥                 □)
-
-  P₂∣P₂∼P₂ : P₂ ∣ P₂ ∼ P₂
-  P₂∣P₂∼P₂ =
-    S.⟨ (λ where
-           (par-left  tr) → ⊥-elim (P₂⟶ tr)
-           (par-right tr) → ⊥-elim (P₂⟶ tr)
-           (par-τ _   tr) → ⊥-elim (P₂⟶ tr))
-      , ⊥-elim ∘ P₂⟶
-      ⟩
-
-  !P₁∣P₂⟶ : ∀ {μ Q} → ! P₁ ∣ P₂ [ μ ]⟶ Q → τ ≡ μ × Q ∼ ! P₁ ∣ P₂
-  !P₁∣P₂⟶ (par-left {P′ = Q} tr) =
-    flip (Σ-map id) (!P₁⟶ tr) λ Q∼ →
-      Q ∣ P₂            ∼⟨ Q∼ ∣-cong (_ ■) ⟩
-      (! P₁ ∣ P₂) ∣ P₂  ∼⟨ symmetric ∣-assoc ⟩
-      ! P₁ ∣ (P₂ ∣ P₂)  ∼⟨ (_ ■) ∣-cong P₂∣P₂∼P₂ ⟩■
-      ! P₁ ∣ P₂
-
-  !P₁∣P₂⟶ (par-right tr) = ⊥-elim (P₂⟶ tr)
-  !P₁∣P₂⟶ (par-τ _ tr)   = ⊥-elim (P₂⟶ tr)
-
-  !P₁∣P₂⇒ : ∀ {Q R} → Q ⇒ R → Q ∼ ! P₁ ∣ P₂ → R ∼ ! P₁ ∣ P₂
-  !P₁∣P₂⇒ done                                       = id
-  !P₁∣P₂⇒ (step {p = Q} {q = R} {r = S} refl tr trs) =
-    Q ∼ ! P₁ ∣ P₂                             ↝⟨ (λ hyp → S.left-to-right hyp tr) ⟩
-    (∃ λ R′ → ! P₁ ∣ P₂ [ τ ]⟶ R′ × R ∼′ R′)  ↝⟨ Σ-map id (Σ-map (proj₂ ∘ !P₁∣P₂⟶) id) ⟩
-    (∃ λ R′ → R′ ∼ ! P₁ ∣ P₂ × R ∼′ R′)       ↝⟨ (λ { (_ , R′∼ , ∼R′) → transitive ∼R′ R′∼ }) ⟩
-    R ∼ ! P₁ ∣ P₂                             ↝⟨ !P₁∣P₂⇒ trs ⟩□
-    S ∼ ! P₁ ∣ P₂                             □
-
-  !P₁⇒ : ∀ {Q} → ! P₁ ⇒ Q → Q ∼ ! P₁ ⊎ Q ∼ ! P₁ ∣ P₂
-  !P₁⇒ done                                     = inj₁ reflexive
-  !P₁⇒ (step {q = Q} {r = R} {μ = μ} _ tr₁ tr₂) = inj₂ (
-                           $⟨ tr₁ , tr₂ ⟩
-    ! P₁ [ μ ]⟶ Q × Q ⇒ R  ↝⟨ Σ-map (proj₂ ∘ !P₁⟶) id ⟩
-    Q ∼ ! P₁ ∣ P₂ × Q ⇒ R  ↝⟨ uncurry (flip !P₁∣P₂⇒) ⟩□
-    R ∼ ! P₁ ∣ P₂          □)
-
-  !P₁[]⇒ : ∀ {P} → ¬ ! P₁ [ name a ]⇒ P
-  !P₁[]⇒ (steps {p′ = Q} {q′ = R} trs tr _) =           $⟨ trs , tr ⟩
-    ! P₁ ⇒ Q × Q [ name a ]⟶ R                          ↝⟨ Σ-map !P₁⇒ id ⟩
-    (Q ∼ ! P₁ ⊎ Q ∼ ! P₁ ∣ P₂) × Q [ name a ]⟶ R        ↝⟨ uncurry (flip λ Q⟶ → ⊎-map (λ hyp → Σ-map id proj₁ $ S.left-to-right hyp Q⟶)
-                                                                                      (λ hyp → Σ-map id proj₁ $ S.left-to-right hyp Q⟶)) ⟩
-    ∃ (! P₁ [ name a ]⟶_) ⊎ ∃ (! P₁ ∣ P₂ [ name a ]⟶_)  ↝⟨ [ proj₁ ∘ !P₁⟶ ∘ proj₂ , proj₁ ∘ !P₁∣P₂⟶ ∘ proj₂ ] ⟩
-    τ ≡ name a                                          ↝⟨ name≢τ ∘ sym ⟩□
-    ⊥                                                   □
-
-  !P₁⇒̂ : ∀ {P} → ¬ ! P₁ [ name a ]⇒̂ P
-  !P₁⇒̂ (silent () _)
-  !P₁⇒̂ (non-silent _ tr) = !P₁[]⇒ tr
+  !P⇒̂ : ∀ {b Q} → ¬ ! P [ name b ]⇒̂ Q
+  !P⇒̂ (silent () _)
+  !P⇒̂ (non-silent _ tr) = !P[]⇒ tr
 
 -- Another interpretation of the second part of Exercise 6.5.8 can be
 -- proved.
