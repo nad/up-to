@@ -69,7 +69,7 @@ weak-is-weak = is-weak challenge (λ p≼′q → force p≼′q) ⇒̂→⇒ id
 
 mutual
 
-  -- Similarity is transitive.
+  -- Weak similarity is transitive.
   --
   -- Note that the size of the second argument is not preserved.
   --
@@ -90,6 +90,9 @@ mutual
 mutual
 
   -- A fully size-preserving transitivity-like lemma.
+  --
+  -- Note that expansion could be replaced by a kind of one-sided
+  -- expansion.
 
   transitive-≳≼ : ∀ {i p q r} → [ i ] p ≳ q → [ i ] q ≼ r → [ i ] p ≼ r
   transitive-≳≼ p≳q q≼r =
