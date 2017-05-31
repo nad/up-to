@@ -131,13 +131,14 @@ Size-preserving F =
 -- up-to technique.
 --
 -- On the other hand, up-to techniques are not necessarily
--- size-preserving, not even for monotone transformers, see
--- Bisimilarity.Up-to.Counterexamples.¬monotone→up-to→size-preserving.
+-- size-preserving, not even for monotone and extensive transformers,
+-- see
+-- Bisimilarity.Up-to.Counterexamples.¬monotone→extensive→up-to→size-preserving.
 -- Thus the property of being size-preserving is less general than
 -- that of being an up-to technique. However, the latter property is
--- not closed under composition (not even for monotone transformers,
--- see Bisimilarity.Up-to.Counterexamples.¬-∘-closure), whereas the
--- former property is (see ∘-closure below).
+-- not closed under composition (not even for monotone and extensive
+-- transformers, see Bisimilarity.Up-to.Counterexamples.¬-∘-closure),
+-- whereas the former property is (see ∘-closure below).
 
 size-preserving→up-to :
   {F : Trans ℓ I} →
@@ -169,8 +170,8 @@ size-preserving→up-to {F} pres = size-preserving→up-to′
 -- pre-fixpoint of F.
 --
 -- Note that size-preserving relation transformers are not necessarily
--- monotone, see
--- Bisimilarity.Up-to.Counterexamples.¬size-preserving→monotone.
+-- monotone (or extensive), see
+-- Bisimilarity.Up-to.Counterexamples.¬size-preserving→monotone⊎extensive.
 
 monotone→⇔ :
   {F : Trans ℓ I} →
@@ -191,8 +192,8 @@ monotone→⇔ {F} F-mono = record
 -- Monotone, compatible transformers are size-preserving.
 --
 -- On the other hand size-preserving transformers are not necessarily
--- compatible, not even if they are monotone, see
--- Bisimilarity.Up-to.Counterexamples.¬monotone→size-preserving→compatible.
+-- compatible, not even if they are monotone and extensive, see
+-- Bisimilarity.Up-to.Counterexamples.¬monotone→extensive→size-preserving→compatible.
 -- Thus the property of being size-preserving is more general than the
 -- property of being compatible. However, it is more well-behaved than
 -- Up-to-technique, because it is closed under composition (see
