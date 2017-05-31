@@ -176,10 +176,10 @@ import Bisimilarity.Weak.Coinductive.Equivalent
 
 import Bisimilarity.Weak.CCS
 
--- An example related to CCS from "Enhancements of the bisimulation
--- proof method" by Pous and Sangiorgi.
+-- Examples/exercises related to CCS from "Enhancements of the
+-- bisimulation proof method" by Pous and Sangiorgi.
 
-import Bisimilarity.Weak.CCS.Example
+import Bisimilarity.Weak.CCS.Examples
 
 -- Some results about various forms of coinductively defined weak
 -- bisimilarity for the delay monad.
