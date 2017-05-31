@@ -188,18 +188,6 @@ monotone→⇔ {F} F-mono = record
              ν C i      ∎
   }
 
--- A corollary of size-preserving→up-to and monotone→⇔.
-
-size-preserving→up-to′ :
-  {F : Trans ℓ I} →
-  Monotone F →
-  (∀ {i} → F (ν C i) ⊆ ν C i) →
-  Up-to-technique F
-size-preserving→up-to′ {F} mono =
-  (∀ {i} → F (ν C i) ⊆ ν C i)  ↝⟨ _⇔_.from (monotone→⇔ mono) ⟩
-  Size-preserving F            ↝⟨ size-preserving→up-to ⟩□
-  Up-to-technique F            □
-
 -- Monotone, compatible transformers are size-preserving.
 --
 -- On the other hand size-preserving transformers are not necessarily
