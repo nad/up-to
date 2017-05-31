@@ -189,22 +189,17 @@ monotone→⇔ {F} F-mono = record
              ν C i      ∎
   }
 
--- Monotone, compatible transformers are size-preserving.
---
--- On the other hand size-preserving transformers are not necessarily
--- compatible, not even if they are monotone and extensive, see
--- Bisimilarity.Up-to.Counterexamples.¬monotone→extensive→size-preserving→compatible.
--- Thus the property of being size-preserving is more general than the
--- property of being compatible. However, it is more well-behaved than
--- Up-to-technique, because it is closed under composition (see
--- ∘-closure below).
+-- A special case of compatibility.
 
-monotone→compatible→size-preserving :
-  {F : Trans ℓ I} →
-  Monotone F →
-  Compatible F →
-  Size-preserving F
-monotone→compatible→size-preserving {F} mono comp =
+Compatible′ : Trans ℓ I → Set ℓ
+Compatible′ F = ∀ {i} → F (⟦ C ⟧ (ν′ C i)) ⊆ ⟦ C ⟧ (F (ν′ C i))
+
+-- Monotone transformers that satisfy the special case of
+-- compatibility are size-preserving.
+
+monotone→compatible′→size-preserving :
+  ∀ {F} → Monotone F → Compatible′ F → Size-preserving F
+monotone→compatible′→size-preserving {F} mono comp =
   _⇔_.from (monotone→⇔ mono) lemma
   where
 
@@ -213,7 +208,7 @@ monotone→compatible→size-preserving {F} mono comp =
     lemma : ∀ {i} → F (ν C i) ⊆ ν C i
     lemma {i} =
       F (ν C i)           ⊆⟨⟩
-      F (⟦ C ⟧ (ν′ C i))  ⊆⟨ comp _ ⟩
+      F (⟦ C ⟧ (ν′ C i))  ⊆⟨ comp ⟩
       ⟦ C ⟧ (F (ν′ C i))  ⊆⟨ map C lemma′ ⟩
       ⟦ C ⟧ (ν′ C i)      ⊆⟨ id ⟩∎
       ν C i               ∎
@@ -223,6 +218,49 @@ monotone→compatible→size-preserving {F} mono comp =
       lemma (mono (ν′ C i  ⊆⟨ (λ ν′y → force ν′y) ⟩∎
                    ν C j   ∎)
                   Fν′x)
+
+-- Thus monotone, compatible transformers are size-preserving.
+
+monotone→compatible→size-preserving :
+  {F : Trans ℓ I} →
+  Monotone F →
+  Compatible F →
+  Size-preserving F
+monotone→compatible→size-preserving mono comp =
+  monotone→compatible′→size-preserving mono (comp _)
+
+-- Extensive, size-preserving transformers satisfy the special case of
+-- compatibility.
+
+extensive→size-preserving→compatible′ :
+  ∀ {F} →
+  Extensive F → Size-preserving F → Compatible′ F
+extensive→size-preserving→compatible′ {F} extensive pres {i} =
+  F (⟦ C ⟧ (ν′ C i))  ⊆⟨⟩
+  F (ν C i)           ⊆⟨ pres id ⟩
+  ν C i               ⊆⟨⟩
+  ⟦ C ⟧ (ν′ C i)      ⊆⟨ map C (extensive _) ⟩∎
+  ⟦ C ⟧ (F (ν′ C i))  ∎
+
+-- For monotone and extensive transformers the special case of
+-- compatibility is logically equivalent to being size-preserving.
+--
+-- However, size-preserving transformers are not necessarily
+-- compatible, not even if they are monotone and extensive, see
+-- Bisimilarity.Up-to.Counterexamples.¬monotone→extensive→size-preserving→compatible.
+-- Thus the property of being size-preserving is more general than the
+-- property of being compatible. However, it is more well-behaved than
+-- Up-to-technique, because it is closed under composition (see
+-- ∘-closure below).
+
+monotone→extensive→size-preserving⇔compatible′ :
+  ∀ {F} →
+  Monotone F → Extensive F →
+  Size-preserving F ⇔ Compatible′ F
+monotone→extensive→size-preserving⇔compatible′ mono extensive = record
+  { to   = extensive→size-preserving→compatible′ extensive
+  ; from = monotone→compatible′→size-preserving mono
+  }
 
 -- The following four lemmas correspond to Pous and Sangiorgi's
 -- Proposition 6.3.11 (except that they state the fourth one for
