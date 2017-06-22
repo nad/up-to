@@ -1,6 +1,7 @@
 ------------------------------------------------------------------------
--- Some exercises and results related to CCS from "Enhancements of the
--- bisimulation proof method" by Pous and Sangiorgi
+-- Some exercises and results related to CCS, mostly from
+-- "Enhancements of the bisimulation proof method" by Pous and
+-- Sangiorgi
 --
 -- Implemented using the coinductive definition of bisimilarity.
 ------------------------------------------------------------------------
@@ -27,8 +28,7 @@ import Labelled-transition-system.Equational-reasoning-instances CCS
 -- similar results in Similarity.Strong.CCS.
 
 module Cong-lemmas
-  ({R} R′ : Proc → Proc → Set)
-  ⦃ _ : Reflexive R ⦄
+  ({R} R′ : Proc ∞ → Proc ∞ → Set)
   ⦃ _ : Convertible R R′ ⦄
   ⦃ _ : Convertible R′ R′ ⦄
   ⦃ _ : Convertible _∼_ R′ ⦄
@@ -71,6 +71,12 @@ module Cong-lemmas
     (par-τ tr₁ tr₂) → Σ-zip _∣_ (Σ-zip par-τ _∣-cong′_)
                         (left-to-right P₁∼P₂ tr₁)
                         (left-to-right Q₁∼Q₂ tr₂)
+
+  rec-cong :
+    ∀ {P Q P′ μ} →
+    R′ (force P) (force Q) → rec P [ μ ]⟶ P′ →
+    ∃ λ Q′ → rec Q [ μ ]⟶ Q′ × R′ P′ Q′
+  rec-cong P∼Q rec = _ , rec , P∼Q
 
   ⊕-cong :
     ∀ {P₁ P₁′ P₂ P₂′ S μ} →
@@ -148,28 +154,6 @@ module Cong-lemmas
         (! P′ ∣ Q′) ∣ Q″
           [ τ ]⟵          ←⟨ replication (par-τ (replication (par-right P′⟶Q′)) P′⟶Q″) ⟩■
         ! P′
-
-  []-cong :
-    (∀ {P P′ Q Q′} → R P P′ → R Q Q′ → R (P ∣ Q) (P′ ∣ Q′)) →
-    (∀ {P P′ Q Q′} → R P P′ → R Q Q′ → R (P ⊕ Q) (P′ ⊕ Q′)) →
-    (∀ {μ μ′ P P′} → μ ≡ μ′ → R P P′ → R (μ · P) (μ′ · P′)) →
-    (∀ {a a′ P P′} → a ≡ a′ → R P P′ → R (ν a P) (ν a′ P′)) →
-    (∀ {P P′} → R P P′ → R (! P) (! P′)) →
-    ∀ {n Ps Qs} (C : Context n) →
-    (∀ x → R (Ps x) (Qs x)) →
-    R (C [ Ps ]) (C [ Qs ])
-  []-cong ∣-cong ⊕-cong ·-cong ν-cong !-cong {Ps = Ps} {Qs} C Ps∼Qs =
-    []-cong′ C
-    where
-    []-cong′ : ∀ C → R (C [ Ps ]) (C [ Qs ])
-    []-cong′ = λ where
-      (hole x)   → Ps∼Qs x
-      ∅          → reflexive
-      (C₁ ∣ C₂)  → ∣-cong ([]-cong′ C₁) ([]-cong′ C₂)
-      (C₁ ⊕ C₂)  → ⊕-cong ([]-cong′ C₁) ([]-cong′ C₂)
-      (_ · C)    → ·-cong refl ([]-cong′ C)
-      (ν _ C)    → ν-cong refl ([]-cong′ C)
-      (! C)      → !-cong ([]-cong′ C)
 
 private
   module CL {i} = Cong-lemmas [ i ]_∼′_ left-to-right
@@ -520,6 +504,23 @@ mutual
 ------------------------------------------------------------------------
 -- More preservation lemmas
 
+-- Preservation lemmas for rec.
+
+rec-cong :
+  ∀ {i P Q} →
+  [ i ] force P ∼′ force Q → [ i ] rec P ∼ rec Q
+rec-cong P∼Q =
+  ⟨ lr P∼Q
+  , Σ-map id (Σ-map id symmetric) ∘ lr (symmetric P∼Q)
+  ⟩
+  where
+  lr = CL.rec-cong
+
+rec-cong′ :
+  ∀ {i P Q} →
+  [ i ] force P ∼′ force Q → [ i ] rec P ∼′ rec Q
+force (rec-cong′ P∼Q) = rec-cong P∼Q
+
 -- _⊕_ preserves bisimilarity.
 
 infix 8 _⊕-cong_ _⊕-cong′_
@@ -599,30 +600,42 @@ mutual
 -- _[_] preserves bisimilarity. (This result is related to Exercise
 -- 6.2.10.)
 
-infix 5 _[_]-cong _[_]-cong′
-
-_[_]-cong :
-  ∀ {i n Ps Qs}
-  (C : Context n) → (∀ x → [ i ] Ps x ∼ Qs x) →
-  [ i ] C [ Ps ] ∼ C [ Qs ]
-_[_]-cong = CL.[]-cong _∣-cong_ _⊕-cong_ _·-cong_ ν-cong !-cong_
-
-_[_]-cong′ :
-  ∀ {i n Ps Qs}
-  (C : Context n) → (∀ x → [ i ] Ps x ∼′ Qs x) →
-  [ i ] C [ Ps ] ∼′ C [ Qs ]
-force (C [ Ps∼Qs ]-cong′) = C [ (λ x → force (Ps∼Qs x)) ]-cong
-
 mutual
 
-  -- The proof of _[_]-cong uses 6-1-3-2 (in !-cong_). The following
-  -- direct proof does not use 6-1-3-2.
+  infix 5 _[_]-cong _[_]-cong′
+
+  _[_]-cong :
+    ∀ {i n Ps Qs}
+    (C : Context ∞ n) → (∀ x → [ i ] Ps x ∼ Qs x) →
+    [ i ] C [ Ps ] ∼ C [ Qs ]
+  hole x  [ Ps∼Qs ]-cong = Ps∼Qs x
+  ∅       [ Ps∼Qs ]-cong = reflexive
+  C₁ ∣ C₂ [ Ps∼Qs ]-cong = (C₁ [ Ps∼Qs ]-cong) ∣-cong (C₂ [ Ps∼Qs ]-cong)
+  C₁ ⊕ C₂ [ Ps∼Qs ]-cong = (C₁ [ Ps∼Qs ]-cong) ⊕-cong (C₂ [ Ps∼Qs ]-cong)
+  μ · C   [ Ps∼Qs ]-cong = refl ·-cong (C [ Ps∼Qs ]-cong)
+  ν a C   [ Ps∼Qs ]-cong = ν-cong refl (C [ Ps∼Qs ]-cong)
+  ! C     [ Ps∼Qs ]-cong = !-cong (C [ Ps∼Qs ]-cong)
+  rec C   [ Ps∼Qs ]-cong = rec-cong (force C [ (λ x → convert (Ps∼Qs x)) ]-cong′)
+
+  _[_]-cong′ :
+    ∀ {i n Ps Qs}
+    (C : Context ∞ n) → (∀ x → [ i ] Ps x ∼′ Qs x) →
+    [ i ] C [ Ps ] ∼′ C [ Qs ]
+  force (C [ Ps∼Qs ]-cong′) = C [ (λ x → force (Ps∼Qs x)) ]-cong
+
+-- The proof of _[_]-cong uses 6-1-3-2 (in !-cong_). The following
+-- direct proof does not use 6-1-3-2 (but it does use
+-- extensionality).
+
+module _ (ext : Proc-extensionality) where
+
+ mutual
 
   infix 5 _[_]-cong₂ _[_]-cong₂′ _[_]-cong₂″
 
   _[_]-cong₂ :
     ∀ {i n Ps Qs}
-    (C : Context n) → (∀ x → [ i ] Ps x ∼ Qs x) →
+    (C : Context ∞ n) → (∀ x → [ i ] Ps x ∼ Qs x) →
     [ i ] C [ Ps ] ∼ C [ Qs ]
   _[_]-cong₂ {i} C Ps∼Qs =
     ⟨ lr C Ps∼Qs
@@ -634,7 +647,7 @@ mutual
 
     _[_][_]-cong₁ :
       ∀ {n P Q Ps Qs} →
-      (C : Context (suc n)) →
+      (C : Context ∞ (suc n)) →
       [ i ] P ∼′ Q →
       (∀ x → [ i ] Ps x ∼ Qs x) →
       [ i ] C [ [ const P , Ps ] ] ∼′ C [ [ const Q , Qs ] ]
@@ -643,7 +656,7 @@ mutual
 
     _[_][_]-cong₂ :
       ∀ {P Q R S} →
-      (C : Context 2) →
+      (C : Context ∞ 2) →
       [ i ] P ∼′ Q →
       [ i ] R ∼′ S →
       [ i ] C [ [ const P , [ const R , (λ ()) ] ] ] ∼′
@@ -653,17 +666,17 @@ mutual
           , [ const (force R∼′S) , (λ ()) ]
           ] ]-cong₂
 
-    lr : ∀ {n Ps Qs P′ μ} (C : Context n) →
+    lr : ∀ {n Ps Qs P′ μ} (C : Context ∞ n) →
          (∀ x → [ i ] Ps x ∼ Qs x) →
          C [ Ps ] [ μ ]⟶ P′ →
          ∃ λ Q′ → C [ Qs ] [ μ ]⟶ Q′ × [ i ] P′ ∼′ Q′
     lr (hole x)  Ps∼Qs tr                  = left-to-right (Ps∼Qs x) tr
     lr ∅         Ps∼Qs ()
-    lr (C₁ ∣ C₂) Ps∼Qs (par-left tr)       = Σ-map (_∣ _) (Σ-map par-left (λ b → subst (λ P → [ i ] _ ∼′ _ ∣ P) (weaken-[] C₂) $
-                                                                                 subst (λ P → [ i ] _ ∣ P ∼′ _) (weaken-[] C₂) $
+    lr (C₁ ∣ C₂) Ps∼Qs (par-left tr)       = Σ-map (_∣ _) (Σ-map par-left (λ b → subst (λ P → [ i ] _ ∼′ _ ∣ P) (ext $ weaken-[] C₂) $
+                                                                                 subst (λ P → [ i ] _ ∣ P ∼′ _) (ext $ weaken-[] C₂) $
                                                                                  hole fzero ∣ weaken C₂ [ b ][ Ps∼Qs ]-cong₁)) (lr C₁ Ps∼Qs tr)
-    lr (C₁ ∣ C₂) Ps∼Qs (par-right tr)      = Σ-map (_ ∣_) (Σ-map par-right (λ b → subst (λ P → [ i ] _ ∼′ P ∣ _) (weaken-[] C₁) $
-                                                                                  subst (λ P → [ i ] P ∣ _ ∼′ _) (weaken-[] C₁) $
+    lr (C₁ ∣ C₂) Ps∼Qs (par-right tr)      = Σ-map (_ ∣_) (Σ-map par-right (λ b → subst (λ P → [ i ] _ ∼′ P ∣ _) (ext $ weaken-[] C₁) $
+                                                                                  subst (λ P → [ i ] P ∣ _ ∼′ _) (ext $ weaken-[] C₁) $
                                                                                   weaken C₁ ∣ hole fzero [ b ][ Ps∼Qs ]-cong₁)) (lr C₂ Ps∼Qs tr)
     lr (C₁ ∣ C₂) Ps∼Qs (par-τ tr₁ tr₂)     = Σ-zip _∣_ (Σ-zip par-τ (λ b₁ b₂ → hole fzero ∣ hole (fsuc fzero) [ b₁ ][ b₂ ]-cong₂))
                                                (lr C₁ Ps∼Qs tr₁) (lr C₂ Ps∼Qs tr₂)
@@ -672,18 +685,35 @@ mutual
     lr (μ · C)   Ps∼Qs action              = _ , action , C [ Ps∼Qs ]-cong₂′
     lr (ν a C)   Ps∼Qs (restriction a∉ tr) = Σ-map (ν a) (Σ-map (restriction a∉) (λ b → ν a (hole fzero) [ b ][ Ps∼Qs ]-cong₁)) (lr C Ps∼Qs tr)
     lr (! C)     Ps∼Qs (replication tr)    = Σ-map id (Σ-map replication id) (lr (! C ∣ C) Ps∼Qs tr)
+    lr (rec C)   Ps∼Qs rec                 = _ , rec , force C [ Ps∼Qs ]-cong₂′
 
   _[_]-cong₂′ :
     ∀ {i n Ps Qs}
-    (C : Context n) → (∀ x → [ i ] Ps x ∼ Qs x) →
+    (C : Context ∞ n) → (∀ x → [ i ] Ps x ∼ Qs x) →
     [ i ] C [ Ps ] ∼′ C [ Qs ]
   force (C [ Ps∼Qs ]-cong₂′) = C [ Ps∼Qs ]-cong₂
 
   _[_]-cong₂″ :
     ∀ {i n Ps Qs}
-    (C : Context n) → (∀ x → [ i ] Ps x ∼′ Qs x) →
+    (C : Context ∞ n) → (∀ x → [ i ] Ps x ∼′ Qs x) →
     [ i ] C [ Ps ] ∼′ C [ Qs ]
   force (C [ Ps∼′Qs ]-cong₂″) = C [ (λ x → force (Ps∼′Qs x)) ]-cong₂
+
+-- Very strong bisimilarity is contained in bisimilarity.
+
+mutual
+
+  ≡→∼ : ∀ {i P Q} → Equal i P Q → [ i ] P ∼ Q
+  ≡→∼ ∅           = reflexive
+  ≡→∼ (eq₁ ∣ eq₂) = ≡→∼ eq₁ ∣-cong ≡→∼ eq₂
+  ≡→∼ (eq₁ ⊕ eq₂) = ≡→∼ eq₁ ⊕-cong ≡→∼ eq₂
+  ≡→∼ (refl · eq) = refl ·-cong ≡→∼ eq
+  ≡→∼ (ν refl eq) = ν-cong refl (≡→∼ eq)
+  ≡→∼ (! eq)      = !-cong ≡→∼ eq
+  ≡→∼ (rec eq)    = rec-cong (≡→∼′ eq)
+
+  ≡→∼′ : ∀ {i P Q} → Equal′ i P Q → [ i ] P ∼′ Q
+  force (≡→∼′ eq) = ≡→∼ (force eq)
 
 ------------------------------------------------------------------------
 -- Lemma 6.2.14
@@ -801,8 +831,8 @@ mutual
 mutual
 
   6-2-16 :
-    ∀ {i n} {Ps Qs : Fin n → Proc} {C : Fin n → Context n} →
-    (∀ x → Weakly-guarded (C x)) →
+    ∀ {i n} {Ps Qs : Fin n → Proc ∞} {C : Fin n → Context ∞ n} →
+    (∀ x → Weakly-guarded ∞ (C x)) →
     (∀ x → [ i ] Ps x ∼ C x [ Ps ]) →
     (∀ x → [ i ] Qs x ∼ C x [ Qs ]) →
     ∀ x → [ i ] Ps x ∼ Qs x
@@ -826,8 +856,8 @@ mutual
           C x [ Qs ]
 
   6-2-16′ :
-    ∀ {i n} {Ps Qs : Fin n → Proc} {C : Fin n → Context n} →
-    (∀ x → Weakly-guarded (C x)) →
+    ∀ {i n} {Ps Qs : Fin n → Proc ∞} {C : Fin n → Context ∞ n} →
+    (∀ x → Weakly-guarded ∞ (C x)) →
     (∀ x → [ i ] Ps x ∼ C x [ Ps ]) →
     (∀ x → [ i ] Qs x ∼ C x [ Qs ]) →
     ∀ x → [ i ] Ps x ∼′ Qs x

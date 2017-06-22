@@ -19,7 +19,7 @@ open import Labelled-transition-system.CCS Name
 ------------------------------------------------------------------------
 -- Exercise 6.1.3 (1)
 
-6-1-3-1-proc : Proc → Proc → ℕ → Proc
+6-1-3-1-proc : Proc ∞ → Proc ∞ → ℕ → Proc ∞
 6-1-3-1-proc P P′ zero    = ! P ∣ P′
 6-1-3-1-proc P P′ (suc n) = 6-1-3-1-proc P P′ n ∣ P
 
@@ -47,16 +47,16 @@ open import Labelled-transition-system.CCS Name
      6-1-3-1-proc P P″ n ∣ P    ≡⟨ refl ⟩∎
      6-1-3-1-proc P P″ (suc n)  ∎)
 
-One-step-away : {A : Set} → (A → Action) → Proc → Set
+One-step-away : {A : Set} → (A → Action) → Proc ∞ → Set
 One-step-away f P = ∃ λ a → ∃ λ P′ → P [ f a ]⟶ P′
 
 cons : {A B : Set} → A → List A × B → List A × B
 cons x (xs , y) = x ∷ xs , y
 
 6-1-3-1-proc′ :
-  (P : Proc) →
+  (P : Proc ∞) →
   List (Maybe (One-step-away name P)) × One-step-away id P →
-  Proc
+  Proc ∞
 6-1-3-1-proc′ P ([] , (_ , P′ , _))          = ! P ∣ P′
 6-1-3-1-proc′ P (just (_ , P′ , _) ∷ Ps , o) = 6-1-3-1-proc′ P (Ps , o) ∣ P′
 6-1-3-1-proc′ P (nothing           ∷ Ps , o) = 6-1-3-1-proc′ P (Ps , o) ∣ P
@@ -105,7 +105,7 @@ record 6-1-3-2-assumptions ℓ : Set (lsuc ℓ) where
   syntax step-∼ p q∼r p∼q  = p ∼⟨ p∼q ⟩ q∼r
 
   field
-    _∼_       : Proc → Proc → Set ℓ
+    _∼_       : Proc ∞ → Proc ∞ → Set ℓ
     step-∼    : ∀ P {Q R} → Q ∼ R → P ∼ Q → P ∼ R
     finally-∼ : ∀ P Q → P ∼ Q → P ∼ Q
     reflexive : ∀ {P} → P ∼ P

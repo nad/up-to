@@ -40,6 +40,18 @@ mutual
               [ i ] P ≤′ P′ → [ i ] Q ≤′ Q′ → [ i ] P ∣ Q ≤′ P′ ∣ Q′
   force (P≤P′ ∣-cong′ Q≤Q′) = force P≤P′ ∣-cong force Q≤Q′
 
+-- Preservation lemmas for rec.
+
+rec-cong :
+  ∀ {i P Q} →
+  [ i ] force P ≤′ force Q → [ i ] rec P ≤ rec Q
+rec-cong {i} P≤Q = ⟨ CL.rec-cong {i = i} P≤Q ⟩
+
+rec-cong′ :
+  ∀ {i P Q} →
+  [ i ] force P ≤′ force Q → [ i ] rec P ≤′ rec Q
+force (rec-cong′ P≤Q) = rec-cong P≤Q
+
 -- _⊕_ preserves similarity.
 
 infix 8 _⊕-cong_ _⊕-cong′_
@@ -101,19 +113,28 @@ mutual
 
 -- _[_] preserves similarity.
 
-infix 5 _[_]-cong _[_]-cong′
+mutual
 
-_[_]-cong :
-  ∀ {i n Ps Qs}
-  (C : Context n) → (∀ x → [ i ] Ps x ≤ Qs x) →
-  [ i ] C [ Ps ] ≤ C [ Qs ]
-_[_]-cong = CL.[]-cong _∣-cong_ _⊕-cong_ _·-cong_ ν-cong !-cong_
+  infix 5 _[_]-cong _[_]-cong′
 
-_[_]-cong′ :
-  ∀ {i n Ps Qs}
-  (C : Context n) → (∀ x → [ i ] Ps x ≤′ Qs x) →
-  [ i ] C [ Ps ] ≤′ C [ Qs ]
-force (C [ Ps≤Qs ]-cong′) = C [ (λ x → force (Ps≤Qs x)) ]-cong
+  _[_]-cong :
+    ∀ {i n Ps Qs}
+    (C : Context ∞ n) → (∀ x → [ i ] Ps x ≤ Qs x) →
+    [ i ] C [ Ps ] ≤ C [ Qs ]
+  hole x  [ Ps≤Qs ]-cong = Ps≤Qs x
+  ∅       [ Ps≤Qs ]-cong = reflexive
+  C₁ ∣ C₂ [ Ps≤Qs ]-cong = (C₁ [ Ps≤Qs ]-cong) ∣-cong (C₂ [ Ps≤Qs ]-cong)
+  C₁ ⊕ C₂ [ Ps≤Qs ]-cong = (C₁ [ Ps≤Qs ]-cong) ⊕-cong (C₂ [ Ps≤Qs ]-cong)
+  μ · C   [ Ps≤Qs ]-cong = refl ·-cong (C [ Ps≤Qs ]-cong)
+  ν a C   [ Ps≤Qs ]-cong = ν-cong refl (C [ Ps≤Qs ]-cong)
+  ! C     [ Ps≤Qs ]-cong = !-cong (C [ Ps≤Qs ]-cong)
+  rec C   [ Ps≤Qs ]-cong = rec-cong (force C [ (λ x → convert (Ps≤Qs x)) ]-cong′)
+
+  _[_]-cong′ :
+    ∀ {i n Ps Qs}
+    (C : Context ∞ n) → (∀ x → [ i ] Ps x ≤′ Qs x) →
+    [ i ] C [ Ps ] ≤′ C [ Qs ]
+  force (C [ Ps≤Qs ]-cong′) = C [ (λ x → force (Ps≤Qs x)) ]-cong
 
 ------------------------------------------------------------------------
 -- Other results
@@ -149,7 +170,7 @@ force (C [ Ps≤Qs ]-cong′) = C [ (λ x → force (Ps≤Qs x)) ]-cong
 
   -- Two vending machines.
 
-  machine₁ machine₂ machine₁′ machine₂′ : Proc
+  machine₁ machine₂ machine₁′ machine₂′ : Proc ∞
 
   machine₁′ = name pay · (coffee · ⊕ tea ·)
   machine₁  = ! machine₁′

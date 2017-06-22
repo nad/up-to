@@ -147,7 +147,7 @@ Size-preserving-reindex {C = C} {F} {f}
      Size-preserving C₁ F → Size-preserving C₂ F →
      Size-preserving (C₁ ⟷ C₂) F)
     ×
-  ¬ ({F : Trans₂ (# 0) Proc} →
+  ¬ ({F : Trans₂ (# 0) (Proc ∞)} →
      Monotone F → Symmetric swap F →
      Size-preserving S.S̲t̲e̲p̲ F →
      Size-preserving B.S̲t̲e̲p̲ F)
@@ -164,7 +164,7 @@ Size-preserving-reindex {C = C} {F} {f}
       Size-preserving C₁ F → Size-preserving C₂ F →
       Size-preserving (C₁ ⟷ C₂) F)                   ↝⟨ (λ closed mono symm pres → closed mono symm pres pres) ⟩
 
-     ({F : Trans₂ (# 0) Proc} →
+     ({F : Trans₂ (# 0) (Proc ∞)} →
       Monotone F → Symmetric swap F →
       Size-preserving S.S̲t̲e̲p̲ F →
       Size-preserving B.S̲t̲e̲p̲ F)                      ↝⟨ contradiction₂ ⟩□
@@ -192,7 +192,7 @@ Size-preserving-reindex {C = C} {F} {f}
   m₁ = proj₁ ≤≥≁
   m₂ = proj₁ (proj₂ ≤≥≁)
 
-  F : Trans₂ (# 0) Proc
+  F : Trans₂ (# 0) (Proc ∞)
   F R = R ∪ (_≡ (m₁ , m₂)) ∪ (_≡ (m₂ , m₁))
 
   mono : Monotone F
@@ -205,7 +205,7 @@ Size-preserving-reindex {C = C} {F} {f}
     R ∘ swap ∪ (_≡ (m₁ , m₂)) ∘ swap ∪ (_≡ (m₂ , m₁)) ∘ swap  ⊆⟨ id ⟩∎
     F R ∘ swap                                                ∎
     where
-    lemma : {p₁ p₂ : Proc × Proc} → p₁ ≡ swap p₂ → swap p₁ ≡ p₂
+    lemma : {p₁ p₂ : Proc ∞ × Proc ∞} → p₁ ≡ swap p₂ → swap p₁ ≡ p₂
     lemma refl = refl
 
   pres : Size-preserving S.S̲t̲e̲p̲ F
@@ -225,7 +225,7 @@ Size-preserving-reindex {C = C} {F} {f}
     ⊥                                    □
 
   contradiction₂ =
-    ({F : Trans₂ (# 0) Proc} →
+    ({F : Trans₂ (# 0) (Proc ∞)} →
      Monotone F → Symmetric swap F →
      Size-preserving S.S̲t̲e̲p̲ F →
      Size-preserving B.S̲t̲e̲p̲ F)        ↝⟨ (λ closed → closed mono symm pres) ⟩

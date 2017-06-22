@@ -24,13 +24,14 @@ open import Bisimilarity.Weak.Coinductive.Other CCS
 open import Bisimilarity.Weak.Coinductive.Other.Up-to CCS
 import Labelled-transition-system.Equational-reasoning-instances CCS
 
--- Up to (non-degenerate) context for CCS (for polyadic contexts).
+-- Up to (non-degenerate) context for CCS (for polyadic, coinductive
+-- contexts).
 
-Up-to-context : Trans₂ (# 0) Proc
+Up-to-context : Trans₂ (# 0) (Proc ∞)
 Up-to-context R (p , q) =
   ∃ λ n →
-  ∃ λ (C : Context n) →
-  Non-degenerate C
+  ∃ λ (C : Context ∞ n) →
+  Non-degenerate ∞ C
     ×
   ∃ λ ps →
   ∃ λ qs →
@@ -72,10 +73,10 @@ Up-to-context-size-preserving =
   where
   a = x , true
 
-  data R₀ : Rel₂ (# 0) Proc where
+  data R₀ : Rel₂ (# 0) (Proc ∞) where
     base : R₀ (τ · (a ·) , a ·)
 
-  R : Rel₂ (# 0) Proc
+  R : Rel₂ (# 0) (Proc ∞)
   R = R₀ ⁼
 
   !τa[R]!a : Up-to-context R (! τ · (a ·) , ! a ·)
@@ -106,6 +107,7 @@ Up-to-context-size-preserving =
   drop-[] (_ , _ · _ , _ , _ , _ , () , _)
   drop-[] (_ , ν _ _ , _ , _ , _ , () , _)
   drop-[] (_ , ! _   , _ , _ , _ , () , _)
+  drop-[] (_ , rec _ , _ , _ , _ , () , _)
 
   R⊆StepR : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ R
   R⊆StepR (inj₁ base) = ⟨ lr , rl ⟩

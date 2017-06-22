@@ -46,6 +46,24 @@ mutual
               [ i ] P ≈′ P′ → [ i ] Q ≈′ Q′ → [ i ] P ∣ Q ≈′ P′ ∣ Q′
   force (P≈P′ ∣-cong′ Q≈Q′) = force P≈P′ ∣-cong force Q≈Q′
 
+-- Preservation lemmas for rec.
+
+rec-cong :
+  ∀ {i P Q} →
+  [ i ] force P ≈′ force Q → [ i ] rec P ≈ rec Q
+rec-cong {i} {P} {Q} P≈Q =
+  ⟨ Σ-map id (Σ-map id symmetric) ∘
+    rl (symmetric P≈Q)
+  , rl P≈Q
+  ⟩
+  where
+  rl = CL.rec-cong
+
+rec-cong′ :
+  ∀ {i P Q} →
+  [ i ] force P ≈′ force Q → [ i ] rec P ≈′ rec Q
+force (rec-cong′ P≈Q) = rec-cong P≈Q
+
 -- _·_ preserves weak bisimilarity.
 
 infix 12 _·-cong_ _·-cong′_
@@ -171,20 +189,72 @@ force (P₁≈′P₁′ ·⊕·-cong′ P₂≈′P₂′) =
 -- _[_] preserves weak bisimilarity for non-degenerate contexts. (This
 -- result is similar to Theorem 6.5.25 in "Enhancements of the
 -- bisimulation proof method" by Pous and Sangiorgi.)
+--
+-- TODO: This definition is very similar to E._[_]-cong. Find some way
+-- to reduce the code duplication. (There was much less code
+-- duplication before contexts were made coinductive.)
 
-infix 5 _[_]-cong _[_]-cong′
+mutual
 
-_[_]-cong :
-  ∀ {i n Ps Qs} {C : Context n} →
-  Non-degenerate C → (∀ x → [ i ] Ps x ≈ Qs x) →
-  [ i ] C [ Ps ] ≈ C [ Qs ]
-_[_]-cong =
-  flip $
-    CL.[]-cong _∣-cong_ _·-cong_ ν-cong !-cong_
-               ⊕·-cong ·⊕-cong _·⊕·-cong_
+  infix 5 _[_]-cong _[_]-cong′
 
-_[_]-cong′ :
-  ∀ {i n Ps Qs} {C : Context n} →
-  Non-degenerate C → (∀ x → [ i ] Ps x ≈′ Qs x) →
-  [ i ] C [ Ps ] ≈′ C [ Qs ]
-force (C [ Ps≈Qs ]-cong′) = C [ (λ x → force (Ps≈Qs x)) ]-cong
+  _[_]-cong :
+    ∀ {i n Ps Qs} {C : Context ∞ n} →
+    Non-degenerate ∞ C → (∀ x → [ i ] Ps x ≈ Qs x) →
+    [ i ] C [ Ps ] ≈ C [ Qs ]
+  hole     [ Ps∼Qs ]-cong = Ps∼Qs _
+  ∅        [ Ps∼Qs ]-cong = reflexive
+  D₁ ∣ D₂  [ Ps∼Qs ]-cong = (D₁ [ Ps∼Qs ]-cong) ∣-cong (D₂ [ Ps∼Qs ]-cong)
+  action D [ Ps∼Qs ]-cong = refl ·-cong (D [ Ps∼Qs ]-cong)
+  ν D      [ Ps∼Qs ]-cong = ν-cong refl (D [ Ps∼Qs ]-cong)
+  ! D      [ Ps∼Qs ]-cong = !-cong (D [ Ps∼Qs ]-cong)
+  rec D    [ Ps∼Qs ]-cong = rec-cong
+                              (force D [ (λ x → convert (Ps∼Qs x)) ]-cong′)
+  D₁ ⊕ D₂  [ Ps∼Qs ]-cong = ⊕-cong Ps∼Qs D₁ D₂
+    where
+    ⊕-cong :
+      ∀ {i n Ps Qs} {C₁ C₂ : Context ∞ n} →
+      (∀ x → [ i ] Ps x ≈ Qs x) →
+      Non-degenerate-summand ∞ C₁ →
+      Non-degenerate-summand ∞ C₂ →
+      [ i ] (C₁ [ Ps ]) ⊕ (C₂ [ Ps ]) ≈ (C₁ [ Qs ]) ⊕ (C₂ [ Qs ])
+    ⊕-cong {Ps = Ps} {Qs} Ps∼Qs = λ where
+      (process P₁) (process P₂) →
+        (context P₁ [ Ps ]) ⊕ (context P₂ [ Ps ])  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁) SE.⊕-cong SE.≡→∼ (context-[] P₂)) ⟩
+        P₁ ⊕ P₂                                    ∼⟨ SE.≡→∼ (context-[] P₁) SE.⊕-cong SE.≡→∼ (context-[] P₂) ⟩■
+        (context P₁ [ Qs ]) ⊕ (context P₂ [ Qs ])
+
+      (process P₁) (action {μ = μ₂} {C = C₂} D₂) →
+        (context P₁ [ Ps ]) ⊕ (μ₂ · C₂ [ Ps ])  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁)) SE.⊕-cong (_ ■) ⟩
+        P₁ ⊕ (μ₂ · C₂ [ Ps ])                   ∼′⟨ ⊕·-cong (D₂ [ Ps∼Qs ]-cong) ⟩ S.∼:
+        P₁ ⊕ (μ₂ · C₂ [ Qs ])                   ∼⟨ SE.≡→∼ (context-[] P₁) SE.⊕-cong (_ ■) ⟩■
+        (context P₁ [ Qs ]) ⊕ (μ₂ · C₂ [ Qs ])
+
+      (action {μ = μ₁} {C = C₁} D₁) (process P₂) →
+        (μ₁ · C₁ [ Ps ]) ⊕ (context P₂ [ Ps ])  ∼⟨ (_ ■) SE.⊕-cong symmetric (SE.≡→∼ (context-[] P₂)) ⟩
+        (μ₁ · C₁ [ Ps ]) ⊕ P₂                   ∼′⟨ ·⊕-cong (D₁ [ Ps∼Qs ]-cong) ⟩ S.∼:
+        (μ₁ · C₁ [ Qs ]) ⊕ P₂                   ∼⟨ (_ ■) SE.⊕-cong SE.≡→∼ (context-[] P₂) ⟩■
+        (μ₁ · C₁ [ Qs ]) ⊕ (context P₂ [ Qs ])
+
+      (action {μ = μ₁} {C = C₁} D₁) (action {μ = μ₂} {C = C₂} D₂) →
+        (μ₁ · C₁ [ Ps ]) ⊕ (μ₂ · C₂ [ Ps ])  ∼⟨ (D₁ [ Ps∼Qs ]-cong) ·⊕·-cong (D₂ [ Ps∼Qs ]-cong) ⟩■
+        (μ₁ · C₁ [ Qs ]) ⊕ (μ₂ · C₂ [ Qs ])
+
+  _[_]-cong′ :
+    ∀ {i n Ps Qs} {C : Context ∞ n} →
+    Non-degenerate ∞ C → (∀ x → [ i ] Ps x ≈′ Qs x) →
+    [ i ] C [ Ps ] ≈′ C [ Qs ]
+  force (C [ Ps≈Qs ]-cong′) = C [ (λ x → force (Ps≈Qs x)) ]-cong
+
+------------------------------------------------------------------------
+-- Lemmas related to rec
+
+add-rec-left : ∀ {i P Q} → [ i ] force P ≈ Q → [ i ] rec P ≈ Q
+add-rec-left P≈Q =
+  ⟨ (λ { rec → _ , silent refl done , convert P≈Q })
+  , (λ tr → Σ-map id (Σ-map (⇒⇒̂-transitive (⟶→⇒ refl rec)) id)
+              (right-to-left P≈Q tr))
+  ⟩
+
+add-rec-right : ∀ {i P Q} → [ i ] P ≈ force Q → [ i ] P ≈ rec Q
+add-rec-right {i} = symmetric ∘ add-rec-left {i = i} ∘ symmetric

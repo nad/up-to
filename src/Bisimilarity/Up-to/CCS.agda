@@ -25,12 +25,12 @@ open import Bisimilarity.Coinductive CCS
 open import Bisimilarity.Step CCS _[_]⟶_ using (Step; Step↔S̲t̲e̲p̲)
 open import Bisimilarity.Up-to CCS
 
--- Up to context for CCS (for polyadic contexts).
+-- Up to context for CCS (for polyadic, coinductive contexts).
 
-Up-to-context : Trans₂ (# 0) Proc
+Up-to-context : Trans₂ (# 0) (Proc ∞)
 Up-to-context R (p , q) =
   ∃ λ n →
-  ∃ λ (C : Context n) →
+  ∃ λ (C : Context ∞ n) →
   ∃ λ ps →
   ∃ λ qs →
   p ≡ C [ ps ]
@@ -77,13 +77,13 @@ Up-to-context-size-preserving =
   a≢b : ¬ a ≡ b
   a≢b ()
 
-  data R : Rel₂ (# 0) Proc where
+  data R : Rel₂ (# 0) (Proc ∞) where
     base : R (! name a · (b ·) , ! name a · (c ·))
 
-  data S₀ : Rel₂ (# 0) Proc where
+  data S₀ : Rel₂ (# 0) (Proc ∞) where
     base : S₀ (! name a · (b ·) ∣ b · , ! name a · (c ·) ∣ c ·)
 
-  S : Rel₂ (# 0) Proc
+  S : Rel₂ (# 0) (Proc ∞)
   S = Up-to-bisimilarity S₀
 
   d!ab[R]d!ac : Up-to-context R ( name d · (! name a · (b ·))
@@ -101,14 +101,14 @@ Up-to-context-size-preserving =
   ¬!ab[S]!ac : ¬ Up-to-context S (! name a · (b ·) , ! name a · (c ·))
   ¬!ab[S]!ac (n , C , Ps , Qs , !ab≡C[Ps] , !ac≡C[Qs] , PsSQs) =
 
-                                  $⟨ Matches-[] C ⟩
-    Matches (C [ Ps ]) C          ↝⟨ subst (flip Matches C) (sym !ab≡C[Ps]) ⟩
-    Matches (! name a · (b ·)) C  ↝⟨ helper ⟩□
-    ⊥                             □
+                                    $⟨ Matches-[] C ⟩
+    Matches ∞ (C [ Ps ]) C          ↝⟨ subst (flip (Matches ∞) C) (sym !ab≡C[Ps]) ⟩
+    Matches ∞ (! name a · (b ·)) C  ↝⟨ helper ⟩□
+    ⊥                               □
 
     where
 
-    helper : ¬ Matches (! name a · (b ·)) C
+    helper : ¬ Matches ∞ (! name a · (b ·)) C
 
     helper (hole x) = case PsSQs x of λ where
       (_ , Ps[x]∼!ab∣b , _ , base , _) →
