@@ -118,12 +118,18 @@ _^[_]_ : ∀ {a} {A : Set a} → (A → A) → ℕ → A → A
 f ^[ zero  ] x = x
 f ^[ suc n ] x = f (f ^[ n ] x)
 
+-- Unions of families of relation transformers.
+
+⋃ : ∀ {a b} ℓ {A : Set a} {B : Set b} →
+    (A → Trans (a ⊔ ℓ) B) → Trans (a ⊔ ℓ) B
+⋃ _ F R = λ b → ∃ λ a → F a R b
+
 -- An analogue of ⋃ₙ Fⁿ.
 
 infix 10 _^ω_
 
 _^ω_ : ∀ {a ℓ} {A : Set a} → Trans ℓ A → Trans ℓ A
-F ^ω R = λ x → ∃ λ n → (F ^[ n ] R) x
+_^ω_ F = ⋃ _ (F ^[_]_)
 
 -- Relation containment.
 
@@ -387,3 +393,22 @@ composition-swap {R = R} {S} R↝ S↝ hyp = λ where
   (∃ λ n → (R ^^ n) p)         ↝⟨ ∃-cong (λ n → ^^-swap R↝ n _) ⟩
   (∃ λ n → (R ^^ n) (swap p))  ↔⟨⟩
   (R *) (swap p)               □
+
+-- ⋃ constructs least upper bounds.
+
+⊆-⋃ : ∀ {a b ℓ} {A : Set a} {B : Set b}
+      (F : A → Trans (a ⊔ ℓ) B) a →
+      ∀ R → F a R ⊆ ⋃ ℓ F R
+⊆-⋃ {ℓ = ℓ} F a R =
+  F a R                    ⊆⟨ a ,_ ⟩
+  (λ x → ∃ λ a → F a R x)  ⊆⟨ id ⟩∎
+  ⋃ ℓ F R                  ∎
+
+⋃-⊆ : ∀ {a b ℓ} {A : Set a} {B : Set b}
+      (F : A → Trans (a ⊔ ℓ) B) (G : Trans (a ⊔ ℓ) B) →
+      (∀ {a} R → F a R ⊆ G R) →
+      ∀ R → ⋃ ℓ F R ⊆ G R
+⋃-⊆ {ℓ = ℓ} F G hyp R =
+  ⋃ ℓ F R                  ⊆⟨⟩
+  (λ x → ∃ λ a → F a R x)  ⊆⟨ hyp _ ∘ proj₂ ⟩∎
+  G R                      ∎
