@@ -1266,3 +1266,33 @@ mutual
 
   6-2-17-4′ : ∀ {P i} → [ i ] ! ! P ∼′ ! P
   force 6-2-17-4′ = 6-2-17-4
+
+------------------------------------------------------------------------
+-- An example from "Coinduction All the Way Up" by Pous
+
+module _ (a b : Name-with-kind) where
+
+  A B C D : ∀ {i} → Proc i
+  A′ B′ C′ D′ : ∀ {i} → Proc′ i
+
+  A = name a · name b · rec D′
+  B = name a · name b · rec C′
+
+  C = name (co a) · (rec A′ ∣ rec C′)
+  D = name (co a) · (rec B′ ∣ rec D′)
+
+  force A′ = A
+  force B′ = B
+  force C′ = C
+  force D′ = D
+
+  mutual
+
+    A∼B : ∀ {i} → [ i ] A ∼ B
+    A∼B =
+      refl ·-cong (refl ·-cong rec-cong λ { .force → symmetric C∼D })
+
+    C∼D : ∀ {i} → [ i ] C ∼ D
+    C∼D = refl ·-cong (rec-cong (λ { .force → A∼B })
+                         ∣-cong
+                       rec-cong (λ { .force → C∼D }))
