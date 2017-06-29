@@ -31,7 +31,8 @@ import Indexed-container.Combinators
 ------------------------------------------------------------------------
 -- Up-to techniques
 
--- Up-to techniques, compatibility and size-preserving functions.
+-- Up-to techniques, compatibility, size-preserving functions, and the
+-- companion.
 
 import Up-to
 

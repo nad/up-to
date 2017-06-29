@@ -1,5 +1,6 @@
 ------------------------------------------------------------------------
--- Up-to techniques, compatibility and size-preserving functions
+-- Up-to techniques, compatibility, size-preserving functions, and the
+-- companion
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K #-}
@@ -304,3 +305,266 @@ const-size-preserving R⊆∼ _ = R⊆∼
 ∪-closure {F} {G} F-pres G-pres {R = R} {i = i} =
   R ⊆ ν C i          ↝⟨ (λ R⊆∼ {_} → [ F-pres (R⊆∼ {_}) , G-pres (R⊆∼ {_}) ]) ⟩□
   F R ∪ G R ⊆ ν C i  □
+
+------------------------------------------------------------------------
+-- The companion
+
+-- The companion.
+--
+-- The name comes from "Coinduction All the Way Up" by Pous, but this
+-- definition is based on the one presented by Parrow and Weber in
+-- "The Largest Respectful Function".
+
+Companion : Trans ℓ I
+Companion R o = ∀ {i} → R ⊆ ν C i → ν C i o
+
+-- The companion is monotone.
+--
+-- This result corresponds to Lemma 2.13 in "The Largest Respectful
+-- Function".
+
+companion-monotone : Monotone Companion
+companion-monotone R⊆S f S⊆ = f (S⊆ ∘ R⊆S)
+
+-- The companion is size-preserving.
+
+companion-size-preserving : Size-preserving Companion
+companion-size-preserving {R} {i} R⊆ {o} =
+  (∀ {i} → R ⊆ ν C i → ν C i o)  ↝⟨ (λ hyp → hyp R⊆) ⟩□
+  ν C i o                        □
+
+-- Every size-preserving function is contained in the companion.
+
+size-preserving⊆companion :
+  ∀ {F} → Size-preserving F → ∀ R → F R ⊆ Companion R
+size-preserving⊆companion {F} pres R {o} FR {i} =
+  R ⊆ ν C i    ↝⟨ pres ⟩
+  F R ⊆ ν C i  ↝⟨ (λ hyp → hyp FR) ⟩□
+  ν C i o      □
+
+-- I have not checked all details, but it seems as if Parrow and Weber
+-- work in set theory and use classical reasoning to prove that the
+-- companion is the largest monotone and compatible function. I don't
+-- know if this result holds in constructive type theory. In
+-- particular, I don't know how to prove that the companion is
+-- compatible.
+
+-- Every "partial" fixpoint ν C i is a pre-fixpoint of the companion.
+
+companion-ν⊆ν : ∀ {i} → Companion (ν C i) ⊆ ν C i
+companion-ν⊆ν {i} =
+  (∀ {j} → ν C i ⊆ ν C j → ν C j _)  ↝⟨ (λ hyp → hyp id) ⟩□
+  ν C i _                            □
+
+-- Some lemmas corresponding to Lemma 3.2 from "Coinduction All the
+-- Way Up".
+
+⟦⟧⊆companion : ∀ R → ⟦ C ⟧ R ⊆ Companion R
+⟦⟧⊆companion R CR {i} =
+  R ⊆ ν C i                ↝⟨ map C ⟩
+  ⟦ C ⟧ R ⊆ ⟦ C ⟧ (ν C i)  ↝⟨ (λ hyp → hyp CR) ⟩
+  ⟦ C ⟧ (ν C i) _          ↝⟨ ν-in _ ⟩□
+  ν C i _                  □
+
+id⊆companion : ∀ R → R ⊆ Companion R
+id⊆companion R r {i} =
+  R ⊆ ν C i  ↝⟨ (λ hyp → hyp r) ⟩□
+  ν C i _    □
+
+companion²⊆companion : ∀ R → Companion (Companion R) ⊆ Companion R
+companion²⊆companion R CCR {i} =
+  R ⊆ ν C i                        ↝⟨ companion-monotone ⟩
+  Companion R ⊆ Companion (ν C i)  ↝⟨ companion-ν⊆ν ∘_ ⟩
+  Companion R ⊆ ν C i              ↝⟨ CCR ⟩□
+  ν C i _                          □
+
+companion-idempotent :
+  ∀ R {o} → Companion (Companion R) o ⇔ Companion R o
+companion-idempotent R {o} = record
+  { to   = companion²⊆companion R
+  ; from = Companion R              ⊆⟨ companion-monotone (id⊆companion _) ⟩∎
+           Companion (Companion R)  ∎
+  }
+
+-- The greatest fixpoint ν C ∞ is pointwise logically equivalent to
+-- the companion applied to an empty relation.
+--
+-- This corresponds to Theorem 3.3 from "Coinduction All the Way Up".
+
+ν⇔companion-⊥ : ∀ {o} → ν C ∞ o ⇔ Companion (λ _ → ⊥) o
+ν⇔companion-⊥ {o} = record
+  { to   = ν C ∞ o                                ↝⟨ (λ hyp {_} _ → hyp) ⟩□
+           (∀ {i} → (λ _ → ⊥) ⊆ ν C i → ν C i o)  □
+  ; from = (∀ {i} → (λ _ → ⊥) ⊆ ν C i → ν C i o)  ↝⟨ (λ hyp → hyp (λ ())) ⟩□
+           ν C ∞ o                                □
+  }
+
+-- The companion applied to the greatest fixpoint ν C ∞ is pointwise
+-- logically equivalent to the greatest fixpoint.
+--
+-- This corresponds to Corollary 3.4 from "Coinduction All the Way
+-- Up".
+
+companion-ν⇔ν : ∀ {o} → Companion (ν C ∞) o ⇔ ν C ∞ o
+companion-ν⇔ν {o} = record
+  { to   = companion-ν⊆ν
+  ; from = ν C ∞                ⊆⟨ _⇔_.to ν⇔companion-⊥ ⟩
+           Companion (λ _ → ⊥)  ⊆⟨ companion-monotone (λ ()) ⟩∎
+           Companion (ν C ∞)    ∎
+  }
+
+-- Pous defines the companion in roughly the following way in
+-- "Coinduction All the Way Up".
+--
+-- Note that this definition is large.
+
+Companion′ : Rel ℓ I → Rel (lsuc ℓ) I
+Companion′ R = λ x →
+  ∃ λ (F : Trans ℓ I) → Monotone F × Compatible F × F R x
+
+-- This variant of the companion is compatible (modulo size issues).
+--
+-- This corresponds to Lemma 3.2 from "Coinduction All the Way Up".
+
+companion′-compatible :
+  ∀ R → Companion′ (⟦ C ⟧ R) ⊆ ⟦ C ⟧ (Companion′ R)
+companion′-compatible R {x} (F , mono , comp , FCR) =
+                          $⟨ FCR ⟩
+  F (⟦ C ⟧ R) x           ↝⟨ comp R ⟩
+  ⟦ C ⟧ (F R) x           ↝⟨ map C (λ FR → F , (λ {_ _} → mono) , comp , FR) ⟩□
+  ⟦ C ⟧ (Companion′ R) x  □
+
+-- Pous' variant of the companion is monotone.
+
+companion′-monotone : ∀ {R S} → R ⊆ S → Companion′ R ⊆ Companion′ S
+companion′-monotone R⊆S =
+  ∃-cong λ _ → ∃-cong λ mono → ∃-cong λ _ → mono R⊆S
+
+-- Pous' variant of the companion is contained in Parrow and Weber's.
+--
+-- I don't know if the other direction is provable (constructively).
+
+companion′⊆companion : ∀ {R} → Companion′ R ⊆ Companion R
+companion′⊆companion {R} {o} =
+  Companion′ R o                                 ↔⟨ ∃-cong (λ _ → Σ-assoc) ⟩
+  (∃ λ F → (Monotone F × Compatible F) × F R o)  ↝⟨ ∃-cong (λ _ → uncurry monotone→compatible→size-preserving ×-cong id) ⟩
+  (∃ λ F → Size-preserving F × F R o)            ↝⟨ (λ { (_ , pres , FR) → size-preserving⊆companion pres _ FR }) ⟩□
+  Companion R o                                  □
+
+-- If "one half of f-symmetry" holds for R, for some involution f,
+-- then the other half also holds.
+--
+-- (Pous mentions something similar in "Coinduction All the Way Up".)
+
+other-half-of-symmetry :
+  {f : I → I} →
+  f ∘ f ≡ id →
+  (R : Rel ℓ I) → R ∘ f ⊆ R → R ⊆ R ∘ f
+other-half-of-symmetry {f} f-involution R R∘f⊆R =
+  R          ⊆⟨ (λ {o} → subst (λ g → R (g o)) (sym f-involution)) ⟩
+  R ∘ f ∘ f  ⊆⟨ R∘f⊆R ⟩∎
+  R ∘ f      ∎
+
+-- The results in the following module correspond to parts of
+-- Proposition 7.1 in "Coinduction All the Way Up".
+
+module _
+  (D : Container I I)
+  (f : I → I)
+  (f-involution : f ∘ f ≡ id)
+  (C⇔⟷D : ∀ {R : Rel ℓ I} {o} → ⟦ C ⟧ R o ⇔ ⟦ D ⊗ reindex f D ⟧ R o)
+  where
+
+  mutual
+
+    ν-symmetric : ∀ {i} → ν C i ∘ f ⊆ ν C i
+    ν-symmetric {i} =
+      ν C i ∘ f                                          ⊆⟨⟩
+      ⟦ C ⟧ (ν′ C i) ∘ f                                 ⊆⟨ _⇔_.to C⇔⟷D ⟩
+      ⟦ D ⊗ reindex f D ⟧ (ν′ C i) ∘ f                   ⊆⟨ _↔_.to (⟦⊗⟧↔ D (reindex f D)) ⟩
+      ⟦ D ⟧ (ν′ C i) ∘ f ∩ ⟦ reindex f D ⟧ (ν′ C i) ∘ f  ⊆⟨ Σ-map id (_↔_.to (⟦reindex⟧↔ D)) ⟩
+      ⟦ D ⟧ (ν′ C i) ∘ f ∩ ⟦ D ⟧ (ν′ C i ∘ f) ∘ f ∘ f    ⊆⟨ (λ {o} → Σ-map id (subst (λ g → ⟦ D ⟧ (ν′ C i ∘ f) (g o)) f-involution)) ⟩
+      ⟦ D ⟧ (ν′ C i) ∘ f ∩ ⟦ D ⟧ (ν′ C i ∘ f)            ⊆⟨ Σ-map (map D (other-half-of-symmetry f-involution (ν′ C i) ν′-symmetric))
+                                                                  (map D ν′-symmetric) ⟩
+      ⟦ D ⟧ (ν′ C i ∘ f) ∘ f ∩ ⟦ D ⟧ (ν′ C i)            ⊆⟨ swap ⟩
+      ⟦ D ⟧ (ν′ C i) ∩ ⟦ D ⟧ (ν′ C i ∘ f) ∘ f            ⊆⟨ Σ-map id (_↔_.from (⟦reindex⟧↔ D)) ⟩
+      ⟦ D ⟧ (ν′ C i) ∩ ⟦ reindex f D ⟧ (ν′ C i)          ⊆⟨ _↔_.from (⟦⊗⟧↔ D (reindex f D)) ⟩
+      ⟦ D ⊗ reindex f D ⟧ (ν′ C i)                       ⊆⟨ _⇔_.from C⇔⟷D ⟩
+      ⟦ C ⟧ (ν′ C i)                                     ⊆⟨ id ⟩∎
+      ν C i                                              ∎
+
+    ν′-symmetric : ∀ {i} → ν′ C i ∘ f ⊆ ν′ C i
+    force (ν′-symmetric x) = ν-symmetric (force x)
+
+  companion-symmetric : ∀ {R} → Companion R ∘ f ⊆ Companion R
+  companion-symmetric {R} {o} =
+    Companion R (f o)                  ↔⟨⟩
+    (∀ {i} → R ⊆ ν C i → ν C i (f o))  ↝⟨ (λ hyp {i} R⊆ν → ν-symmetric (hyp R⊆ν)) ⟩
+    (∀ {i} → R ⊆ ν C i → ν C i o)      ↔⟨⟩
+    Companion R o                      □
+
+  symmetry-lemma :
+    {R S : Rel ℓ I} →
+    R ∘ f ⊆ R →
+    R ⊆ ⟦ C ⟧ (Companion S) ⇔ R ⊆ ⟦ D ⟧ (Companion S)
+  symmetry-lemma {R} {S} R-sym = record { to = to; from = from }
+    where
+    lemma = λ {o} →
+      ⟦ C ⟧ (Companion S) o                                    ↝⟨ C⇔⟷D ⟩
+      ⟦ D ⊗ reindex f D ⟧ (Companion S) o                      ↔⟨ ⟦⊗⟧↔ D (reindex f D) ⟩
+      ⟦ D ⟧ (Companion S) o × ⟦ reindex f D ⟧ (Companion S) o  ↔⟨ ∃-cong (λ _ → ⟦reindex⟧↔ D) ⟩□
+      ⟦ D ⟧ (Companion S) o × ⟦ D ⟧ (Companion S ∘ f) (f o)    □
+
+    to : R ⊆ ⟦ C ⟧ (Companion S) → R ⊆ ⟦ D ⟧ (Companion S)
+    to R⊆CCS =
+      R                                                  ⊆⟨ R⊆CCS ⟩
+      ⟦ C ⟧ (Companion S)                                ⊆⟨ _⇔_.to lemma ⟩
+      ⟦ D ⟧ (Companion S) ∩ ⟦ D ⟧ (Companion S ∘ f) ∘ f  ⊆⟨ proj₁ ⟩∎
+      ⟦ D ⟧ (Companion S)                                ∎
+
+    from : R ⊆ ⟦ D ⟧ (Companion S) → R ⊆ ⟦ C ⟧ (Companion S)
+    from R⊆DCS =
+      R                                                  ⊆⟨ (λ x → x , x) ⟩
+      R ∩ R                                              ⊆⟨ Σ-map id (other-half-of-symmetry f-involution R R-sym) ⟩
+      R ∩ R ∘ f                                          ⊆⟨ Σ-map R⊆DCS R⊆DCS ⟩
+      ⟦ D ⟧ (Companion S) ∩ ⟦ D ⟧ (Companion S) ∘ f      ⊆⟨ Σ-map id (map D (other-half-of-symmetry f-involution
+                                                                               (Companion S) companion-symmetric)) ⟩
+      ⟦ D ⟧ (Companion S) ∩ ⟦ D ⟧ (Companion S ∘ f) ∘ f  ⊆⟨ _⇔_.from lemma ⟩∎
+      ⟦ C ⟧ (Companion S)                                ∎
+
+-- Another conservative approximation of "up-to technique": being
+-- below the companion. This notion was presented by Pous in
+-- "Coinduction All the Way Up".
+
+Below-the-companion : Trans ℓ I → Set (lsuc ℓ)
+Below-the-companion F = ∀ R → F R ⊆ Companion R
+
+-- A transformer is below the companion iff it is size-preserving.
+--
+-- This is a generalisation of the following result, which is based on
+-- a proposition due to Pous and Rot.
+
+⊆companion⇔size-preserving :
+  ∀ {F} → Below-the-companion F ⇔ Size-preserving F
+⊆companion⇔size-preserving {F} = record
+  { to   = λ F⊆C {R} {i} R⊆ν →
+             F R          ⊆⟨ F⊆C _ ⟩
+             Companion R  ⊆⟨ (λ hyp → hyp R⊆ν) ⟩∎
+             ν C i        ∎
+  ; from = size-preserving⊆companion
+  }
+
+-- A monotone transformer F is below the companion iff, for all
+-- sizes i, ν C i is a pre-fixpoint of F.
+--
+-- This corresponds roughly to Proposition 5.2 in "Companions,
+-- Codensity and Causality" by Pous and Rot.
+
+monotone→⊆companion⇔size-preserving :
+  ∀ {F} →
+  Monotone F →
+  Below-the-companion F ⇔ (∀ {i} → F (ν C i) ⊆ ν C i)
+monotone→⊆companion⇔size-preserving {F} mono =
+  Below-the-companion F        ↝⟨ ⊆companion⇔size-preserving ⟩
+  Size-preserving F            ↝⟨ monotone→⇔ mono ⟩□
+  (∀ {i} → F (ν C i) ⊆ ν C i)  □
