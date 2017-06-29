@@ -414,23 +414,31 @@ reindex f = reindex₂ f ⊚ reindex₁ f
 -- If f is an involution, then ν (reindex f C) i is pointwise
 -- logically equivalent to ν C i ⊚ f.
 
-ν-reindex⇔ :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} {f : I → I} →
-  f ⊚ f ≡ P.id →
-  ∀ {i x} → ν (reindex f C) i x ⇔ ν C i (f x)
-ν-reindex⇔ {C = C} {f} inv {i} {x} =
-  ν (reindex f C) i x                     ↔⟨⟩
-  ⟦ reindex f C ⟧ (ν′ (reindex f C) i) x  ↔⟨ ⟦reindex⟧↔ C ⟩
-  ⟦ C ⟧ (ν′ (reindex f C) i ⊚ f) (f x)    ↝⟨ ⟦ C ⟧-cong (record { to = to; from = from }) ⟩
-  ⟦ C ⟧ (ν′ C i ⊚ f ⊚ f) (f x)            ↔⟨ ≡⇒↝ bijection $ cong (λ g → ⟦ C ⟧ (ν′ C i ⊚ g) (f x)) inv ⟩
-  ⟦ C ⟧ (ν′ C i) (f x)                    ↔⟨⟩
-  ν C i (f x)                             □
-  where
-  to : ∀ {i} → ν′ (reindex f C) i ⊆ ν′ C i ⊚ f
-  force (to x) = _⇔_.to (ν-reindex⇔ inv) (force x)
+mutual
 
-  from : ∀ {i} → ν′ C i ⊚ f ⊆ ν′ (reindex f C) i
-  force (from x) = _⇔_.from (ν-reindex⇔ inv) (force x)
+  ν-reindex⇔ :
+    ∀ {ℓ} {I : Set ℓ} {C : Container I I} {f : I → I} →
+    f ⊚ f ≡ P.id →
+    ∀ {i x} → ν (reindex f C) i x ⇔ ν C i (f x)
+  ν-reindex⇔ {C = C} {f} inv {i} {x} =
+    ν (reindex f C) i x                     ↔⟨⟩
+    ⟦ reindex f C ⟧ (ν′ (reindex f C) i) x  ↔⟨ ⟦reindex⟧↔ C ⟩
+    ⟦ C ⟧ (ν′ (reindex f C) i ⊚ f) (f x)    ↝⟨ ⟦ C ⟧-cong (ν′-reindex⇔ inv) ⟩
+    ⟦ C ⟧ (ν′ C i ⊚ f ⊚ f) (f x)            ↔⟨ ≡⇒↝ bijection $ cong (λ g → ⟦ C ⟧ (ν′ C i ⊚ g) (f x)) inv ⟩
+    ⟦ C ⟧ (ν′ C i) (f x)                    ↔⟨⟩
+    ν C i (f x)                             □
+
+  ν′-reindex⇔ :
+    ∀ {ℓ} {I : Set ℓ} {C : Container I I} {f : I → I} →
+    f ⊚ f ≡ P.id →
+    ∀ {i x} → ν′ (reindex f C) i x ⇔ ν′ C i (f x)
+  ν′-reindex⇔ {C = C} {f} inv = record { to = to; from = from }
+    where
+    to : ∀ {i} → ν′ (reindex f C) i ⊆ ν′ C i ⊚ f
+    force (to x) = _⇔_.to (ν-reindex⇔ inv) (force x)
+
+    from : ∀ {i} → ν′ C i ⊚ f ⊆ ν′ (reindex f C) i
+    force (from x) = _⇔_.from (ν-reindex⇔ inv) (force x)
 
 -- A cartesian product combinator.
 --
