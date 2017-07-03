@@ -77,6 +77,28 @@ map : ∀ {ℓ₁ ℓ₂ ℓ₃} {I O : Set ℓ₁} (C : Container I O)
       A ⊆ B → ⟦ C ⟧ A ⊆ ⟦ C ⟧ B
 map _ f = map₁ f
 
+-- Functor laws.
+
+map₁-id : ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} {C : Container₁ I} {A : Rel ℓ₂ I} →
+          _≡_ {A = ⟦ C ⟧₁ A → _} (map₁ id) id
+map₁-id = refl
+
+map-id : ∀ {ℓ₁ ℓ₂} {I O : Set ℓ₁} {C : Container I O} {A : Rel ℓ₂ I} →
+         _≡_ {A = ⟦ C ⟧ A ⊆ _} (map C id) id
+map-id = refl
+
+map₁-∘ : ∀ {ℓ₁ ℓ₂ ℓ₃ ℓ₄} {I : Set ℓ₁} {C : Container₁ I}
+           {D : Rel ℓ₂ I} {E : Rel ℓ₃ I} {F : Rel ℓ₄ I}
+         (f : E ⊆ F) (g : D ⊆ E) →
+         _≡_ {A = ⟦ C ⟧₁ D → _} (map₁ (f ∘ g)) (map₁ f ∘ map₁ g)
+map₁-∘ _ _ = refl
+
+map-∘ : ∀ {ℓ₁ ℓ₂ ℓ₃ ℓ₄} {I O : Set ℓ₁} {C : Container I O}
+          {D : Rel ℓ₂ I} {E : Rel ℓ₃ I} {F : Rel ℓ₄ I}
+        (f : E ⊆ F) (g : D ⊆ E) →
+        _≡_ {A = ⟦ C ⟧ D ⊆ _} (map C (f ∘ g)) (map C f ∘ map C g)
+map-∘ _ _ = refl
+
 -- Some preservation lemmas.
 
 ⟦⟧₁-cong : ∀ {k ℓ₁ ℓ₂ ℓ₃} {I : Set ℓ₁} {C : Container₁ I}
