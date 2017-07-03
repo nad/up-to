@@ -9,7 +9,7 @@ module Indexed-container.Combinators where
 open import Equality.Propositional hiding (Extensionality)
 open import Interval using (ext)
 open import Logical-equivalence using (_⇔_)
-open import Prelude as P hiding (id) renaming (_∘_ to _⊚_)
+open import Prelude as P hiding (id; const) renaming (_∘_ to _⊚_)
 
 open import Bijection equality-with-J as Bijection using (_↔_)
 open import Equivalence equality-with-J hiding (id; _∘_; inverse)
@@ -80,6 +80,49 @@ id i = ↑ _ ⊤ ◁₁ λ _ i′ → i ≡ i′
   s ≡ t × (λ {_} → f) ≡ g        ↝⟨ ≡×≡↔≡ ⟩
 
   x ≡ y                          □
+
+-- A constant combinator.
+
+const : ∀ {i} {I : Set i} → Rel i I → Container I I
+const X = X ◁ λ _ _ → ⊥
+
+-- An unfolding lemma for ⟦ const ⟧.
+
+⟦const⟧↔ : ∀ {ℓ y} {I : Set ℓ} {X} {Y : Rel y I} {i} →
+           ⟦ const X ⟧ Y i ↔ X i
+⟦const⟧↔ {I = I} {X} {Y} {i} =
+  X i × (∀ {i} → ⊥ → Y i)  ↝⟨ ∃-cong (λ _ → Bijection.implicit-Π↔Π) ⟩
+  X i × (∀ i → ⊥ → Y i)    ↝⟨ ∃-cong (λ _ → ∀-cong ext λ _ → Π⊥↔⊤ ext) ⟩
+  X i × (I → ⊤)            ↝⟨ drop-⊤-right (λ _ → →-right-zero) ⟩
+  X i                      □
+
+-- An unfolding lemma for ⟦ const ⟧₂.
+
+⟦const⟧₂↔ :
+  ∀ {ℓ y} {I : Set ℓ} {X} {Y : Rel y I}
+  (R : ∀ {i} → Rel₂ ℓ (Y i)) {i}
+  (x y : ⟦ const X ⟧ Y i) →
+
+  ⟦ const X ⟧₂ R (x , y)
+    ↔
+  proj₁ x ≡ proj₁ y
+
+⟦const⟧₂↔ {X = X} R x@(s , f) y@(t , g) =
+
+  ⟦ const X ⟧₂ R (x , y)                                ↔⟨⟩
+
+  (∃ λ (eq : s ≡ t) →
+   ∀ {o} (p : ⊥) → R (f p , g (subst (λ _ → ⊥) eq p)))  ↝⟨ ∃-cong (λ _ → Bijection.implicit-Π↔Π) ⟩
+
+  (∃ λ (eq : s ≡ t) →
+   ∀ o (p : ⊥) → R (f p , g (subst (λ _ → ⊥) eq p)))    ↝⟨ ∃-cong (λ _ → ∀-cong ext λ _ → Π⊥↔⊤ ext) ⟩
+
+  (∃ λ (eq : s ≡ t) → ∀ o → ⊤)                          ↝⟨ drop-⊤-right (λ _ → →-right-zero) ⟩
+
+  s ≡ t                                                 □
+
+  where
+  open Container
 
 -- A composition combinator.
 

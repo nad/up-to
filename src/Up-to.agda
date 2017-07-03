@@ -19,7 +19,7 @@ open import Bijection equality-with-J using (_↔_)
 open import Function-universe equality-with-J as F hiding (id; _∘_)
 
 open import Indexed-container.Combinators
-  hiding (id) renaming (_∘_ to _⊚_)
+  hiding (id; const) renaming (_∘_ to _⊚_)
 open import Relation
 
 ------------------------------------------------------------------------
