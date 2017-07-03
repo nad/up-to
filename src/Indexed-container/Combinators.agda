@@ -649,6 +649,138 @@ C₁ ⊗ C₂ =
   ν-⊗⊆₂′ : ν′ (C₁ ⊗ C₂) i ⊆ ν′ C₂ i
   force (ν-⊗⊆₂′ x) = proj₂ (ν-⊗⊆ (force x))
 
+-- A disjoint union combinator.
+--
+-- Similar to a construction in "Containers: Constructing strictly
+-- positive types" by Abbott, Altenkirch and Ghani (see
+-- Proposition 3.5).
+
+infixr 2 _⊕_
+
+_⊕_ : ∀ {ℓ} {I O : Set ℓ} →
+      Container I O → Container I O → Container I O
+C₁ ⊕ C₂ =
+  (λ o → Shape C₁ o ⊎ Shape C₂ o)
+    ◁
+  [ Position C₁ , Position C₂ ]
+  where
+  open Container
+
+-- An unfolding lemma for ⟦ C₁ ⊕ C₂ ⟧.
+
+⟦⊕⟧↔ : ∀ {ℓ x} {I O : Set ℓ}
+       (C₁ C₂ : Container I O) {X : Rel x I} {o} →
+       ⟦ C₁ ⊕ C₂ ⟧ X o ↔ ⟦ C₁ ⟧ X o ⊎ ⟦ C₂ ⟧ X o
+⟦⊕⟧↔ C₁ C₂ {X} {o} =
+  ⟦ C₁ ⊕ C₂ ⟧ X o                               ↔⟨⟩
+
+  (∃ λ (s : Shape C₁ o ⊎ Shape C₂ o) →
+   [ Position C₁ , Position C₂ ] s ⊆ X)         ↝⟨ ∃-⊎-distrib-right ⟩
+
+  (∃ λ (s : Shape C₁ o) → Position C₁ s ⊆ X) ⊎
+  (∃ λ (s : Shape C₂ o) → Position C₂ s ⊆ X)    ↔⟨⟩
+
+  ⟦ C₁ ⟧ X o ⊎ ⟦ C₂ ⟧ X o                       □
+  where
+  open Container
+
+-- An unfolding lemma for ⟦ C₁ ⊕ C₂ ⟧₂.
+
+⟦⊕⟧₂↔ :
+  ∀ {ℓ x} {I : Set ℓ} {X : Rel x I}
+  (C₁ C₂ : Container I I) (R : ∀ {i} → Rel₂ ℓ (X i)) {i}
+  (x y : ⟦ C₁ ⊕ C₂ ⟧ X i) →
+
+  ⟦ C₁ ⊕ C₂ ⟧₂ R (x , y)
+
+    ↔
+
+  (curry (⟦ C₁ ⟧₂ R) ⊎-rel curry (⟦ C₂ ⟧₂ R))
+    (_↔_.to (⟦⊕⟧↔ C₁ C₂) x)
+    (_↔_.to (⟦⊕⟧↔ C₁ C₂) y)
+
+⟦⊕⟧₂↔ C₁ C₂ R (inj₁ x , f) (inj₁ y , g) =
+
+  ⟦ C₁ ⊕ C₂ ⟧₂ R ((inj₁ x , f) , (inj₁ y , g))                   ↔⟨⟩
+
+  (∃ λ (eq : inj₁ x ≡ inj₁ y) →
+   ∀ {o} (p : Position C₁ x o) →
+   R ( f p
+     , g (subst (λ s → [_,_] {C = λ _ → Rel _ _}
+                         (Position C₁) (Position C₂) s o) eq p)
+     ))                                                          ↝⟨ inverse $ Σ-cong Bijection.≡↔inj₁≡inj₁ (λ _ → F.id) ⟩
+
+  (∃ λ (eq : x ≡ y) →
+   ∀ {o} (p : Position C₁ x o) →
+   R ( f p
+     , g (subst (λ s → [_,_] {C = λ _ → Rel _ _}
+                         (Position C₁) (Position C₂) s o)
+                         (cong inj₁ eq) p)
+     ))                                                          ↝⟨ (∃-cong λ eq → implicit-∀-cong ext $ ∀-cong ext λ _ →
+                                                                     ≡⇒↝ _ $ cong (λ x → R (_ , g x)) $ sym $
+                                                                     subst-∘ _ _ eq) ⟩
+  (∃ λ (eq : x ≡ y) →
+   ∀ {o} (p : Position C₁ x o) →
+   R ( f p
+     , g (subst (λ s → Position C₁ s o) eq p)
+     ))                                                          ↔⟨⟩
+
+  ⟦ C₁ ⟧₂ R ((x , f) , (y , g))                                  □
+
+  where
+  open Container
+
+⟦⊕⟧₂↔ C₁ C₂ R (inj₁ x , f) (inj₂ y , g) =
+
+  ⟦ C₁ ⊕ C₂ ⟧₂ R ((inj₁ x , f) , (inj₂ y , g))  ↔⟨⟩
+
+  (∃ λ (eq : inj₁ x ≡ inj₂ y) → _)              ↝⟨ inverse $ Σ-cong (inverse Bijection.≡↔⊎) (λ _ → F.id) ⟩
+
+  (∃ λ (eq : ⊥) → _)                            ↝⟨ Σ-left-zero ⟩
+
+  ⊥                                             □
+
+⟦⊕⟧₂↔ C₁ C₂ R (inj₂ x , f) (inj₁ y , g) =
+
+  ⟦ C₁ ⊕ C₂ ⟧₂ R ((inj₂ x , f) , (inj₁ y , g))  ↔⟨⟩
+
+  (∃ λ (eq : inj₂ x ≡ inj₁ y) → _)              ↝⟨ inverse $ Σ-cong (inverse Bijection.≡↔⊎) (λ _ → F.id) ⟩
+
+  (∃ λ (eq : ⊥) → _)                            ↝⟨ Σ-left-zero ⟩
+
+  ⊥                                             □
+
+⟦⊕⟧₂↔ C₁ C₂ R (inj₂ x , f) (inj₂ y , g) =
+
+  ⟦ C₁ ⊕ C₂ ⟧₂ R ((inj₂ x , f) , (inj₂ y , g))                   ↔⟨⟩
+
+  (∃ λ (eq : inj₂ x ≡ inj₂ y) →
+   ∀ {o} (p : Position C₂ x o) →
+   R ( f p
+     , g (subst (λ s → [_,_] {C = λ _ → Rel _ _}
+                         (Position C₁) (Position C₂) s o) eq p)
+     ))                                                          ↝⟨ inverse $ Σ-cong Bijection.≡↔inj₂≡inj₂ (λ _ → F.id) ⟩
+
+  (∃ λ (eq : x ≡ y) →
+   ∀ {o} (p : Position C₂ x o) →
+   R ( f p
+     , g (subst (λ s → [_,_] {C = λ _ → Rel _ _}
+                         (Position C₁) (Position C₂) s o)
+                         (cong inj₂ eq) p)
+     ))                                                          ↝⟨ (∃-cong λ eq → implicit-∀-cong ext $ ∀-cong ext λ _ →
+                                                                     ≡⇒↝ _ $ cong (λ x → R (_ , g x)) $ sym $
+                                                                     subst-∘ _ _ eq) ⟩
+  (∃ λ (eq : x ≡ y) →
+   ∀ {o} (p : Position C₂ x o) →
+   R ( f p
+     , g (subst (λ s → Position C₂ s o) eq p)
+     ))                                                          ↔⟨⟩
+
+  ⟦ C₂ ⟧₂ R ((x , f) , (y , g))                                  □
+
+  where
+  open Container
+
 mutual
 
   -- A combinator that is similar to the function ⟷ from
