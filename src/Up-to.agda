@@ -264,8 +264,7 @@ monotone→extensive→size-preserving⇔compatible′ mono extensive = record
   }
 
 -- The following four lemmas correspond to Pous and Sangiorgi's
--- Proposition 6.3.11 (except that they state the fourth one for
--- arbitrary instead of binary unions).
+-- Proposition 6.3.11.
 
 -- The identity function is size-preserving.
 
@@ -293,6 +292,21 @@ const-size-preserving R⊆∼ _ = R⊆∼
  R ⊆ ν C i        ↝⟨ G-pres ⟩
  G R ⊆ ν C i      ↝⟨ F-pres ⟩□
  F (G R) ⊆ ν C i  □
+
+-- If F is a family of size-preserving transformers, then ⋃ lzero F is
+-- also size-preserving.
+
+⋃-closure :
+  {A : Set ℓ} {F : A → Trans ℓ I} →
+  (∀ a → Size-preserving (F a)) →
+  Size-preserving (⋃ lzero F)
+⋃-closure {F = F} pres {R = R} {i = i} =
+  R ⊆ ν C i                        ↝⟨ (λ R⊆∼ {_} → uncurry λ a →
+
+      F a R                              ⊆⟨ pres a (λ {_} → R⊆∼ {_}) ⟩∎
+      ν C i                              ∎) ⟩□
+
+  (λ b → ∃ λ a → F a R b) ⊆ ν C i  □
 
 -- If F and G are both size-preserving, then
 -- λ R → F R ∪ G R is also size-preserving.
