@@ -222,7 +222,7 @@ module _ {Name : Set} where
     impossible : ∀ {μ P q} {Q : Set q} →
                  ! ! a · [ μ ]⟶ P → μ ≡ τ → Q
     impossible {μ} !!a⟶P μ≡τ = ⊥-elim $ name≢τ
-      (name a  ≡⟨ !-only (!-only ·-only) !!a⟶P ⟩
+      (name a  ≡⟨ !-only (!-only ·!-only) !!a⟶P ⟩
        μ       ≡⟨ μ≡τ ⟩∎
        τ       ∎)
 

@@ -216,7 +216,7 @@ open Bisimilarity.Exercises.Other.CCS.6-1-3-2 (record
   impossible : ∀ {μ P q} {Q : Set q} →
                ! ! a · [ μ ]⟶ P → μ ≡ τ → Q
   impossible {μ} !!a⟶P μ≡τ = ⊥-elim $ name≢τ
-    (name a  ≡⟨ !-only (!-only ·-only) !!a⟶P ⟩
+    (name a  ≡⟨ !-only (!-only ·!-only) !!a⟶P ⟩
      μ       ≡⟨ μ≡τ ⟩∎
      τ       ∎)
 
