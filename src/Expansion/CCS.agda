@@ -9,7 +9,7 @@ module Expansion.CCS {Name : Set} where
 open import Equality.Propositional
 open import Prelude hiding (module W)
 
-open import Function-universe equality-with-J hiding (_∘_)
+open import Function-universe equality-with-J hiding (id; _∘_)
 
 import Bisimilarity.Coinductive.Equational-reasoning-instances
 import Bisimilarity.Exercises.Coinductive.CCS as SE
@@ -32,9 +32,12 @@ import Labelled-transition-system.Equational-reasoning-instances CCS
 
 module Cong-lemmas
   ({R} R′ : Proc ∞ → Proc ∞ → Set)
+  ⦃ _ : Reflexive R ⦄
   ⦃ _ : Reflexive R′ ⦄
+  ⦃ _ : Convertible R R ⦄
   ⦃ _ : Convertible R R′ ⦄
   ⦃ _ : Convertible R′ R′ ⦄
+  ⦃ _ : Transitive′ R _∼_ ⦄
   ⦃ _ : Transitive′ R′ _∼_ ⦄
   ⦃ _ : Transitive _∼_ R′ ⦄
   (right-to-left :
@@ -76,19 +79,31 @@ module Cong-lemmas
 
   rec-cong :
     ∀ {P Q Q′ μ} →
-    R′ (force P) (force Q) → rec Q [ μ ]⟶ Q′ →
+    R (force P) (force Q) → rec Q [ μ ]⟶ Q′ →
     ∃ λ P′ → rec P [ μ ]⇒̂ P′ × R′ P′ Q′
-  rec-cong {P} {Q} P≳Q rec =
-    rec P      →⟨ _[_]⟶_.rec ⟩■
-      ⇒̂[ τ ]′
-    force P    ∼⟨ P≳Q ⟩■
-    force Q
+  rec-cong P≳Q (rec Q⟶Q′) = lemma (right-to-left P≳Q Q⟶Q′)
+    where
+    lemma : ∀ {P Q′ μ} →
+            (∃ λ P′ → force P [ μ ]⇒̂ P′ × R′ P′ Q′) →
+            (∃ λ P′ → rec   P [ μ ]⇒̂ P′ × R′ P′ Q′)
+    lemma {P} {Q′} (_ , silent s done , p) =
+        _
+      , silent s done
+      , (rec P    ∼⟨ SE.rec∼force ⟩
+         force P  ∼⟨ p ⟩■
+         Q′)
+    lemma (_ , silent s (step s′ tr trs) , p) =
+      _ , silent s (step s′ (rec tr) trs) , p
+    lemma (_ , non-silent ¬s (steps done tr trs) , p) =
+      _ , non-silent ¬s (steps done (rec tr) trs) , p
+    lemma (_ , non-silent ¬s (steps (step refl tr₁ trs₁) tr trs₂) , p) =
+      _ , non-silent ¬s (steps (step refl (rec tr₁) trs₁) tr trs₂) , p
 
   ·-cong :
     ∀ {P₁ P₂ Q₂ μ μ′} →
-    R P₁ P₂ → μ · P₂ [ μ′ ]⟶ Q₂ →
+    R′ P₁ P₂ → μ · P₂ [ μ′ ]⟶ Q₂ →
     ∃ λ Q₁ → μ · P₁ [ μ′ ]⇒̂ Q₁ × R′ Q₁ Q₂
-  ·-cong P₁≳P₂ action = _ , ⟶→⇒̂ action , convert P₁≳P₂
+  ·-cong P₁≳P₂ action = _ , ⟶→⇒̂ action , P₁≳P₂
 
   ν-cong :
     (∀ {a P P′} → R′ P P′ → R′ (ν a P) (ν a P′)) →
@@ -225,7 +240,7 @@ module Cong-lemmas
 
   ⊕·-cong :
     ∀ {P Q Q′ S′ μ μ′} →
-    R Q Q′ → P ⊕ μ · Q′ [ μ′ ]⟶ S′ →
+    R′ Q Q′ → P ⊕ μ · Q′ [ μ′ ]⟶ S′ →
     ∃ λ S → P ⊕ μ · Q [ μ′ ]⇒̂ S × R′ S S′
   ⊕·-cong {P} {Q} {Q′} {S′} {μ} {μ′} Q≳Q′ = λ where
     (choice-left P⟶S′) →
@@ -241,7 +256,7 @@ module Cong-lemmas
 
   ·⊕·-cong :
     ∀ {μ₁ μ₂ P₁ P₁′ P₂ P₂′ S′ μ} →
-    R P₁ P₁′ → R P₂ P₂′ → μ₁ · P₁′ ⊕ μ₂ · P₂′ [ μ ]⟶ S′ →
+    R′ P₁ P₁′ → R′ P₂ P₂′ → μ₁ · P₁′ ⊕ μ₂ · P₂′ [ μ ]⟶ S′ →
     ∃ λ S → μ₁ · P₁ ⊕ μ₂ · P₂ [ μ ]⇒̂ S × R′ S S′
   ·⊕·-cong {μ₁} {μ₂} {P₁} {P₁′} {P₂} {P₂′} P₁≳P₁′ P₂≳P₂′ = λ where
     (choice-left action) →
@@ -255,6 +270,63 @@ module Cong-lemmas
         ⇒̂[ μ₂ ]′
       P₂                 ∼⟨ P₂≳P₂′ ⟩■
       P₂′
+
+  []-cong :
+    (∀ {P P′ Q Q′} → R P P′ → R Q Q′ → R (P ∣ Q) (P′ ∣ Q′)) →
+    (∀ {μ μ′ P P′} → μ ≡ μ′ → R′ P P′ → R (μ · P) (μ′ · P′)) →
+    (∀ {a a′ P P′} → a ≡ a′ → R P P′ → R (ν a P) (ν a′ P′)) →
+    (∀ {P P′} → R P P′ → R (! P) (! P′)) →
+    (∀ {P P′} → R (force P) (force P′) → R (rec P) (rec P′)) →
+    (∀ {P μ Q Q′} → R′ Q Q′ → R (P ⊕ μ · Q) (P ⊕ μ · Q′)) →
+    (∀ {P P′ μ Q} → R′ P P′ → R (μ · P ⊕ Q) (μ · P′ ⊕ Q)) →
+    (∀ {μ₁ μ₂ P₁ P₁′ P₂ P₂′} → R′ P₁ P₁′ → R′ P₂ P₂′ →
+     R (μ₁ · P₁ ⊕ μ₂ · P₂) (μ₁ · P₁′ ⊕ μ₂ · P₂′)) →
+    ∀ {n Ps Qs} {C : Context n} →
+    (∀ x → R (Ps x) (Qs x)) → Non-degenerate C →
+    R (C [ Ps ]) (C [ Qs ])
+  []-cong ∣-cong ·-cong ν-cong !-cong rec-cong ⊕·-cong ·⊕-cong ·⊕·-cong
+          {n} {Ps} {Qs} Ps≳Qs = []-cong′
+    where
+    mutual
+
+      []-cong′ : ∀ {C} → Non-degenerate C → R (C [ Ps ]) (C [ Qs ])
+      []-cong′ = λ where
+        hole       → Ps≳Qs _
+        ∅          → reflexive
+        (D₁ ∣ D₂)  → ∣-cong ([]-cong′ D₁) ([]-cong′ D₂)
+        (D₁ ⊕ D₂)  → ⊕-cong D₁ D₂
+        (action D) → ·-cong refl (convert ([]-cong′ D))
+        (ν D)      → ν-cong refl ([]-cong′ D)
+        (! D)      → !-cong ([]-cong′ D)
+        (rec D)    → rec-cong ([]-cong′ D)
+        context    → reflexive
+
+      ⊕-cong :
+        {C₁ C₂ : Context n} →
+        Non-degenerate-summand C₁ →
+        Non-degenerate-summand C₂ →
+        R ((C₁ [ Ps ]) ⊕ (C₂ [ Ps ])) ((C₁ [ Qs ]) ⊕ (C₂ [ Qs ]))
+      ⊕-cong = λ where
+        (process P₁) (process P₂) →
+          (context P₁ [ Ps ]) ⊕ (context P₂ [ Ps ])  ∼⟨⟩
+          P₁ ⊕ P₂                                    ∼⟨⟩
+          (context P₁ [ Qs ]) ⊕ (context P₂ [ Qs ])  ■
+
+        (process P₁) (action {μ = μ₂} {C = C₂} D₂) →
+          (context P₁ [ Ps ]) ⊕ (μ₂ · C₂ [ Ps ])  ∼⟨⟩
+          P₁ ⊕ (μ₂ · C₂ [ Ps ])                   ∼′⟨ ⊕·-cong (convert ([]-cong′ D₂)) ⟩ S.∼:
+          P₁ ⊕ (μ₂ · C₂ [ Qs ])                   ∼⟨⟩
+          (context P₁ [ Qs ]) ⊕ (μ₂ · C₂ [ Qs ])  ■
+
+        (action {μ = μ₁} {C = C₁} D₁) (process P₂) →
+          (μ₁ · C₁ [ Ps ]) ⊕ (context P₂ [ Ps ])  ∼⟨⟩
+          (μ₁ · C₁ [ Ps ]) ⊕ P₂                   ∼′⟨ ·⊕-cong (convert ([]-cong′ D₁)) ⟩ S.∼:
+          (μ₁ · C₁ [ Qs ]) ⊕ P₂                   ∼⟨⟩
+          (μ₁ · C₁ [ Qs ]) ⊕ (context P₂ [ Qs ])  ■
+
+        (action {μ = μ₁} {C = C₁} D₁) (action {μ = μ₂} {C = C₂} D₂) →
+          (μ₁ · C₁ [ Ps ]) ⊕ (μ₂ · C₂ [ Ps ])  ∼⟨ ·⊕·-cong (convert ([]-cong′ D₁)) (convert ([]-cong′ D₂)) ⟩■
+          (μ₁ · C₁ [ Qs ]) ⊕ (μ₂ · C₂ [ Qs ])
 
 private
   module CL {i} = Cong-lemmas [ i ]_≳′_ right-to-left
@@ -298,7 +370,7 @@ mutual
 
 rec-cong :
   ∀ {i P Q} →
-  [ i ] force P ≳′ force Q → [ i ] rec P ≳ rec Q
+  [ i ] force P ≳ force Q → [ i ] rec P ≳ rec Q
 rec-cong {i} {P} {Q} P≳Q =
   ⟨ lr
   , CL.rec-cong P≳Q
@@ -306,23 +378,31 @@ rec-cong {i} {P} {Q} P≳Q =
   where
   lr : ∀ {P′ μ} → rec P [ μ ]⟶ P′ →
        ∃ λ Q′ → rec Q [ μ ]⟶̂ Q′ × [ i ] P′ ≳′ Q′
-  lr rec =
-    force P   ∼⟨ P≳Q ⟩■
-    force Q
-      ⟵̂[ τ ]  ←⟨ _[_]⟶̂_.step rec ⟩■
-    rec Q
+  lr {P′} {μ} (rec tr) =
+    case left-to-right P≳Q tr of λ where
+      (_ , done refl , P′≳′Q) →
+        P′        ∼′⟨ P′≳′Q ⟩ S.∼:
+        force Q   ∼⟨ symmetric SE.rec∼force ⟩■
+        rec Q
+          ⟵̂[ τ ]  ←⟨ _[_]⟶̂_.done refl ⟩■
+        rec Q
+      (Q′ , step Q⟶Q′ , P′≳′Q′) →
+        P′        ∼⟨ P′≳′Q′ ⟩■
+        Q′
+          ⟵̂[ μ ]  ←⟨ _[_]⟶̂_.step (rec Q⟶Q′) ⟩■
+        rec Q
 
 rec-cong′ :
   ∀ {i P Q} →
   [ i ] force P ≳′ force Q → [ i ] rec P ≳′ rec Q
-force (rec-cong′ P≳Q) = rec-cong P≳Q
+force (rec-cong′ P≳Q) = rec-cong (force P≳Q)
 
 -- _·_ preserves the expansion relation.
 
 infix 12 _·-cong_ _·-cong′_
 
 _·-cong_ : ∀ {i μ μ′ P P′} →
-           μ ≡ μ′ → [ i ] P ≳ P′ → [ i ] μ · P ≳ μ′ · P′
+           μ ≡ μ′ → [ i ] P ≳′ P′ → [ i ] μ · P ≳ μ′ · P′
 _·-cong_ {i} {μ} {P = P} {P′} refl P≳P′ = ⟨ lr , CL.·-cong P≳P′ ⟩
   where
   lr : ∀ {Q μ″} →
@@ -332,7 +412,7 @@ _·-cong_ {i} {μ} {P = P} {P′} refl P≳P′ = ⟨ lr , CL.·-cong P≳P′ �
 
 _·-cong′_ : ∀ {i μ μ′ P P′} →
             μ ≡ μ′ → [ i ] P ≳′ P′ → [ i ] μ · P ≳′ μ′ · P′
-force (μ≡μ′ ·-cong′ P≳P′) = μ≡μ′ ·-cong force P≳P′
+force (μ≡μ′ ·-cong′ P≳P′) = μ≡μ′ ·-cong P≳P′
 
 -- _· turns equal actions into processes related by the expansion
 -- relation.
@@ -504,7 +584,7 @@ mutual
 -- Some congruence lemmas for combinations of _⊕_ and _·_.
 
 ⊕·-cong : ∀ {i P μ Q Q′} →
-          [ i ] Q ≳ Q′ → [ i ] P ⊕ μ · Q ≳ P ⊕ μ · Q′
+          [ i ] Q ≳′ Q′ → [ i ] P ⊕ μ · Q ≳ P ⊕ μ · Q′
 ⊕·-cong {i} {P} {μ} {Q} {Q′} Q≳Q′ =
   ⟨ lr , CL.⊕·-cong Q≳Q′ ⟩
   where
@@ -524,11 +604,11 @@ mutual
       P ⊕ μ · Q′
 
 ⊕·-cong′ : ∀ {i P μ Q Q′} →
-           [ i ] Q ≳ Q′ → [ i ] P ⊕ μ · Q ≳′ P ⊕ μ · Q′
+           [ i ] Q ≳′ Q′ → [ i ] P ⊕ μ · Q ≳′ P ⊕ μ · Q′
 force (⊕·-cong′ Q≳Q′) = ⊕·-cong Q≳Q′
 
 ·⊕-cong : ∀ {i P P′ μ Q} →
-          [ i ] P ≳ P′ → [ i ] μ · P ⊕ Q ≳ μ · P′ ⊕ Q
+          [ i ] P ≳′ P′ → [ i ] μ · P ⊕ Q ≳ μ · P′ ⊕ Q
 ·⊕-cong {P = P} {P′} {μ} {Q} P≳P′ =
   μ · P ⊕ Q   ∼⟨ SE.⊕-comm ⟩
   Q ⊕ μ · P   ∼′⟨ ⊕·-cong P≳P′ ⟩ S.∼:
@@ -536,13 +616,13 @@ force (⊕·-cong′ Q≳Q′) = ⊕·-cong Q≳Q′
   μ · P′ ⊕ Q
 
 ·⊕-cong′ : ∀ {i P P′ μ Q} →
-           [ i ] P ≳ P′ → [ i ] μ · P ⊕ Q ≳′ μ · P′ ⊕ Q
+           [ i ] P ≳′ P′ → [ i ] μ · P ⊕ Q ≳′ μ · P′ ⊕ Q
 force (·⊕-cong′ P≳P′) = ·⊕-cong P≳P′
 
 infix 8 _·⊕·-cong_ _·⊕·-cong′_
 
 _·⊕·-cong_ : ∀ {i μ₁ μ₂ P₁ P₁′ P₂ P₂′} →
-             [ i ] P₁ ≳ P₁′ → [ i ] P₂ ≳ P₂′ →
+             [ i ] P₁ ≳′ P₁′ → [ i ] P₂ ≳′ P₂′ →
              [ i ] μ₁ · P₁ ⊕ μ₂ · P₂ ≳ μ₁ · P₁′ ⊕ μ₂ · P₂′
 _·⊕·-cong_ {i} {μ₁} {μ₂} {P₁} {P₁′} {P₂} {P₂′} P₁≳P₁′ P₂≳P₂′ =
   ⟨ lr , CL.·⊕·-cong P₁≳P₁′ P₂≳P₂′ ⟩
@@ -565,61 +645,25 @@ _·⊕·-cong_ {i} {μ₁} {μ₂} {P₁} {P₁′} {P₂} {P₂′} P₁≳P₁
 _·⊕·-cong′_ : ∀ {i μ₁ μ₂ P₁ P₁′ P₂ P₂′} →
               [ i ] P₁ ≳′ P₁′ → [ i ] P₂ ≳′ P₂′ →
               [ i ] μ₁ · P₁ ⊕ μ₂ · P₂ ≳′ μ₁ · P₁′ ⊕ μ₂ · P₂′
-force (P₁≳′P₁′ ·⊕·-cong′ P₂≳′P₂′) =
-  force P₁≳′P₁′ ·⊕·-cong force P₂≳′P₂′
+force (P₁≳′P₁′ ·⊕·-cong′ P₂≳′P₂′) = P₁≳′P₁′ ·⊕·-cong P₂≳′P₂′
 
 -- _[_] preserves the expansion relation for non-degenerate contexts.
 -- (This result is related to Theorem 6.5.25 in "Enhancements of the
 -- bisimulation proof method" by Pous and Sangiorgi.)
 
-mutual
+infix 5 _[_]-cong _[_]-cong′
 
-  infix 5 _[_]-cong _[_]-cong′
+_[_]-cong :
+  ∀ {i n Ps Qs} {C : Context n} →
+  Non-degenerate C → (∀ x → [ i ] Ps x ≳ Qs x) →
+  [ i ] C [ Ps ] ≳ C [ Qs ]
+_[_]-cong =
+  flip $
+    CL.[]-cong _∣-cong_ _·-cong_ ν-cong !-cong_ rec-cong
+               ⊕·-cong ·⊕-cong _·⊕·-cong_
 
-  _[_]-cong :
-    ∀ {i n Ps Qs} {C : Context ∞ n} →
-    Non-degenerate ∞ C → (∀ x → [ i ] Ps x ≳ Qs x) →
-    [ i ] C [ Ps ] ≳ C [ Qs ]
-  hole     [ Ps∼Qs ]-cong = Ps∼Qs _
-  ∅        [ Ps∼Qs ]-cong = reflexive
-  D₁ ∣ D₂  [ Ps∼Qs ]-cong = (D₁ [ Ps∼Qs ]-cong) ∣-cong (D₂ [ Ps∼Qs ]-cong)
-  action D [ Ps∼Qs ]-cong = refl ·-cong (D [ Ps∼Qs ]-cong)
-  ν D      [ Ps∼Qs ]-cong = ν-cong refl (D [ Ps∼Qs ]-cong)
-  ! D      [ Ps∼Qs ]-cong = !-cong (D [ Ps∼Qs ]-cong)
-  rec D    [ Ps∼Qs ]-cong = rec-cong
-                              (force D [ (λ x → convert (Ps∼Qs x)) ]-cong′)
-  D₁ ⊕ D₂  [ Ps∼Qs ]-cong = ⊕-cong Ps∼Qs D₁ D₂
-    where
-    ⊕-cong :
-      ∀ {i n Ps Qs} {C₁ C₂ : Context ∞ n} →
-      (∀ x → [ i ] Ps x ≳ Qs x) →
-      Non-degenerate-summand ∞ C₁ →
-      Non-degenerate-summand ∞ C₂ →
-      [ i ] (C₁ [ Ps ]) ⊕ (C₂ [ Ps ]) ≳ (C₁ [ Qs ]) ⊕ (C₂ [ Qs ])
-    ⊕-cong {Ps = Ps} {Qs} Ps∼Qs = λ where
-      (process P₁) (process P₂) →
-        (context P₁ [ Ps ]) ⊕ (context P₂ [ Ps ])  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁) SE.⊕-cong SE.≡→∼ (context-[] P₂)) ⟩
-        P₁ ⊕ P₂                                    ∼⟨ SE.≡→∼ (context-[] P₁) SE.⊕-cong SE.≡→∼ (context-[] P₂) ⟩■
-        (context P₁ [ Qs ]) ⊕ (context P₂ [ Qs ])
-
-      (process P₁) (action {μ = μ₂} {C = C₂} D₂) →
-        (context P₁ [ Ps ]) ⊕ (μ₂ · C₂ [ Ps ])  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁)) SE.⊕-cong (_ ■) ⟩
-        P₁ ⊕ (μ₂ · C₂ [ Ps ])                   ∼′⟨ ⊕·-cong (D₂ [ Ps∼Qs ]-cong) ⟩ S.∼:
-        P₁ ⊕ (μ₂ · C₂ [ Qs ])                   ∼⟨ SE.≡→∼ (context-[] P₁) SE.⊕-cong (_ ■) ⟩■
-        (context P₁ [ Qs ]) ⊕ (μ₂ · C₂ [ Qs ])
-
-      (action {μ = μ₁} {C = C₁} D₁) (process P₂) →
-        (μ₁ · C₁ [ Ps ]) ⊕ (context P₂ [ Ps ])  ∼⟨ (_ ■) SE.⊕-cong symmetric (SE.≡→∼ (context-[] P₂)) ⟩
-        (μ₁ · C₁ [ Ps ]) ⊕ P₂                   ∼′⟨ ·⊕-cong (D₁ [ Ps∼Qs ]-cong) ⟩ S.∼:
-        (μ₁ · C₁ [ Qs ]) ⊕ P₂                   ∼⟨ (_ ■) SE.⊕-cong SE.≡→∼ (context-[] P₂) ⟩■
-        (μ₁ · C₁ [ Qs ]) ⊕ (context P₂ [ Qs ])
-
-      (action {μ = μ₁} {C = C₁} D₁) (action {μ = μ₂} {C = C₂} D₂) →
-        (μ₁ · C₁ [ Ps ]) ⊕ (μ₂ · C₂ [ Ps ])  ∼⟨ (D₁ [ Ps∼Qs ]-cong) ·⊕·-cong (D₂ [ Ps∼Qs ]-cong) ⟩■
-        (μ₁ · C₁ [ Qs ]) ⊕ (μ₂ · C₂ [ Qs ])
-
-  _[_]-cong′ :
-    ∀ {i n Ps Qs} {C : Context ∞ n} →
-    Non-degenerate ∞ C → (∀ x → [ i ] Ps x ≳′ Qs x) →
-    [ i ] C [ Ps ] ≳′ C [ Qs ]
-  force (C [ Ps≳Qs ]-cong′) = C [ (λ x → force (Ps≳Qs x)) ]-cong
+_[_]-cong′ :
+  ∀ {i n Ps Qs} {C : Context n} →
+  Non-degenerate C → (∀ x → [ i ] Ps x ≳′ Qs x) →
+  [ i ] C [ Ps ] ≳′ C [ Qs ]
+force (C [ Ps≳Qs ]-cong′) = C [ (λ x → force (Ps≳Qs x)) ]-cong

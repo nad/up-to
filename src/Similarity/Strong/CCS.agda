@@ -44,13 +44,13 @@ mutual
 
 rec-cong :
   ∀ {i P Q} →
-  [ i ] force P ≤′ force Q → [ i ] rec P ≤ rec Q
+  [ i ] force P ≤ force Q → [ i ] rec P ≤ rec Q
 rec-cong {i} P≤Q = ⟨ CL.rec-cong {i = i} P≤Q ⟩
 
 rec-cong′ :
   ∀ {i P Q} →
   [ i ] force P ≤′ force Q → [ i ] rec P ≤′ rec Q
-force (rec-cong′ P≤Q) = rec-cong P≤Q
+force (rec-cong′ P≤Q) = rec-cong (force P≤Q)
 
 -- _⊕_ preserves similarity.
 
@@ -69,12 +69,12 @@ force (P≤P′ ⊕-cong′ Q≤Q′) = force P≤P′ ⊕-cong force Q≤Q′
 infix 12 _·-cong_ _·-cong′_
 
 _·-cong_ : ∀ {i μ μ′ P P′} →
-           μ ≡ μ′ → [ i ] P ≤ P′ → [ i ] μ · P ≤ μ′ · P′
-_·-cong_ {i} {μ} {P = P} {P′} refl P≤P′ = ⟨ CL.·-cong P≤P′ ⟩
+           μ ≡ μ′ → [ i ] P ≤′ P′ → [ i ] μ · P ≤ μ′ · P′
+_·-cong_ {i} refl P≤P′ = ⟨ CL.·-cong {i = i} P≤P′ ⟩
 
 _·-cong′_ : ∀ {i μ μ′ P P′} →
             μ ≡ μ′ → [ i ] P ≤′ P′ → [ i ] μ · P ≤′ μ′ · P′
-force (μ≡μ′ ·-cong′ P≤P′) = μ≡μ′ ·-cong force P≤P′
+force (μ≡μ′ ·-cong′ P≤P′) = μ≡μ′ ·-cong P≤P′
 
 -- _· turns equal actions into similar processes.
 
@@ -113,28 +113,20 @@ mutual
 
 -- _[_] preserves similarity.
 
-mutual
+infix 5 _[_]-cong _[_]-cong′
 
-  infix 5 _[_]-cong _[_]-cong′
+_[_]-cong :
+  ∀ {i n Ps Qs}
+  (C : Context n) → (∀ x → [ i ] Ps x ≤ Qs x) →
+  [ i ] C [ Ps ] ≤ C [ Qs ]
+_[_]-cong =
+  CL.[]-cong _∣-cong_ _⊕-cong_ _·-cong_ ν-cong !-cong_ rec-cong
 
-  _[_]-cong :
-    ∀ {i n Ps Qs}
-    (C : Context ∞ n) → (∀ x → [ i ] Ps x ≤ Qs x) →
-    [ i ] C [ Ps ] ≤ C [ Qs ]
-  hole x  [ Ps≤Qs ]-cong = Ps≤Qs x
-  ∅       [ Ps≤Qs ]-cong = reflexive
-  C₁ ∣ C₂ [ Ps≤Qs ]-cong = (C₁ [ Ps≤Qs ]-cong) ∣-cong (C₂ [ Ps≤Qs ]-cong)
-  C₁ ⊕ C₂ [ Ps≤Qs ]-cong = (C₁ [ Ps≤Qs ]-cong) ⊕-cong (C₂ [ Ps≤Qs ]-cong)
-  μ · C   [ Ps≤Qs ]-cong = refl ·-cong (C [ Ps≤Qs ]-cong)
-  ν a C   [ Ps≤Qs ]-cong = ν-cong refl (C [ Ps≤Qs ]-cong)
-  ! C     [ Ps≤Qs ]-cong = !-cong (C [ Ps≤Qs ]-cong)
-  rec C   [ Ps≤Qs ]-cong = rec-cong (force C [ (λ x → convert (Ps≤Qs x)) ]-cong′)
-
-  _[_]-cong′ :
-    ∀ {i n Ps Qs}
-    (C : Context ∞ n) → (∀ x → [ i ] Ps x ≤′ Qs x) →
-    [ i ] C [ Ps ] ≤′ C [ Qs ]
-  force (C [ Ps≤Qs ]-cong′) = C [ (λ x → force (Ps≤Qs x)) ]-cong
+_[_]-cong′ :
+  ∀ {i n Ps Qs}
+  (C : Context n) → (∀ x → [ i ] Ps x ≤′ Qs x) →
+  [ i ] C [ Ps ] ≤′ C [ Qs ]
+force (C [ Ps≤Qs ]-cong′) = C [ (λ x → force (Ps≤Qs x)) ]-cong
 
 ------------------------------------------------------------------------
 -- Other results

@@ -30,7 +30,7 @@ open import Bisimilarity.Up-to CCS
 Up-to-context : Trans₂ (# 0) (Proc ∞)
 Up-to-context R (p , q) =
   ∃ λ n →
-  ∃ λ (C : Context ∞ n) →
+  ∃ λ (C : Context n) →
   ∃ λ ps →
   ∃ λ qs →
   p ≡ C [ ps ]
@@ -101,14 +101,14 @@ Up-to-context-size-preserving =
   ¬!ab[S]!ac : ¬ Up-to-context S (! name a · (b ·) , ! name a · (c ·))
   ¬!ab[S]!ac (n , C , Ps , Qs , !ab≡C[Ps] , !ac≡C[Qs] , PsSQs) =
 
-                                    $⟨ Matches-[] C ⟩
-    Matches ∞ (C [ Ps ]) C          ↝⟨ subst (flip (Matches ∞) C) (sym !ab≡C[Ps]) ⟩
-    Matches ∞ (! name a · (b ·)) C  ↝⟨ helper ⟩□
-    ⊥                               □
+                                  $⟨ Matches-[] C ⟩
+    Matches (C [ Ps ]) C          ↝⟨ subst (flip Matches C) (sym !ab≡C[Ps]) ⟩
+    Matches (! name a · (b ·)) C  ↝⟨ helper ⟩□
+    ⊥                             □
 
     where
 
-    helper : ¬ Matches ∞ (! name a · (b ·)) C
+    helper : ¬ Matches (! name a · (b ·)) C
 
     helper (hole x) = case PsSQs x of λ where
       (_ , Ps[x]∼!ab∣b , _ , base , _) →
@@ -145,8 +145,35 @@ Up-to-context-size-preserving =
         (∃ λ P′ → ∅ [ name b ]⟶ P′)    ↝⟨ (λ ()) ∘ proj₂ ⟩□
         ⊥                              □
 
-    helper (! action (action ∅)) =
-                                           $⟨ !ac≡C[Qs] ⟩
+    -- There is lots of code duplication below due to some Agda
+    -- performance bug which made Agda very slow when I tried to move
+    -- some of the code to a lemma.
+
+    helper (! action (action ∅)) =         $⟨ !ac≡C[Qs] ⟩
+      ! name a · (c ·) ≡ C [ Qs ]          ↔⟨⟩
+      ! name a · (c ·) ≡ ! name a · (b ·)  ↝⟨ cong (λ { (! (_ · name x · _)) → x; _ → a }) ⟩
+      c ≡ b                                ↝⟨ a≢b ⟩
+      ⊥                                    □
+
+    helper context =                       $⟨ !ac≡C[Qs] ⟩
+      ! name a · (c ·) ≡ C [ Qs ]          ↔⟨⟩
+      ! name a · (c ·) ≡ ! name a · (b ·)  ↝⟨ cong (λ { (! (_ · name x · _)) → x; _ → a }) ⟩
+      c ≡ b                                ↝⟨ a≢b ⟩
+      ⊥                                    □
+
+    helper (! context) =                   $⟨ !ac≡C[Qs] ⟩
+      ! name a · (c ·) ≡ C [ Qs ]          ↔⟨⟩
+      ! name a · (c ·) ≡ ! name a · (b ·)  ↝⟨ cong (λ { (! (_ · name x · _)) → x; _ → a }) ⟩
+      c ≡ b                                ↝⟨ a≢b ⟩
+      ⊥                                    □
+
+    helper (! action context) =            $⟨ !ac≡C[Qs] ⟩
+      ! name a · (c ·) ≡ C [ Qs ]          ↔⟨⟩
+      ! name a · (c ·) ≡ ! name a · (b ·)  ↝⟨ cong (λ { (! (_ · name x · _)) → x; _ → a }) ⟩
+      c ≡ b                                ↝⟨ a≢b ⟩
+      ⊥                                    □
+
+    helper (! action (action context)) =   $⟨ !ac≡C[Qs] ⟩
       ! name a · (c ·) ≡ C [ Qs ]          ↔⟨⟩
       ! name a · (c ·) ≡ ! name a · (b ·)  ↝⟨ cong (λ { (! (_ · name x · _)) → x; _ → a }) ⟩
       c ≡ b                                ↝⟨ a≢b ⟩

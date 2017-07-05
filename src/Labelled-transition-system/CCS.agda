@@ -74,7 +74,7 @@ data _[_]⟶_ : Proc ∞ → Action → Proc ∞ → Set where
   restriction  : ∀ {P P′ a μ} →
                  a ∉ μ → P [ μ ]⟶ P′ → ν a P [ μ ]⟶ ν a P′
   replication  : ∀ {P P′ μ} → ! P ∣ P [ μ ]⟶ P′ → ! P [ μ ]⟶ P′
-  rec          : ∀ {P} → rec P [ τ ]⟶ force P
+  rec          : ∀ {P P′ μ} → force P [ μ ]⟶ P′ → rec P [ μ ]⟶ P′
 
 pattern par-τ {P} {P′} {Q} {Q′} {a} tr₁ tr₂ =
   par-τ′ {P} {P′} {Q} {Q′} {a} refl tr₁ tr₂
@@ -92,107 +92,71 @@ CCS = record
 
 open LTS CCS public hiding (Proc; _[_]⟶_)
 
-mutual
+-- Polyadic contexts.
 
-  -- Polyadic contexts.
-
-  data Context (i : Size) (n : ℕ) : Set where
-    hole    : (x : Fin n) → Context i n
-    ∅       : Context i n
-    _∣_ _⊕_ : Context i n → Context i n → Context i n
-    _·_     : (μ : Action) → Context i n → Context i n
-    ν       : (a : Name) → Context i n → Context i n
-    !_      : Context i n → Context i n
-    rec     : Context′ i n → Context i n
-
-  record Context′ (i : Size) (n : ℕ) : Set where
-    coinductive
-    field
-      force : {j : Size< i} → Context j n
-
-open Context′ public
+data Context (n : ℕ) : Set where
+  hole    : (x : Fin n) → Context n
+  ∅       : Context n
+  _∣_ _⊕_ : Context n → Context n → Context n
+  _·_     : (μ : Action) → Context n → Context n
+  ν       : (a : Name) → Context n → Context n
+  !_      : Context n → Context n
+  rec     : Context n → Context n
+  context : Proc ∞ → Context n
 
 -- Hole filling.
 
-_[_] : ∀ {i n} → Context i n → (Fin n → Proc ∞) → Proc i
-hole x  [ Ps ] = Ps x
-∅       [ Ps ] = ∅
-C₁ ∣ C₂ [ Ps ] = (C₁ [ Ps ]) ∣ (C₂ [ Ps ])
-C₁ ⊕ C₂ [ Ps ] = (C₁ [ Ps ]) ⊕ (C₂ [ Ps ])
-μ · C   [ Ps ] = μ · (C [ Ps ])
-ν a C   [ Ps ] = ν a (C [ Ps ])
-! C     [ Ps ] = ! (C [ Ps ])
-rec C   [ Ps ] = rec λ { .force → force C [ Ps ] }
+_[_] : ∀ {i n} → Context n → (Fin n → Proc ∞) → Proc i
+hole x    [ Ps ] = Ps x
+∅         [ Ps ] = ∅
+C₁ ∣ C₂   [ Ps ] = (C₁ [ Ps ]) ∣ (C₂ [ Ps ])
+C₁ ⊕ C₂   [ Ps ] = (C₁ [ Ps ]) ⊕ (C₂ [ Ps ])
+μ · C     [ Ps ] = μ · (C [ Ps ])
+ν a C     [ Ps ] = ν a (C [ Ps ])
+! C       [ Ps ] = ! (C [ Ps ])
+rec C     [ Ps ] = rec λ { .force → C [ Ps ] }
+context P [ Ps ] = P
 
-mutual
+-- Weakly guarded contexts.
 
-  -- Weakly guarded contexts.
-
-  data Weakly-guarded (i : Size) {n : ℕ} : Context ∞ n → Set where
-    ∅      : Weakly-guarded i ∅
-    _∣_    : ∀ {C₁ C₂} →
-             Weakly-guarded i C₁ → Weakly-guarded i C₂ →
-             Weakly-guarded i (C₁ ∣ C₂)
-    _⊕_    : ∀ {C₁ C₂} →
-             Weakly-guarded i C₁ → Weakly-guarded i C₂ →
-             Weakly-guarded i (C₁ ⊕ C₂)
-    action : ∀ {μ C} → Weakly-guarded i (μ · C)
-    ν      : ∀ {a C} → Weakly-guarded i C → Weakly-guarded i (ν a C)
-    !_     : ∀ {C} → Weakly-guarded i C → Weakly-guarded i (! C)
-    rec    : ∀ {C} → Weakly-guarded′ i (force C) →
-             Weakly-guarded i (rec C)
-
-  record Weakly-guarded′
-           (i : Size) {n : ℕ} (C : Context ∞ n) : Set where
-    coinductive
-    field
-      force : {j : Size< i} → Weakly-guarded j C
-
-open Weakly-guarded′ public
-
--- Turns processes into contexts without holes.
-
-context : ∀ {i n} → Proc i → Context i n
-context ∅         = ∅
-context (P₁ ∣ P₂) = context P₁ ∣ context P₂
-context (P₁ ⊕ P₂) = context P₁ ⊕ context P₂
-context (μ · P)   = μ · context P
-context (ν a P)   = ν a (context P)
-context (! P)     = ! context P
-context (rec P)   = rec λ { .force → context (force P) }
+data Weakly-guarded {n : ℕ} : Context n → Set where
+  ∅       : Weakly-guarded ∅
+  _∣_     : ∀ {C₁ C₂} →
+            Weakly-guarded C₁ → Weakly-guarded C₂ →
+            Weakly-guarded (C₁ ∣ C₂)
+  _⊕_     : ∀ {C₁ C₂} →
+            Weakly-guarded C₁ → Weakly-guarded C₂ →
+            Weakly-guarded (C₁ ⊕ C₂)
+  action  : ∀ {μ C} → Weakly-guarded (μ · C)
+  ν       : ∀ {a C} → Weakly-guarded C → Weakly-guarded (ν a C)
+  !_      : ∀ {C} → Weakly-guarded C → Weakly-guarded (! C)
+  rec     : ∀ {C} → Weakly-guarded C → Weakly-guarded (rec C)
+  context : ∀ {P} → Weakly-guarded (context P)
 
 -- Non-degenerate contexts.
 
 mutual
 
-  data Non-degenerate (i : Size) {n : ℕ} : Context ∞ n → Set where
-    hole   : ∀ {x} → Non-degenerate i (hole x)
-    ∅      : Non-degenerate i ∅
-    _∣_    : ∀ {C₁ C₂} →
-             Non-degenerate i C₁ → Non-degenerate i C₂ →
-             Non-degenerate i (C₁ ∣ C₂)
-    _⊕_    : ∀ {C₁ C₂} →
-             Non-degenerate-summand i C₁ →
-             Non-degenerate-summand i C₂ →
-             Non-degenerate i (C₁ ⊕ C₂)
-    action : ∀ {μ C} → Non-degenerate i C → Non-degenerate i (μ · C)
-    ν      : ∀ {a C} → Non-degenerate i C → Non-degenerate i (ν a C)
-    !_     : ∀ {C} → Non-degenerate i C → Non-degenerate i (! C)
-    rec    : ∀ {C} →
-             Non-degenerate′ i (force C) → Non-degenerate i (rec C)
+  data Non-degenerate {n : ℕ} : Context n → Set where
+    hole    : ∀ {x} → Non-degenerate (hole x)
+    ∅       : Non-degenerate ∅
+    _∣_     : ∀ {C₁ C₂} →
+              Non-degenerate C₁ → Non-degenerate C₂ →
+              Non-degenerate (C₁ ∣ C₂)
+    _⊕_     : ∀ {C₁ C₂} →
+              Non-degenerate-summand C₁ →
+              Non-degenerate-summand C₂ →
+              Non-degenerate (C₁ ⊕ C₂)
+    action  : ∀ {μ C} → Non-degenerate C → Non-degenerate (μ · C)
+    ν       : ∀ {a C} → Non-degenerate C → Non-degenerate (ν a C)
+    !_      : ∀ {C} → Non-degenerate C → Non-degenerate (! C)
+    rec     : ∀ {C} → Non-degenerate C → Non-degenerate (rec C)
+    context : ∀ {P} → Non-degenerate (context P)
 
-  data Non-degenerate-summand (i : Size) {n : ℕ} :
-                              Context ∞ n → Set where
-    process : ∀ P → Non-degenerate-summand i (context P)
+  data Non-degenerate-summand {n : ℕ} : Context n → Set where
+    process : ∀ P → Non-degenerate-summand (context P)
     action  : ∀ {μ C} →
-              Non-degenerate i C → Non-degenerate-summand i (μ · C)
-
-  record Non-degenerate′ (i : Size) {n} (C : Context ∞ n) : Set where
-    coinductive
-    field
-      force : {j : Size< i} → Non-degenerate j C
-
-open Non-degenerate′ public
+              Non-degenerate C → Non-degenerate-summand (μ · C)
 
 -- "Very strong" bisimilarity for processes.
 
@@ -345,22 +309,23 @@ names-are-not-inverted {a} {P} {Q} =
 
 6-2-15 :
   ∀ {n Ps μ P}
-  (C : Context ∞ n) → Weakly-guarded ∞ C →
+  (C : Context n) → Weakly-guarded C →
   C [ Ps ] [ μ ]⟶ P →
-  ∃ λ (C′ : Context ∞ n) →
+  ∃ λ (C′ : Context n) →
     P ≡ C′ [ Ps ] × ∀ Qs → C [ Qs ] [ μ ]⟶ C′ [ Qs ]
-6-2-15 ∅         ∅         ()
-6-2-15 (C₁ ∣ C₂) (w₁ ∣ w₂) (par-left  tr)       = Σ-map (_∣ C₂) (Σ-map (cong (_∣ _)) (par-left  ∘_)) (6-2-15 C₁ w₁ tr)
-6-2-15 (C₁ ∣ C₂) (w₁ ∣ w₂) (par-right tr)       = Σ-map (C₁ ∣_) (Σ-map (cong (_ ∣_)) (par-right ∘_)) (6-2-15 C₂ w₂ tr)
-6-2-15 (C₁ ∣ C₂) (w₁ ∣ w₂) (par-τ tr₁ tr₂)      = Σ-zip _∣_ (Σ-zip (cong₂ _)
-                                                                   (λ trs₁ trs₂ Qs → par-τ (trs₁ Qs) (trs₂ Qs)))
-                                                    (6-2-15 C₁ w₁ tr₁) (6-2-15 C₂ w₂ tr₂)
-6-2-15 (C₁ ⊕ C₂) (w₁ ⊕ w₂) (choice-left  tr)    = Σ-map id (Σ-map id (choice-left  ∘_)) (6-2-15 C₁ w₁ tr)
-6-2-15 (C₁ ⊕ C₂) (w₁ ⊕ w₂) (choice-right tr)    = Σ-map id (Σ-map id (choice-right ∘_)) (6-2-15 C₂ w₂ tr)
-6-2-15 (μ · C)   action    action               = C , refl , λ _ → action
-6-2-15 (ν a C)   (ν w)     (restriction a∉μ tr) = Σ-map (ν a) (Σ-map (cong _) (restriction a∉μ ∘_)) (6-2-15 C w tr)
-6-2-15 (! C)     (! w)     (replication tr)     = Σ-map id (Σ-map id (replication ∘_)) (6-2-15 (! C ∣ C) (! w ∣ w) tr)
-6-2-15 (rec C)   (rec w)   rec                  = force C , refl , λ _ → rec
+6-2-15 ∅           ∅         ()
+6-2-15 (C₁ ∣ C₂)   (w₁ ∣ w₂) (par-left  tr)       = Σ-map (_∣ C₂) (Σ-map (cong (_∣ _)) (par-left  ∘_)) (6-2-15 C₁ w₁ tr)
+6-2-15 (C₁ ∣ C₂)   (w₁ ∣ w₂) (par-right tr)       = Σ-map (C₁ ∣_) (Σ-map (cong (_ ∣_)) (par-right ∘_)) (6-2-15 C₂ w₂ tr)
+6-2-15 (C₁ ∣ C₂)   (w₁ ∣ w₂) (par-τ tr₁ tr₂)      = Σ-zip _∣_ (Σ-zip (cong₂ _)
+                                                                     (λ trs₁ trs₂ Qs → par-τ (trs₁ Qs) (trs₂ Qs)))
+                                                      (6-2-15 C₁ w₁ tr₁) (6-2-15 C₂ w₂ tr₂)
+6-2-15 (C₁ ⊕ C₂)   (w₁ ⊕ w₂) (choice-left  tr)    = Σ-map id (Σ-map id (choice-left  ∘_)) (6-2-15 C₁ w₁ tr)
+6-2-15 (C₁ ⊕ C₂)   (w₁ ⊕ w₂) (choice-right tr)    = Σ-map id (Σ-map id (choice-right ∘_)) (6-2-15 C₂ w₂ tr)
+6-2-15 (μ · C)     action    action               = C , refl , λ _ → action
+6-2-15 (ν a C)     (ν w)     (restriction a∉μ tr) = Σ-map (ν a) (Σ-map (cong _) (restriction a∉μ ∘_)) (6-2-15 C w tr)
+6-2-15 (! C)       (! w)     (replication tr)     = Σ-map id (Σ-map id (replication ∘_)) (6-2-15 (! C ∣ C) (! w ∣ w) tr)
+6-2-15 (rec C)     (rec w)   (rec tr)             = Σ-map id (Σ-map id (rec ∘_)) (6-2-15 C w tr)
+6-2-15 (context P) context   tr                   = context _ , refl , λ _ → tr
 
 -- Very strong bisimilarity is reflexive.
 
@@ -375,79 +340,60 @@ Proc-refl (rec P)   = rec λ { .force → Proc-refl (force P) }
 
 -- Weakening of contexts.
 
-weaken : ∀ {i n} → Context i n → Context i (suc n)
-weaken (hole x)  = hole (fsuc x)
-weaken ∅         = ∅
-weaken (C₁ ∣ C₂) = weaken C₁ ∣ weaken C₂
-weaken (C₁ ⊕ C₂) = weaken C₁ ⊕ weaken C₂
-weaken (μ · C)   = μ · weaken C
-weaken (ν a C)   = ν a (weaken C)
-weaken (! C)     = ! weaken C
-weaken (rec C)   = rec λ { .force → weaken (force C) }
+weaken : ∀ {n} → Context n → Context (suc n)
+weaken (hole x)    = hole (fsuc x)
+weaken ∅           = ∅
+weaken (C₁ ∣ C₂)   = weaken C₁ ∣ weaken C₂
+weaken (C₁ ⊕ C₂)   = weaken C₁ ⊕ weaken C₂
+weaken (μ · C)     = μ · weaken C
+weaken (ν a C)     = ν a (weaken C)
+weaken (! C)       = ! weaken C
+weaken (rec C)     = rec (weaken C)
+weaken (context P) = context P
 
 -- A lemma relating weakening and hole filling.
 
 weaken-[] :
-  ∀ {i n ps} (C : Context ∞ n) →
+  ∀ {i n ps} (C : Context n) →
   Equal i (weaken C [ ps ]) (C [ ps ∘ fsuc ])
-weaken-[] (hole x)  = Proc-refl _
-weaken-[] ∅         = ∅
-weaken-[] (C₁ ∣ C₂) = weaken-[] C₁ ∣ weaken-[] C₂
-weaken-[] (C₁ ⊕ C₂) = weaken-[] C₁ ⊕ weaken-[] C₂
-weaken-[] (μ · C)   = refl · weaken-[] C
-weaken-[] (ν a C)   = ν refl (weaken-[] C)
-weaken-[] (! C)     = ! weaken-[] C
-weaken-[] (rec C)   = rec λ { .force → weaken-[] (force C) }
+weaken-[] (hole x)    = Proc-refl _
+weaken-[] ∅           = ∅
+weaken-[] (C₁ ∣ C₂)   = weaken-[] C₁ ∣ weaken-[] C₂
+weaken-[] (C₁ ⊕ C₂)   = weaken-[] C₁ ⊕ weaken-[] C₂
+weaken-[] (μ · C)     = refl · weaken-[] C
+weaken-[] (ν a C)     = ν refl (weaken-[] C)
+weaken-[] (! C)       = ! weaken-[] C
+weaken-[] (rec C)     = rec λ { .force → weaken-[] C }
+weaken-[] (context P) = Proc-refl _
 
--- The result of filling the holes in the context "context P" is P.
+-- A relation expressing that a certain process matches a certain
+-- context.
 
-context-[] : ∀ {i n} {Ps : Fin n → Proc ∞} P →
-             Equal i P (context P [ Ps ])
-context-[] ∅         = ∅
-context-[] (P₁ ∣ P₂) = context-[] P₁ ∣ context-[] P₂
-context-[] (P₁ ⊕ P₂) = context-[] P₁ ⊕ context-[] P₂
-context-[] (μ · P)   = refl · context-[] P
-context-[] (ν a P)   = ν refl (context-[] P)
-context-[] (! P)     = ! (context-[] P)
-context-[] (rec P)   = rec λ { .force → context-[] (force P) }
-
-mutual
-
-  -- A relation expressing that a certain process matches a certain
-  -- context.
-
-  data Matches (i : Size) {n} : Proc ∞ → Context ∞ n → Set where
-    hole   : ∀ {P} (x : Fin n) → Matches i P (hole x)
-    ∅      : Matches i ∅ ∅
-    _∣_    : ∀ {P₁ P₂ C₁ C₂} →
-             Matches i P₁ C₁ → Matches i P₂ C₂ →
-             Matches i (P₁ ∣ P₂) (C₁ ∣ C₂)
-    _⊕_    : ∀ {P₁ P₂ C₁ C₂} →
-             Matches i P₁ C₁ → Matches i P₂ C₂ →
-             Matches i (P₁ ⊕ P₂) (C₁ ⊕ C₂)
-    action : ∀ {μ P C} → Matches i P C → Matches i (μ · P) (μ · C)
-    ν      : ∀ {a P C} → Matches i P C → Matches i (ν a P) (ν a C)
-    !_     : ∀ {P C} → Matches i P C → Matches i (! P) (! C)
-    rec    : ∀ {P C} →
-             Matches′ i (force P) (force C) → Matches i (rec P) (rec C)
-
-  record Matches′
-           (i : Size) {n} (P : Proc ∞) (C : Context ∞ n) : Set where
-    coinductive
-    field
-      force : {j : Size< i} → Matches j P C
-
-open Matches′ public
+data Matches {n} : Proc ∞ → Context n → Set where
+  hole    : ∀ {P} (x : Fin n) → Matches P (hole x)
+  ∅       : Matches ∅ ∅
+  _∣_     : ∀ {P₁ P₂ C₁ C₂} →
+            Matches P₁ C₁ → Matches P₂ C₂ →
+            Matches (P₁ ∣ P₂) (C₁ ∣ C₂)
+  _⊕_     : ∀ {P₁ P₂ C₁ C₂} →
+            Matches P₁ C₁ → Matches P₂ C₂ →
+            Matches (P₁ ⊕ P₂) (C₁ ⊕ C₂)
+  action  : ∀ {μ P C} → Matches P C → Matches (μ · P) (μ · C)
+  ν       : ∀ {a P C} → Matches P C → Matches (ν a P) (ν a C)
+  !_      : ∀ {P C} → Matches P C → Matches (! P) (! C)
+  rec     : ∀ {P C} → Matches (force P) C → Matches (rec P) (rec C)
+  context : ∀ {P} → Matches P (context P)
 
 -- The process obtained by filling a context's holes matches the
 -- context.
 
-Matches-[] : ∀ {i n Ps} (C : Context ∞ n) → Matches i (C [ Ps ]) C
-Matches-[] (hole x)  = hole x
-Matches-[] ∅         = ∅
-Matches-[] (C₁ ∣ C₂) = Matches-[] C₁ ∣ Matches-[] C₂
-Matches-[] (C₁ ⊕ C₂) = Matches-[] C₁ ⊕ Matches-[] C₂
-Matches-[] (μ · C)   = action (Matches-[] C)
-Matches-[] (ν a C)   = ν (Matches-[] C)
-Matches-[] (! C)     = ! Matches-[] C
-Matches-[] (rec C)   = rec λ { .force → Matches-[] (force C) }
+Matches-[] : ∀ {n Ps} (C : Context n) → Matches (C [ Ps ]) C
+Matches-[] (hole x)    = hole x
+Matches-[] ∅           = ∅
+Matches-[] (C₁ ∣ C₂)   = Matches-[] C₁ ∣ Matches-[] C₂
+Matches-[] (C₁ ⊕ C₂)   = Matches-[] C₁ ⊕ Matches-[] C₂
+Matches-[] (μ · C)     = action (Matches-[] C)
+Matches-[] (ν a C)     = ν (Matches-[] C)
+Matches-[] (! C)       = ! Matches-[] C
+Matches-[] (rec C)     = rec (Matches-[] C)
+Matches-[] (context P) = context

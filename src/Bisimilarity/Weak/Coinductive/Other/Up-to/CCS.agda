@@ -30,8 +30,8 @@ import Labelled-transition-system.Equational-reasoning-instances CCS
 Up-to-context : Trans₂ (# 0) (Proc ∞)
 Up-to-context R (p , q) =
   ∃ λ n →
-  ∃ λ (C : Context ∞ n) →
-  Non-degenerate ∞ C
+  ∃ λ (C : Context n) →
+  Non-degenerate C
     ×
   ∃ λ ps →
   ∃ λ qs →
@@ -101,13 +101,20 @@ Up-to-context-size-preserving =
   drop-[] (_ , hole i , _ , _ , _ , P∣Q≡Ps[i] , !S≡Qs[i] , PsRQs) =
     subst R (cong₂ _,_ (sym P∣Q≡Ps[i]) (sym !S≡Qs[i])) (PsRQs i)
 
-  drop-[] (_ , ∅     , _ , _ , _ , () , _)
-  drop-[] (_ , _ ∣ _ , _ , _ , _ , _  , () , _)
-  drop-[] (_ , _ ⊕ _ , _ , _ , _ , () , _)
-  drop-[] (_ , _ · _ , _ , _ , _ , () , _)
-  drop-[] (_ , ν _ _ , _ , _ , _ , () , _)
-  drop-[] (_ , ! _   , _ , _ , _ , () , _)
-  drop-[] (_ , rec _ , _ , _ , _ , () , _)
+  drop-[] (_ , ∅               , _ , _ , _ , () , _)
+  drop-[] (_ , _ ∣ _           , _ , _ , _ , _  , () , _)
+  drop-[] (_ , _ ⊕ _           , _ , _ , _ , () , _)
+  drop-[] (_ , _ · _           , _ , _ , _ , () , _)
+  drop-[] (_ , ν _ _           , _ , _ , _ , () , _)
+  drop-[] (_ , ! _             , _ , _ , _ , () , _)
+  drop-[] (_ , rec _           , _ , _ , _ , () , _)
+  drop-[] (_ , context ∅       , _ , _ , _ , () , _)
+  drop-[] (_ , context (_ ∣ _) , _ , _ , _ , _ , () , _)
+  drop-[] (_ , context (_ ⊕ _) , _ , _ , _ , () , _)
+  drop-[] (_ , context (_ · _) , _ , _ , _ , () , _)
+  drop-[] (_ , context (ν _ _) , _ , _ , _ , () , _)
+  drop-[] (_ , context (! _)   , _ , _ , _ , () , _)
+  drop-[] (_ , context (rec _) , _ , _ , _ , () , _)
 
   R⊆StepR : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ R
   R⊆StepR (inj₁ base) = ⟨ lr , rl ⟩
