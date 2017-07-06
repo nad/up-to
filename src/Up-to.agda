@@ -347,6 +347,11 @@ companion-size-preserving {R} {i} R⊆ {o} =
   (∀ {i} → R ⊆ ν C i → ν C i o)  ↝⟨ (λ hyp → hyp R⊆) ⟩□
   ν C i o                        □
 
+-- The companion is an up-to technique.
+
+companion-up-to : Up-to-technique Companion
+companion-up-to = size-preserving→up-to companion-size-preserving
+
 -- Every size-preserving function is contained in the companion.
 
 size-preserving⊆companion :
