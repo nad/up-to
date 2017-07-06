@@ -1277,3 +1277,28 @@ module _ (a b : Name-with-kind) where
 
     C∼D : ∀ {i} → [ i ] C ∼ D
     C∼D = refl ·!-cong λ { .force → A∼B ∣-cong C∼D }
+
+------------------------------------------------------------------------
+-- Some other examples
+
+Restricted : Name → Proc ∞
+Restricted a = ν a (name (a , true) · ∅)
+
+Restricted∼∅ : ∀ {a} → Restricted a ∼ ∅
+Restricted∼∅ =
+  ⟨ (λ { (restriction x≢x action) → ⊥-elim (x≢x refl) })
+  , (λ ())
+  ⟩
+
+module _ (a : Name) (μ : Action) where
+
+  P : ∀ {i} → Proc i
+  P = Restricted a ∣ (μ ·! λ { .force → P })
+
+  Q : ∀ {i} → Proc i
+  Q = μ ·! λ { .force → Q }
+
+  P∼Q : ∀ {i} → [ i ] P ∼ Q
+  P∼Q = P      ∼⟨ Restricted∼∅ ∣-cong (refl ·!-cong λ { .force → P∼Q }) ⟩
+        ∅ ∣ Q  ∼⟨ ∣-left-identity ⟩■
+        Q
