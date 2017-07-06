@@ -356,13 +356,6 @@ size-preserving⊆companion {F} pres R {o} FR {i} =
   F R ⊆ ν C i  ↝⟨ (λ hyp → hyp FR) ⟩□
   ν C i o      □
 
--- I have not checked all details, but it seems as if Parrow and Weber
--- work in set theory and use classical reasoning to prove that the
--- companion is the largest monotone and compatible function. I don't
--- know if this result holds in constructive type theory. In
--- particular, I don't know how to prove that the companion is
--- compatible.
-
 -- Every "partial" fixpoint ν C i is a pre-fixpoint of the companion.
 
 companion-ν⊆ν : ∀ {i} → Companion (ν C i) ⊆ ν C i
@@ -454,9 +447,7 @@ companion′-monotone : ∀ {R S} → R ⊆ S → Companion′ R ⊆ Companion�
 companion′-monotone R⊆S =
   ∃-cong λ _ → ∃-cong λ mono → ∃-cong λ _ → mono R⊆S
 
--- Pous' variant of the companion is contained in Parrow and Weber's.
---
--- I don't know if the other direction is provable (constructively).
+-- Pous' variant of the companion is contained in Companion.
 
 companion′⊆companion : ∀ {R} → Companion′ R ⊆ Companion R
 companion′⊆companion {R} {o} =
@@ -464,6 +455,32 @@ companion′⊆companion {R} {o} =
   (∃ λ F → (Monotone F × Compatible F) × F R o)  ↝⟨ ∃-cong (λ _ → uncurry monotone→compatible→size-preserving ×-cong id) ⟩
   (∃ λ F → Size-preserving F × F R o)            ↝⟨ (λ { (_ , pres , FR) → size-preserving⊆companion pres _ FR }) ⟩□
   Companion R o                                  □
+
+-- The other direction holds iff Companion is compatible.
+--
+-- However, I don't know if this is provable (constructively).
+
+companion-compatible⇔companion⊆companion′ :
+  Compatible Companion ⇔ (∀ {R} → Companion R ⊆ Companion′ R)
+companion-compatible⇔companion⊆companion′ = record
+  { to   = λ comp  f → Companion , companion-monotone , comp , f
+  ; from = λ below R →
+             Companion (⟦ C ⟧ R)   ⊆⟨ below ⟩
+
+             Companion′ (⟦ C ⟧ R)  ⊆⟨ (λ { (F , mono , comp , x) → (_$ x) (
+
+                 F (⟦ C ⟧ R)            ⊆⟨ comp _ ⟩
+
+                 ⟦ C ⟧ (F R)            ⊆⟨ map C (
+
+                     F R                     ⊆⟨ (λ y → F , (λ {_ _} → mono) , comp , y) ⟩
+                     Companion′ R            ⊆⟨ companion′⊆companion ⟩∎
+                     Companion R             ∎) ⟩∎
+
+                 ⟦ C ⟧ (Companion R)     ∎) }) ⟩∎
+
+             ⟦ C ⟧ (Companion R)   ∎
+  }
 
 -- If "one half of f-symmetry" holds for R, for some involution f,
 -- then the other half also holds.
