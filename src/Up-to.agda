@@ -173,6 +173,10 @@ size-preserving→up-to {F} pres = size-preserving→up-to′
 -- Note that size-preserving relation transformers are not necessarily
 -- monotone (or extensive), see
 -- Bisimilarity.Up-to.Counterexamples.¬size-preserving→monotone⊎extensive.
+--
+-- Furthermore there are transformers F that satisfy the property
+-- ∀ {i} → F (ν C i) ⊆ ν C i that are not size-preserving, see
+-- Bisimilarity.Up-to.Counterexamples.¬special-case-of-size-preserving→size-preserving.
 
 monotone→⇔ :
   {F : Trans ℓ I} →

@@ -212,13 +212,14 @@ coinductive-bisimilarity-is-not-propositional =
     force (proof′ b b₁ b₂) = proof b b₁ b₂
 
 -- In fact, for every type A there is a pointwise split surjection
--- from a certain instance of bisimilarity to equality on A.
+-- from a certain instance of bisimilarity (of any size) to equality
+-- on A.
 
 bisimilarity↠equality :
   {A : Set} →
   let open Bisimilarity.Coinductive (bisimilarity⇔equality A) in
-  {p q : A} → p ∼ q ↠ p ≡ q
-bisimilarity↠equality {A} = record
+  ∀ {i} {p q : A} → ([ i ] p ∼ q) ↠ p ≡ q
+bisimilarity↠equality {A} {i} = record
   { logical-equivalence = record
     { to   = to
     ; from = from
@@ -228,11 +229,11 @@ bisimilarity↠equality {A} = record
   where
   open Bisimilarity.Coinductive (bisimilarity⇔equality A)
 
-  to : ∀ {p q} → p ∼ q → p ≡ q
+  to : ∀ {p q} → [ i ] p ∼ q → p ≡ q
   to p∼q with left-to-right p∼q (refl , refl)
   ... | _ , (refl , _) , _ = refl
 
-  from : ∀ {p q} → p ≡ q → p ∼ q
+  from : ∀ {p q} → p ≡ q → [ i ] p ∼ q
   from refl = reflexive
 
   to∘from : ∀ {p q} (p≡q : p ≡ q) → to (from p≡q) ≡ p≡q

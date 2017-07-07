@@ -11,11 +11,14 @@ open import Logical-equivalence using (_⇔_)
 open import Prelude
 
 open import Bijection equality-with-J using (_↔_)
+open import Equality.Decision-procedures equality-with-J
 open import Fin equality-with-J
 open import Function-universe equality-with-J hiding (id; _∘_)
+open import Surjection equality-with-J using (_↠_)
 
-open import Indexed-container using (⟦_⟧; force)
+open import Indexed-container using (Container; ν; ⟦_⟧; force)
 open import Labelled-transition-system
+import Up-to
 
 import Bisimilarity.Classical
 import Bisimilarity.Coinductive
@@ -79,6 +82,39 @@ private
 
   F-pres : Size-preserving F
   F-pres _ _ = total
+
+-- Relation transformers F that satisfy ∀ {i} → F (ν C i) ⊆ ν C i are
+-- not necessarily size-preserving.
+
+¬special-case-of-size-preserving→size-preserving :
+  ∃ λ (I : Set) →
+  ∃ λ (C : Container I I) →
+  ¬ ((F : Trans (# 0) I) →
+     (∀ {i} → F (ν C i) ⊆ ν C i) → Up-to.Size-preserving C F)
+¬special-case-of-size-preserving→size-preserving =
+    (Bool × Bool)
+  , S̲t̲e̲p̲
+  , ((∀ F → (∀ {i} → F (Bisimilarity i) ⊆ Bisimilarity i) →
+      Size-preserving F)                                                  ↝⟨ _$ G ⟩
+
+     ((∀ {i} → G (Bisimilarity i) ⊆ Bisimilarity i) → Size-preserving G)  ↝⟨ _$ (_$ _↠_.from bisimilarity↠equality refl) ⟩
+
+     Size-preserving G                                                    ↝⟨ _$ (λ ()) ⟩
+
+     G (λ _ → ⊥) ⊆ Bisimilarity ∞                                         ↝⟨ _$ (λ ()) ⟩
+
+     Bisimilarity ∞ (true , false)                                        ↝⟨ _↠_.to bisimilarity↠equality ⟩
+
+     true ≡ false                                                         ↝⟨ Bool.true≢false ⟩□
+
+     ⊥                                                                    □)
+  where
+  lts = bisimilarity⇔equality Bool
+
+  open Combination lts
+
+  G : Trans₂ (# 0) Bool
+  G R p = R (true , true) → R p
 
 -- Monotone, extensive, size-preserving relation transformers are not
 -- necessarily compatible.
