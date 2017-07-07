@@ -16,7 +16,6 @@ module Bisimilarity.Coinductive.General
          where
 
 open import Equality.Propositional hiding (Extensionality)
-open import Interval using (ext)
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 

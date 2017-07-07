@@ -14,7 +14,6 @@ module Bisimilarity.Step
          where
 
 open import Equality.Propositional
-open import Interval using (ext)
 open import Prelude
 
 open import Bijection equality-with-J using (_↔_)
