@@ -84,6 +84,75 @@ private
   F-pres _ _ = total
 
 -- Relation transformers F that satisfy ∀ {i} → F (ν C i) ⊆ ν C i are
+-- not necessarily up-to techniques.
+
+¬special-case-of-size-preserving→up-to :
+  ∃ λ (I : Set) →
+  ∃ λ (C : Container I I) →
+  ¬ ((F : Trans (# 0) I) →
+     (∀ {i} → F (ν C i) ⊆ ν C i) → Up-to.Up-to-technique C F)
+¬special-case-of-size-preserving→up-to =
+    (Proc × Proc)
+  , S̲t̲e̲p̲
+  , ((∀ F → (∀ {i} → F (Bisimilarity i) ⊆ Bisimilarity i) →
+      Up-to-technique F)                                                  ↝⟨ _$ G ⟩
+
+     ((∀ {i} → G (Bisimilarity i) ⊆ Bisimilarity i) → Up-to-technique G)  ↝⟨ _$ bisimilarity-pre-fixpoint ⟩
+
+     Up-to-technique G                                                    ↝⟨ (λ up-to → up-to) ⟩
+
+     (S ⊆ ⟦ S̲t̲e̲p̲ ⟧ (G S) → S ⊆ Bisimilarity ∞)                            ↝⟨ (λ hyp below → hyp (_↔_.to Step↔S̲t̲e̲p̲ ∘ below)) ⟩
+
+     (S ⊆ Step (G S) → S ⊆ Bisimilarity ∞)                                ↝⟨ _$ S⊆StepGS ⟩
+
+     S ⊆ Bisimilarity ∞                                                   ↝⟨ _$ pq ⟩
+
+     Bisimilarity ∞ (p , q)                                               ↝⟨ p≁q ⟩□
+
+     ⊥                                                                    □)
+
+  where
+
+  data Proc : Set where
+    p q r : Proc
+
+  data _⟶_ : Proc → Proc → Set where
+    p : p ⟶ p
+    q : q ⟶ r
+
+  lts = record
+    { Proc    = Proc
+    ; Label   = ⊤
+    ; Silent  = λ _ → ⊥
+    ; silent? = λ _ → no λ ()
+    ; _[_]⟶_  = λ p _ q → p ⟶ q
+    }
+
+  open Combination lts hiding (Proc)
+
+  G : Trans₂ (# 0) Proc
+  G R x = R (r , r) → ¬ R (p , r) → R x
+
+  p≁r : ∀ {i} → ¬ Bisimilarity i (p , r)
+  p≁r hyp with left-to-right hyp p
+  ... | _ , () , _
+
+  bisimilarity-pre-fixpoint :
+    ∀ {i} → G (Bisimilarity i) ⊆ Bisimilarity i
+  bisimilarity-pre-fixpoint hyp = hyp reflexive p≁r
+
+  data S : Rel₂ (# 0) Proc where
+    pq : S (p , q)
+
+  S⊆StepGS : S ⊆ Step (G S)
+  Step.left-to-right (S⊆StepGS pq) p = r , q , λ ()
+  Step.right-to-left (S⊆StepGS pq) q = p , p , λ ()
+
+  p≁q : ¬ Bisimilarity ∞ (p , q)
+  p≁q hyp with left-to-right hyp p
+  ... | r , q , p∼r = p≁r (force p∼r)
+
+-- Relation transformers F that satisfy ∀ {i} → F (ν C i) ⊆ ν C i are
 -- not necessarily size-preserving.
 
 ¬special-case-of-size-preserving→size-preserving :
@@ -92,29 +161,17 @@ private
   ¬ ((F : Trans (# 0) I) →
      (∀ {i} → F (ν C i) ⊆ ν C i) → Up-to.Size-preserving C F)
 ¬special-case-of-size-preserving→size-preserving =
-    (Bool × Bool)
-  , S̲t̲e̲p̲
-  , ((∀ F → (∀ {i} → F (Bisimilarity i) ⊆ Bisimilarity i) →
-      Size-preserving F)                                                  ↝⟨ _$ G ⟩
+  case ¬special-case-of-size-preserving→up-to of λ where
+    (I , C , ¬→up-to) →
+      let open Up-to C in
+        I , C
+      , (((F : Trans (# 0) I) →
+          (∀ {i} → F (ν C i) ⊆ ν C i) → Up-to.Size-preserving C F)  ↝⟨ (λ hyp F pres → size-preserving→up-to (hyp F pres)) ⟩
 
-     ((∀ {i} → G (Bisimilarity i) ⊆ Bisimilarity i) → Size-preserving G)  ↝⟨ _$ (_$ _↠_.from bisimilarity↠equality refl) ⟩
+         ((F : Trans (# 0) I) →
+          (∀ {i} → F (ν C i) ⊆ ν C i) → Up-to.Up-to-technique C F)  ↝⟨ ¬→up-to ⟩□
 
-     Size-preserving G                                                    ↝⟨ _$ (λ ()) ⟩
-
-     G (λ _ → ⊥) ⊆ Bisimilarity ∞                                         ↝⟨ _$ (λ ()) ⟩
-
-     Bisimilarity ∞ (true , false)                                        ↝⟨ _↠_.to bisimilarity↠equality ⟩
-
-     true ≡ false                                                         ↝⟨ Bool.true≢false ⟩□
-
-     ⊥                                                                    □)
-  where
-  lts = bisimilarity⇔equality Bool
-
-  open Combination lts
-
-  G : Trans₂ (# 0) Bool
-  G R p = R (true , true) → R p
+         ⊥                                                          □)
 
 -- Monotone, extensive, size-preserving relation transformers are not
 -- necessarily compatible.

@@ -175,8 +175,8 @@ size-preserving→up-to {F} pres = size-preserving→up-to′
 -- Bisimilarity.Up-to.Counterexamples.¬size-preserving→monotone⊎extensive.
 --
 -- Furthermore there are transformers F that satisfy the property
--- ∀ {i} → F (ν C i) ⊆ ν C i that are not size-preserving, see
--- Bisimilarity.Up-to.Counterexamples.¬special-case-of-size-preserving→size-preserving.
+-- ∀ {i} → F (ν C i) ⊆ ν C i that are not up-to techniques, see
+-- Bisimilarity.Up-to.Counterexamples.¬special-case-of-size-preserving→up-to.
 
 monotone→⇔ :
   {F : Trans ℓ I} →
