@@ -1,10 +1,21 @@
 ------------------------------------------------------------------------
--- Experiments related to bisimilarity
+-- Code related to the paper "Up-to Techniques Using Sized Types"
 --
 -- Nils Anders Danielsson
 ------------------------------------------------------------------------
 
+{-# OPTIONS --without-K #-}
+
 module README where
+
+------------------------------------------------------------------------
+-- Pointers to results from the paper
+
+-- In order to more easily find code corresponding to results from the
+-- paper, see the following module. Note that some of the code
+-- referenced below is not discussed at all in the paper.
+
+import README.Pointers-to-results-from-the-paper
 
 ------------------------------------------------------------------------
 -- Some preliminaries

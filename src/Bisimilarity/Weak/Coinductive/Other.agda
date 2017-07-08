@@ -12,9 +12,11 @@ open import Prelude
 
 import Bisimilarity.Coinductive
 import Bisimilarity.Coinductive.Equational-reasoning-instances
+import Bisimilarity.Coinductive.General
 open import Equational-reasoning
 import Expansion
 import Expansion.Equational-reasoning-instances
+open import Relation
 
 open LTS lts
 private
@@ -23,23 +25,44 @@ private
   open module E = Expansion lts
     using (_≳_; _≳′_; _≲_; [_]_≳_; [_]_≳′_)
 
-open import Bisimilarity.Coinductive.General
-              lts _[_]⇒̂_ _[_]⇒̂_ ⟶→⇒̂ ⟶→⇒̂ public
+private
+  module General =
+    Bisimilarity.Coinductive.General lts _[_]⇒̂_ _[_]⇒̂_ ⟶→⇒̂ ⟶→⇒̂
+
+open General public
   using (S̲t̲e̲p̲; ⟨_,_⟩; left-to-right; right-to-left; force;
          [_]_≡_; [_]_≡′_; []≡↔;
          Extensionality; extensionality)
-  renaming ( Bisimilarity to Weak-bisimilarity
-           ; Bisimilarity′ to Weak-bisimilarity′
-           ; [_]_∼_ to [_]_≈_
-           ; [_]_∼′_ to [_]_≈′_
-           ; _∼_ to _≈_
-           ; _∼′_ to _≈′_
-           ; reflexive-∼ to reflexive-≈
+  renaming ( reflexive-∼ to reflexive-≈
            ; reflexive-∼′ to reflexive-≈′
            ; ≡⇒∼ to ≡⇒≈
            ; ∼:_ to ≈:_
            ; ∼′:_ to ≈′:_
            )
+
+-- Some definitions are given in the following way, rather than via
+-- open public, to make hyperlinks to these definitions more
+-- informative.
+
+Weak-bisimilarity : Size → Rel₂ (# 0) Proc
+Weak-bisimilarity = General.Bisimilarity
+
+Weak-bisimilarity′ : Size → Rel₂ (# 0) Proc
+Weak-bisimilarity′ = General.Bisimilarity′
+
+infix 4 _≈_ _≈′_ [_]_≈_ [_]_≈′_
+
+[_]_≈_ : Size → Proc → Proc → Set
+[_]_≈_ = General.[_]_∼_
+
+[_]_≈′_ : Size → Proc → Proc → Set
+[_]_≈′_ = General.[_]_∼′_
+
+_≈_ : Proc → Proc → Set
+_≈_ = General._∼_
+
+_≈′_ : Proc → Proc → Set
+_≈′_ = General._∼′_
 
 -- Combinators that can perhaps make the code a bit nicer to read.
 

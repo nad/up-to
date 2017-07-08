@@ -15,30 +15,53 @@ open import Prelude
 
 import Bisimilarity.Coinductive
 import Bisimilarity.Coinductive.Equational-reasoning-instances
+import Bisimilarity.Coinductive.General
 open import Equational-reasoning
+open import Relation
 
 open LTS lts
 private
   open module SB = Bisimilarity.Coinductive lts
     using (_∼_; _∼′_; [_]_∼_; [_]_∼′_)
 
-open import Bisimilarity.Coinductive.General
-              lts _[_]⟶̂_ _[_]⇒̂_ ⟶→⟶̂ ⟶→⇒̂ public
+private
+  module General =
+    Bisimilarity.Coinductive.General lts _[_]⟶̂_ _[_]⇒̂_ ⟶→⟶̂ ⟶→⇒̂
+
+open General public
   using (S̲t̲e̲p̲; ⟨_,_⟩; left-to-right; right-to-left; force;
          [_]_≡_; [_]_≡′_; []≡↔;
          Extensionality; extensionality)
-  renaming ( Bisimilarity to Expansion
-           ; Bisimilarity′ to Expansion′
-           ; [_]_∼_ to [_]_≳_
-           ; [_]_∼′_ to [_]_≳′_
-           ; _∼_ to _≳_
-           ; _∼′_ to _≳′_
-           ; reflexive-∼ to reflexive-≳
+  renaming ( reflexive-∼ to reflexive-≳
            ; reflexive-∼′ to reflexive-≳′
            ; ≡⇒∼ to ≡⇒≳
            ; ∼:_ to ≳:_
            ; ∼′:_ to ≳′:_
            )
+
+-- Some definitions are given in the following way, rather than via
+-- open public, to make hyperlinks to these definitions more
+-- informative.
+
+Expansion : Size → Rel₂ (# 0) Proc
+Expansion = General.Bisimilarity
+
+Expansion′ : Size → Rel₂ (# 0) Proc
+Expansion′ = General.Bisimilarity′
+
+infix 4 _≳_ _≳′_ [_]_≳_ [_]_≳′_
+
+[_]_≳_ : Size → Proc → Proc → Set
+[_]_≳_ = General.[_]_∼_
+
+[_]_≳′_ : Size → Proc → Proc → Set
+[_]_≳′_ = General.[_]_∼′_
+
+_≳_ : Proc → Proc → Set
+_≳_ = General._∼_
+
+_≳′_ : Proc → Proc → Set
+_≳′_ = General._∼′_
 
 -- The converse relation.
 

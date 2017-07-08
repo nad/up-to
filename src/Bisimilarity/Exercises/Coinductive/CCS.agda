@@ -288,18 +288,30 @@ private
 ------------------------------------------------------------------------
 -- Exercise 6.1.3 (2), plus some rearrangement lemmas
 
-open Bisimilarity.Exercises.Other.CCS.6-1-3-2 (record
-       { _∼_       = _∼_
-       ; step-∼    = step-∼
-       ; finally-∼ = Equational-reasoning.finally₂
-       ; reflexive = reflexive
-       ; symmetric = symmetric
-       ; ∣-comm    = ∣-comm
-       ; ∣-assoc   = ∣-assoc
-       ; _∣-cong_  = _∣-cong_
-       ; 6-1-2     = 6-1-2
-       })
-       public using (swap-rightmost; 6-1-3-2)
+private
+  module 6-1-3-2 = Bisimilarity.Exercises.Other.CCS.6-1-3-2 (record
+    { _∼_       = _∼_
+    ; step-∼    = step-∼
+    ; finally-∼ = Equational-reasoning.finally₂
+    ; reflexive = reflexive
+    ; symmetric = symmetric
+    ; ∣-comm    = ∣-comm
+    ; ∣-assoc   = ∣-assoc
+    ; _∣-cong_  = _∣-cong_
+    ; 6-1-2     = 6-1-2
+    })
+
+6-1-3-2 :
+  ∀ {μ P P₀} →
+  ! P [ μ ]⟶ P₀ →
+  (∃ λ P′ → P [ μ ]⟶ P′ × P₀ ∼ ! P ∣ P′)
+    ⊎
+  (μ ≡ τ × ∃ λ P′ → ∃ λ P″ → ∃ λ a →
+   P [ name a ]⟶ P′ × P [ name (co a) ]⟶ P″ × P₀ ∼ (! P ∣ P′) ∣ P″)
+6-1-3-2 = 6-1-3-2.6-1-3-2
+
+swap-rightmost : ∀ {P Q R} → (P ∣ Q) ∣ R ∼ (P ∣ R) ∣ Q
+swap-rightmost = 6-1-3-2.swap-rightmost
 
 swap-in-the-middle : ∀ {P Q R S} →
                      (P ∣ Q) ∣ (R ∣ S) ∼ (P ∣ R) ∣ (Q ∣ S)

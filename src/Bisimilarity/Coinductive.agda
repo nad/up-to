@@ -10,10 +10,41 @@ module Bisimilarity.Coinductive (lts : LTS) where
 
 open import Prelude
 
+import Bisimilarity.Coinductive.General
+open import Relation
+
 open LTS lts
 
-open import Bisimilarity.Coinductive.General
-              lts _[_]⟶_ _[_]⟶_ id id public
+private
+  module General =
+    Bisimilarity.Coinductive.General lts _[_]⟶_ _[_]⟶_ id id
+
+open General public
+  hiding (Bisimilarity; Bisimilarity′; [_]_∼_; [_]_∼′_; _∼_; _∼′_)
+
+-- Some definitions are given in the following way, rather than via
+-- open public, to make hyperlinks to these definitions more
+-- informative.
+
+Bisimilarity : Size → Rel₂ (# 0) Proc
+Bisimilarity = General.Bisimilarity
+
+Bisimilarity′ : Size → Rel₂ (# 0) Proc
+Bisimilarity′ = General.Bisimilarity′
+
+infix 4 _∼_ _∼′_ [_]_∼_ [_]_∼′_
+
+[_]_∼_ : Size → Proc → Proc → Set
+[_]_∼_ = General.[_]_∼_
+
+[_]_∼′_ : Size → Proc → Proc → Set
+[_]_∼′_ = General.[_]_∼′_
+
+_∼_ : Proc → Proc → Set
+_∼_ = General._∼_
+
+_∼′_ : Proc → Proc → Set
+_∼′_ = General._∼′_
 
 -- Combinators that can perhaps make the code a bit nicer to read.
 
