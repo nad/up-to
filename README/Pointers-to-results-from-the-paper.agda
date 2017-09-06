@@ -184,9 +184,9 @@ module Strong-bisimilarity-congruence where
 
 -- The example with P and Q.
 
-P   = Bisimilarity.Exercises.Coinductive.CCS.P
-Q   = Bisimilarity.Exercises.Coinductive.CCS.Q
-P∼Q = Bisimilarity.Exercises.Coinductive.CCS.P∼Q
+P   = Bisimilarity.Exercises.Coinductive.CCS.Another-example.P
+Q   = Bisimilarity.Exercises.Coinductive.CCS.Another-example.Q
+P∼Q = Bisimilarity.Exercises.Coinductive.CCS.Another-example.P∼Q
 
 -- The code uses overloaded equational reasoning combinators.
 

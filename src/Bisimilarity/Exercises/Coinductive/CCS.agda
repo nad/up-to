@@ -1302,7 +1302,7 @@ Restricted∼∅ =
   , (λ ())
   ⟩
 
-module _ (a : Name) (μ : Action) where
+module Another-example (a : Name) (μ : Action) where
 
   P : ∀ {i} → Proc i
   P = Restricted a ∣ (μ ·′ λ { .force → P })
