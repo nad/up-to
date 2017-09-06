@@ -351,7 +351,7 @@ mutual
                 , restriction _   (par-right tr)
                 , _)) →
                                           $⟨ tr ⟩
-      name (co a) · P [ name (co b) ]⟶ _  ↝⟨ cong proj₁ ∘ cancel-name ∘ ·!-only ⟩
+      name (co a) · P [ name (co b) ]⟶ _  ↝⟨ cong proj₁ ∘ cancel-name ∘ ·′-only ⟩
       proj₁ a ≡ proj₁ b                   ↝⟨ a≢b ⟩
       ⊥                                   ↝⟨ ⊥-elim ⟩□
       _                                   □
@@ -361,7 +361,7 @@ mutual
                 , restriction _   (par-left action)
                 , _)) →
                                      $⟨ tr ⟩
-      name (co a) · P [ name c ]⟶ _  ↝⟨ cong proj₁ ∘ cancel-name ∘ ·!-only ⟩
+      name (co a) · P [ name c ]⟶ _  ↝⟨ cong proj₁ ∘ cancel-name ∘ ·′-only ⟩
       proj₁ a ≡ proj₁ c              ↝⟨ a≢c ⟩
       ⊥                              ↝⟨ ⊥-elim ⟩□
       _                              □

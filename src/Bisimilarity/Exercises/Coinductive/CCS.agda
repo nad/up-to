@@ -91,15 +91,15 @@ module Cong-lemmas
           [ μ ]⟵   ←⟨ choice-right P₂′⟶S′ ⟩■
         P₁′ ⊕ P₂′
 
-  ·!-cong :
+  ·′-cong :
     ∀ {P₁ P₂ Q₁ μ μ′} →
-    R′ (force P₁) (force P₂) → μ ·! P₁ [ μ′ ]⟶ Q₁ →
-    ∃ λ Q₂ → μ ·! P₂ [ μ′ ]⟶ Q₂ × R′ Q₁ Q₂
-  ·!-cong {P₁} {P₂} {μ = μ} P₁∼P₂ action =
+    R′ (force P₁) (force P₂) → μ ·′ P₁ [ μ′ ]⟶ Q₁ →
+    ∃ λ Q₂ → μ ·′ P₂ [ μ′ ]⟶ Q₂ × R′ Q₁ Q₂
+  ·′-cong {P₁} {P₂} {μ = μ} P₁∼P₂ action =
     force P₁  ∼⟨ P₁∼P₂ ⟩■
     force P₂
       [ μ ]⟵  ←⟨ _[_]⟶_.action ⟩■
-    μ ·! P₂
+    μ ·′ P₂
 
   ν-cong :
     (∀ {a P P′} → R′ P P′ → R′ (ν a P) (ν a P′)) →
@@ -373,7 +373,7 @@ mutual
 
       (inj₂ (refl , P′ , P″ , c , a⊕b⟶P′ , a⊕b⟶P″ , P∼![a⊕b]∣P′∣P″)) →
         let b≡co-a , P′≡∅ , P″≡∅ = Σ-map id [ id , id ]
-                                     (·!⊕·!-co a⊕b⟶P′ a⊕b⟶P″) in
+                                     (·′⊕·′-co a⊕b⟶P′ a⊕b⟶P″) in
 
         P                          ∼⟨ P∼![a⊕b]∣P′∣P″ ⟩
         (! (a · ⊕ b ·) ∣ P′) ∣ P″  ∼⟨ (reflexive ∣-cong ≡⇒∼ P′≡∅) ∣-cong ≡⇒∼ P″≡∅ ⟩
@@ -439,7 +439,7 @@ mutual
     impossible : ∀ {μ P q} {Q : Set q} →
                  ! ! a · [ μ ]⟶ P → μ ≡ τ → Q
     impossible {μ} !!a⟶P μ≡τ = ⊥-elim $ name≢τ
-      (name a  ≡⟨ !-only (!-only ·!-only) !!a⟶P ⟩
+      (name a  ≡⟨ !-only (!-only ·′-only) !!a⟶P ⟩
        μ       ≡⟨ μ≡τ ⟩∎
        τ       ∎)
 
@@ -526,22 +526,22 @@ _⊕-cong′_ : ∀ {i P P′ Q Q′} →
             [ i ] P ∼′ P′ → [ i ] Q ∼′ Q′ → [ i ] P ⊕ Q ∼′ P′ ⊕ Q′
 force (P∼P′ ⊕-cong′ Q∼Q′) = force P∼P′ ⊕-cong force Q∼Q′
 
--- _·!_ preserves bisimilarity.
+-- _·′_ preserves bisimilarity.
 
-infix 12 _·!-cong_ _·!-cong′_
+infix 12 _·′-cong_ _·′-cong′_
 
-_·!-cong_ :
+_·′-cong_ :
   ∀ {i μ μ′ P P′} →
-  μ ≡ μ′ → [ i ] force P ∼′ force P′ → [ i ] μ ·! P ∼ μ′ ·! P′
-refl ·!-cong P∼P′ =
-  ⟨ CL.·!-cong P∼P′
-  , Σ-map id (Σ-map id symmetric) ∘ CL.·!-cong (symmetric P∼P′)
+  μ ≡ μ′ → [ i ] force P ∼′ force P′ → [ i ] μ ·′ P ∼ μ′ ·′ P′
+refl ·′-cong P∼P′ =
+  ⟨ CL.·′-cong P∼P′
+  , Σ-map id (Σ-map id symmetric) ∘ CL.·′-cong (symmetric P∼P′)
   ⟩
 
-_·!-cong′_ :
+_·′-cong′_ :
   ∀ {i μ μ′ P P′} →
-  μ ≡ μ′ → [ i ] force P ∼′ force P′ → [ i ] μ ·! P ∼′ μ′ ·! P′
-force (μ≡μ′ ·!-cong′ P∼P′) = μ≡μ′ ·!-cong P∼P′
+  μ ≡ μ′ → [ i ] force P ∼′ force P′ → [ i ] μ ·′ P ∼′ μ′ ·′ P′
+force (μ≡μ′ ·′-cong′ P∼P′) = μ≡μ′ ·′-cong P∼P′
 
 -- _·_ preserves bisimilarity.
 
@@ -550,7 +550,7 @@ infix 12 _·-cong_ _·-cong′_
 _·-cong_ :
   ∀ {i μ μ′ P P′} →
   μ ≡ μ′ → [ i ] P ∼ P′ → [ i ] μ · P ∼ μ′ · P′
-refl ·-cong P∼P′ = refl ·!-cong convert P∼P′
+refl ·-cong P∼P′ = refl ·′-cong convert P∼P′
 
 _·-cong′_ :
   ∀ {i μ μ′ P P′} →
@@ -617,7 +617,7 @@ mutual
   ∅       [ Ps∼Qs ]-cong = reflexive
   C₁ ∣ C₂ [ Ps∼Qs ]-cong = (C₁ [ Ps∼Qs ]-cong) ∣-cong (C₂ [ Ps∼Qs ]-cong)
   C₁ ⊕ C₂ [ Ps∼Qs ]-cong = (C₁ [ Ps∼Qs ]-cong) ⊕-cong (C₂ [ Ps∼Qs ]-cong)
-  μ ·! C  [ Ps∼Qs ]-cong = refl ·!-cong λ { .force → force C [ Ps∼Qs ]-cong }
+  μ ·′ C  [ Ps∼Qs ]-cong = refl ·′-cong λ { .force → force C [ Ps∼Qs ]-cong }
   ν a C   [ Ps∼Qs ]-cong = ν-cong refl (C [ Ps∼Qs ]-cong)
   ! C     [ Ps∼Qs ]-cong = !-cong (C [ Ps∼Qs ]-cong)
 
@@ -686,7 +686,7 @@ module _ (ext : Proc-extensionality) where
                                                (lr C₁ Ps∼Qs tr₁) (lr C₂ Ps∼Qs tr₂)
     lr (C₁ ⊕ C₂) Ps∼Qs (choice-left tr)    = Σ-map id (Σ-map choice-left id) (lr C₁ Ps∼Qs tr)
     lr (C₁ ⊕ C₂) Ps∼Qs (choice-right tr)   = Σ-map id (Σ-map choice-right id) (lr C₂ Ps∼Qs tr)
-    lr (μ ·! C)  Ps∼Qs action              = _ , action , force C [ Ps∼Qs ]-cong₂′
+    lr (μ ·′ C)  Ps∼Qs action              = _ , action , force C [ Ps∼Qs ]-cong₂′
     lr (ν a C)   Ps∼Qs (restriction a∉ tr) = Σ-map (ν a) (Σ-map (restriction a∉) (λ b → ν a (hole fzero) [ b ][ Ps∼Qs ]-cong₁)) (lr C Ps∼Qs tr)
     lr (! C)     Ps∼Qs (replication tr)    = Σ-map id (Σ-map replication id) (lr (! C ∣ C) Ps∼Qs tr)
 
@@ -710,7 +710,7 @@ mutual
   ≡→∼ ∅            = reflexive
   ≡→∼ (eq₁ ∣ eq₂)  = ≡→∼ eq₁ ∣-cong ≡→∼ eq₂
   ≡→∼ (eq₁ ⊕ eq₂)  = ≡→∼ eq₁ ⊕-cong ≡→∼ eq₂
-  ≡→∼ (refl ·! eq) = refl ·!-cong ≡→∼′ eq
+  ≡→∼ (refl ·′ eq) = refl ·′-cong ≡→∼′ eq
   ≡→∼ (ν refl eq)  = ν-cong refl (≡→∼ eq)
   ≡→∼ (! eq)       = !-cong ≡→∼ eq
 
@@ -765,7 +765,7 @@ mutual
       (inj₂ ( refl , R′ , R″ , c , aP⊕bQ⟶R′ , aP⊕bQ⟶R″
             , R∼![aP⊕bQ]∣R′∣R″
             )) →
-        let b≡co-a , R′≡,R″≡ = ·!⊕·!-co aP⊕bQ⟶R′ aP⊕bQ⟶R″
+        let b≡co-a , R′≡,R″≡ = ·′⊕·′-co aP⊕bQ⟶R′ aP⊕bQ⟶R″
 
             lemma : _ → [ _ ] _ ∼ _
             lemma = λ where
@@ -1279,8 +1279,8 @@ module _ (a b : Name-with-kind) where
   A = name a · name b · D
   B = name a · name b · C
 
-  C = name (co a) ·! λ { .force → A ∣ C }
-  D = name (co a) ·! λ { .force → B ∣ D }
+  C = name (co a) ·′ λ { .force → A ∣ C }
+  D = name (co a) ·′ λ { .force → B ∣ D }
 
   mutual
 
@@ -1288,7 +1288,7 @@ module _ (a b : Name-with-kind) where
     A∼B = refl ·-cong (refl ·-cong symmetric C∼D)
 
     C∼D : ∀ {i} → [ i ] C ∼ D
-    C∼D = refl ·!-cong λ { .force → A∼B ∣-cong C∼D }
+    C∼D = refl ·′-cong λ { .force → A∼B ∣-cong C∼D }
 
 ------------------------------------------------------------------------
 -- Some other examples
@@ -1305,12 +1305,12 @@ Restricted∼∅ =
 module _ (a : Name) (μ : Action) where
 
   P : ∀ {i} → Proc i
-  P = Restricted a ∣ (μ ·! λ { .force → P })
+  P = Restricted a ∣ (μ ·′ λ { .force → P })
 
   Q : ∀ {i} → Proc i
-  Q = μ ·! λ { .force → Q }
+  Q = μ ·′ λ { .force → Q }
 
   P∼Q : ∀ {i} → [ i ] P ∼ Q
-  P∼Q = P      ∼⟨ Restricted∼∅ ∣-cong (refl ·!-cong λ { .force → P∼Q }) ⟩
+  P∼Q = P      ∼⟨ Restricted∼∅ ∣-cong (refl ·′-cong λ { .force → P∼Q }) ⟩
         ∅ ∣ Q  ∼⟨ ∣-left-identity ⟩■
         Q

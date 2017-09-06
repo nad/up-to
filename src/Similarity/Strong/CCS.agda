@@ -52,19 +52,19 @@ _⊕-cong′_ : ∀ {i P P′ Q Q′} →
             [ i ] P ≤′ P′ → [ i ] Q ≤′ Q′ → [ i ] P ⊕ Q ≤′ P′ ⊕ Q′
 force (P≤P′ ⊕-cong′ Q≤Q′) = force P≤P′ ⊕-cong force Q≤Q′
 
--- _·!_ preserves similarity.
+-- _·′_ preserves similarity.
 
-infix 12 _·!-cong_ _·!-cong′_
+infix 12 _·′-cong_ _·′-cong′_
 
-_·!-cong_ :
+_·′-cong_ :
   ∀ {i μ μ′ P P′} →
-  μ ≡ μ′ → [ i ] force P ≤′ force P′ → [ i ] μ ·! P ≤ μ′ ·! P′
-_·!-cong_ {i} refl P≤P′ = ⟨ CL.·!-cong {i = i} P≤P′ ⟩
+  μ ≡ μ′ → [ i ] force P ≤′ force P′ → [ i ] μ ·′ P ≤ μ′ ·′ P′
+_·′-cong_ {i} refl P≤P′ = ⟨ CL.·′-cong {i = i} P≤P′ ⟩
 
-_·!-cong′_ :
+_·′-cong′_ :
   ∀ {i μ μ′ P P′} →
-  μ ≡ μ′ → [ i ] force P ≤′ force P′ → [ i ] μ ·! P ≤′ μ′ ·! P′
-force (μ≡μ′ ·!-cong′ P≤P′) = μ≡μ′ ·!-cong P≤P′
+  μ ≡ μ′ → [ i ] force P ≤′ force P′ → [ i ] μ ·′ P ≤′ μ′ ·′ P′
+force (μ≡μ′ ·′-cong′ P≤P′) = μ≡μ′ ·′-cong P≤P′
 
 -- _·_ preserves similarity.
 
@@ -72,7 +72,7 @@ infix 12 _·-cong_ _·-cong′_
 
 _·-cong_ : ∀ {i μ μ′ P P′} →
            μ ≡ μ′ → [ i ] P ≤ P′ → [ i ] μ · P ≤ μ′ · P′
-refl ·-cong P≤P′ = refl ·!-cong convert P≤P′
+refl ·-cong P≤P′ = refl ·′-cong convert P≤P′
 
 _·-cong′_ : ∀ {i μ μ′ P P′} →
             μ ≡ μ′ → [ i ] P ≤′ P′ → [ i ] μ · P ≤′ μ′ · P′
@@ -127,7 +127,7 @@ mutual
   ∅       [ Ps≤Qs ]-cong = reflexive
   C₁ ∣ C₂ [ Ps≤Qs ]-cong = (C₁ [ Ps≤Qs ]-cong) ∣-cong (C₂ [ Ps≤Qs ]-cong)
   C₁ ⊕ C₂ [ Ps≤Qs ]-cong = (C₁ [ Ps≤Qs ]-cong) ⊕-cong (C₂ [ Ps≤Qs ]-cong)
-  μ ·! C  [ Ps≤Qs ]-cong = refl ·!-cong λ { .force → force C [ Ps≤Qs ]-cong }
+  μ ·′ C  [ Ps≤Qs ]-cong = refl ·′-cong λ { .force → force C [ Ps≤Qs ]-cong }
   ν a C   [ Ps≤Qs ]-cong = ν-cong refl (C [ Ps≤Qs ]-cong)
   ! C     [ Ps≤Qs ]-cong = !-cong (C [ Ps≤Qs ]-cong)
 
@@ -285,7 +285,7 @@ mutual
     helper : ∀ {P} →
              machine₂ ∣ coffee · [ name tea ]⟶ P →
              pay ≡ tea ⊎ coffee ≡ tea
-    helper (par-right tr) = inj₂ $ cancel-name $ ·!-only tr
+    helper (par-right tr) = inj₂ $ cancel-name $ ·′-only tr
     helper (par-left  tr) =
       inj₁ $ cancel-name $
-        !-only (⊕-only (⊕-only ·!-only ·!-only) ·!-only) tr
+        !-only (⊕-only (⊕-only ·′-only ·′-only) ·′-only) tr

@@ -74,11 +74,11 @@ module Cong-lemmas
                         (right-to-left P₁≳P₂ tr₁)
                         (right-to-left Q₁≳Q₂ tr₂)
 
-  ·!-cong :
+  ·′-cong :
     ∀ {P₁ P₂ Q₂ μ μ′} →
-    R′ (force P₁) (force P₂) → μ ·! P₂ [ μ′ ]⟶ Q₂ →
-    ∃ λ Q₁ → μ ·! P₁ [ μ′ ]⇒̂ Q₁ × R′ Q₁ Q₂
-  ·!-cong P₁≳P₂ action = _ , ⟶→⇒̂ action , P₁≳P₂
+    R′ (force P₁) (force P₂) → μ ·′ P₂ [ μ′ ]⟶ Q₂ →
+    ∃ λ Q₁ → μ ·′ P₁ [ μ′ ]⇒̂ Q₁ × R′ Q₁ Q₂
+  ·′-cong P₁≳P₂ action = _ , ⟶→⇒̂ action , P₁≳P₂
 
   ν-cong :
     (∀ {a P P′} → R′ P P′ → R′ (ν a P) (ν a P′)) →
@@ -213,36 +213,36 @@ module Cong-lemmas
                 (! P′ ∣ P″) ∣ P‴  ∼⟨ symmetric Q′∼!P′∣P″∣P‴ ⟩■
                 Q′
 
-  ⊕·!-cong :
+  ⊕·′-cong :
     ∀ {P Q Q′ S′ μ μ′} →
-    R′ (force Q) (force Q′) → P ⊕ μ ·! Q′ [ μ′ ]⟶ S′ →
-    ∃ λ S → P ⊕ μ ·! Q [ μ′ ]⇒̂ S × R′ S S′
-  ⊕·!-cong {P} {Q} {Q′} {S′} {μ} {μ′} Q≳Q′ = λ where
+    R′ (force Q) (force Q′) → P ⊕ μ ·′ Q′ [ μ′ ]⟶ S′ →
+    ∃ λ S → P ⊕ μ ·′ Q [ μ′ ]⇒̂ S × R′ S S′
+  ⊕·′-cong {P} {Q} {Q′} {S′} {μ} {μ′} Q≳Q′ = λ where
     (choice-left P⟶S′) →
-      P ⊕ μ ·! Q  →⟨ choice-left P⟶S′ ⟩■
+      P ⊕ μ ·′ Q  →⟨ choice-left P⟶S′ ⟩■
         ⇒̂[ μ′ ]′
       S′          ■
 
     (choice-right action) →
-      P ⊕ μ ·! Q  →⟨ choice-right action ⟩■
+      P ⊕ μ ·′ Q  →⟨ choice-right action ⟩■
         ⇒̂[ μ ]′
       force Q     ∼⟨ Q≳Q′ ⟩■
       force Q′
 
-  ·!⊕·!-cong :
+  ·′⊕·′-cong :
     ∀ {μ₁ μ₂ P₁ P₁′ P₂ P₂′ S′ μ} →
     R′ (force P₁) (force P₁′) → R′ (force P₂) (force P₂′) →
-    μ₁ ·! P₁′ ⊕ μ₂ ·! P₂′ [ μ ]⟶ S′ →
-    ∃ λ S → μ₁ ·! P₁ ⊕ μ₂ ·! P₂ [ μ ]⇒̂ S × R′ S S′
-  ·!⊕·!-cong {μ₁} {μ₂} {P₁} {P₁′} {P₂} {P₂′} P₁≳P₁′ P₂≳P₂′ = λ where
+    μ₁ ·′ P₁′ ⊕ μ₂ ·′ P₂′ [ μ ]⟶ S′ →
+    ∃ λ S → μ₁ ·′ P₁ ⊕ μ₂ ·′ P₂ [ μ ]⇒̂ S × R′ S S′
+  ·′⊕·′-cong {μ₁} {μ₂} {P₁} {P₁′} {P₂} {P₂′} P₁≳P₁′ P₂≳P₂′ = λ where
     (choice-left action) →
-      μ₁ ·! P₁ ⊕ μ₂ ·! P₂  →⟨ choice-left action ⟩■
+      μ₁ ·′ P₁ ⊕ μ₂ ·′ P₂  →⟨ choice-left action ⟩■
         ⇒̂[ μ₁ ]′
       force P₁             ∼⟨ P₁≳P₁′ ⟩■
       force P₁′
 
     (choice-right action) →
-      μ₁ ·! P₁ ⊕ μ₂ ·! P₂  →⟨ choice-right action ⟩■
+      μ₁ ·′ P₁ ⊕ μ₂ ·′ P₂  →⟨ choice-right action ⟩■
         ⇒̂[ μ₂ ]′
       force P₂             ∼⟨ P₂≳P₂′ ⟩■
       force P₂′
@@ -285,24 +285,24 @@ mutual
               [ i ] P ≳′ P′ → [ i ] Q ≳′ Q′ → [ i ] P ∣ Q ≳′ P′ ∣ Q′
   force (P≳P′ ∣-cong′ Q≳Q′) = force P≳P′ ∣-cong force Q≳Q′
 
--- _·!_ preserves the expansion relation.
+-- _·′_ preserves the expansion relation.
 
-infix 12 _·!-cong_ _·!-cong′_
+infix 12 _·′-cong_ _·′-cong′_
 
-_·!-cong_ :
+_·′-cong_ :
   ∀ {i μ μ′ P P′} →
-  μ ≡ μ′ → [ i ] force P ≳′ force P′ → [ i ] μ ·! P ≳ μ′ ·! P′
-_·!-cong_ {i} {μ} {P = P} {P′} refl P≳P′ = ⟨ lr , CL.·!-cong P≳P′ ⟩
+  μ ≡ μ′ → [ i ] force P ≳′ force P′ → [ i ] μ ·′ P ≳ μ′ ·′ P′
+_·′-cong_ {i} {μ} {P = P} {P′} refl P≳P′ = ⟨ lr , CL.·′-cong P≳P′ ⟩
   where
   lr : ∀ {Q μ″} →
-       μ ·! P [ μ″ ]⟶ Q →
-       ∃ λ Q′ → μ ·! P′ [ μ″ ]⟶̂ Q′ × [ i ] Q ≳′ Q′
+       μ ·′ P [ μ″ ]⟶ Q →
+       ∃ λ Q′ → μ ·′ P′ [ μ″ ]⟶̂ Q′ × [ i ] Q ≳′ Q′
   lr action = _ , ⟶→⟶̂ action , P≳P′
 
-_·!-cong′_ :
+_·′-cong′_ :
   ∀ {i μ μ′ P P′} →
-  μ ≡ μ′ → [ i ] force P ≳′ force P′ → [ i ] μ ·! P ≳′ μ′ ·! P′
-force (μ≡μ′ ·!-cong′ P≳P′) = μ≡μ′ ·!-cong P≳P′
+  μ ≡ μ′ → [ i ] force P ≳′ force P′ → [ i ] μ ·′ P ≳′ μ′ ·′ P′
+force (μ≡μ′ ·′-cong′ P≳P′) = μ≡μ′ ·′-cong P≳P′
 
 -- _·_ preserves the expansion relation.
 
@@ -310,7 +310,7 @@ infix 12 _·-cong_ _·-cong′_
 
 _·-cong_ : ∀ {i μ μ′ P P′} →
            μ ≡ μ′ → [ i ] P ≳ P′ → [ i ] μ · P ≳ μ′ · P′
-refl ·-cong P≳P′ = refl ·!-cong convert P≳P′
+refl ·-cong P≳P′ = refl ·′-cong convert P≳P′
 
 _·-cong′_ : ∀ {i μ μ′ P P′} →
             μ ≡ μ′ → [ i ] P ≳′ P′ → [ i ] μ · P ≳′ μ′ · P′
@@ -483,73 +483,73 @@ mutual
   (∀ {P Q Q′} → Q ≳ Q′ → P ⊕ Q ≈ P ⊕ Q′)  ↝⟨ ¬⊕-congʳ-≳≈ x ⟩□
   ⊥                                       □
 
--- Some congruence lemmas for combinations of _⊕_ and _·!_.
+-- Some congruence lemmas for combinations of _⊕_ and _·′_.
 
-⊕·!-cong : ∀ {i P μ Q Q′} →
-           [ i ] force Q ≳′ force Q′ → [ i ] P ⊕ μ ·! Q ≳ P ⊕ μ ·! Q′
-⊕·!-cong {i} {P} {μ} {Q} {Q′} Q≳Q′ =
-  ⟨ lr , CL.⊕·!-cong Q≳Q′ ⟩
+⊕·′-cong : ∀ {i P μ Q Q′} →
+           [ i ] force Q ≳′ force Q′ → [ i ] P ⊕ μ ·′ Q ≳ P ⊕ μ ·′ Q′
+⊕·′-cong {i} {P} {μ} {Q} {Q′} Q≳Q′ =
+  ⟨ lr , CL.⊕·′-cong Q≳Q′ ⟩
   where
   lr : ∀ {R μ′} →
-       P ⊕ μ ·! Q [ μ′ ]⟶ R →
-       ∃ λ R′ → P ⊕ μ ·! Q′ [ μ′ ]⟶̂ R′ × [ i ] R ≳′ R′
+       P ⊕ μ ·′ Q [ μ′ ]⟶ R →
+       ∃ λ R′ → P ⊕ μ ·′ Q′ [ μ′ ]⟶̂ R′ × [ i ] R ≳′ R′
   lr {R} {μ′} = λ where
     (choice-left P⟶R) →
       R           ■
         ⟵̂[ μ′ ]   ←⟨ choice-left P⟶R ⟩■
-      P ⊕ μ ·! Q′
+      P ⊕ μ ·′ Q′
 
     (choice-right action) →
       force Q      ∼⟨ Q≳Q′ ⟩■
       force Q′
         ⟵̂[ μ ]     ←⟨ choice-right action ⟩■
-      P ⊕ μ ·! Q′
+      P ⊕ μ ·′ Q′
 
-⊕·!-cong′ : ∀ {i P μ Q Q′} →
-            [ i ] force Q ≳′ force Q′ → [ i ] P ⊕ μ ·! Q ≳′ P ⊕ μ ·! Q′
-force (⊕·!-cong′ Q≳Q′) = ⊕·!-cong Q≳Q′
+⊕·′-cong′ : ∀ {i P μ Q Q′} →
+            [ i ] force Q ≳′ force Q′ → [ i ] P ⊕ μ ·′ Q ≳′ P ⊕ μ ·′ Q′
+force (⊕·′-cong′ Q≳Q′) = ⊕·′-cong Q≳Q′
 
-·!⊕-cong : ∀ {i P P′ μ Q} →
-           [ i ] force P ≳′ force P′ → [ i ] μ ·! P ⊕ Q ≳ μ ·! P′ ⊕ Q
-·!⊕-cong {P = P} {P′} {μ} {Q} P≳P′ =
-  μ ·! P ⊕ Q   ∼⟨ SE.⊕-comm ⟩
-  Q ⊕ μ ·! P   ∼′⟨ ⊕·!-cong P≳P′ ⟩ S.∼:
-  Q ⊕ μ ·! P′  ∼⟨ SE.⊕-comm ⟩■
-  μ ·! P′ ⊕ Q
+·′⊕-cong : ∀ {i P P′ μ Q} →
+           [ i ] force P ≳′ force P′ → [ i ] μ ·′ P ⊕ Q ≳ μ ·′ P′ ⊕ Q
+·′⊕-cong {P = P} {P′} {μ} {Q} P≳P′ =
+  μ ·′ P ⊕ Q   ∼⟨ SE.⊕-comm ⟩
+  Q ⊕ μ ·′ P   ∼′⟨ ⊕·′-cong P≳P′ ⟩ S.∼:
+  Q ⊕ μ ·′ P′  ∼⟨ SE.⊕-comm ⟩■
+  μ ·′ P′ ⊕ Q
 
-·!⊕-cong′ : ∀ {i P P′ μ Q} →
-            [ i ] force P ≳′ force P′ → [ i ] μ ·! P ⊕ Q ≳′ μ ·! P′ ⊕ Q
-force (·!⊕-cong′ P≳P′) = ·!⊕-cong P≳P′
+·′⊕-cong′ : ∀ {i P P′ μ Q} →
+            [ i ] force P ≳′ force P′ → [ i ] μ ·′ P ⊕ Q ≳′ μ ·′ P′ ⊕ Q
+force (·′⊕-cong′ P≳P′) = ·′⊕-cong P≳P′
 
-infix 8 _·!⊕·!-cong_ _·!⊕·!-cong′_
+infix 8 _·′⊕·′-cong_ _·′⊕·′-cong′_
 
-_·!⊕·!-cong_ :
+_·′⊕·′-cong_ :
   ∀ {i μ₁ μ₂ P₁ P₁′ P₂ P₂′} →
   [ i ] force P₁ ≳′ force P₁′ → [ i ] force P₂ ≳′ force P₂′ →
-  [ i ] μ₁ ·! P₁ ⊕ μ₂ ·! P₂ ≳ μ₁ ·! P₁′ ⊕ μ₂ ·! P₂′
-_·!⊕·!-cong_ {i} {μ₁} {μ₂} {P₁} {P₁′} {P₂} {P₂′} P₁≳P₁′ P₂≳P₂′ =
-  ⟨ lr , CL.·!⊕·!-cong P₁≳P₁′ P₂≳P₂′ ⟩
+  [ i ] μ₁ ·′ P₁ ⊕ μ₂ ·′ P₂ ≳ μ₁ ·′ P₁′ ⊕ μ₂ ·′ P₂′
+_·′⊕·′-cong_ {i} {μ₁} {μ₂} {P₁} {P₁′} {P₂} {P₂′} P₁≳P₁′ P₂≳P₂′ =
+  ⟨ lr , CL.·′⊕·′-cong P₁≳P₁′ P₂≳P₂′ ⟩
   where
-  lr : ∀ {R μ} → μ₁ ·! P₁ ⊕ μ₂ ·! P₂ [ μ ]⟶ R →
-       ∃ λ R′ → μ₁ ·! P₁′ ⊕ μ₂ ·! P₂′ [ μ ]⟶̂ R′ × [ i ] R ≳′ R′
+  lr : ∀ {R μ} → μ₁ ·′ P₁ ⊕ μ₂ ·′ P₂ [ μ ]⟶ R →
+       ∃ λ R′ → μ₁ ·′ P₁′ ⊕ μ₂ ·′ P₂′ [ μ ]⟶̂ R′ × [ i ] R ≳′ R′
   lr = λ where
     (choice-left action) →
       force P₁               ∼⟨ P₁≳P₁′ ⟩■
       force P₁′
         ⟵̂[ μ₁ ]              ←⟨ choice-left action ⟩■
-      μ₁ ·! P₁′ ⊕ μ₂ ·! P₂′
+      μ₁ ·′ P₁′ ⊕ μ₂ ·′ P₂′
 
     (choice-right action) →
       force P₂               ∼⟨ P₂≳P₂′ ⟩■
       force P₂′
         ⟵̂[ μ₂ ]              ←⟨ choice-right action ⟩■
-      μ₁ ·! P₁′ ⊕ μ₂ ·! P₂′
+      μ₁ ·′ P₁′ ⊕ μ₂ ·′ P₂′
 
-_·!⊕·!-cong′_ :
+_·′⊕·′-cong′_ :
   ∀ {i μ₁ μ₂ P₁ P₁′ P₂ P₂′} →
   [ i ] force P₁ ≳′ force P₁′ → [ i ] force P₂ ≳′ force P₂′ →
-  [ i ] μ₁ ·! P₁ ⊕ μ₂ ·! P₂ ≳′ μ₁ ·! P₁′ ⊕ μ₂ ·! P₂′
-force (P₁≳′P₁′ ·!⊕·!-cong′ P₂≳′P₂′) = P₁≳′P₁′ ·!⊕·!-cong P₂≳′P₂′
+  [ i ] μ₁ ·′ P₁ ⊕ μ₂ ·′ P₂ ≳′ μ₁ ·′ P₁′ ⊕ μ₂ ·′ P₂′
+force (P₁≳′P₁′ ·′⊕·′-cong′ P₂≳′P₂′) = P₁≳′P₁′ ·′⊕·′-cong P₂≳′P₂′
 
 -- _[_] preserves the expansion relation for non-degenerate contexts.
 -- (This result is related to Theorem 6.5.25 in "Enhancements of the
@@ -564,7 +564,7 @@ _[_]-cong :
 hole     [ Ps≳Qs ]-cong = Ps≳Qs _
 ∅        [ Ps≳Qs ]-cong = reflexive
 D₁ ∣ D₂  [ Ps≳Qs ]-cong = (D₁ [ Ps≳Qs ]-cong) ∣-cong (D₂ [ Ps≳Qs ]-cong)
-action D [ Ps≳Qs ]-cong = refl ·!-cong λ { .force → force D [ Ps≳Qs ]-cong }
+action D [ Ps≳Qs ]-cong = refl ·′-cong λ { .force → force D [ Ps≳Qs ]-cong }
 ν D      [ Ps≳Qs ]-cong = ν-cong refl (D [ Ps≳Qs ]-cong)
 ! D      [ Ps≳Qs ]-cong = !-cong (D [ Ps≳Qs ]-cong)
 D₁ ⊕ D₂  [ Ps≳Qs ]-cong = ⊕-cong Ps≳Qs D₁ D₂
@@ -588,20 +588,20 @@ D₁ ⊕ D₂  [ Ps≳Qs ]-cong = ⊕-cong Ps≳Qs D₁ D₂
       (context P₁ [ Qs ]) ⊕ (context P₂ [ Qs ])
 
     (process P₁) (action {μ = μ₂} {C = C₂} D₂) →
-      (context P₁ [ Ps ]) ⊕ μ₂ ·! (C₂ [ Ps ]′)  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁)) SE.⊕-cong (_ ■) ⟩
-      P₁ ⊕ μ₂ ·! (C₂ [ Ps ]′)                   ∼′⟨ ⊕·!-cong (D₂ [ Ps≳Qs ]-cong′) ⟩ S.∼:
-      P₁ ⊕ μ₂ ·! (C₂ [ Qs ]′)                   ∼⟨ SE.≡→∼ (context-[] P₁) SE.⊕-cong (_ ■) ⟩■
-      (context P₁ [ Qs ]) ⊕ μ₂ ·! (C₂ [ Qs ]′)
+      (context P₁ [ Ps ]) ⊕ μ₂ ·′ (C₂ [ Ps ]′)  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁)) SE.⊕-cong (_ ■) ⟩
+      P₁ ⊕ μ₂ ·′ (C₂ [ Ps ]′)                   ∼′⟨ ⊕·′-cong (D₂ [ Ps≳Qs ]-cong′) ⟩ S.∼:
+      P₁ ⊕ μ₂ ·′ (C₂ [ Qs ]′)                   ∼⟨ SE.≡→∼ (context-[] P₁) SE.⊕-cong (_ ■) ⟩■
+      (context P₁ [ Qs ]) ⊕ μ₂ ·′ (C₂ [ Qs ]′)
 
     (action {μ = μ₁} {C = C₁} D₁) (process P₂) →
-      μ₁ ·! (C₁ [ Ps ]′) ⊕ (context P₂ [ Ps ])  ∼⟨ (_ ■) SE.⊕-cong symmetric (SE.≡→∼ (context-[] P₂)) ⟩
-      μ₁ ·! (C₁ [ Ps ]′) ⊕ P₂                   ∼′⟨ ·!⊕-cong (D₁ [ Ps≳Qs ]-cong′) ⟩ S.∼:
-      μ₁ ·! (C₁ [ Qs ]′) ⊕ P₂                   ∼⟨ (_ ■) SE.⊕-cong SE.≡→∼ (context-[] P₂) ⟩■
-      μ₁ ·! (C₁ [ Qs ]′) ⊕ (context P₂ [ Qs ])
+      μ₁ ·′ (C₁ [ Ps ]′) ⊕ (context P₂ [ Ps ])  ∼⟨ (_ ■) SE.⊕-cong symmetric (SE.≡→∼ (context-[] P₂)) ⟩
+      μ₁ ·′ (C₁ [ Ps ]′) ⊕ P₂                   ∼′⟨ ·′⊕-cong (D₁ [ Ps≳Qs ]-cong′) ⟩ S.∼:
+      μ₁ ·′ (C₁ [ Qs ]′) ⊕ P₂                   ∼⟨ (_ ■) SE.⊕-cong SE.≡→∼ (context-[] P₂) ⟩■
+      μ₁ ·′ (C₁ [ Qs ]′) ⊕ (context P₂ [ Qs ])
 
     (action {μ = μ₁} {C = C₁} D₁) (action {μ = μ₂} {C = C₂} D₂) →
-      μ₁ ·! (C₁ [ Ps ]′) ⊕ μ₂ ·! (C₂ [ Ps ]′)  ∼⟨ (D₁ [ Ps≳Qs ]-cong′) ·!⊕·!-cong (D₂ [ Ps≳Qs ]-cong′) ⟩■
-      μ₁ ·! (C₁ [ Qs ]′) ⊕ μ₂ ·! (C₂ [ Qs ]′)
+      μ₁ ·′ (C₁ [ Ps ]′) ⊕ μ₂ ·′ (C₂ [ Ps ]′)  ∼⟨ (D₁ [ Ps≳Qs ]-cong′) ·′⊕·′-cong (D₂ [ Ps≳Qs ]-cong′) ⟩■
+      μ₁ ·′ (C₁ [ Qs ]′) ⊕ μ₂ ·′ (C₂ [ Qs ]′)
 
 _[_]-cong′ :
   ∀ {i n Ps Qs} {C : Context ∞ n} →

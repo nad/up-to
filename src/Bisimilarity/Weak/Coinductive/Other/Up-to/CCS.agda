@@ -93,7 +93,7 @@ Up-to-context-size-preserving =
   !a[τ]⇒̂→≡ : ∀ {P} → ! a · [ τ ]⇒̂ P → P ≡ ! a ·
   !a[τ]⇒̂→≡ (silent refl done)              = refl
   !a[τ]⇒̂→≡ (silent refl (step refl !a⟶ _)) = ⊥-elim $ name≢τ $
-                                               !-only ·!-only !a⟶
+                                               !-only ·′-only !a⟶
   !a[τ]⇒̂→≡ (non-silent ¬s _)               = ⊥-elim $ ¬s refl
 
   drop-[] : ∀ {P Q S} →
@@ -104,7 +104,7 @@ Up-to-context-size-preserving =
   drop-[] (_ , ∅      , _ , _ , _ , () , _)
   drop-[] (_ , _ ∣ _  , _ , _ , _ , _  , () , _)
   drop-[] (_ , _ ⊕ _  , _ , _ , _ , () , _)
-  drop-[] (_ , _ ·! _ , _ , _ , _ , () , _)
+  drop-[] (_ , _ ·′ _ , _ , _ , _ , () , _)
   drop-[] (_ , ν _ _  , _ , _ , _ , () , _)
   drop-[] (_ , ! _    , _ , _ , _ , () , _)
 
