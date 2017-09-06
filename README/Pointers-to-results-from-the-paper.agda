@@ -45,9 +45,9 @@ never  = Delay-monad.never
 
 -- Strong bisimilarity for the delay monad.
 
-Strongly-bisimilar  = Delay-monad.Strong-bisimilarity.Strongly-bisimilar
-Strongly-bisimilar′ = Delay-monad.Strong-bisimilarity.∞Strongly-bisimilar
-transitiveˢ         = Delay-monad.Strong-bisimilarity.transitive
+[_]_∼D_     = Delay-monad.Strong-bisimilarity.Strongly-bisimilar
+[_]_∼′D_    = Delay-monad.Strong-bisimilarity.∞Strongly-bisimilar
+transitiveˢ = Delay-monad.Strong-bisimilarity.transitive
 
 ------------------------------------------------------------------------
 -- Section 3 and Appendix A
@@ -397,8 +397,8 @@ module Weak-bisimilarity-almost-congruence where
 
 -- Weak bisimilarity for the delay monad.
 
-Weakly-bisimilar  = Delay-monad.Weak-bisimilarity.Weakly-bisimilar
-Weakly-bisimilar′ = Delay-monad.Weak-bisimilarity.∞Weakly-bisimilar
+[_]_≈D_  = Delay-monad.Weak-bisimilarity.Weakly-bisimilar
+[_]_≈′D_ = Delay-monad.Weak-bisimilarity.∞Weakly-bisimilar
 
 -- This definition is pointwise logically equivalent, in a
 -- size-preserving way, to the one obtained from the LTS for the delay
@@ -461,7 +461,7 @@ transitiveʷˢ = Delay-monad.Weak-bisimilarity.transitive-≈∼
 
 -- The expansion relation.
 
-Expansion = Delay-monad.Expansion.Expansion
+[_]_≳D_ = Delay-monad.Expansion.Expansion
 
 -- Size-preserving transitivity-like proofs involving the expansion
 -- relation.
