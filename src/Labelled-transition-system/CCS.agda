@@ -454,3 +454,18 @@ Matches-[] (C₁ ⊕ C₂) = Matches-[] C₁ ⊕ Matches-[] C₂
 Matches-[] (μ ·′ C)  = action λ { .force → Matches-[] (force C) }
 Matches-[] (ν a C)   = ν (Matches-[] C)
 Matches-[] (! C)     = ! Matches-[] C
+
+-- Matches respects very strong bisimilarity.
+
+Matches-cong : ∀ {i P Q n} {C : Context ∞ n} →
+               Equal i P Q → Matches i P C → Matches i Q C
+Matches-cong _           (hole x)   = hole x
+Matches-cong ∅           ∅          = ∅
+Matches-cong (p₁ ∣ p₂)   (q₁ ∣ q₂)  = Matches-cong p₁ q₁ ∣
+                                      Matches-cong p₂ q₂
+Matches-cong (p₁ ⊕ p₂)   (q₁ ⊕ q₂)  = Matches-cong p₁ q₁ ⊕
+                                      Matches-cong p₂ q₂
+Matches-cong (refl ·′ p) (action q) = action λ { .force →
+                                        Matches-cong (force p) (force q) }
+Matches-cong (ν refl p)  (ν q)      = ν (Matches-cong p q)
+Matches-cong (! p)       (! q)      = ! Matches-cong p q
