@@ -101,7 +101,7 @@ private
 
      Up-to-technique G                                                    ↝⟨ (λ up-to → up-to) ⟩
 
-     (S ⊆ ⟦ S̲t̲e̲p̲ ⟧ (G S) → S ⊆ Bisimilarity ∞)                            ↝⟨ (λ hyp below → hyp (_↔_.to Step↔S̲t̲e̲p̲ ∘ below)) ⟩
+     (S ⊆ ⟦ S̲t̲e̲p̲ ⟧ (G S) → S ⊆ Bisimilarity ∞)                            ↝⟨ (λ hyp below → hyp (Step↔S̲t̲e̲p̲ _ ∘ below)) ⟩
 
      (S ⊆ Step (G S) → S ⊆ Bisimilarity ∞)                                ↝⟨ _$ S⊆StepGS ⟩
 
@@ -256,7 +256,7 @@ private
     (F (⟦ S̲t̲e̲p̲ ⟧ R) (true , true) → ⟦ S̲t̲e̲p̲ ⟧ (F R) (true , true))  ↔⟨⟩
 
     (⟦ S̲t̲e̲p̲ ⟧ R (false , false) ⊎ ⟦ S̲t̲e̲p̲ ⟧ R (true , true) →
-     ⟦ S̲t̲e̲p̲ ⟧ (F R) (true , true))                                 ↝⟨ _$ inj₁ (_↔_.to Step↔S̲t̲e̲p̲ StepRff) ⟩
+     ⟦ S̲t̲e̲p̲ ⟧ (F R) (true , true))                                 ↝⟨ _$ inj₁ (_⇔_.to (Step↔S̲t̲e̲p̲ _) StepRff) ⟩
 
     ⟦ S̲t̲e̲p̲ ⟧ (F R) (true , true)                                   ↝⟨ (λ step → S̲t̲e̲p̲.left-to-right {p = true} {q = true} step {p′ = false} _ ) ⟩
 
@@ -383,7 +383,7 @@ private
                      ⟩
 
   R̲-prog′ : R̲ ⊆ ⟦ S̲t̲e̲p̲ ⟧ (F (G R̲))
-  R̲-prog′ Rx = _↔_.to Step↔S̲t̲e̲p̲ (R̲-prog Rx)
+  R̲-prog′ Rx = _⇔_.to (Step↔S̲t̲e̲p̲ _) (R̲-prog Rx)
 
   module F-lemmas where
 
@@ -403,7 +403,7 @@ private
     module _ {R} (R-prog′ : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ (F R)) where
 
       R-prog : Progression R (F R)
-      R-prog Rx = _↔_.from Step↔S̲t̲e̲p̲ (R-prog′ Rx)
+      R-prog Rx = _⇔_.from (Step↔S̲t̲e̲p̲ _) (R-prog′ Rx)
 
       ¬rr : ∀ {s} → ¬ R (r s , r (not s))
       ¬rr rel with Progression.left-to-right R-prog rel rr
@@ -481,7 +481,7 @@ private
     module _ {R} (R-prog′ : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ (G R)) where
 
       R-prog : Progression R (G R)
-      R-prog Rx = _↔_.from Step↔S̲t̲e̲p̲ (R-prog′ Rx)
+      R-prog Rx = _⇔_.from (Step↔S̲t̲e̲p̲ _) (R-prog′ Rx)
 
       ¬rr : ∀ {s} → ¬ R (r s , r (not s))
       ¬rr rel with Progression.left-to-right R-prog rel rr

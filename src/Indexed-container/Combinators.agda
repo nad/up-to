@@ -6,8 +6,7 @@
 
 module Indexed-container.Combinators where
 
-open import Equality.Propositional hiding (Extensionality)
-open import Interval using (ext)
+open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude as P hiding (id; const) renaming (_∘_ to _⊚_)
 
@@ -28,36 +27,39 @@ id i = ↑ _ ⊤ ◁₁ λ _ i′ → i ≡ i′
 
 -- An unfolding lemma for ⟦ id ⟧.
 
-⟦id⟧↔ : ∀ {ℓ x} {I : Set ℓ} {X : Rel x I} {i} → ⟦ id ⟧ X i ↔ X i
-⟦id⟧↔ {X = X} {i} =
-  ↑ _ ⊤ × (λ i′ → i ≡ i′) ⊆ X  ↝⟨ drop-⊤-left-× (λ _ → Bijection.↑↔) ⟩
+⟦id⟧↔ : ∀ {k ℓ x} {I : Set ℓ} {X : Rel x I} {i} →
+        Extensionality? k ℓ (ℓ ⊔ x) →
+        ⟦ id ⟧ X i ↝[ k ] X i
+⟦id⟧↔ {X = X} {i} ext =
+  ↑ _ ⊤ × (λ i′ → i ≡ i′) ⊆ X  ↔⟨ drop-⊤-left-× (λ _ → Bijection.↑↔) ⟩
   (λ i′ → i ≡ i′) ⊆ X          ↔⟨⟩
-  (∀ {i′} → i ≡ i′ → X i′)     ↝⟨ Bijection.implicit-Π↔Π ⟩
-  (∀ i′ → i ≡ i′ → X i′)       ↝⟨ inverse $ ∀-intro ext _ ⟩□
+  (∀ {i′} → i ≡ i′ → X i′)     ↔⟨ Bijection.implicit-Π↔Π ⟩
+  (∀ i′ → i ≡ i′ → X i′)       ↝⟨ inverse-ext? (λ ext → ∀-intro ext _) ext ⟩□
   X i                          □
 
 -- An unfolding lemma for ⟦ id ⟧₂.
 
 ⟦id⟧₂↔ :
-  ∀ {ℓ x} {I : Set ℓ} {X : Rel x I}
-  (R : ∀ {i} → Rel₂ ℓ (X i)) {i}
+  ∀ {k ℓ x} {I : Set ℓ} {X : Rel x I} →
+  Extensionality? k ℓ ℓ →
+  ∀ (R : ∀ {i} → Rel₂ ℓ (X i)) {i} →
   (x y : ⟦ id ⟧ X i) →
 
   ⟦ id ⟧₂ R (x , y)
-    ↔
+    ↝[ k ]
   proj₁ x ≡ proj₁ y × R (proj₂ x refl , proj₂ y refl)
 
-⟦id⟧₂↔ R {i} x@(s , f) y@(t , g) =
+⟦id⟧₂↔ ext R {i} x@(s , f) y@(t , g) =
 
   ⟦ id ⟧₂ R (x , y)                               ↔⟨⟩
 
   (∃ λ (eq : s ≡ t) →
    ∀ {o} (p : i ≡ o) →
-   R (f p , g (subst (λ _ → i ≡ o) eq p)))        ↝⟨ ∃-cong (λ _ → Bijection.implicit-Π↔Π) ⟩
+   R (f p , g (subst (λ _ → i ≡ o) eq p)))        ↔⟨ ∃-cong (λ _ → Bijection.implicit-Π↔Π) ⟩
 
   (∃ λ (eq : s ≡ t) →
    ∀ o (p : i ≡ o) →
-   R (f p , g (subst (λ _ → i ≡ o) eq p)))        ↝⟨ ∃-cong (λ _ → inverse $ ∀-intro ext _) ⟩
+   R (f p , g (subst (λ _ → i ≡ o) eq p)))        ↝⟨ ∃-cong (λ _ → inverse-ext? (λ ext → ∀-intro ext _) ext) ⟩
 
   (∃ λ (eq : s ≡ t) →
    R (f refl , g (subst (λ _ → i ≡ i) eq refl)))  ↝⟨ ∃-cong (λ eq → ≡⇒↝ _ (cong (λ eq → R (f refl , g eq)) (subst-const eq))) ⟩
@@ -67,11 +69,13 @@ id i = ↑ _ ⊤ ◁₁ λ _ i′ → i ≡ i′
 -- A second unfolding lemma for ⟦ id ⟧₂.
 
 ⟦id⟧₂≡↔ :
-  ∀ {ℓ} {I : Set ℓ} {X : Rel ℓ I} {i} (x y : ⟦ id ⟧ X i) →
+  ∀ {ℓ} {I : Set ℓ} {X : Rel ℓ I} {i} →
+  Extensionality ℓ ℓ →
+  (x y : ⟦ id ⟧ X i) →
   ⟦ id ⟧₂ (uncurry _≡_) (x , y) ↔ x ≡ y
-⟦id⟧₂≡↔ x@(s , f) y@(t , g) =
+⟦id⟧₂≡↔ ext x@(s , f) y@(t , g) =
 
-  ⟦ id ⟧₂ (uncurry _≡_) (x , y)  ↝⟨ ⟦id⟧₂↔ (uncurry _≡_) x y ⟩
+  ⟦ id ⟧₂ (uncurry _≡_) (x , y)  ↝⟨ ⟦id⟧₂↔ ext (uncurry _≡_) x y ⟩
 
   s ≡ t × f refl ≡ g refl        ↔⟨ ∃-cong (λ _ → ≃-≡ (↔⇒≃ $ inverse $ ∀-intro ext _)) ⟩
 
@@ -88,36 +92,38 @@ const X = X ◁ λ _ _ → ⊥
 
 -- An unfolding lemma for ⟦ const ⟧.
 
-⟦const⟧↔ : ∀ {ℓ y} {I : Set ℓ} {X} {Y : Rel y I} {i} →
-           ⟦ const X ⟧ Y i ↔ X i
-⟦const⟧↔ {I = I} {X} {Y} {i} =
-  X i × (∀ {i} → ⊥ → Y i)  ↝⟨ ∃-cong (λ _ → Bijection.implicit-Π↔Π) ⟩
-  X i × (∀ i → ⊥ → Y i)    ↝⟨ ∃-cong (λ _ → ∀-cong ext λ _ → Π⊥↔⊤ ext) ⟩
-  X i × (I → ⊤)            ↝⟨ drop-⊤-right (λ _ → →-right-zero) ⟩
+⟦const⟧↔ : ∀ {k ℓ y} {I : Set ℓ} {X} {Y : Rel y I} {i} →
+           Extensionality? k ℓ (ℓ ⊔ y) →
+           ⟦ const X ⟧ Y i ↝[ k ] X i
+⟦const⟧↔ {k} {ℓ} {I = I} {X} {Y} {i} ext =
+  X i × (∀ {i} → ⊥ → Y i)  ↔⟨ ∃-cong (λ _ → Bijection.implicit-Π↔Π) ⟩
+  X i × (∀ i → ⊥ → Y i)    ↝⟨ ∃-cong (λ _ → ∀-cong ext λ _ → Π⊥↔⊤ (lower-extensionality? k lzero ℓ ext)) ⟩
+  X i × (I → ⊤)            ↔⟨ drop-⊤-right (λ _ → →-right-zero) ⟩
   X i                      □
 
 -- An unfolding lemma for ⟦ const ⟧₂.
 
 ⟦const⟧₂↔ :
-  ∀ {ℓ y} {I : Set ℓ} {X} {Y : Rel y I}
-  (R : ∀ {i} → Rel₂ ℓ (Y i)) {i}
+  ∀ {k ℓ y} {I : Set ℓ} {X} {Y : Rel y I} →
+  Extensionality? k ℓ ℓ →
+  ∀ (R : ∀ {i} → Rel₂ ℓ (Y i)) {i}
   (x y : ⟦ const X ⟧ Y i) →
 
   ⟦ const X ⟧₂ R (x , y)
-    ↔
+    ↝[ k ]
   proj₁ x ≡ proj₁ y
 
-⟦const⟧₂↔ {X = X} R x@(s , f) y@(t , g) =
+⟦const⟧₂↔ {X = X} ext R x@(s , f) y@(t , g) =
 
   ⟦ const X ⟧₂ R (x , y)                                ↔⟨⟩
 
   (∃ λ (eq : s ≡ t) →
-   ∀ {o} (p : ⊥) → R (f p , g (subst (λ _ → ⊥) eq p)))  ↝⟨ ∃-cong (λ _ → Bijection.implicit-Π↔Π) ⟩
+   ∀ {o} (p : ⊥) → R (f p , g (subst (λ _ → ⊥) eq p)))  ↔⟨ ∃-cong (λ _ → Bijection.implicit-Π↔Π) ⟩
 
   (∃ λ (eq : s ≡ t) →
    ∀ o (p : ⊥) → R (f p , g (subst (λ _ → ⊥) eq p)))    ↝⟨ ∃-cong (λ _ → ∀-cong ext λ _ → Π⊥↔⊤ ext) ⟩
 
-  (∃ λ (eq : s ≡ t) → ∀ o → ⊤)                          ↝⟨ drop-⊤-right (λ _ → →-right-zero) ⟩
+  (∃ λ (eq : s ≡ t) → ∀ o → ⊤)                          ↔⟨ drop-⊤-right (λ _ → →-right-zero) ⟩
 
   s ≡ t                                                 □
 
@@ -140,65 +146,66 @@ C ∘ D =
 
 -- An unfolding lemma for ⟦ C ∘ D ⟧.
 
-⟦∘⟧↔ : ∀ {ℓ x} {I J K : Set ℓ} {X : Rel x I}
-       (C : Container J K) {D : Container I J} {k} →
-       ⟦ C ∘ D ⟧ X k ↔ ⟦ C ⟧ (⟦ D ⟧ X) k
-⟦∘⟧↔ {X = X} C {D} {k} =
+⟦∘⟧↔ : ∀ {fk ℓ x} {I J K : Set ℓ} {X : Rel x I} →
+       Extensionality? fk ℓ (ℓ ⊔ x) →
+       ∀ (C : Container J K) {D : Container I J} {k} →
+       ⟦ C ∘ D ⟧ X k ↝[ fk ] ⟦ C ⟧ (⟦ D ⟧ X) k
+⟦∘⟧↔ {X = X} ext C {D} {k} =
 
   ⟦ C ∘ D ⟧ X k                                                     ↔⟨⟩
 
   (∃ λ { (s , f) →
          ∀ {i} →
          (∃ λ j → ∃ λ (p : Position C s j) → Position D (f p) i) →
-         X i })                                                     ↝⟨ inverse Σ-assoc ⟩
+         X i })                                                     ↔⟨ inverse Σ-assoc ⟩
 
   (∃ λ s →
    ∃ λ (f : Position C s ⊆ Shape D) →
      ∀ {i} →
      (∃ λ j → ∃ λ (p : Position C s j) → Position D (f p) i) →
-     X i)                                                           ↝⟨ (∃-cong λ _ → ∃-cong λ _ → implicit-∀-cong ext currying) ⟩
-
+     X i)                                                           ↝⟨ (∃-cong λ _ → ∃-cong λ _ → implicit-∀-cong ext $
+                                                                        from-isomorphism currying) ⟩
   (∃ λ s →
    ∃ λ (f : Position C s ⊆ Shape D) →
      ∀ {i} j →
      (∃ λ (p : Position C s j) → Position D (f p) i) →
-     X i)                                                           ↝⟨ (∃-cong λ _ → ∃-cong λ _ → Bijection.implicit-Π↔Π) ⟩
+     X i)                                                           ↔⟨ (∃-cong λ _ → ∃-cong λ _ → Bijection.implicit-Π↔Π) ⟩
 
   (∃ λ s →
    ∃ λ (f : Position C s ⊆ Shape D) →
      ∀ i j →
      (∃ λ (p : Position C s j) → Position D (f p) i) →
-     X i)                                                           ↝⟨ (∃-cong λ _ → ∃-cong λ _ → Π-comm) ⟩
+     X i)                                                           ↔⟨ (∃-cong λ _ → ∃-cong λ _ → Π-comm) ⟩
 
   (∃ λ s →
    ∃ λ (f : Position C s ⊆ Shape D) →
      ∀ j i →
      (∃ λ (p : Position C s j) → Position D (f p) i) →
-     X i)                                                           ↝⟨ (∃-cong λ _ → ∃-cong λ _ → inverse Bijection.implicit-Π↔Π) ⟩
+     X i)                                                           ↔⟨ (∃-cong λ _ → ∃-cong λ _ → inverse Bijection.implicit-Π↔Π) ⟩
 
   (∃ λ s →
    ∃ λ (f : Position C s ⊆ Shape D) →
      ∀ {j} i →
      (∃ λ (p : Position C s j) → Position D (f p) i) →
-     X i)                                                           ↝⟨ (∃-cong λ _ → inverse implicit-ΠΣ-comm) ⟩
+     X i)                                                           ↔⟨ (∃-cong λ _ → inverse implicit-ΠΣ-comm) ⟩
 
   (∃ λ s → ∀ {j} →
    ∃ λ (f : Position C s j → Shape D j) →
      ∀ i →
      (∃ λ (p : Position C s j) → Position D (f p) i) →
      X i)                                                           ↝⟨ (∃-cong λ _ → implicit-∀-cong ext $ ∃-cong λ _ → ∀-cong ext λ _ →
-                                                                        currying) ⟩
+                                                                        from-isomorphism currying) ⟩
   (∃ λ s → ∀ {j} →
    ∃ λ (f : Position C s j → Shape D j) →
-     ∀ i → (p : Position C s j) → Position D (f p) i → X i)         ↝⟨ (∃-cong λ _ → implicit-∀-cong ext $ ∃-cong λ _ → Π-comm) ⟩
+     ∀ i → (p : Position C s j) → Position D (f p) i → X i)         ↝⟨ (∃-cong λ _ → implicit-∀-cong ext $ ∃-cong λ _ → from-isomorphism Π-comm) ⟩
 
   (∃ λ s → ∀ {j} →
    ∃ λ (f : Position C s j → Shape D j) →
-     (p : Position C s j) → ∀ i → Position D (f p) i → X i)         ↝⟨ (∃-cong λ _ → implicit-∀-cong ext $ inverse ΠΣ-comm) ⟩
+     (p : Position C s j) → ∀ i → Position D (f p) i → X i)         ↝⟨ (∃-cong λ _ → implicit-∀-cong ext $ from-isomorphism $ inverse ΠΣ-comm) ⟩
 
   (∃ λ s → ∀ {j} → Position C s j →
    ∃ λ (s′ : Shape D j) → ∀ i → Position D s′ i → X i)              ↝⟨ (∃-cong λ _ → implicit-∀-cong ext $ ∀-cong ext λ _ → ∃-cong λ _ →
-                                                                        inverse Bijection.implicit-Π↔Π) ⟩
+                                                                        from-isomorphism $ inverse Bijection.implicit-Π↔Π) ⟩
   (∃ λ s → ∀ {j} → Position C s j →
    ∃ λ (s′ : Shape D j) → Position D s′ ⊆ X)                        ↔⟨⟩
 
@@ -263,26 +270,27 @@ reindex₁ f C =
 
 -- An unfolding lemma for ⟦ reindex₁ f C ⟧.
 
-⟦reindex₁⟧↔ : ∀ {ℓ x} {I₁ I₂ O : Set ℓ} {f : I₁ → I₂}
-              (C : Container I₁ O) {X : Rel x I₂} {o} →
-              ⟦ reindex₁ f C ⟧ X o ↔ ⟦ C ⟧ (X ⊚ f) o
-⟦reindex₁⟧↔ {f = f} C {X} {o} =
-  ⟦ reindex₁ f C ⟧ X o                                 ↝⟨ (∃-cong λ _ → Bijection.implicit-Π↔Π) ⟩
+⟦reindex₁⟧↔ : ∀ {k ℓ x} {I₁ I₂ O : Set ℓ} {f : I₁ → I₂} →
+              Extensionality? k ℓ (ℓ ⊔ x) →
+              ∀ (C : Container I₁ O) {X : Rel x I₂} {o} →
+              ⟦ reindex₁ f C ⟧ X o ↝[ k ] ⟦ C ⟧ (X ⊚ f) o
+⟦reindex₁⟧↔ {f = f} ext C {X} {o} =
+  ⟦ reindex₁ f C ⟧ X o                                 ↔⟨ (∃-cong λ _ → Bijection.implicit-Π↔Π) ⟩
 
   (∃ λ (s : Shape C o) →
-   ∀ i → (∃ λ i′ → f i′ ≡ i × Position C s i′) → X i)  ↝⟨ (∃-cong λ _ → ∀-cong ext λ _ → currying) ⟩
+   ∀ i → (∃ λ i′ → f i′ ≡ i × Position C s i′) → X i)  ↝⟨ (∃-cong λ _ → ∀-cong ext λ _ → from-isomorphism currying) ⟩
 
   (∃ λ (s : Shape C o) →
-   ∀ i i′ → f i′ ≡ i × Position C s i′ → X i)          ↝⟨ (∃-cong λ _ → ∀-cong ext λ _ → ∀-cong ext λ _ → currying) ⟩
+   ∀ i i′ → f i′ ≡ i × Position C s i′ → X i)          ↝⟨ (∃-cong λ _ → ∀-cong ext λ _ → ∀-cong ext λ _ → from-isomorphism currying) ⟩
 
   (∃ λ (s : Shape C o) →
-   ∀ i i′ → f i′ ≡ i → Position C s i′ → X i)          ↝⟨ (∃-cong λ _ → Π-comm) ⟩
+   ∀ i i′ → f i′ ≡ i → Position C s i′ → X i)          ↔⟨ (∃-cong λ _ → Π-comm) ⟩
 
   (∃ λ (s : Shape C o) →
-   ∀ i i′ → f i ≡ i′ → Position C s i → X i′)          ↝⟨ (∃-cong λ _ → ∀-cong ext λ _ → inverse $ ∀-intro ext _) ⟩
+   ∀ i i′ → f i ≡ i′ → Position C s i → X i′)          ↝⟨ (∃-cong λ _ → ∀-cong ext λ _ → inverse-ext? (λ ext → ∀-intro ext _) ext) ⟩
 
   (∃ λ (s : Shape C o) →
-   ∀ i → Position C s i → X (f i))                     ↝⟨ (∃-cong λ _ → inverse Bijection.implicit-Π↔Π) ⟩
+   ∀ i → Position C s i → X (f i))                     ↔⟨ (∃-cong λ _ → inverse Bijection.implicit-Π↔Π) ⟩
 
   ⟦ C ⟧ (X ⊚ f) o                                      □
   where
@@ -291,19 +299,20 @@ reindex₁ f C =
 -- An unfolding lemma for ⟦ reindex₁ f C ⟧₂.
 
 ⟦reindex₁⟧₂↔ :
-  ∀ {ℓ x} {I O : Set ℓ} {X : Rel x O}
-  (C : Container I O) (f : I → O) (R : ∀ {o} → Rel₂ ℓ (X o)) {o}
+  ∀ {k ℓ x} {I O : Set ℓ} {X : Rel x O} →
+  Extensionality? k ℓ ℓ →
+  ∀ (C : Container I O) (f : I → O) (R : ∀ {o} → Rel₂ ℓ (X o)) {o}
   (x y : ⟦ reindex₁ f C ⟧ X o) →
 
   ⟦ reindex₁ f C ⟧₂ R (x , y)
 
-    ↔
+    ↝[ k ]
 
   ⟦ C ⟧₂ R ( (proj₁ x , λ p → proj₂ x (_ , refl , p))
            , (proj₁ y , λ p → proj₂ y (_ , refl , p))
            )
 
-⟦reindex₁⟧₂↔ C f R x@(s , g) y@(t , h) =
+⟦reindex₁⟧₂↔ ext C f R x@(s , g) y@(t , h) =
 
   ⟦ reindex₁ f C ⟧₂ R (x , y)                                             ↔⟨⟩
 
@@ -319,37 +328,37 @@ reindex₁ f C =
          , proj₁ (proj₂ p)
          , subst (λ s → Position C s (proj₁ p)) eq (proj₂ (proj₂ p))
          )
-     ))                                                                   ↝⟨ (∃-cong λ _ → implicit-∀-cong ext $
+     ))                                                                   ↝⟨ (∃-cong λ _ → implicit-∀-cong ext $ from-isomorphism
                                                                               currying) ⟩
   (∃ λ (eq : s ≡ t) →
    ∀ {o} o′ (p : f o′ ≡ o × Position C s o′) →
    R ( g (o′ , p)
      , h (o′ , proj₁ p , subst (λ s → Position C s o′) eq (proj₂ p))
-     ))                                                                   ↝⟨ (∃-cong λ _ → implicit-∀-cong ext $ ∀-cong ext λ _ →
+     ))                                                                   ↝⟨ (∃-cong λ _ → implicit-∀-cong ext $ ∀-cong ext λ _ → from-isomorphism
                                                                               currying) ⟩
   (∃ λ (eq : s ≡ t) →
    ∀ {o} o′ (≡o : f o′ ≡ o) (p : Position C s o′) →
    R ( g (o′ , ≡o , p)
      , h (o′ , ≡o , subst (λ s → Position C s o′) eq p)
-     ))                                                                   ↝⟨ (∃-cong λ _ →
+     ))                                                                   ↔⟨ (∃-cong λ _ →
                                                                               Bijection.implicit-Π↔Π) ⟩
   (∃ λ (eq : s ≡ t) →
    ∀ o o′ (≡o : f o′ ≡ o) (p : Position C s o′) →
    R ( g (o′ , ≡o , p)
      , h (o′ , ≡o , subst (λ s → Position C s o′) eq p)
-     ))                                                                   ↝⟨ (∃-cong λ _ →
+     ))                                                                   ↔⟨ (∃-cong λ _ →
                                                                               Π-comm) ⟩
   (∃ λ (eq : s ≡ t) →
    ∀ o o′ (≡o′ : f o ≡ o′) (p : Position C s o) →
    R ( g (o , ≡o′ , p)
      , h (o , ≡o′ , subst (λ s → Position C s o) eq p)
-     ))                                                                   ↝⟨ (∃-cong λ _ → ∀-cong ext λ _ → inverse $
-                                                                              ∀-intro ext _) ⟩
+     ))                                                                   ↝⟨ (∃-cong λ _ → ∀-cong ext λ _ →
+                                                                              inverse-ext? (λ ext → ∀-intro ext _) ext) ⟩
   (∃ λ (eq : s ≡ t) →
    ∀ o (p : Position C s o) →
    R ( g (o , refl , p)
      , h (o , refl , subst (λ s → Position C s o) eq p)
-     ))                                                                   ↝⟨ (∃-cong λ _ → inverse
+     ))                                                                   ↔⟨ (∃-cong λ _ → inverse
                                                                               Bijection.implicit-Π↔Π) ⟩
   (∃ λ (eq : s ≡ t) →
    ∀ {o} (p : Position C s o) →
@@ -418,37 +427,39 @@ reindex f = reindex₂ f ⊚ reindex₁ f
 
 -- An unfolding lemma for ⟦ reindex f C ⟧.
 
-⟦reindex⟧↔ : ∀ {ℓ x} {I O : Set ℓ} {f : I → O}
-             (C : Container I O) {X : Rel x O} {i} →
-             ⟦ reindex f C ⟧ X i ↔ ⟦ C ⟧ (X ⊚ f) (f i)
-⟦reindex⟧↔ {f = f} C {X} {i} =
+⟦reindex⟧↔ : ∀ {k ℓ x} {I O : Set ℓ} {f : I → O} →
+             Extensionality? k ℓ (ℓ ⊔ x) →
+             ∀ (C : Container I O) {X : Rel x O} {i} →
+             ⟦ reindex f C ⟧ X i ↝[ k ] ⟦ C ⟧ (X ⊚ f) (f i)
+⟦reindex⟧↔ {f = f} ext C {X} {i} =
   ⟦ reindex f C ⟧ X i                ↔⟨⟩
   ⟦ reindex₂ f (reindex₁ f C) ⟧ X i  ↔⟨⟩
-  ⟦ reindex₁ f C ⟧ X (f i)           ↝⟨ ⟦reindex₁⟧↔ C ⟩□
+  ⟦ reindex₁ f C ⟧ X (f i)           ↝⟨ ⟦reindex₁⟧↔ ext C ⟩□
   ⟦ C ⟧ (X ⊚ f) (f i)                □
 
 -- An unfolding lemma for ⟦ reindex f C ⟧₂.
 
 ⟦reindex⟧₂↔ :
-  ∀ {ℓ x} {I O : Set ℓ} {X : Rel x O}
-  (C : Container I O) (f : I → O) (R : ∀ {o} → Rel₂ ℓ (X o)) {i}
+  ∀ {k ℓ x} {I O : Set ℓ} {X : Rel x O} →
+  Extensionality? k ℓ ℓ →
+  ∀ (C : Container I O) (f : I → O) (R : ∀ {o} → Rel₂ ℓ (X o)) {i}
   (x y : ⟦ reindex f C ⟧ X i) →
 
   ⟦ reindex f C ⟧₂ R (x , y)
 
-    ↔
+    ↝[ k ]
 
   ⟦ C ⟧₂ R ( (proj₁ x , λ p → proj₂ x (_ , refl , p))
            , (proj₁ y , λ p → proj₂ y (_ , refl , p))
            )
 
-⟦reindex⟧₂↔ C f R x y =
+⟦reindex⟧₂↔ ext C f R x y =
 
   ⟦ reindex f C ⟧₂ R (x , y)                           ↔⟨⟩
 
   ⟦ reindex₂ f (reindex₁ f C) ⟧₂ R (x , y)             ↔⟨⟩
 
-  ⟦ reindex₁ f C ⟧₂ R (x , y)                          ↝⟨ ⟦reindex₁⟧₂↔ C f R x y ⟩□
+  ⟦ reindex₁ f C ⟧₂ R (x , y)                          ↝⟨ ⟦reindex₁⟧₂↔ ext C f R x y ⟩□
 
   ⟦ C ⟧₂ R ( (proj₁ x , λ p → proj₂ x (_ , refl , p))
            , (proj₁ y , λ p → proj₂ y (_ , refl , p))
@@ -465,8 +476,8 @@ mutual
     ∀ {i x} → ν (reindex f C) i x ⇔ ν C i (f x)
   ν-reindex⇔ {C = C} {f} inv {i} {x} =
     ν (reindex f C) i x                     ↔⟨⟩
-    ⟦ reindex f C ⟧ (ν′ (reindex f C) i) x  ↔⟨ ⟦reindex⟧↔ C ⟩
-    ⟦ C ⟧ (ν′ (reindex f C) i ⊚ f) (f x)    ↝⟨ ⟦ C ⟧-cong (ν′-reindex⇔ inv) ⟩
+    ⟦ reindex f C ⟧ (ν′ (reindex f C) i) x  ↝⟨ ⟦reindex⟧↔ _ C ⟩
+    ⟦ C ⟧ (ν′ (reindex f C) i ⊚ f) (f x)    ↝⟨ ⟦⟧-cong _ C (ν′-reindex⇔ inv) ⟩
     ⟦ C ⟧ (ν′ C i ⊚ f ⊚ f) (f x)            ↔⟨ ≡⇒↝ bijection $ cong (λ g → ⟦ C ⟧ (ν′ C i ⊚ g) (f x)) inv ⟩
     ⟦ C ⟧ (ν′ C i) (f x)                    ↔⟨⟩
     ν C i (f x)                             □
@@ -502,31 +513,32 @@ C₁ ⊗ C₂ =
 
 -- An unfolding lemma for ⟦ C₁ ⊗ C₂ ⟧.
 
-⟦⊗⟧↔ : ∀ {ℓ x} {I O : Set ℓ}
-       (C₁ C₂ : Container I O) {X : Rel x I} {o} →
-       ⟦ C₁ ⊗ C₂ ⟧ X o ↔ ⟦ C₁ ⟧ X o × ⟦ C₂ ⟧ X o
-⟦⊗⟧↔ C₁ C₂ {X} {o} =
+⟦⊗⟧↔ : ∀ {k ℓ x} {I O : Set ℓ} →
+       Extensionality? k ℓ (ℓ ⊔ x) →
+       ∀ (C₁ C₂ : Container I O) {X : Rel x I} {o} →
+       ⟦ C₁ ⊗ C₂ ⟧ X o ↝[ k ] ⟦ C₁ ⟧ X o × ⟦ C₂ ⟧ X o
+⟦⊗⟧↔ {k} {ℓ} ext C₁ C₂ {X} {o} =
   ⟦ C₁ ⊗ C₂ ⟧ X o                                                  ↔⟨⟩
 
   (∃ λ (s : Shape C₁ o × Shape C₂ o) →
-   (λ i → Position C₁ (proj₁ s) i ⊎ Position C₂ (proj₂ s) i) ⊆ X)  ↝⟨ inverse Σ-assoc ⟩
+   (λ i → Position C₁ (proj₁ s) i ⊎ Position C₂ (proj₂ s) i) ⊆ X)  ↔⟨ inverse Σ-assoc ⟩
 
   (∃ λ (s₁ : Shape C₁ o) →
    ∃ λ (s₂ : Shape C₂ o) →
-   (λ i → Position C₁ s₁ i ⊎ Position C₂ s₂ i) ⊆ X)                ↝⟨ (∃-cong λ _ → ∃-cong λ _ → implicit-∀-cong ext $ Π⊎↔Π×Π ext) ⟩
+   (λ i → Position C₁ s₁ i ⊎ Position C₂ s₂ i) ⊆ X)                ↝⟨ (∃-cong λ _ → ∃-cong λ _ → implicit-∀-cong ext $
+                                                                       Π⊎↔Π×Π (lower-extensionality? k lzero ℓ ext)) ⟩
+  (∃ λ (s₁ : Shape C₁ o) →
+   ∃ λ (s₂ : Shape C₂ o) →
+   ∀ {i} → (Position C₁ s₁ i → X i) × (Position C₂ s₂ i → X i))    ↔⟨ (∃-cong λ _ → ∃-cong λ _ → implicit-ΠΣ-comm) ⟩
 
   (∃ λ (s₁ : Shape C₁ o) →
    ∃ λ (s₂ : Shape C₂ o) →
-   ∀ {i} → (Position C₁ s₁ i → X i) × (Position C₂ s₂ i → X i))    ↝⟨ (∃-cong λ _ → ∃-cong λ _ → implicit-ΠΣ-comm) ⟩
-
-  (∃ λ (s₁ : Shape C₁ o) →
-   ∃ λ (s₂ : Shape C₂ o) →
-   Position C₁ s₁ ⊆ X × Position C₂ s₂ ⊆ X)                        ↝⟨ (∃-cong λ _ → ∃-comm) ⟩
+   Position C₁ s₁ ⊆ X × Position C₂ s₂ ⊆ X)                        ↔⟨ (∃-cong λ _ → ∃-comm) ⟩
 
   (∃ λ (s₁ : Shape C₁ o) →
    Position C₁ s₁ ⊆ X
      ×
-   ∃ λ (s₂ : Shape C₂ o) → Position C₂ s₂ ⊆ X)                     ↝⟨ Σ-assoc ⟩
+   ∃ λ (s₂ : Shape C₂ o) → Position C₂ s₂ ⊆ X)                     ↔⟨ Σ-assoc ⟩
 
   (∃ λ (s : Shape C₁ o) → Position C₁ s ⊆ X) ×
   (∃ λ (s : Shape C₂ o) → Position C₂ s ⊆ X)                       ↔⟨⟩
@@ -538,8 +550,9 @@ C₁ ⊗ C₂ =
 -- An unfolding lemma for ⟦ C₁ ⊗ C₂ ⟧₂.
 
 ⟦⊗⟧₂↔ :
-  ∀ {ℓ x} {I : Set ℓ} {X : Rel x I}
-  (C₁ C₂ : Container I I) (R : ∀ {i} → Rel₂ ℓ (X i)) {i}
+  ∀ {k ℓ x} {I : Set ℓ} {X : Rel x I} →
+  Extensionality? k ℓ ℓ →
+  ∀ (C₁ C₂ : Container I I) (R : ∀ {i} → Rel₂ ℓ (X i)) {i}
   (x y : ⟦ C₁ ⊗ C₂ ⟧ X i) →
 
   let (x₁ , x₂) , f = x
@@ -548,13 +561,13 @@ C₁ ⊗ C₂ =
 
   ⟦ C₁ ⊗ C₂ ⟧₂ R (x , y)
 
-    ↔
+    ↝[ k ]
 
   ⟦ C₁ ⟧₂ R ((x₁ , f ⊚ inj₁) , (y₁ , g ⊚ inj₁))
     ×
   ⟦ C₂ ⟧₂ R ((x₂ , f ⊚ inj₂) , (y₂ , g ⊚ inj₂))
 
-⟦⊗⟧₂↔ C₁ C₂ R (x@(x₁ , x₂) , f) (y@(y₁ , y₂) , g) =
+⟦⊗⟧₂↔ ext C₁ C₂ R (x@(x₁ , x₂) , f) (y@(y₁ , y₂) , g) =
 
   ⟦ C₁ ⊗ C₂ ⟧₂ R ((x , f) , (y , g))                                      ↔⟨⟩
 
@@ -567,14 +580,14 @@ C₁ ⊗ C₂ =
    R ( f p
      , g (subst (λ { (s₁ , s₂) → Position C₁ s₁ o ⊎ Position C₂ s₂ o })
                 eq p)
-     ))                                                                   ↝⟨ inverse (Σ-cong ≡×≡↔≡ λ _ → F.id) ⟩
+     ))                                                                   ↔⟨ inverse (Σ-cong ≡×≡↔≡ λ _ → Bijection.id) ⟩
 
   (∃ λ (eq : x₁ ≡ y₁ × x₂ ≡ y₂) →
    ∀ {o} (p : Position C₁ x₁ o ⊎ Position C₂ x₂ o) →
    R ( f p
      , g (subst (λ { (s₁ , s₂) → Position C₁ s₁ o ⊎ Position C₂ s₂ o })
                 (cong₂ _,_ (proj₁ eq) (proj₂ eq)) p)
-     ))                                                                   ↝⟨ inverse Σ-assoc ⟩
+     ))                                                                   ↔⟨ inverse Σ-assoc ⟩
 
   (∃ λ (eq₁ : x₁ ≡ y₁) →
    ∃ λ (eq₂ : x₂ ≡ y₂) →
@@ -610,7 +623,7 @@ C₁ ⊗ C₂ =
     R (f (inj₁ p) , g (inj₁ (subst (λ s₁ → Position C₁ s₁ o) eq₁ p))))
      ×
    ((p : Position C₂ x₂ o) →
-    R (f (inj₂ p) , g (inj₂ (subst (λ s₂ → Position C₂ s₂ o) eq₂ p)))))   ↝⟨ (∃-cong λ _ → ∃-cong λ _ → implicit-ΠΣ-comm) ⟩
+    R (f (inj₂ p) , g (inj₂ (subst (λ s₂ → Position C₂ s₂ o) eq₂ p)))))   ↔⟨ (∃-cong λ _ → ∃-cong λ _ → implicit-ΠΣ-comm) ⟩
 
   (∃ λ (eq₁ : x₁ ≡ y₁) →
    ∃ λ (eq₂ : x₂ ≡ y₂) →
@@ -618,7 +631,7 @@ C₁ ⊗ C₂ =
     R (f (inj₁ p) , g (inj₁ (subst (λ s₁ → Position C₁ s₁ o) eq₁ p))))
      ×
    (∀ {o} (p : Position C₂ x₂ o) →
-    R (f (inj₂ p) , g (inj₂ (subst (λ s₂ → Position C₂ s₂ o) eq₂ p)))))   ↝⟨ (∃-cong λ _ → ∃-comm) ⟩
+    R (f (inj₂ p) , g (inj₂ (subst (λ s₂ → Position C₂ s₂ o) eq₂ p)))))   ↔⟨ (∃-cong λ _ → ∃-comm) ⟩
 
   (∃ λ (eq₁ : x₁ ≡ y₁) →
    (∀ {o} (p : Position C₁ x₁ o) →
@@ -626,7 +639,7 @@ C₁ ⊗ C₂ =
      ×
    ∃ λ (eq₂ : x₂ ≡ y₂) →
    (∀ {o} (p : Position C₂ x₂ o) →
-    R (f (inj₂ p) , g (inj₂ (subst (λ s₂ → Position C₂ s₂ o) eq₂ p)))))   ↝⟨ Σ-assoc ⟩
+    R (f (inj₂ p) , g (inj₂ (subst (λ s₂ → Position C₂ s₂ o) eq₂ p)))))   ↔⟨ Σ-assoc ⟩
 
   (∃ λ (eq : x₁ ≡ y₁) →
    (∀ {o} (p : Container.Position C₁ x₁ o) →
@@ -677,11 +690,11 @@ C₁ ⊗ C₂ =
 -- intersection ν C₁ i ∩ ν C₂ i.
 
 ν-⊗⊆ :
-  ∀ {ℓ} {I : Set ℓ} {C₁ C₂ : Container I I} →
-  ∀ {i} → ν (C₁ ⊗ C₂) i ⊆ ν C₁ i ∩ ν C₂ i
+  ∀ {ℓ} {I : Set ℓ} {C₁ C₂ : Container I I} {i} →
+  ν (C₁ ⊗ C₂) i ⊆ ν C₁ i ∩ ν C₂ i
 ν-⊗⊆ {C₁ = C₁} {C₂} {i} =
   ν (C₁ ⊗ C₂) i                                      ⊆⟨⟩
-  ⟦ C₁ ⊗ C₂ ⟧ (ν′ (C₁ ⊗ C₂) i)                       ⊆⟨ _↔_.to (⟦⊗⟧↔ C₁ C₂) ⟩
+  ⟦ C₁ ⊗ C₂ ⟧ (ν′ (C₁ ⊗ C₂) i)                       ⊆⟨ ⟦⊗⟧↔ _ C₁ C₂ ⟩
   ⟦ C₁ ⟧ (ν′ (C₁ ⊗ C₂) i) ∩ ⟦ C₂ ⟧ (ν′ (C₁ ⊗ C₂) i)  ⊆⟨ Σ-map (map C₁ ν-⊗⊆₁′) (map C₂ ν-⊗⊆₂′) ⟩
   ⟦ C₁ ⟧ (ν′ C₁ i) ∩ ⟦ C₂ ⟧ (ν′ C₂ i)                ⊆⟨ P.id ⟩∎
   ν C₁ i ∩ ν C₂ i                                    ∎
@@ -730,19 +743,20 @@ C₁ ⊕ C₂ =
 -- An unfolding lemma for ⟦ C₁ ⊕ C₂ ⟧₂.
 
 ⟦⊕⟧₂↔ :
-  ∀ {ℓ x} {I : Set ℓ} {X : Rel x I}
-  (C₁ C₂ : Container I I) (R : ∀ {i} → Rel₂ ℓ (X i)) {i}
+  ∀ {k ℓ x} {I : Set ℓ} {X : Rel x I} →
+  Extensionality? k ℓ ℓ →
+  ∀ (C₁ C₂ : Container I I) (R : ∀ {i} → Rel₂ ℓ (X i)) {i}
   (x y : ⟦ C₁ ⊕ C₂ ⟧ X i) →
 
   ⟦ C₁ ⊕ C₂ ⟧₂ R (x , y)
 
-    ↔
+    ↝[ k ]
 
   (curry (⟦ C₁ ⟧₂ R) ⊎-rel curry (⟦ C₂ ⟧₂ R))
     (_↔_.to (⟦⊕⟧↔ C₁ C₂) x)
     (_↔_.to (⟦⊕⟧↔ C₁ C₂) y)
 
-⟦⊕⟧₂↔ C₁ C₂ R (inj₁ x , f) (inj₁ y , g) =
+⟦⊕⟧₂↔ ext C₁ C₂ R (inj₁ x , f) (inj₁ y , g) =
 
   ⟦ C₁ ⊕ C₂ ⟧₂ R ((inj₁ x , f) , (inj₁ y , g))                   ↔⟨⟩
 
@@ -751,7 +765,7 @@ C₁ ⊕ C₂ =
    R ( f p
      , g (subst (λ s → [_,_] {C = λ _ → Rel _ _}
                          (Position C₁) (Position C₂) s o) eq p)
-     ))                                                          ↝⟨ inverse $ Σ-cong Bijection.≡↔inj₁≡inj₁ (λ _ → F.id) ⟩
+     ))                                                          ↔⟨ inverse $ Σ-cong Bijection.≡↔inj₁≡inj₁ (λ _ → Bijection.id) ⟩
 
   (∃ λ (eq : x ≡ y) →
    ∀ {o} (p : Position C₁ x o) →
@@ -773,27 +787,27 @@ C₁ ⊕ C₂ =
   where
   open Container
 
-⟦⊕⟧₂↔ C₁ C₂ R (inj₁ x , f) (inj₂ y , g) =
+⟦⊕⟧₂↔ _ C₁ C₂ R (inj₁ x , f) (inj₂ y , g) =
 
   ⟦ C₁ ⊕ C₂ ⟧₂ R ((inj₁ x , f) , (inj₂ y , g))  ↔⟨⟩
 
-  (∃ λ (eq : inj₁ x ≡ inj₂ y) → _)              ↝⟨ inverse $ Σ-cong (inverse Bijection.≡↔⊎) (λ _ → F.id) ⟩
+  (∃ λ (eq : inj₁ x ≡ inj₂ y) → _)              ↔⟨ inverse $ Σ-cong (inverse Bijection.≡↔⊎) (λ _ → Bijection.id) ⟩
 
-  (∃ λ (eq : ⊥) → _)                            ↝⟨ Σ-left-zero ⟩
+  (∃ λ (eq : ⊥) → _)                            ↔⟨ Σ-left-zero ⟩
 
   ⊥                                             □
 
-⟦⊕⟧₂↔ C₁ C₂ R (inj₂ x , f) (inj₁ y , g) =
+⟦⊕⟧₂↔ _ C₁ C₂ R (inj₂ x , f) (inj₁ y , g) =
 
   ⟦ C₁ ⊕ C₂ ⟧₂ R ((inj₂ x , f) , (inj₁ y , g))  ↔⟨⟩
 
-  (∃ λ (eq : inj₂ x ≡ inj₁ y) → _)              ↝⟨ inverse $ Σ-cong (inverse Bijection.≡↔⊎) (λ _ → F.id) ⟩
+  (∃ λ (eq : inj₂ x ≡ inj₁ y) → _)              ↔⟨ inverse $ Σ-cong (inverse Bijection.≡↔⊎) (λ _ → Bijection.id) ⟩
 
-  (∃ λ (eq : ⊥) → _)                            ↝⟨ Σ-left-zero ⟩
+  (∃ λ (eq : ⊥) → _)                            ↔⟨ Σ-left-zero ⟩
 
   ⊥                                             □
 
-⟦⊕⟧₂↔ C₁ C₂ R (inj₂ x , f) (inj₂ y , g) =
+⟦⊕⟧₂↔ ext C₁ C₂ R (inj₂ x , f) (inj₂ y , g) =
 
   ⟦ C₁ ⊕ C₂ ⟧₂ R ((inj₂ x , f) , (inj₂ y , g))                   ↔⟨⟩
 
@@ -802,7 +816,7 @@ C₁ ⊕ C₂ =
    R ( f p
      , g (subst (λ s → [_,_] {C = λ _ → Rel _ _}
                          (Position C₁) (Position C₂) s o) eq p)
-     ))                                                          ↝⟨ inverse $ Σ-cong Bijection.≡↔inj₂≡inj₂ (λ _ → F.id) ⟩
+     ))                                                          ↔⟨ inverse $ Σ-cong Bijection.≡↔inj₂≡inj₂ (λ _ → Bijection.id) ⟩
 
   (∃ λ (eq : x ≡ y) →
    ∀ {o} (p : Position C₂ x o) →
@@ -845,20 +859,24 @@ mutual
 -- An unfolding lemma for ⟦ C₁ ⟷ C₂ ⟧.
 
 ⟦⟷⟧↔ :
-  ∀ {ℓ x} {I : Set ℓ}
-  (C₁ C₂ : Container (I × I) (I × I)) {X : Rel₂ x I} {i} →
-  ⟦ C₁ ⟷ C₂ ⟧ X i ↔ ⟦ C₁ ⟧ X i × ⟦ C₂ ⟧ (X ⊚ swap) (swap i)
-⟦⟷⟧↔ C₁ C₂ {X} {i} =
+  ∀ {k ℓ x} {I : Set ℓ} →
+  Extensionality? k ℓ (ℓ ⊔ x) →
+  ∀ (C₁ C₂ : Container (I × I) (I × I)) {X : Rel₂ x I} {i} →
+  ⟦ C₁ ⟷ C₂ ⟧ X i
+    ↝[ k ]
+  ⟦ C₁ ⟧ X i × ⟦ C₂ ⟧ (X ⊚ swap) (swap i)
+⟦⟷⟧↔ ext C₁ C₂ {X} {i} =
   ⟦ C₁ ⟷ C₂ ⟧ X i                          ↔⟨⟩
-  ⟦ C₁ ⊗ reindex swap C₂ ⟧ X i             ↝⟨ ⟦⊗⟧↔ C₁ (reindex swap C₂) ⟩
-  ⟦ C₁ ⟧ X i × ⟦ reindex swap C₂ ⟧ X i     ↝⟨ ∃-cong (λ _ → ⟦reindex⟧↔ C₂) ⟩□
+  ⟦ C₁ ⊗ reindex swap C₂ ⟧ X i             ↝⟨ ⟦⊗⟧↔ ext C₁ (reindex swap C₂) ⟩
+  ⟦ C₁ ⟧ X i × ⟦ reindex swap C₂ ⟧ X i     ↝⟨ ∃-cong (λ _ → ⟦reindex⟧↔ ext C₂) ⟩□
   ⟦ C₁ ⟧ X i × ⟦ C₂ ⟧ (X ⊚ swap) (swap i)  □
 
 -- An unfolding lemma for ⟦ C₁ ⟷ C₂ ⟧₂.
 
 ⟦⟷⟧₂↔ :
-  ∀ {ℓ x} {I : Set ℓ} {X : Rel₂ x I}
-  (C₁ C₂ : Container (I × I) (I × I)) (R : ∀ {i} → Rel₂ ℓ (X i)) {i}
+  ∀ {k ℓ x} {I : Set ℓ} {X : Rel₂ x I} →
+  Extensionality? k ℓ ℓ →
+  ∀ (C₁ C₂ : Container (I × I) (I × I)) (R : ∀ {i} → Rel₂ ℓ (X i)) {i}
   (x y : ⟦ C₁ ⟷ C₂ ⟧ X i) →
 
   let (s₁ , s₂) , f = x
@@ -867,7 +885,7 @@ mutual
 
   ⟦ C₁ ⟷ C₂ ⟧₂ R (x , y)
 
-    ↔
+    ↝[ k ]
 
   ⟦ C₁ ⟧₂ R ((s₁ , f ⊚ inj₁) , (t₁ , g ⊚ inj₁))
     ×
@@ -875,15 +893,15 @@ mutual
             , (t₂ , λ p → g (inj₂ (_ , refl , p)))
             )
 
-⟦⟷⟧₂↔ C₁ C₂ R x@((s₁ , s₂) , f) y@((t₁ , t₂) , g) =
+⟦⟷⟧₂↔ ext C₁ C₂ R x@((s₁ , s₂) , f) y@((t₁ , t₂) , g) =
 
   ⟦ C₁ ⟷ C₂ ⟧₂ R (x , y)                                      ↔⟨⟩
 
-  ⟦ C₁ ⊗ reindex swap C₂ ⟧₂ R (x , y)                         ↝⟨ ⟦⊗⟧₂↔ C₁ (reindex swap C₂) R _ (_ , g) ⟩
+  ⟦ C₁ ⊗ reindex swap C₂ ⟧₂ R (x , y)                         ↝⟨ ⟦⊗⟧₂↔ ext C₁ (reindex swap C₂) R _ (_ , g) ⟩
 
   ⟦ C₁ ⟧₂ R ((s₁ , f ⊚ inj₁) , (t₁ , g ⊚ inj₁))
     ×
-  ⟦ reindex swap C₂ ⟧₂ R ((s₂ , f ⊚ inj₂) , (t₂ , g ⊚ inj₂))  ↝⟨ ∃-cong (λ _ → ⟦reindex⟧₂↔ C₂ _ R _ (_ , g ⊚ inj₂)) ⟩□
+  ⟦ reindex swap C₂ ⟧₂ R ((s₂ , f ⊚ inj₂) , (t₂ , g ⊚ inj₂))  ↝⟨ ∃-cong (λ _ → ⟦reindex⟧₂↔ ext C₂ _ R _ (_ , g ⊚ inj₂)) ⟩□
 
   ⟦ C₁ ⟧₂ R ((s₁ , f ⊚ inj₁) , (t₁ , g ⊚ inj₁))
     ×
@@ -904,12 +922,12 @@ mutual
 ⊆reindex₂-swap-⊗→⊆⟷ {C = C} {R} R⊆ =
   R                                  ⊆⟨ (λ x → lemma₁ x , lemma₂ x) ⟩
   ⟦ C ⟧ R ∩ R ⊚ swap                 ⊆⟨ Σ-map P.id lemma₃ ⟩
-  ⟦ C ⟧ R ∩ ⟦ C ⟧ (R ⊚ swap) ⊚ swap  ⊆⟨ _↔_.from (⟦⟷⟧↔ C C) ⟩∎
+  ⟦ C ⟧ R ∩ ⟦ C ⟧ (R ⊚ swap) ⊚ swap  ⊆⟨ _⇔_.from (⟦⟷⟧↔ _ C C) ⟩∎
   ⟦ ⟷[ C ] ⟧ R                       ∎
   where
   lemma₀ =
     R                                 ⊆⟨ R⊆ ⟩
-    ⟦ reindex₂ swap id ⊗ C ⟧ R        ⊆⟨ _↔_.to (⟦⊗⟧↔ (reindex₂ swap id) C) ⟩∎
+    ⟦ reindex₂ swap id ⊗ C ⟧ R        ⊆⟨ ⟦⊗⟧↔ _ (reindex₂ swap id) C ⟩∎
     ⟦ reindex₂ swap id ⟧ R ∩ ⟦ C ⟧ R  ∎
 
   lemma₁ =
@@ -921,7 +939,7 @@ mutual
     R                                 ⊆⟨ lemma₀ ⟩
     ⟦ reindex₂ swap id ⟧ R ∩ ⟦ C ⟧ R  ⊆⟨ proj₁ ⟩
     ⟦ reindex₂ swap id ⟧ R            ⊆⟨ P.id ⟩
-    ⟦ id ⟧ R ⊚ swap                   ⊆⟨ _↔_.to ⟦id⟧↔ ⟩∎
+    ⟦ id ⟧ R ⊚ swap                   ⊆⟨ _⇔_.to (⟦id⟧↔ _) ⟩∎
     R ⊚ swap                          ∎
 
   lemma₃ =
@@ -938,21 +956,21 @@ mutual
   R ∪ R ⊚ swap ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ (R ∪ R ⊚ swap)
 ⊆⟷→∪-swap⊆reindex₂-swap-⊗ {C = C} {R} R⊆ =
   R ∪ R ⊚ swap                                                ⊆⟨ (λ x → lemma₁ x , lemma₂ x) ⟩
-  ⟦ reindex₂ swap id ⟧ (R ∪ R ⊚ swap) ∩ ⟦ C ⟧ (R ∪ R ⊚ swap)  ⊆⟨ _↔_.from (⟦⊗⟧↔ (reindex₂ swap id) C) ⟩∎
+  ⟦ reindex₂ swap id ⟧ (R ∪ R ⊚ swap) ∩ ⟦ C ⟧ (R ∪ R ⊚ swap)  ⊆⟨ _⇔_.from (⟦⊗⟧↔ _ (reindex₂ swap id) C) ⟩∎
   ⟦ reindex₂ swap id ⊗ C ⟧ (R ∪ R ⊚ swap)                     ∎
   where
   lemma₁ =
     R ∪ R ⊚ swap                         ⊆⟨ [ inj₂ , inj₁ ] ⟩
     R ⊚ swap ∪ R                         ⊆⟨ P.id ⟩
     R ⊚ swap ∪ R ⊚ swap ⊚ swap           ⊆⟨ P.id ⟩
-    (R ∪ R ⊚ swap) ⊚ swap                ⊆⟨ _↔_.from ⟦id⟧↔ ⟩
+    (R ∪ R ⊚ swap) ⊚ swap                ⊆⟨ _⇔_.from (⟦id⟧↔ _) ⟩
     ⟦ id ⟧ (R ∪ R ⊚ swap) ⊚ swap         ⊆⟨ P.id ⟩∎
     ⟦ reindex₂ swap id ⟧ (R ∪ R ⊚ swap)  ∎
 
   lemma₂ =
     R ∪ R ⊚ swap                         ⊆⟨ ⊎-map R⊆ R⊆ ⟩
 
-    ⟦ ⟷[ C ] ⟧ R ∪ ⟦ ⟷[ C ] ⟧ R ⊚ swap   ⊆⟨ ⊎-map (_↔_.to (⟦⟷⟧↔ C C)) (_↔_.to (⟦⟷⟧↔ C C)) ⟩
+    ⟦ ⟷[ C ] ⟧ R ∪ ⟦ ⟷[ C ] ⟧ R ⊚ swap   ⊆⟨ ⊎-map (_⇔_.to (⟦⟷⟧↔ _ C C)) (_⇔_.to (⟦⟷⟧↔ _ C C)) ⟩
 
     ⟦ C ⟧ R ∩ ⟦ C ⟧ (R ⊚ swap) ⊚ swap ∪
     ⟦ C ⟧ R ⊚ swap ∩ ⟦ C ⟧ (R ⊚ swap)    ⊆⟨ ⊎-map proj₁ proj₂ ⟩

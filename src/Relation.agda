@@ -7,7 +7,6 @@
 module Relation where
 
 open import Equality.Propositional
-open import Interval using (ext)
 open import Prelude
 
 open import Bijection equality-with-J using (_↔_)
@@ -163,18 +162,21 @@ syntax finally-⊆ P Q P⊆Q = P ⊆⟨ P⊆Q ⟩∎ Q ∎
 
 -- Preservation lemmas for _⊆_.
 
-infix 4 _⊆-cong_ _⊆-cong-→_
+infix 4 _⊆-cong-→_
 
-_⊆-cong_ :
+⊆-cong :
   ∀ {k a r₁ r₂ s₁ s₂} {A : Set a}
     {R₁ : Rel r₁ A} {S₁ : Rel s₁ A}
     {R₂ : Rel r₂ A} {S₂ : Rel s₂ A} →
+  Extensionality? ⌊ k ⌋-sym (a ⊔ r₁ ⊔ r₂) (r₁ ⊔ r₂ ⊔ s₁ ⊔ s₂) →
   (∀ {x} → R₁ x ↝[ ⌊ k ⌋-sym ] R₂ x) →
   (∀ {x} → S₁ x ↝[ ⌊ k ⌋-sym ] S₂ x) →
   R₁ ⊆ S₁ ↝[ ⌊ k ⌋-sym ] R₂ ⊆ S₂
-_⊆-cong_ {k} R₁↝R₂ S₁↝S₂ =
-  implicit-∀-cong (forget-ext? ⌊ k ⌋-sym ext) $
-  →-cong (forget-ext? ⌊ k ⌋-sym ext) R₁↝R₂ S₁↝S₂
+⊆-cong {k} {a} {r₁} {r₂} ext R₁↝R₂ S₁↝S₂ =
+  implicit-∀-cong
+    (lower-extensionality? ⌊ k ⌋-sym (r₁ ⊔ r₂) lzero ext) $
+  →-cong (lower-extensionality? ⌊ k ⌋-sym a (r₁ ⊔ r₂) ext)
+         R₁↝R₂ S₁↝S₂
 
 _⊆-cong-→_ :
   ∀ {a r₁ r₂ s₁ s₂} {A : Set a}
@@ -186,11 +188,12 @@ R₂→R₁ ⊆-cong-→ S₁→S₂ = implicit-∀-cong _ $ →-cong-→ R₂�
 ⊆-congʳ :
   ∀ {k a r s₁ s₂} {A : Set a}
     {R : Rel r A} {S₁ : Rel s₁ A} {S₂ : Rel s₂ A} →
+  Extensionality? k (a ⊔ r) (r ⊔ s₁ ⊔ s₂) →
   (∀ {x} → S₁ x ↝[ k ] S₂ x) →
   R ⊆ S₁ ↝[ k ] R ⊆ S₂
-⊆-congʳ {k} S₁↝S₂ =
-  implicit-∀-cong (forget-ext? k ext) $
-  ∀-cong (forget-ext? k ext) λ _ →
+⊆-congʳ {k} {a} {r} ext S₁↝S₂ =
+  implicit-∀-cong (lower-extensionality? k r lzero ext) $
+  ∀-cong (lower-extensionality? k a r ext) λ _ →
   S₁↝S₂
 
 -- Monotonicity of relation transformers.

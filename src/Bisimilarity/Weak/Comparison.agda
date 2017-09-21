@@ -72,9 +72,11 @@ module _ {lts : LTS} where
   larger⇔smallest = Comp.larger⇔smallest
 
   -- There is a split surjection from the classical definition of
-  -- bisimilarity to the coinductive one (assuming extensionality).
+  -- bisimilarity to the coinductive one (assuming two kinds of
+  -- extensionality).
 
   classical↠coinductive :
+    Extensionality lzero lzero →
     Co.Extensionality →
     ∀ {ℓ p q} → Cl.[ ℓ ] p ≈ q ↠ p Co.≈ q
   classical↠coinductive = Comp.classical↠coinductive
@@ -90,74 +92,81 @@ coinductive↠classical :
 coinductive↠classical {p = ()}
 
 -- There is an LTS for which coinductive weak bisimilarity is
--- pointwise propositional (assuming extensionality and univalence).
+-- pointwise propositional (assuming two kinds of extensionality and
+-- univalence).
 
 coinductive-weak-bisimilarity-is-sometimes-propositional :
+  Extensionality lzero (lsuc lzero) →
   Univalence lzero →
   let module Co = Bisimilarity.Weak.Coinductive one-loop in
   Co.Extensionality → Is-proposition (tt Co.≈ tt)
-coinductive-weak-bisimilarity-is-sometimes-propositional univ =
+coinductive-weak-bisimilarity-is-sometimes-propositional ext univ =
   subst (λ lts → let module Co = Bisimilarity.Coinductive lts in
                   ∀ p → Co.Extensionality → Is-proposition (p Co.∼ p))
-        (sym $ weak≡id univ one-loop (λ _ ()))
-        (λ _ → Comp.coinductive-bisimilarity-is-sometimes-propositional)
+        (sym $ weak≡id ext univ one-loop (λ _ ()))
+        (λ _ → Comp.coinductive-bisimilarity-is-sometimes-propositional
+                 (lower-extensionality _ _ ext))
         _
 
 -- However, classical weak bisimilarity is, for the same LTS, not
--- pointwise propositional (assuming univalence).
+-- pointwise propositional (assuming extensionality and univalence).
 
 classical-weak-bisimilarity-is-not-propositional :
+  Extensionality lzero (lsuc lzero) →
   Univalence lzero →
   let module Cl = Bisimilarity.Weak.Classical one-loop in
   ∀ {ℓ} → ¬ Is-proposition (Cl.[ ℓ ] tt ≈ tt)
-classical-weak-bisimilarity-is-not-propositional univ {ℓ} =
+classical-weak-bisimilarity-is-not-propositional ext univ {ℓ} =
   subst (λ lts → let module Cl = Bisimilarity.Classical lts in
                  ∀ p → ¬ Is-proposition (Cl.[ ℓ ] p ∼ p))
-        (sym $ weak≡id univ one-loop (λ _ ()))
+        (sym $ weak≡id ext univ one-loop (λ _ ()))
         (λ _ → Comp.classical-bisimilarity-is-not-propositional)
         _
 
 -- Thus there is, in general, no split surjection from the coinductive
--- definition of weak bisimilarity to the classical one (assuming
--- extensionality and univalence).
+-- definition of weak bisimilarity to the classical one (assuming two
+-- kinds of extensionality and univalence).
 
 ¬coinductive↠classical :
+  Extensionality lzero (lsuc lzero) →
   Univalence lzero →
   ∀ {ℓ} →
   Bisimilarity.Weak.Coinductive.Extensionality one-loop →
   ¬ (∀ {p q} → Bisimilarity.Weak.Coinductive._≈_  one-loop   p q ↠
                Bisimilarity.Weak.Classical.[_]_≈_ one-loop ℓ p q)
-¬coinductive↠classical univ {ℓ} =
+¬coinductive↠classical ext univ {ℓ} =
   subst (λ lts → Bisimilarity.Coinductive.Extensionality lts →
                  ¬ (∀ {p q} → Bisimilarity.Coinductive._∼_  lts   p q ↠
                               Bisimilarity.Classical.[_]_∼_ lts ℓ p q))
-        (sym $ weak≡id univ one-loop (λ _ ()))
-        Comp.¬coinductive↠classical
+        (sym $ weak≡id ext univ one-loop (λ _ ()))
+        (Comp.¬coinductive↠classical (lower-extensionality _ _ ext))
 
 -- Note also that coinductive weak bisimilarity is not always
--- propositional (assuming univalence).
+-- propositional (assuming extensionality and univalence).
 
 coinductive-weak-bisimilarity-is-not-propositional :
+  Extensionality lzero (lsuc lzero) →
   Univalence lzero →
   let open Bisimilarity.Weak.Coinductive two-bisimilar-processes in
   ¬ (∀ {p q} → Is-proposition (p ≈ q))
-coinductive-weak-bisimilarity-is-not-propositional univ =
+coinductive-weak-bisimilarity-is-not-propositional ext univ =
   subst (λ lts → let open Bisimilarity.Coinductive lts in
                  ¬ (∀ {p q} → Is-proposition (p ∼ q)))
-        (sym $ weak≡id univ two-bisimilar-processes (λ _ ()))
+        (sym $ weak≡id ext univ two-bisimilar-processes (λ _ ()))
         Comp.coinductive-bisimilarity-is-not-propositional
 
 -- In fact, for every type A there is a pointwise split surjection
 -- from a certain instance of weak bisimilarity to equality on A
--- (assuming univalence).
+-- (assuming extensionality and univalence).
 
 weak-bisimilarity↠equality :
+  Extensionality lzero (lsuc lzero) →
   Univalence lzero →
   {A : Set} →
   let open Bisimilarity.Weak.Coinductive (bisimilarity⇔equality A) in
   {p q : A} → p ≈ q ↠ p ≡ q
-weak-bisimilarity↠equality univ {A} =
+weak-bisimilarity↠equality ext univ {A} =
   subst (λ lts → let open Bisimilarity.Coinductive lts in
                  ∀ {p q} → p ∼ q ↠ p ≡ q)
-        (sym $ weak≡id univ (bisimilarity⇔equality A) (λ _ ()))
+        (sym $ weak≡id ext univ (bisimilarity⇔equality A) (λ _ ()))
         Comp.bisimilarity↠equality

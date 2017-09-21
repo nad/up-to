@@ -13,8 +13,6 @@ open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 
-open import Bijection equality-with-J using (_↔_)
-
 import Bisimilarity.Classical.Equational-reasoning-instances
 open import Bisimilarity.Comparison
 import Bisimilarity.Exercises.Other.CCS
@@ -121,8 +119,8 @@ open import Bisimilarity.Classical CCS
 -- _∣_ preserves bisimilarity.
 
 _∣-cong_ : ∀ {P P′ Q Q′} → P ∼ P′ → Q ∼ Q′ → P ∣ Q ∼ P′ ∣ Q′
-P∼P′ ∣-cong Q∼Q′ with _↔_.to Bisimilarity↔ P∼P′
-                    | _↔_.to Bisimilarity↔ Q∼Q′
+P∼P′ ∣-cong Q∼Q′ with _⇔_.to (Bisimilarity↔ _) P∼P′
+                    | _⇔_.to (Bisimilarity↔ _) Q∼Q′
 ... | L , L-bisim , PLP′
     | R , R-bisim , QRQ′ = ⟨ LR , ⟪ lr , rl ⟫ , base PLP′ QRQ′ ⟩
   where

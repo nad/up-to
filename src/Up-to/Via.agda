@@ -7,7 +7,7 @@
 module Up-to.Via where
 
 open import Equality.Propositional
-open import Interval using (ext)
+open import Logical-equivalence using (_⇔_)
 open import Prelude
 
 open import Bijection equality-with-J as Bijection using (_↔_)
@@ -113,11 +113,13 @@ mutual
   up-to-via²→ν-∘⊆ν {ℓ} {I} {C₁} {C₂} {F₁} {F₂} {G} {f}
                    inv symm up-to₁ up-to₂ =
                                                        $⟨ (λ {_} → ν-out) ⟩
-    R ⊆ ⟦ C₁ ⊚ F₁ ⊗ reindex f (C₂ ⊚ F₂) ⟧ R            ↔⟨ ⊆-congʳ $ ⟦⊗⟧↔ (C₁ ⊚ F₁) (reindex f (C₂ ⊚ F₂)) ⟩
-    R ⊆ ⟦ C₁ ⊚ F₁ ⟧ R ∩ ⟦ reindex f (C₂ ⊚ F₂) ⟧ R      ↔⟨ implicit-ΠΣ-comm F.∘ implicit-∀-cong ext ΠΣ-comm ⟩
+    R ⊆ ⟦ C₁ ⊚ F₁ ⊗ reindex f (C₂ ⊚ F₂) ⟧ R            ↝⟨ ⊆-congʳ _ $ ⟦⊗⟧↔ _ (C₁ ⊚ F₁) (reindex f (C₂ ⊚ F₂)) ⟩
+    R ⊆ ⟦ C₁ ⊚ F₁ ⟧ R ∩ ⟦ reindex f (C₂ ⊚ F₂) ⟧ R      ↝⟨ from-isomorphism implicit-ΠΣ-comm F.∘
+                                                          implicit-∀-cong _ (from-isomorphism ΠΣ-comm) ⟩
     R ⊆ ⟦ C₁ ⊚ F₁ ⟧ R × R ⊆ ⟦ reindex f (C₂ ⊚ F₂) ⟧ R  ↝⟨ Σ-map lemma₁ lemma₂ ⟩
-    G R ⊆ ⟦ C₁ ⟧ (G R) × G R ⊆ ⟦ reindex f C₂ ⟧ (G R)  ↔⟨ inverse (implicit-ΠΣ-comm F.∘ implicit-∀-cong ext ΠΣ-comm) ⟩
-    G R ⊆ ⟦ C₁ ⟧ (G R) ∩ ⟦ reindex f C₂ ⟧ (G R)        ↔⟨ ⊆-congʳ $ inverse $ ⟦⊗⟧↔ C₁ (reindex f C₂) ⟩
+    G R ⊆ ⟦ C₁ ⟧ (G R) × G R ⊆ ⟦ reindex f C₂ ⟧ (G R)  ↝⟨ _⇔_.from (from-isomorphism implicit-ΠΣ-comm F.∘
+                                                                    implicit-∀-cong _ (from-isomorphism ΠΣ-comm)) ⟩
+    G R ⊆ ⟦ C₁ ⟧ (G R) ∩ ⟦ reindex f C₂ ⟧ (G R)        ↝⟨ _⇔_.from $ ⊆-congʳ _ $ ⟦⊗⟧↔ _ C₁ (reindex f C₂) ⟩
     G R ⊆ ⟦ C₁ ⊗ reindex f C₂ ⟧ (G R)                  ↝⟨ unfold (C₁ ⊗ reindex f C₂) ⟩
     G R ⊆ ν (C₁ ⊗ reindex f C₂) ∞                      ↝⟨ (λ hyp {_} x → hyp (proj₁ up-to₁ R x)) ⟩□
     R ⊆ ν (C₁ ⊗ reindex f C₂) ∞                        □
@@ -128,28 +130,26 @@ mutual
     I↔I = Bijection.bijection-from-involutive-family
             (λ _ _ → f) (λ _ _ → ext⁻¹ inv) tt tt
 
-    ∘⊆↔⊆∘ :
-      ∀ {r s} {S₁ : Rel r I} {S₂ : Rel s I} →
-      S₁ ∘ f ⊆ S₂ ↔ S₁ ⊆ S₂ ∘ f
-    ∘⊆↔⊆∘ {S₁ = S₁} {S₂} =
-      (∀ {p} → S₁ (f p) → S₂ p)  ↝⟨ Bijection.implicit-Π↔Π ⟩
-      (∀ p → S₁ (f p) → S₂ p)    ↝⟨ Π-cong ext I↔I (λ _ → →-cong ext F.id (≡⇒↝ _ $ cong S₂ $ ext⁻¹ (sym inv) _)) ⟩
-      (∀ p → S₁ p → S₂ (f p))    ↝⟨ inverse Bijection.implicit-Π↔Π ⟩□
+    ∘⊆⇔⊆∘ : {S₁ S₂ : Rel ℓ I} → S₁ ∘ f ⊆ S₂ ⇔ S₁ ⊆ S₂ ∘ f
+    ∘⊆⇔⊆∘ {S₁ = S₁} {S₂} =
+      (∀ {p} → S₁ (f p) → S₂ p)  ↔⟨ Bijection.implicit-Π↔Π ⟩
+      (∀ p → S₁ (f p) → S₂ p)    ↝⟨ Π-cong _ I↔I (λ _ → →-cong _ F.id (≡⇒↝ _ $ cong S₂ $ ext⁻¹ (sym inv) _)) ⟩
+      (∀ p → S₁ p → S₂ (f p))    ↔⟨ inverse Bijection.implicit-Π↔Π ⟩□
       (∀ {p} → S₁ p → S₂ (f p))  □
 
     lemma₁ =
-      R ⊆ ⟦ C₁ ⊚ F₁ ⟧ R      ↔⟨ ⊆-congʳ (⟦∘⟧↔ C₁) ⟩
+      R ⊆ ⟦ C₁ ⊚ F₁ ⟧ R      ↝⟨ ⊆-congʳ _ (⟦∘⟧↔ _ C₁) ⟩
       R ⊆ ⟦ C₁ ⟧ (⟦ F₁ ⟧ R)  ↝⟨ proj₂ up-to₁ _ ⟩□
       G R ⊆ ⟦ C₁ ⟧ (G R)     □
 
     lemma₂ =
-      R ⊆ ⟦ reindex f (C₂ ⊚ F₂) ⟧ R    ↔⟨ ⊆-congʳ $ ⟦reindex⟧↔ (C₂ ⊚ F₂) ⟩
-      R ⊆ ⟦ C₂ ⊚ F₂ ⟧ (R ∘ f) ∘ f      ↔⟨ ⊆-congʳ (⟦∘⟧↔ C₂) ⟩
-      R ⊆ ⟦ C₂ ⟧ (⟦ F₂ ⟧ (R ∘ f)) ∘ f  ↔⟨ inverse ∘⊆↔⊆∘ ⟩
+      R ⊆ ⟦ reindex f (C₂ ⊚ F₂) ⟧ R    ↝⟨ ⊆-congʳ _ $ ⟦reindex⟧↔ _ (C₂ ⊚ F₂) ⟩
+      R ⊆ ⟦ C₂ ⊚ F₂ ⟧ (R ∘ f) ∘ f      ↝⟨ ⊆-congʳ _ (⟦∘⟧↔ _ C₂) ⟩
+      R ⊆ ⟦ C₂ ⟧ (⟦ F₂ ⟧ (R ∘ f)) ∘ f  ↝⟨ _⇔_.from ∘⊆⇔⊆∘ ⟩
       R ∘ f ⊆ ⟦ C₂ ⟧ (⟦ F₂ ⟧ (R ∘ f))  ↝⟨ proj₂ up-to₂ _ ⟩
-      G (R ∘ f) ⊆ ⟦ C₂ ⟧ (G (R ∘ f))   ↝⟨ involution→other-symmetry G inv symm _ ⊆-cong-→ ⟦ C₂ ⟧-cong (symm _) ⟩
-      G R ∘ f ⊆ ⟦ C₂ ⟧ (G R ∘ f)       ↔⟨ ∘⊆↔⊆∘ ⟩
-      G R ⊆ ⟦ C₂ ⟧ (G R ∘ f) ∘ f       ↔⟨ ⊆-congʳ $ inverse $ ⟦reindex⟧↔ C₂ ⟩
+      G (R ∘ f) ⊆ ⟦ C₂ ⟧ (G (R ∘ f))   ↝⟨ involution→other-symmetry G inv symm _ ⊆-cong-→ ⟦⟧-cong _ C₂ (symm _) ⟩
+      G R ∘ f ⊆ ⟦ C₂ ⟧ (G R ∘ f)       ↝⟨ _⇔_.to ∘⊆⇔⊆∘ ⟩
+      G R ⊆ ⟦ C₂ ⟧ (G R ∘ f) ∘ f       ↝⟨ _⇔_.from $ ⊆-congʳ _ $ ⟦reindex⟧↔ _ C₂ ⟩
       G R ⊆ ⟦ reindex f C₂ ⟧ (G R)     □
 
 -- If F is monotone and compatible, then F is an up-to technique via

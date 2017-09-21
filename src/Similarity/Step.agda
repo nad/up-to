@@ -14,7 +14,6 @@ module Similarity.Step
          where
 
 open import Equality.Propositional
-open import Interval using (ext)
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 
@@ -84,17 +83,18 @@ S̲t̲e̲p̲ =
        })
 
 -- The definition of Step in terms of a container is pointwise
--- isomorphic to the direct definition.
+-- logically equivalent to the direct definition, and in the presence
+-- of extensionality it is pointwise isomorphic to the direct
+-- definition.
 
 Step↔S̲t̲e̲p̲ :
-  ∀ {r} {R : Rel₂ r Proc} {pq} → Step R pq ↔ ⟦ S̲t̲e̲p̲ ⟧ R pq
-Step↔S̲t̲e̲p̲ {R = R} {pq} = record
+  ∀ {k r} {R : Rel₂ r Proc} {pq} →
+  Extensionality? k lzero r →
+  Step R pq ↝[ k ] ⟦ S̲t̲e̲p̲ ⟧ R pq
+Step↔S̲t̲e̲p̲ {r = r} {R} {pq} = generalise-ext? Step⇔S̲t̲e̲p̲ λ ext → record
   { surjection = record
-    { logical-equivalence = record
-      { to   = λ s → to₁ s , to₂ s
-      ; from = from
-      }
-    ; right-inverse-of = λ where
+    { logical-equivalence = Step⇔S̲t̲e̲p̲
+    ; right-inverse-of    = λ where
         (_ , f) →
           Σ-≡,≡→≡ refl $
             implicit-extensionality ext λ _ → apply-ext ext (to₂∘from f)
@@ -119,11 +119,17 @@ Step↔S̲t̲e̲p̲ {R = R} {pq} = record
               in  q′ , q⟶q′ , f (_ , p⟶p′ , refl))
          ⟩
 
+  Step⇔S̲t̲e̲p̲ : Step R pq ⇔ ⟦ S̲t̲e̲p̲ ⟧ R pq
+  Step⇔S̲t̲e̲p̲ = record
+    { to   = λ s → to₁ s , to₂ s
+    ; from = from
+    }
+
   to₂∘from :
     ∀ {p′q′} {s : Container.Shape S̲t̲e̲p̲ pq}
     (f : Container.Position S̲t̲e̲p̲ s ⊆ R) →
     (pos : Container.Position S̲t̲e̲p̲ s p′q′) →
-    to₂ (from (s , f)) pos ≡ f pos
+    proj₂ (_⇔_.to Step⇔S̲t̲e̲p̲ (_⇔_.from Step⇔S̲t̲e̲p̲ (s , f))) pos ≡ f pos
   to₂∘from f (_ , _ , refl) = refl
 
 module S̲t̲e̲p̲ {r} {R : Rel₂ r Proc} {p q} where
@@ -133,21 +139,22 @@ module S̲t̲e̲p̲ {r} {R : Rel₂ r Proc} {p q} where
   ⟨_⟩ :
     (∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝ q′ × R (p′ , q′)) →
     ⟦ S̲t̲e̲p̲ ⟧ R (p , q)
-  ⟨ lr ⟩ = _↔_.to Step↔S̲t̲e̲p̲ Step.⟨ lr ⟩
+  ⟨ lr ⟩ = _⇔_.to (Step↔S̲t̲e̲p̲ _) Step.⟨ lr ⟩
 
   -- A "projection".
 
   challenge :
     ⟦ S̲t̲e̲p̲ ⟧ R (p , q) →
     ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝ q′ × R (p′ , q′)
-  challenge = Step.challenge ∘ _↔_.from Step↔S̲t̲e̲p̲
+  challenge = Step.challenge ∘ _⇔_.from (Step↔S̲t̲e̲p̲ _)
 
 open Temporarily-private public
 
 -- An unfolding lemma for ⟦ S̲t̲e̲p̲ ⟧₂.
 
 ⟦S̲t̲e̲p̲⟧₂↔ :
-  ∀ {x} {X : Rel₂ x Proc}
+  ∀ {x} {X : Rel₂ x Proc} →
+  Extensionality lzero lzero →
   (R : ∀ {o} → Rel₂ (# 0) (X o)) →
   ∀ {p q} (p∼q₁ p∼q₂ : ⟦ S̲t̲e̲p̲ ⟧ X (p , q)) →
 
@@ -163,8 +170,8 @@ open Temporarily-private public
           ×
         R (subst (X ∘ (p′ ,_)) q′₁≡q′₂ p′≤q′₁ , p′≤q′₂))
 
-⟦S̲t̲e̲p̲⟧₂↔ {X = X} R {p} {q}
-                   (s₁@(_ , ch₁) , f₁) (s₂@(_ , ch₂) , f₂) =
+⟦S̲t̲e̲p̲⟧₂↔ {X = X} ext R {p} {q}
+         (s₁@(_ , ch₁) , f₁) (s₂@(_ , ch₂) , f₂) =
 
   (∃ λ (eq : s₁ ≡ s₂) →
    ∀ {o} (p : Container.Position S̲t̲e̲p̲ s₁ o) →

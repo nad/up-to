@@ -7,7 +7,6 @@
 module Labelled-transition-system where
 
 open import Equality.Propositional
-open import Interval using (ext)
 open import Prelude
 
 open import Bijection equality-with-J using (_↔_)
@@ -239,30 +238,37 @@ record LTS : Set₁ where
     ; left-inverse-of = λ _ → refl
     }
 
-  -- If no action is silent, then _[_]⇒̂_ is pointwise isomorphic to
-  -- _[_]⟶_.
+  -- If no action is silent, then _[_]⇒̂_ is pointwise logically
+  -- equivalent to _[_]⟶_, and in the presence of extensionality they
+  -- are pointwise isomorphic.
 
-  ⟶↔⇒̂ : (∀ μ → ¬ Silent μ) →
-        ∀ {p μ q} → p [ μ ]⟶ q ↔ p [ μ ]⇒̂ q
-  ⟶↔⇒̂ ¬silent = record
-    { surjection = record
-      { logical-equivalence = record
-        { to   = λ tr → non-silent (¬silent _) (_↔_.to (⟶↔⇒ ¬silent) tr)
-        ; from = λ
-            { (silent s _)      → ⊥-elim (¬silent _ s)
-            ; (non-silent _ tr) → _↔_.from (⟶↔⇒ ¬silent) tr
-            }
-        }
-      ; right-inverse-of = λ
+  ⟶↔⇒̂ : ∀ {k} →
+        Extensionality? k lzero lzero →
+        (∀ μ → ¬ Silent μ) →
+        ∀ {p μ q} → p [ μ ]⟶ q ↝[ k ] p [ μ ]⇒̂ q
+  ⟶↔⇒̂ ext ¬silent = generalise-ext? ⟶⇔⇒̂ ⟶↔⇒̂′ ext
+    where
+    ⟶⇔⇒̂ = record
+      { to   = λ tr → non-silent (¬silent _) (_↔_.to (⟶↔⇒ ¬silent) tr)
+      ; from = λ
           { (silent s _)      → ⊥-elim (¬silent _ s)
-          ; (non-silent _ tr) →
-              cong₂ non-silent
-                    (apply-ext ext (⊥-elim ∘ ¬silent _))
-                    (_↔_.right-inverse-of (⟶↔⇒ ¬silent) tr)
+          ; (non-silent _ tr) → _↔_.from (⟶↔⇒ ¬silent) tr
           }
       }
-    ; left-inverse-of = λ _ → refl
-    }
+
+    ⟶↔⇒̂′ = λ ext → record
+      { surjection = record
+        { logical-equivalence = ⟶⇔⇒̂
+        ; right-inverse-of    = λ
+            { (silent s _)      → ⊥-elim (¬silent _ s)
+            ; (non-silent _ tr) →
+                cong₂ non-silent
+                      (apply-ext ext (⊥-elim ∘ ¬silent _))
+                      (_↔_.right-inverse-of (⟶↔⇒ ¬silent) tr)
+            }
+        }
+      ; left-inverse-of = λ _ → refl
+      }
 
   -- Map-like functions.
 
@@ -402,14 +408,15 @@ weak lts = record
   open LTS lts
 
 -- If no lts action is silent, then weak lts is equal to lts (assuming
--- univalence).
+-- extensionality and univalence).
 
 weak≡id :
+  Extensionality lzero (lsuc lzero) →
   Univalence lzero →
   ∀ lts →
   (∀ μ → ¬ LTS.Silent lts μ) →
   weak lts ≡ lts
-weak≡id univ lts ¬silent =
+weak≡id ext univ lts ¬silent =
   cong (λ _[_]⟶_ → record
           { Proc    = Proc
           ; Label   = Label
@@ -418,7 +425,7 @@ weak≡id univ lts ¬silent =
           ; _[_]⟶_  = _[_]⟶_
           })
        (apply-ext ext λ p → apply-ext ext λ μ → apply-ext ext λ q →
-          p [ μ ]⇒̂ q  ≡⟨ ≃⇒≡ univ $ ↔⇒≃ $ inverse $ ⟶↔⇒̂ ¬silent ⟩∎
+          p [ μ ]⇒̂ q  ≡⟨ ≃⇒≡ univ $ ↔⇒≃ $ inverse $ ⟶↔⇒̂ (lower-extensionality _ _ ext) ¬silent ⟩∎
           p [ μ ]⟶ q  ∎)
   where
   open LTS lts

@@ -91,7 +91,8 @@ B-record = Bisimilarity.Step.Step
 B-container = Bisimilarity.Step.S̲t̲e̲p̲
 
 -- The definition of Step in terms of a container is pointwise
--- isomorphic to the direct definition.
+-- logically equivalent to the direct definition, and in the presence
+-- of extensionality the definitions are pointwise isomorphic.
 
 container-isomorphic-to-record = Bisimilarity.Step.Step↔S̲t̲e̲p̲
 

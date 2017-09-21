@@ -15,13 +15,12 @@ module Bisimilarity.Coinductive.General
          (⟶→↝₂ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]↝₂ q)
          where
 
-open import Equality.Propositional hiding (Extensionality)
+open import Equality.Propositional as Eq hiding (Extensionality)
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 
 open import Bijection equality-with-J as Bijection using (_↔_)
-import Equivalence equality-with-J as Eq
-open import Function-universe equality-with-J as F hiding (id; _∘_)
+open import Function-universe equality-with-J hiding (id; _∘_)
 open import H-level equality-with-J
 open import H-level.Closure equality-with-J
 
@@ -104,6 +103,7 @@ infix 4 [_]_≡_ [_]_≡′_
 -- proofs.
 
 []≡↔ :
+  Eq.Extensionality lzero lzero →
   ∀ {p q} {i : Size} (p∼q₁ p∼q₂ : ν S̲t̲e̲p̲ ∞ (p , q)) →
 
   [ i ] p∼q₁ ≡ p∼q₂
@@ -126,11 +126,11 @@ infix 4 [_]_≡_ [_]_≡′_
           ×
         [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (_, q′)) p′₁≡p′₂ p′∼q′₁ ≡′ p′∼q′₂)
 
-[]≡↔ {p} {q} {i} p∼q₁@(s₁ , f₁) p∼q₂@(s₂ , f₂) =
+[]≡↔ ext {p} {q} {i} p∼q₁@(s₁ , f₁) p∼q₂@(s₂ , f₂) =
 
-  [ i ] p∼q₁ ≡ p∼q₂                                                     ↝⟨ ν-bisimilar↔ p∼q₁ p∼q₂ ⟩
+  [ i ] p∼q₁ ≡ p∼q₂                                                     ↝⟨ ν-bisimilar↔ ext p∼q₁ p∼q₂ ⟩
 
-  ⟦ S̲t̲e̲p̲₁ ⟷ S̲t̲e̲p̲₂ ⟧₂ (ν′-bisimilar i) (p∼q₁ , p∼q₂)                     ↝⟨ ⟦⟷⟧₂↔ S̲t̲e̲p̲₁ S̲t̲e̲p̲₂ (ν′-bisimilar i) p∼q₁ p∼q₂ ⟩
+  ⟦ S̲t̲e̲p̲₁ ⟷ S̲t̲e̲p̲₂ ⟧₂ (ν′-bisimilar i) (p∼q₁ , p∼q₂)                     ↝⟨ ⟦⟷⟧₂↔ ext S̲t̲e̲p̲₁ S̲t̲e̲p̲₂ (ν′-bisimilar i) p∼q₁ p∼q₂ ⟩
 
   ⟦ S̲t̲e̲p̲₁ ⟧₂ (ν′-bisimilar i)
     ((proj₁ s₁ , f₁ ∘ inj₁) , (proj₁ s₂ , f₂ ∘ inj₁))
@@ -138,10 +138,10 @@ infix 4 [_]_≡_ [_]_≡′_
   ⟦ S̲t̲e̲p̲₂ ⟧₂ (ν′-bisimilar i)
     ( (proj₂ s₁ , λ p → f₁ (inj₂ (_ , refl , p)))
     , (proj₂ s₂ , λ p → f₂ (inj₂ (_ , refl , p)))
-    )                                                                   ↝⟨ Step₁.⟦S̲t̲e̲p̲⟧₂↔ (ν′-bisimilar i) (proj₁ s₁ , f₁ ∘ inj₁)
-                                                                                                           (proj₁ s₂ , f₂ ∘ inj₁)
+    )                                                                   ↝⟨ Step₁.⟦S̲t̲e̲p̲⟧₂↔ ext (ν′-bisimilar i) (proj₁ s₁ , f₁ ∘ inj₁)
+                                                                                                               (proj₁ s₂ , f₂ ∘ inj₁)
                                                                              ×-cong
-                                                                           Step₂.⟦S̲t̲e̲p̲⟧₂↔ (ν′-bisimilar i)
+                                                                           Step₂.⟦S̲t̲e̲p̲⟧₂↔ ext (ν′-bisimilar i)
                                                                              (proj₂ s₁ , λ p → f₁ (inj₂ (_ , refl , p)))
                                                                              (proj₂ s₂ , λ p → f₂ (inj₂ (_ , refl , p))) ⟩
   (∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
@@ -189,13 +189,14 @@ infix 4 [_]_≡_ [_]_≡′_
   S̲t̲e̲p̲₂ = Step₂.S̲t̲e̲p̲
 
 module Bisimilarity-of-∼
+         (ext : Eq.Extensionality lzero lzero)
          {p q} {i : Size}
          (p∼q₁ p∼q₂ : ν S̲t̲e̲p̲ ∞ (p , q))
          where
 
   -- A "constructor".
 
-  ⟨_,_,_,_⟩ :
+  ⟨_,_,_,_,_⟩ :
     (∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
      let q′₁ , q⟶q′₁ , p′∼q′₁ = S̲t̲e̲p̲.left-to-right p∼q₁ p⟶p′
          q′₂ , q⟶q′₂ , p′∼q′₂ = S̲t̲e̲p̲.left-to-right p∼q₂ p⟶p′
@@ -211,7 +212,7 @@ module Bisimilarity-of-∼
             ×
           [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (_, q′)) p′₁≡p′₂ p′∼q′₁ ≡′ p′∼q′₂) →
     [ i ] p∼q₁ ≡ p∼q₂
-  ⟨_,_,_,_⟩ = curry (_↔_.from ([]≡↔ p∼q₁ p∼q₂))
+  ⟨_,_,_,_,_⟩ = curry (_↔_.from ([]≡↔ ext p∼q₁ p∼q₂))
 
   -- Some "projections".
 
@@ -224,7 +225,7 @@ module Bisimilarity-of-∼
          subst (q [ μ ]↝₁_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
            ×
          [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (p′ ,_)) q′₁≡q′₂ p′∼q′₁ ≡′ p′∼q′₂
-  left-to-right = proj₁ ∘ _↔_.to ([]≡↔ p∼q₁ p∼q₂)
+  left-to-right = proj₁ ∘ _↔_.to ([]≡↔ ext p∼q₁ p∼q₂)
 
   right-to-left :
     [ i ] p∼q₁ ≡ p∼q₂ →
@@ -235,19 +236,21 @@ module Bisimilarity-of-∼
          subst (p [ μ ]↝₂_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
            ×
          [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (_, q′)) p′₁≡p′₂ p′∼q′₁ ≡′ p′∼q′₂
-  right-to-left = proj₂ ∘ _↔_.to ([]≡↔ p∼q₁ p∼q₂)
+  right-to-left = proj₂ ∘ _↔_.to ([]≡↔ ext p∼q₁ p∼q₂)
 
 -- A statement of extensionality for bisimilarity.
 
 Extensionality : Set
 Extensionality = ν′-extensionality S̲t̲e̲p̲
 
--- This form of extensionality can be used to derive another form.
+-- This form of extensionality can be used to derive another form
+-- (in the presence of extensionality for functions).
 
 extensionality :
+  Eq.Extensionality lzero lzero →
   Extensionality →
   ∀ {p q} {p∼q₁ p∼q₂ : ν S̲t̲e̲p̲ ∞ (p , q)} →
   [ ∞ ] p∼q₁ ≡ p∼q₂ → p∼q₁ ≡ p∼q₂
-extensionality ext = ν-extensionality ext
+extensionality ext ν-ext = ν-extensionality ext ν-ext
 
 open S̲t̲e̲p̲ public using (⟨_,_⟩; left-to-right; right-to-left)

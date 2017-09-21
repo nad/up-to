@@ -53,11 +53,11 @@ Sound⇔ : ∀ F → Sound F ⇔ Up-to-technique ⟦ F ⟧
 Sound⇔ F = record
   { to = λ sound {R} →
 
-      R ⊆ ⟦ C ⟧ (⟦ F ⟧ R)  ↔⟨ ⊆-congʳ (inverse $ ⟦∘⟧↔ C) ⟩
+      R ⊆ ⟦ C ⟧ (⟦ F ⟧ R)  ↝⟨ ⊆-congʳ _ (_⇔_.from $ ⟦∘⟧↔ _ C) ⟩
 
       R ⊆ ⟦ C ⊚ F ⟧ R      ↝⟨ unfold (C ⊚ F) ⟩
 
-      R ⊆ ν (C ⊚ F) ∞      ↝⟨ ⊆-congʳ sound ⟩□
+      R ⊆ ν (C ⊚ F) ∞      ↝⟨ ⊆-congʳ _ sound ⟩□
 
       R ⊆ ν C ∞            □
 
@@ -65,7 +65,7 @@ Sound⇔ F = record
 
       ν (C ⊚ F) ∞                  ⊆⟨ ν-out ⟩
 
-      ⟦ C ⊚ F ⟧ (ν (C ⊚ F) ∞)      ⊆⟨ _↔_.to (⟦∘⟧↔ C) ⟩∎
+      ⟦ C ⊚ F ⟧ (ν (C ⊚ F) ∞)      ⊆⟨ ⟦∘⟧↔ _ C ⟩∎
 
       ⟦ C ⟧ (⟦ F ⟧ (ν (C ⊚ F) ∞))  ∎)
 
@@ -521,14 +521,14 @@ module _
     ν-symmetric {i} =
       ν C i ∘ f                                          ⊆⟨⟩
       ⟦ C ⟧ (ν′ C i) ∘ f                                 ⊆⟨ _⇔_.to C⇔⟷D ⟩
-      ⟦ D ⊗ reindex f D ⟧ (ν′ C i) ∘ f                   ⊆⟨ _↔_.to (⟦⊗⟧↔ D (reindex f D)) ⟩
-      ⟦ D ⟧ (ν′ C i) ∘ f ∩ ⟦ reindex f D ⟧ (ν′ C i) ∘ f  ⊆⟨ Σ-map id (_↔_.to (⟦reindex⟧↔ D)) ⟩
+      ⟦ D ⊗ reindex f D ⟧ (ν′ C i) ∘ f                   ⊆⟨ ⟦⊗⟧↔ _ D (reindex f D) ⟩
+      ⟦ D ⟧ (ν′ C i) ∘ f ∩ ⟦ reindex f D ⟧ (ν′ C i) ∘ f  ⊆⟨ Σ-map id (⟦reindex⟧↔ _ D) ⟩
       ⟦ D ⟧ (ν′ C i) ∘ f ∩ ⟦ D ⟧ (ν′ C i ∘ f) ∘ f ∘ f    ⊆⟨ (λ {o} → Σ-map id (subst (λ g → ⟦ D ⟧ (ν′ C i ∘ f) (g o)) f-involution)) ⟩
       ⟦ D ⟧ (ν′ C i) ∘ f ∩ ⟦ D ⟧ (ν′ C i ∘ f)            ⊆⟨ Σ-map (map D (other-half-of-symmetry f-involution (ν′ C i) ν′-symmetric))
                                                                   (map D ν′-symmetric) ⟩
       ⟦ D ⟧ (ν′ C i ∘ f) ∘ f ∩ ⟦ D ⟧ (ν′ C i)            ⊆⟨ swap ⟩
-      ⟦ D ⟧ (ν′ C i) ∩ ⟦ D ⟧ (ν′ C i ∘ f) ∘ f            ⊆⟨ Σ-map id (_↔_.from (⟦reindex⟧↔ D)) ⟩
-      ⟦ D ⟧ (ν′ C i) ∩ ⟦ reindex f D ⟧ (ν′ C i)          ⊆⟨ _↔_.from (⟦⊗⟧↔ D (reindex f D)) ⟩
+      ⟦ D ⟧ (ν′ C i) ∩ ⟦ D ⟧ (ν′ C i ∘ f) ∘ f            ⊆⟨ Σ-map id (_⇔_.from (⟦reindex⟧↔ _ D)) ⟩
+      ⟦ D ⟧ (ν′ C i) ∩ ⟦ reindex f D ⟧ (ν′ C i)          ⊆⟨ _⇔_.from (⟦⊗⟧↔ _ D (reindex f D)) ⟩
       ⟦ D ⊗ reindex f D ⟧ (ν′ C i)                       ⊆⟨ _⇔_.from C⇔⟷D ⟩
       ⟦ C ⟧ (ν′ C i)                                     ⊆⟨ id ⟩∎
       ν C i                                              ∎
@@ -551,8 +551,8 @@ module _
     where
     lemma = λ {o} →
       ⟦ C ⟧ (Companion S) o                                    ↝⟨ C⇔⟷D ⟩
-      ⟦ D ⊗ reindex f D ⟧ (Companion S) o                      ↔⟨ ⟦⊗⟧↔ D (reindex f D) ⟩
-      ⟦ D ⟧ (Companion S) o × ⟦ reindex f D ⟧ (Companion S) o  ↔⟨ ∃-cong (λ _ → ⟦reindex⟧↔ D) ⟩□
+      ⟦ D ⊗ reindex f D ⟧ (Companion S) o                      ↝⟨ ⟦⊗⟧↔ _ D (reindex f D) ⟩
+      ⟦ D ⟧ (Companion S) o × ⟦ reindex f D ⟧ (Companion S) o  ↝⟨ ∃-cong (λ _ → ⟦reindex⟧↔ _ D) ⟩□
       ⟦ D ⟧ (Companion S) o × ⟦ D ⟧ (Companion S ∘ f) (f o)    □
 
     to : R ⊆ ⟦ C ⟧ (Companion S) → R ⊆ ⟦ D ⟧ (Companion S)

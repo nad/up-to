@@ -14,15 +14,11 @@ module Similarity.General
          (⟶→↝ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]↝ q)
          where
 
-open import Equality.Propositional hiding (Extensionality)
-open import Logical-equivalence using (_⇔_)
+open import Equality.Propositional as Eq hiding (Extensionality)
 open import Prelude
 
-open import Bijection equality-with-J as Bijection using (_↔_)
-import Equivalence equality-with-J as Eq
-open import Function-universe equality-with-J as F hiding (id; _∘_)
-open import H-level equality-with-J
-open import H-level.Closure equality-with-J
+open import Bijection equality-with-J using (_↔_)
+open import Function-universe equality-with-J hiding (id; _∘_)
 
 open import Indexed-container hiding (⟨_⟩)
 open import Relation
@@ -94,6 +90,7 @@ infix 4 [_]_≡_ [_]_≡′_
 -- proofs.
 
 []≡↔ :
+  Eq.Extensionality lzero lzero →
   ∀ {p q} {i : Size} (p≤q₁ p≤q₂ : ν S̲t̲e̲p̲ ∞ (p , q)) →
 
   [ i ] p≤q₁ ≡ p≤q₂
@@ -108,12 +105,12 @@ infix 4 [_]_≡_ [_]_≡′_
           ×
         [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (p′ ,_)) q′₁≡q′₂ p′≤q′₁ ≡′ p′≤q′₂)
 
-[]≡↔ {p} {q} {i} p≤q₁@(s₁ , f₁) p≤q₂@(s₂ , f₂) =
-  [ i ] p≤q₁ ≡ p≤q₂                                                    ↝⟨ ν-bisimilar↔ (s₁ , f₁) (s₂ , f₂) ⟩
+[]≡↔ ext {p} {q} {i} p≤q₁@(s₁ , f₁) p≤q₂@(s₂ , f₂) =
+  [ i ] p≤q₁ ≡ p≤q₂                                                    ↝⟨ ν-bisimilar↔ ext (s₁ , f₁) (s₂ , f₂) ⟩
 
   (∃ λ (eq : s₁ ≡ s₂) →
    ∀ {o} (p : Container.Position S̲t̲e̲p̲ s₁ o) →
-   [ i ] f₁ p ≡′ f₂ (subst (λ s → Container.Position S̲t̲e̲p̲ s o) eq p))  ↝⟨ Step.⟦S̲t̲e̲p̲⟧₂↔ (ν′-bisimilar i) p≤q₁ p≤q₂ ⟩□
+   [ i ] f₁ p ≡′ f₂ (subst (λ s → Container.Position S̲t̲e̲p̲ s o) eq p))  ↝⟨ Step.⟦S̲t̲e̲p̲⟧₂↔ ext (ν′-bisimilar i) p≤q₁ p≤q₂ ⟩□
 
   (∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
    let q′₁ , q⟶q′₁ , p′≤q′₁ = S̲t̲e̲p̲.challenge p≤q₁ p⟶p′
@@ -128,10 +125,12 @@ infix 4 [_]_≡_ [_]_≡′_
 Extensionality : Set
 Extensionality = ν′-extensionality S̲t̲e̲p̲
 
--- This form of extensionality can be used to derive another form.
+-- This form of extensionality can be used to derive another form (in
+-- the presence of extensionality for functions).
 
 extensionality :
+  Eq.Extensionality lzero lzero →
   Extensionality →
   ∀ {p q} {p≤q₁ p≤q₂ : ν S̲t̲e̲p̲ ∞ (p , q)} →
   [ ∞ ] p≤q₁ ≡ p≤q₂ → p≤q₁ ≡ p≤q₂
-extensionality ext = ν-extensionality ext
+extensionality ext ν-ext = ν-extensionality ext ν-ext

@@ -82,12 +82,14 @@ module _ {lts : LTS} where
   larger⇔smallest = IC.larger⇔smallest _
 
   -- There is a split surjection from the classical definition of
-  -- bisimilarity to the coinductive one (assuming extensionality).
+  -- bisimilarity to the coinductive one (assuming two kinds of
+  -- extensionality).
 
   classical↠coinductive :
+    Extensionality lzero lzero →
     Co.Extensionality →
     ∀ {ℓ p q} → Cl.[ ℓ ] p ∼ q ↠ p Co.∼ q
-  classical↠coinductive ext = gfp↠ν _ ext
+  classical↠coinductive ext co-ext = gfp↠ν ext _ co-ext
 
 -- There is at least one LTS for which there is a split surjection
 -- from the coinductive definition of bisimilarity to the classical
@@ -100,20 +102,22 @@ coinductive↠classical :
 coinductive↠classical {p = ()}
 
 -- There is an LTS for which coinductive bisimilarity is pointwise
--- propositional (assuming extensionality).
+-- propositional (assuming two kinds of extensionality).
 
 coinductive-bisimilarity-is-sometimes-propositional :
+  Extensionality lzero lzero →
   let module Co = Bisimilarity.Coinductive one-loop in
   Co.Extensionality → Is-proposition (tt Co.∼ tt)
-coinductive-bisimilarity-is-sometimes-propositional ext =
+coinductive-bisimilarity-is-sometimes-propositional ext co-ext =
   _⇔_.from propositional⇔irrelevant λ ∼₁ ∼₂ →
-    extensionality ext (irr ∼₁ ∼₂)
+    extensionality ext co-ext (irr ∼₁ ∼₂)
   where
   open Bisimilarity.Coinductive one-loop
 
   irr : ∀ {i} ∼₁ ∼₂ → [ i ] ∼₁ ≡ ∼₂
   irr ∼₁ ∼₂ =
-    Bisimilarity-of-∼.⟨ ∼₁
+    Bisimilarity-of-∼.⟨ ext
+                      , ∼₁
                       , ∼₂
                       , (λ _ → refl , refl , irr′ (proj₂ ∼₁ _)
                                                   (proj₂ ∼₂ _))
@@ -150,7 +154,7 @@ classical-bisimilarity-is-not-propositional {ℓ} =
 
   tt∼tt₂ : [ ℓ ] tt ∼ tt
   tt∼tt₂ =
-    let R , R-is-a-bisimulation , ttRtt = _↔_.to Bisimilarity↔ tt∼tt₁ in
+    let R , R-is-a-bisimulation , ttRtt = _⇔_.to (Bisimilarity↔ _) tt∼tt₁ in
     ⟨ (R ∪ R)
     , ×2-preserves-bisimulations R-is-a-bisimulation
     , inj₁ ttRtt
@@ -165,18 +169,19 @@ classical-bisimilarity-is-not-propositional {ℓ} =
     Fin 1    □
 
 -- Thus there is, in general, no split surjection from the coinductive
--- definition of bisimilarity to the classical one (assuming
--- extensionality).
+-- definition of bisimilarity to the classical one (assuming two kinds
+-- of extensionality).
 
 ¬coinductive↠classical :
+  Extensionality lzero lzero →
   ∀ {ℓ} →
   Bisimilarity.Coinductive.Extensionality one-loop →
   ¬ (∀ {p q} → Bisimilarity.Coinductive._∼_  one-loop   p q ↠
                Bisimilarity.Classical.[_]_∼_ one-loop ℓ p q)
-¬coinductive↠classical {ℓ} ext =
+¬coinductive↠classical ext {ℓ} co-ext =
   (∀ {p q} → p Co.∼ q ↠ Cl.[ ℓ ] p ∼ q)                              ↝⟨ (λ co↠cl → co↠cl {q = _}) ⟩
   tt Co.∼ tt ↠ Cl.[ ℓ ] tt ∼ tt                                      ↝⟨ (λ co↠cl → H-level.respects-surjection co↠cl 1) ⟩
-  (Is-proposition (tt Co.∼ tt) → Is-proposition (Cl.[ ℓ ] tt ∼ tt))  ↝⟨ (_$ coinductive-bisimilarity-is-sometimes-propositional ext) ⟩
+  (Is-proposition (tt Co.∼ tt) → Is-proposition (Cl.[ ℓ ] tt ∼ tt))  ↝⟨ (_$ coinductive-bisimilarity-is-sometimes-propositional ext co-ext) ⟩
   Is-proposition (Cl.[ ℓ ] tt ∼ tt)                                  ↝⟨ classical-bisimilarity-is-not-propositional ⟩□
   ⊥                                                                  □
   where

@@ -10,8 +10,7 @@ module Bisimilarity.Weak.Coinductive.Up-to.Delay-monad {A : Set} where
 open import Delay-monad
 import Delay-monad.Partial-order as P
 import Delay-monad.Weak-bisimilarity as W
-open import Equality.Propositional
-open import Interval using (ext)
+open import Equality.Propositional as Eq
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 
@@ -34,14 +33,15 @@ import Bisimilarity.Weak.Coinductive.Other delay-monad as CWO
 
 -- Everything is an up-to technique for (one notion of) weak
 -- bisimilarity for the delay monad (if A is a set, and assuming
--- excluded middle).
+-- excluded middle and extensionality).
 
 everything-up-to :
   Excluded-middle lzero →
+  Eq.Extensionality lzero lzero →
   Is-set A →
   (F : Trans₂ (# 0) (Delay A ∞)) →
   Up-to-technique F
-everything-up-to em A-set F {R = R} R-prog {x = x , y} =
+everything-up-to em ext A-set F {R = R} R-prog {x = x , y} =
   everything-up-to′ x y
   where
   lemma :

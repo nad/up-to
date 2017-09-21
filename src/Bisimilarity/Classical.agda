@@ -12,11 +12,10 @@ open import Labelled-transition-system
 module Bisimilarity.Classical (lts : LTS) where
 
 open import Equality.Propositional
-open import Interval using (ext)
+open import Logical-equivalence using (_⇔_)
 open import Prelude
 
-open import Bijection equality-with-J using (_↔_)
-open import Function-universe equality-with-J as F hiding (id; _∘_)
+open import Function-universe equality-with-J hiding (id; _∘_)
 
 open LTS lts
 
@@ -83,19 +82,25 @@ p ∼ q = [ lzero ] p ∼ q
 -- An unfolding lemma for Bisimilarity.
 
 Bisimilarity↔ :
-  ∀ {ℓ pq} →
-  Bisimilarity ℓ pq ↔ ∃ λ (R : Rel₂ ℓ Proc) → Bisimulation R × R pq
-Bisimilarity↔ {ℓ} {pq} =
+  ∀ {k ℓ pq} →
+  Extensionality? k ℓ ℓ →
+
+  Bisimilarity ℓ pq
+    ↝[ k ]
+  ∃ λ (R : Rel₂ ℓ Proc) → Bisimulation R × R pq
+
+Bisimilarity↔ {k} {ℓ} {pq} ext =
   Bisimilarity ℓ pq                                ↔⟨⟩
   gfp ℓ S̲t̲e̲p̲ pq                                    ↔⟨⟩
-  (∃ λ (R : Rel₂ ℓ Proc) → R ⊆ ⟦ S̲t̲e̲p̲ ⟧ R × R pq)  ↝⟨ (∃-cong λ _ → (implicit-∀-cong ext $ ∀-cong ext λ _ → inverse Step↔S̲t̲e̲p̲) ×-cong F.id) ⟩
+  (∃ λ (R : Rel₂ ℓ Proc) → R ⊆ ⟦ S̲t̲e̲p̲ ⟧ R × R pq)  ↝⟨ (∃-cong λ _ → ×-cong₁ λ _ → ⊆-congʳ ext $
+                                                       inverse-ext? Step↔S̲t̲e̲p̲ (lower-extensionality? k _ lzero ext)) ⟩
   (∃ λ (R : Rel₂ ℓ Proc) → Bisimulation R × R pq)  □
 
 -- A "constructor".
 
 ⟨_,_,_⟩ : ∀ {ℓ p q} →
           (R : Rel₂ ℓ Proc) → Bisimulation R → R (p , q) → [ ℓ ] p ∼ q
-⟨ R , bisim , pRq ⟩ = _↔_.from Bisimilarity↔ (R , bisim , pRq)
+⟨ R , bisim , pRq ⟩ = _⇔_.from (Bisimilarity↔ _) (R , bisim , pRq)
 
 ------------------------------------------------------------------------
 -- Bisimilarity is an equivalence relation
@@ -116,7 +121,7 @@ reflexive-∼ {ℓ} =
 -- Symmetry.
 
 symmetric-∼ : ∀ {ℓ p q} → [ ℓ ] p ∼ q → [ ℓ ] q ∼ p
-symmetric-∼ p∼q with _↔_.to Bisimilarity↔ p∼q
+symmetric-∼ p∼q with _⇔_.to (Bisimilarity↔ _) p∼q
 ... | R , R-is-a-bisimulation , pRq =
   ⟨ R ⁻¹
   , ⟪ right-to-left R-is-a-bisimulation
@@ -128,8 +133,8 @@ symmetric-∼ p∼q with _↔_.to Bisimilarity↔ p∼q
 -- Transitivity.
 
 transitive-∼ : ∀ {ℓ p q r} → [ ℓ ] p ∼ q → [ ℓ ] q ∼ r → [ ℓ ] p ∼ r
-transitive-∼ p∼q q∼r with _↔_.to Bisimilarity↔ p∼q
-                        | _↔_.to Bisimilarity↔ q∼r
+transitive-∼ p∼q q∼r with _⇔_.to (Bisimilarity↔ _) p∼q
+                        | _⇔_.to (Bisimilarity↔ _) q∼r
 ... | R₁ , R-is₁ , pR₁q | R₂ , R-is₂ , qR₂r =
   ⟨ R₁ ⊙ R₂
   , ⟪ (λ { (q , pR₁q , qR₂r) p⟶p′ →
@@ -161,7 +166,7 @@ bisimilarity-is-a-bisimulation :
   ∀ {ℓ} → Bisimulation (Bisimilarity ℓ)
 bisimilarity-is-a-bisimulation {ℓ} =
   Bisimilarity ℓ             ⊆⟨ gfp-out _ ⟩
-  ⟦ S̲t̲e̲p̲ ⟧ (Bisimilarity ℓ)  ⊆⟨ _↔_.from Step↔S̲t̲e̲p̲ ⟩∎
+  ⟦ S̲t̲e̲p̲ ⟧ (Bisimilarity ℓ)  ⊆⟨ _⇔_.from (Step↔S̲t̲e̲p̲ _) ⟩∎
   Step (Bisimilarity ℓ)      ∎
 
 -- Bisimilarity is larger than every bisimulation.
@@ -172,7 +177,7 @@ bisimulation⊆∼ :
 bisimulation⊆∼ {ℓ} {R} R-is-a-bisimulation =
   gfp-unfold ℓ
      (R           ⊆⟨ R-is-a-bisimulation ⟩
-      Step R      ⊆⟨ _↔_.to Step↔S̲t̲e̲p̲ ⟩∎
+      Step R      ⊆⟨ Step↔S̲t̲e̲p̲ _ ⟩∎
       ⟦ S̲t̲e̲p̲ ⟧ R  ∎)
 
 ------------------------------------------------------------------------

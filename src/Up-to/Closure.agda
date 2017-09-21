@@ -38,10 +38,10 @@ Compatible-⊗ :
   Monotone F →
   Compatible C₁ F → Compatible C₂ F → Compatible (C₁ ⊗ C₂) F
 Compatible-⊗ {C₁ = C₁} {C₂} {F} mono comp₁ comp₂ R =
-  F (⟦ C₁ ⊗ C₂ ⟧ R)            ⊆⟨ mono (_↔_.to (⟦⊗⟧↔ C₁ C₂)) ⟩
+  F (⟦ C₁ ⊗ C₂ ⟧ R)            ⊆⟨ mono (⟦⊗⟧↔ _ C₁ C₂) ⟩
   F (⟦ C₁ ⟧ R ∩ ⟦ C₂ ⟧ R)      ⊆⟨ (λ x → mono proj₁ x , mono proj₂ x) ⟩
   F (⟦ C₁ ⟧ R) ∩ F (⟦ C₂ ⟧ R)  ⊆⟨ Σ-map (comp₁ _) (comp₂ _) ⟩
-  ⟦ C₁ ⟧ (F R) ∩ ⟦ C₂ ⟧ (F R)  ⊆⟨ _↔_.from (⟦⊗⟧↔ C₁ C₂) ⟩∎
+  ⟦ C₁ ⟧ (F R) ∩ ⟦ C₂ ⟧ (F R)  ⊆⟨ _⇔_.from (⟦⊗⟧↔ _ C₁ C₂) ⟩∎
   ⟦ C₁ ⊗ C₂ ⟧ (F R)            ∎
 
 -- The function flip Compatible F is closed under reindex₁ f, assuming
@@ -52,10 +52,10 @@ Compatible-reindex₁ :
   Monotone F → Symmetric f F →
   Compatible C F → Compatible (reindex₁ f C) F
 Compatible-reindex₁ {C = C} {F} {f} mono hyp comp R =
-  F (⟦ reindex₁ f C ⟧ R)  ⊆⟨ mono (_↔_.to (⟦reindex₁⟧↔ C)) ⟩
+  F (⟦ reindex₁ f C ⟧ R)  ⊆⟨ mono (⟦reindex₁⟧↔ _ C) ⟩
   F (⟦ C ⟧ (R ∘ f))       ⊆⟨ comp _ ⟩
   ⟦ C ⟧ (F (R ∘ f))       ⊆⟨ map C (hyp _) ⟩
-  ⟦ C ⟧ (F R ∘ f)         ⊆⟨ _↔_.from (⟦reindex₁⟧↔ C) ⟩∎
+  ⟦ C ⟧ (F R ∘ f)         ⊆⟨ _⇔_.from (⟦reindex₁⟧↔ _ C) ⟩∎
   ⟦ reindex₁ f C ⟧ (F R)  ∎
 
 -- The function flip Compatible F is closed under reindex₂ f, assuming
