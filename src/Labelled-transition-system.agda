@@ -15,7 +15,7 @@ open import Function-universe equality-with-J hiding (id; _∘_)
 open import Univalence-axiom equality-with-J
 
 -- Labelled transition systems were perhaps first defined by Robert M.
--- Keller (http://dx.doi.org/10.1145/360248.360251). The definition
+-- Keller (https://doi.org/10.1145/360248.360251). The definition
 -- below is a variant with two fields "Silent" and "silent?", added by
 -- me.
 --
