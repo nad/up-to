@@ -242,21 +242,21 @@ up-to-!-size-preserving =
 
 size-preserving⇒up-to = Up-to.size-preserving→up-to
 
--- The class of up-to techniques is not closed under composition, not
--- even for monotone (and extensive) transformers.
+-- There are monotone (and extensive) up-to techniques G and H such
+-- that G ∘ H is not an up-to-technique.
 
 not-closed-under-composition =
-  Bisimilarity.Up-to.Counterexamples.¬-∘-closure
+  Bisimilarity.Up-to.Counterexamples.∃[monotone×extensive×up-to]²×¬∘-up-to
 
 -- Size-preserving is closed under composition.
 
 ∘-closure = Up-to.∘-closure
 
--- Up-to techniques are not necessarily size-preserving (not even if
--- they are monotone and extensive).
+-- There is a (monotone and extensive) up-to technique that is not
+-- size-preserving.
 
-¬up-to⇒size-preserving =
-  Bisimilarity.Up-to.Counterexamples.¬monotone→extensive→up-to→size-preserving
+not-size-preserving =
+  Bisimilarity.Up-to.Counterexamples.∃monotone×extensive×up-to×¬size-preserving
 
 -- Monotonicity.
 
@@ -267,17 +267,18 @@ Monotone = Relation.Monotone
 
 simplification = Up-to.monotone→⇔
 
--- Size-preserving relation transformers are not necessarily monotone
--- (or extensive).
+-- There is a size-preserving transformer that is not monotone (and
+-- not extensive either).
 
 not-monotone =
-  Bisimilarity.Up-to.Counterexamples.¬size-preserving→monotone⊎extensive
+  Bisimilarity.Up-to.Counterexamples.∃size-preserving×¬[monotone⊎extensive]
 
--- Transformers that preserve every approximation of the greatest
--- fixpoint are not necessarily up-to techniques.
+-- There is a transformer that, despite preserving every approximation
+-- of the greatest fixpoint of some container, is not an up-to
+-- technique for this container.
 
 not-up-to =
-  Bisimilarity.Up-to.Counterexamples.¬special-case-of-size-preserving→up-to
+  Bisimilarity.Up-to.Counterexamples.∃special-case-of-size-preserving×¬up-to
 
 ------------------------------------------------------------------------
 -- Section 7

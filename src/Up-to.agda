@@ -134,7 +134,7 @@ Size-preserving F =
 -- On the other hand, up-to techniques are not necessarily
 -- size-preserving, not even for monotone and extensive transformers,
 -- see
--- Bisimilarity.Up-to.Counterexamples.¬monotone→extensive→up-to→size-preserving.
+-- Bisimilarity.Up-to.Counterexamples.∃monotone×extensive×up-to×¬size-preserving.
 -- Thus the property of being size-preserving is less general than
 -- that of being an up-to technique. However, the latter property is
 -- not closed under composition (not even for monotone and extensive
@@ -172,11 +172,12 @@ size-preserving→up-to {F} pres = size-preserving→up-to′
 --
 -- Note that size-preserving relation transformers are not necessarily
 -- monotone (or extensive), see
--- Bisimilarity.Up-to.Counterexamples.¬size-preserving→monotone⊎extensive.
+-- Bisimilarity.Up-to.Counterexamples.∃size-preserving×¬[monotone⊎extensive].
 --
--- Furthermore there are transformers F that satisfy the property
--- ∀ {i} → F (ν C i) ⊆ ν C i that are not up-to techniques, see
--- Bisimilarity.Up-to.Counterexamples.¬special-case-of-size-preserving→up-to.
+-- Furthermore there is a container C such that transformers F that
+-- satisfy the property ∀ {i} → F (ν C i) ⊆ ν C i are not necessarily
+-- up-to techniques for C, see
+-- Bisimilarity.Up-to.Counterexamples.∃special-case-of-size-preserving×¬up-to.
 
 monotone→⇔ :
   {F : Trans ℓ I} →
@@ -252,7 +253,7 @@ extensive→size-preserving→compatible′ {F} extensive pres {i} =
 --
 -- However, size-preserving transformers are not necessarily
 -- compatible, not even if they are monotone and extensive, see
--- Bisimilarity.Up-to.Counterexamples.¬monotone→extensive→size-preserving→compatible.
+-- Bisimilarity.Up-to.Counterexamples.∃monotone×extensive×size-preserving×¬compatible.
 -- Thus the property of being size-preserving is more general than the
 -- property of being compatible. However, it is more well-behaved than
 -- Up-to-technique, because it is closed under composition (see

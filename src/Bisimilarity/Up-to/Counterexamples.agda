@@ -43,18 +43,16 @@ private
     open Bisimilarity.Up-to lts public
     open LTS lts public hiding (_[_]⟶_)
 
--- Size-preserving relation transformers are not necessarily monotone
--- or extensive.
+-- There is a size-preserving relation transformer that is neither
+-- monotone nor extensive.
 
-¬size-preserving→monotone⊎extensive :
-  ∃ λ lts → let open Combination lts in
-  ¬ ((F : Trans₂ (# 0) Proc) → Size-preserving F →
-     Monotone F ⊎ Extensive F)
-¬size-preserving→monotone⊎extensive =
-    one-loop
-  , ((∀ G → Size-preserving G → Monotone G ⊎ Extensive G)  ↝⟨ (λ hyp → hyp _ F-pres) ⟩
-     Monotone F ⊎ Extensive F                              ↝⟨ [ ¬-F-mono , ¬-F-extensive ] ⟩□
-     ⊥                                                     □)
+∃size-preserving×¬[monotone⊎extensive] :
+  ∃ λ lts →
+  let open Combination lts in
+  ∃ λ (F : Trans₂ (# 0) Proc) →
+      Size-preserving F × ¬ (Monotone F ⊎ Extensive F)
+∃size-preserving×¬[monotone⊎extensive] =
+  one-loop , F , F-pres , [ ¬-F-mono , ¬-F-extensive ]
   where
   open Combination one-loop
 
@@ -83,33 +81,26 @@ private
   F-pres : Size-preserving F
   F-pres _ _ = total
 
--- Relation transformers F that satisfy ∀ {i} → F (ν C i) ⊆ ν C i are
--- not necessarily up-to techniques.
+-- There is a relation transformer F satisfying
+-- ∀ {i} → F (ν C i) ⊆ ν C i (for some C) that is not an up-to
+-- technique for C.
 
-¬special-case-of-size-preserving→up-to :
+∃special-case-of-size-preserving×¬up-to :
   ∃ λ (I : Set) →
   ∃ λ (C : Container I I) →
-  ¬ ((F : Trans (# 0) I) →
-     (∀ {i} → F (ν C i) ⊆ ν C i) → Up-to.Up-to-technique C F)
-¬special-case-of-size-preserving→up-to =
+  ∃ λ (F : Trans (# 0) I) →
+      (∀ {i} → F (ν C i) ⊆ ν C i) × ¬ Up-to.Up-to-technique C F
+∃special-case-of-size-preserving×¬up-to =
     (Proc × Proc)
   , S̲t̲e̲p̲
-  , ((∀ F → (∀ {i} → F (Bisimilarity i) ⊆ Bisimilarity i) →
-      Up-to-technique F)                                                  ↝⟨ _$ G ⟩
-
-     ((∀ {i} → G (Bisimilarity i) ⊆ Bisimilarity i) → Up-to-technique G)  ↝⟨ _$ bisimilarity-pre-fixpoint ⟩
-
-     Up-to-technique G                                                    ↝⟨ (λ up-to → up-to) ⟩
-
-     (S ⊆ ⟦ S̲t̲e̲p̲ ⟧ (G S) → S ⊆ Bisimilarity ∞)                            ↝⟨ (λ hyp below → hyp (Step↔S̲t̲e̲p̲ _ ∘ below)) ⟩
-
-     (S ⊆ Step (G S) → S ⊆ Bisimilarity ∞)                                ↝⟨ _$ S⊆StepGS ⟩
-
-     S ⊆ Bisimilarity ∞                                                   ↝⟨ _$ pq ⟩
-
-     Bisimilarity ∞ (p , q)                                               ↝⟨ p≁q ⟩□
-
-     ⊥                                                                    □)
+  , G
+  , bisimilarity-pre-fixpoint
+  , (Up-to-technique G                          ↝⟨ (λ up-to → up-to) ⟩
+     (S ⊆ ⟦ S̲t̲e̲p̲ ⟧ (G S) → S ⊆ Bisimilarity ∞)  ↝⟨ (λ hyp below → hyp (Step↔S̲t̲e̲p̲ _ ∘ below)) ⟩
+     (S ⊆ Step (G S) → S ⊆ Bisimilarity ∞)      ↝⟨ _$ S⊆StepGS ⟩
+     S ⊆ Bisimilarity ∞                         ↝⟨ _$ pq ⟩
+     Bisimilarity ∞ (p , q)                     ↝⟨ p≁q ⟩□
+     ⊥                                          □)
 
   where
 
@@ -152,41 +143,35 @@ private
   p≁q hyp with left-to-right hyp p
   ... | r , q , p∼r = p≁r (force p∼r)
 
--- Relation transformers F that satisfy ∀ {i} → F (ν C i) ⊆ ν C i are
--- not necessarily size-preserving.
+-- There is a relation transformer F satisfying
+-- ∀ {i} → F (ν C i) ⊆ ν C i (for some C) that is not size-preserving
+-- for C.
 
-¬special-case-of-size-preserving→size-preserving :
+∃special-case-of-size-preserving×¬size-preserving :
   ∃ λ (I : Set) →
   ∃ λ (C : Container I I) →
-  ¬ ((F : Trans (# 0) I) →
-     (∀ {i} → F (ν C i) ⊆ ν C i) → Up-to.Size-preserving C F)
-¬special-case-of-size-preserving→size-preserving =
-  case ¬special-case-of-size-preserving→up-to of λ where
-    (I , C , ¬→up-to) →
-      let open Up-to C in
-        I , C
-      , (((F : Trans (# 0) I) →
-          (∀ {i} → F (ν C i) ⊆ ν C i) → Up-to.Size-preserving C F)  ↝⟨ (λ hyp F pres → size-preserving→up-to (hyp F pres)) ⟩
+  ∃ λ (F : Trans (# 0) I) →
+      (∀ {i} → F (ν C i) ⊆ ν C i) × ¬ Up-to.Size-preserving C F
+∃special-case-of-size-preserving×¬size-preserving =
+  Σ-map id (Σ-map id (Σ-map id (Σ-map id
+              (_∘ Up-to.size-preserving→up-to _))))
+    ∃special-case-of-size-preserving×¬up-to
 
-         ((F : Trans (# 0) I) →
-          (∀ {i} → F (ν C i) ⊆ ν C i) → Up-to.Up-to-technique C F)  ↝⟨ ¬→up-to ⟩□
+-- There is a monotone, extensive and size-preserving relation
+-- transformer that is not compatible.
 
-         ⊥                                                          □)
-
--- Monotone, extensive, size-preserving relation transformers are not
--- necessarily compatible.
-
-¬monotone→extensive→size-preserving→compatible :
-  ∃ λ lts → let open Combination lts in
-  ¬ ((F : Trans₂ (# 0) Proc) →
-     Monotone F → Extensive F → Size-preserving F → Compatible F)
-¬monotone→extensive→size-preserving→compatible =
+∃monotone×extensive×size-preserving×¬compatible :
+  ∃ λ lts →
+  let open Combination lts in
+  ∃ λ (F : Trans₂ (# 0) Proc) →
+      Monotone F × Extensive F × Size-preserving F × ¬ Compatible F
+∃monotone×extensive×size-preserving×¬compatible =
     one-transition
-
-  , ((∀ F → Monotone F → Extensive F → Size-preserving F → Compatible F)  ↝⟨ (λ hyp → hyp F mono extensive
-                                                                                        (_⇔_.from (monotone→⇔ mono) (λ {_ x} → pre {x = x}))) ⟩
-     Compatible F                                                         ↝⟨ ¬comp ⟩□
-     ⊥                                                                    □)
+  , F
+  , mono
+  , extensive
+  , pres
+  , ¬comp
 
   where
 
@@ -234,6 +219,11 @@ private
   pre {x = false , true}  = id
   pre {x = false , false} = id
 
+  -- F is size-preserving.
+
+  pres : Size-preserving F
+  pres = _⇔_.from (monotone→⇔ mono) (λ {_ x} → pre {x = x})
+
   -- A relation.
 
   R : Rel₂ (# 0) Proc
@@ -266,48 +256,13 @@ private
 
     ⊥                                                              □
 
--- Up-to-technique is not closed under composition, not even for
--- monotone and extensive relation transformers.
---
--- (Pous and Sangiorgi discuss another counterexample to this property
--- in Section 6.5.4 of "Enhancements of the bisimulation proof
--- method".)
+-- An LTS used in a couple of lemmas below, along with some
+-- properties.
 
-¬-∘-closure :
-  ∃ λ lts → let open Combination lts in
-  ¬ ({F G : Trans₂ (# 0) Proc} →
-     Monotone F → Extensive F →
-     Monotone G → Extensive G →
-     Up-to-technique F →
-     Up-to-technique G →
-     Up-to-technique (F ∘ G))
-¬-∘-closure =
-    lts
+module PQR where
 
-  , ((∀ {F G} →
-      Monotone F → Extensive F → Monotone G → Extensive G →
-      Up-to-technique F → Up-to-technique G → Up-to-technique (F ∘ G))  ↝⟨ (λ cl → cl F-lemmas.mono F-lemmas.ext G-lemmas.mono G-lemmas.ext
-                                                                                      F-lemmas.up-to G-lemmas.up-to) ⟩
-
-     Up-to-technique (F ∘ G)                                            ↝⟨ (λ up-to → up-to R̲-prog′) ⟩
-
-     R̲ ⊆ Bisimilarity ∞                                                 ↝⟨ (λ le → le pp) ⟩
-
-     p left ∼ p right                                                   ↝⟨ (λ rel → S̲t̲e̲p̲.left-to-right rel pq) ⟩
-
-     (∃ λ y → p right [ pq ]⟶ y × q left ∼′ y)                          ↝⟨ (λ { (.(q right) , pq , rel) → rel }) ⟩
-
-     q left ∼′ q right                                                  ↝⟨ (λ rel → S̲t̲e̲p̲.left-to-right (force rel) qq) ⟩
-
-     (∃ λ y → q right [ qq left ]⟶ y × q left ∼′ y)                     ↝⟨ (λ { (_ , () , _) }) ⟩□
-
-     ⊥                                                                  □)
-
-  where
-
-  ----------------------------------------------------------------------
   -- An LTS with two sets of processes, three "to the left", and three
-  -- "to the right"
+  -- "to the right".
 
   Side : Set
   Side = Bool
@@ -339,12 +294,10 @@ private
     ; _[_]⟶_  = _[_]⟶_
     }
 
-  open Combination lts
+  open Combination lts public hiding (Label)
 
-  ----------------------------------------------------------------------
-  -- Two relation transformers and one relation
-
-  -- F and G both add (at most) one pair to the underlying relation.
+  -- Two relation transformers: F and G both add (at most) one pair to
+  -- the underlying relation.
 
   data F (R : Rel₂ (# 0) Proc) : Rel₂ (# 0) Proc where
     qq  : F R (q left , q right)
@@ -354,7 +307,7 @@ private
     rr  : G R (r left , r right)
     [_] : ∀ {x} → R x → G R x
 
-  -- R̲ adds one pair to reflexivity.
+  -- A relation that adds one pair to reflexivity.
 
   data R̲ : Rel₂ (# 0) Proc where
     pp   : R̲ (p left , p right)
@@ -385,6 +338,33 @@ private
   R̲-prog′ : R̲ ⊆ ⟦ S̲t̲e̲p̲ ⟧ (F (G R̲))
   R̲-prog′ Rx = _⇔_.to (Step↔S̲t̲e̲p̲ _) (R̲-prog Rx)
 
+  -- The two processes q left and q right are not bisimilar.
+
+  q≁q : ¬ q left ∼ q right
+  q≁q =
+    q left ∼ q right                                ↝⟨ (λ rel → S̲t̲e̲p̲.left-to-right rel qq) ⟩
+    (∃ λ y → q right [ qq left ]⟶ y × q left ∼′ y)  ↝⟨ (λ { (_ , () , _) }) ⟩□
+    ⊥                                               □
+
+  -- The two processes r left and r right are not bisimilar.
+
+  r≁r : ¬ r left ∼ r right
+  r≁r =
+    r left ∼ r right                                ↝⟨ (λ rel → S̲t̲e̲p̲.left-to-right rel rr) ⟩
+    (∃ λ y → r right [ rr left ]⟶ y × r left ∼′ y)  ↝⟨ (λ { (_ , () , _) }) ⟩□
+    ⊥                                               □
+
+  -- F ∘ G is not an up-to technique.
+
+  ¬-F∘G-up-to : ¬ Up-to-technique (F ∘ G)
+  ¬-F∘G-up-to =
+    Up-to-technique (F ∘ G)                    ↝⟨ (λ up-to → up-to R̲-prog′) ⟩
+    R̲ ⊆ Bisimilarity ∞                         ↝⟨ (λ le → le pp) ⟩
+    p left ∼ p right                           ↝⟨ (λ rel → S̲t̲e̲p̲.left-to-right rel pq) ⟩
+    (∃ λ y → p right [ pq ]⟶ y × q left ∼′ y)  ↝⟨ (λ { (.(q right) , pq , rel) → rel }) ⟩
+    q left ∼′ q right                          ↝⟨ (λ rel → q≁q (force rel)) ⟩
+    ⊥                                          □
+
   module F-lemmas where
 
     -- F is monotone.
@@ -397,6 +377,15 @@ private
 
     ext : Extensive F
     ext = λ _ → [_]
+
+    -- F is not size-preserving.
+
+    ¬-pres : ¬ Size-preserving F
+    ¬-pres =
+      Size-preserving F                    ↝⟨ (λ pres → _⇔_.to (monotone→⇔ mono) pres) ⟩
+      F (Bisimilarity ∞) ⊆ Bisimilarity ∞  ↝⟨ _$ qq ⟩
+      q left ∼ q right                     ↝⟨ q≁q ⟩□
+      ⊥                                    □
 
     -- F is an up-to technique.
 
@@ -476,6 +465,15 @@ private
     ext : Extensive G
     ext = λ _ → [_]
 
+    -- G is not size-preserving.
+
+    ¬-pres : ¬ Size-preserving G
+    ¬-pres =
+      Size-preserving G                    ↝⟨ (λ pres → _⇔_.to (monotone→⇔ mono) pres) ⟩
+      G (Bisimilarity ∞) ⊆ Bisimilarity ∞  ↝⟨ _$ rr ⟩
+      r left ∼ r right                     ↝⟨ r≁r ⟩□
+      ⊥                                    □
+
     -- G is an up-to technique.
 
     module _ {R} (R-prog′ : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ (G R)) where
@@ -541,29 +539,68 @@ private
       up-to {r right , r left}  rel = ⊥-elim (¬rr rel)
       up-to {r right , r right} rel = reflexive
 
--- Up-to techniques are not necessarily size-preserving, not even if
--- they are monotone and extensive.
+-- There are monotone and extensive up-to techniques F and G such
+-- that F ∘ G is not an up-to-technique.
+--
+-- Pous and Sangiorgi discuss another instance of this property in
+-- Section 6.5.4 of "Enhancements of the bisimulation proof method".
 
-¬monotone→extensive→up-to→size-preserving :
-  ∃ λ lts → let open Combination lts in
-  ¬ ((F : Trans₂ (# 0) Proc) →
-     Monotone F → Extensive F → Up-to-technique F → Size-preserving F)
-¬monotone→extensive→up-to→size-preserving =
-  let lts , ¬-∘-closure = ¬-∘-closure
-      open Combination lts
-  in
-
+∃[monotone×extensive×up-to]²×¬∘-up-to :
+  ∃ λ lts →
+  let open Combination lts in
+  ∃ λ (F : Trans₂ (# 0) Proc) →
+  ∃ λ (G : Trans₂ (# 0) Proc) →
+      Monotone F × Extensive F × Up-to-technique F ×
+      Monotone G × Extensive G × Up-to-technique G ×
+      ¬ Up-to-technique (F ∘ G)
+∃[monotone×extensive×up-to]²×¬∘-up-to =
     lts
+  , F
+  , G
+  , F-lemmas.mono
+  , F-lemmas.ext
+  , F-lemmas.up-to
+  , G-lemmas.mono
+  , G-lemmas.ext
+  , G-lemmas.up-to
+  , ¬-F∘G-up-to
+  where
+  open PQR
 
-  , λ monotone→extensive→up-to→size-preserving →
+-- Up-to-technique is not closed under composition, not even for
+-- monotone and extensive relation transformers.
 
-    ¬-∘-closure λ {F G} F-mono F-ext G-mono G-ext F-up-to G-up-to →
+¬-∘-closure :
+  ∃ λ lts → let open Combination lts in
+  ¬ ({F G : Trans₂ (# 0) Proc} →
+     Monotone F → Extensive F →
+     Monotone G → Extensive G →
+     Up-to-technique F →
+     Up-to-technique G →
+     Up-to-technique (F ∘ G))
+¬-∘-closure =
+    lts
+  , λ ∘-closure →
+        ¬-F∘G-up-to (∘-closure F-lemmas.mono F-lemmas.ext
+                               G-lemmas.mono G-lemmas.ext
+                               F-lemmas.up-to G-lemmas.up-to)
+  where
+  open PQR
 
-                                             $⟨ (λ {_ _} → monotone→extensive→up-to→size-preserving F F-mono F-ext F-up-to) ,
-                                                (λ {_ _} → monotone→extensive→up-to→size-preserving G G-mono G-ext G-up-to) ⟩
+-- There is a (monotone and extensive) up-to technique that is not
+-- size-preserving.
 
-      Size-preserving F × Size-preserving G  ↝⟨ uncurry ∘-closure ⟩
-
-      Size-preserving (F ∘ G)                ↝⟨ size-preserving→up-to ⟩□
-
-      Up-to-technique (F ∘ G)                □
+∃monotone×extensive×up-to×¬size-preserving :
+  ∃ λ lts →
+  let open Combination lts in
+  ∃ λ (F : Trans₂ (# 0) Proc) →
+      Monotone F × Extensive F × Up-to-technique F × ¬ Size-preserving F
+∃monotone×extensive×up-to×¬size-preserving =
+    lts
+  , F
+  , F-lemmas.mono
+  , F-lemmas.ext
+  , F-lemmas.up-to
+  , F-lemmas.¬-pres
+  where
+  open PQR
