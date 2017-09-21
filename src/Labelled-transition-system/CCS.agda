@@ -359,6 +359,27 @@ Proc-refl (μ ·′ P)  = refl ·′ λ { .force → Proc-refl (force P) }
 Proc-refl (ν a P)   = ν refl (Proc-refl P)
 Proc-refl (! P)     = ! Proc-refl P
 
+-- Very strong bisimilarity is symmetric.
+
+Proc-sym : ∀ {i P Q} → Equal i P Q → Equal i Q P
+Proc-sym ∅         = ∅
+Proc-sym (P₁ ∣ P₂) = Proc-sym P₁ ∣ Proc-sym P₂
+Proc-sym (P₁ ⊕ P₂) = Proc-sym P₁ ⊕ Proc-sym P₂
+Proc-sym (p ·′ P)  = sym p ·′ λ { .force → Proc-sym (force P) }
+Proc-sym (ν p P)   = ν (sym p) (Proc-sym P)
+Proc-sym (! P)     = ! Proc-sym P
+
+-- Very strong bisimilarity is transitive.
+
+Proc-trans : ∀ {i P Q R} → Equal i P Q → Equal i Q R → Equal i P R
+Proc-trans ∅         ∅         = ∅
+Proc-trans (P₁ ∣ P₂) (Q₁ ∣ Q₂) = Proc-trans P₁ Q₁ ∣ Proc-trans P₂ Q₂
+Proc-trans (P₁ ⊕ P₂) (Q₁ ⊕ Q₂) = Proc-trans P₁ Q₁ ⊕ Proc-trans P₂ Q₂
+Proc-trans (p ·′ P)  (q ·′ Q)  = trans p q ·′ λ { .force →
+                                   Proc-trans (force P) (force Q) }
+Proc-trans (ν p P)   (ν q Q)   = ν (trans p q) (Proc-trans P Q)
+Proc-trans (! P)     (! Q)     = ! Proc-trans P Q
+
 -- Weakening of contexts.
 
 weaken : ∀ {i n} → Context i n → Context i (suc n)
