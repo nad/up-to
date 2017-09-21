@@ -178,9 +178,7 @@ _⊆-cong-→_ :
   ∀ {a r₁ r₂ s₁ s₂} {A : Set a}
     {R₁ : Rel r₁ A} {S₁ : Rel s₁ A}
     {R₂ : Rel r₂ A} {S₂ : Rel s₂ A} →
-  (∀ {x} → R₂ x → R₁ x) →
-  (∀ {x} → S₁ x → S₂ x) →
-  R₁ ⊆ S₁ → R₂ ⊆ S₂
+  R₂ ⊆ R₁ → S₁ ⊆ S₂ → R₁ ⊆ S₁ → R₂ ⊆ S₂
 R₂→R₁ ⊆-cong-→ S₁→S₂ = implicit-∀-cong ext $ →-cong-→ R₂→R₁ S₁→S₂
 
 ⊆-congʳ :
