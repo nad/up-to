@@ -257,7 +257,7 @@ record LTS : Set₁ where
           { (silent s _)      → ⊥-elim (¬silent _ s)
           ; (non-silent _ tr) →
               cong₂ non-silent
-                    (ext (⊥-elim ∘ ¬silent _))
+                    (apply-ext ext (⊥-elim ∘ ¬silent _))
                     (_↔_.right-inverse-of (⟶↔⇒ ¬silent) tr)
           }
       }
@@ -417,7 +417,7 @@ weak≡id univ lts ¬silent =
           ; silent? = silent?
           ; _[_]⟶_  = _[_]⟶_
           })
-       (ext λ p → ext λ μ → ext λ q →
+       (apply-ext ext λ p → apply-ext ext λ μ → apply-ext ext λ q →
           p [ μ ]⇒̂ q  ≡⟨ ≃⇒≡ univ $ ↔⇒≃ $ inverse $ ⟶↔⇒̂ ¬silent ⟩∎
           p [ μ ]⟶ q  ∎)
   where

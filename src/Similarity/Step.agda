@@ -97,7 +97,7 @@ Step↔S̲t̲e̲p̲ {R = R} {pq} = record
     ; right-inverse-of = λ where
         (_ , f) →
           Σ-≡,≡→≡ refl $
-            implicit-extensionality ext λ _ → ext (to₂∘from f)
+            implicit-extensionality ext λ _ → apply-ext ext (to₂∘from f)
     }
   ; left-inverse-of = λ _ → refl
   }
@@ -295,21 +295,21 @@ open Temporarily-private public
    ∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
    R (f₁ (μ , p⟶p′ , refl) ,
       f₂ (μ , p⟶p′ , sym (cong (λ ch → proj₁ (ch p′ p⟶p′))
-                               (Eq.good-ext ext eq)))))                ↝⟨ (Σ-cong (inverse $ ∀-cong ext λ _ →
+                               (apply-ext (Eq.good-ext ext) eq)))))    ↝⟨ (Σ-cong (inverse $ ∀-cong ext λ _ →
                                                                                    implicit-extensionality-isomorphism
                                                                                      {k = bijection} ext) λ eq →
                                                                            implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ p⟶p′ →
                                                                            ≡⇒↝ _ $ sym $ cong (λ eq →
                                                                              R (f₁ _ , f₂ (_ , p⟶p′ , sym (cong (λ ch → proj₁ (ch _ p⟶p′))
-                                                                                                                (Eq.good-ext ext eq))))) $
-                                                                           ext (_↔_.right-inverse-of
-                                                                                  (implicit-extensionality-isomorphism ext) ∘ eq)) ⟩
+                                                                                                             (apply-ext (Eq.good-ext ext) eq))))) $
+                                                                           apply-ext ext $
+                                                                           _↔_.right-inverse-of (implicit-extensionality-isomorphism ext) ∘ eq) ⟩
   (∃ λ (eq : ∀ p′ μ → ch₁ {p′ = p′} {μ = μ} ≡ ch₂) →
    let eq′ = implicit-extensionality (Eq.good-ext ext) ∘ eq in
    ∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
    R (f₁ (μ , p⟶p′ , refl) ,
       f₂ (μ , p⟶p′ , sym (cong (λ ch → proj₁ (ch p′ p⟶p′))
-                               (Eq.good-ext ext eq′)))))               ↝⟨ (∃-cong λ _ →
+                               (apply-ext (Eq.good-ext ext) eq′)))))   ↝⟨ (∃-cong λ _ →
                                                                            implicit-∀-cong ext $ implicit-∀-cong ext $ ∀-cong ext λ _ →
                                                                            ≡⇒↝ _ $ cong (λ eq → R (f₁ _ , f₂ (_ , _ , sym eq))) $
                                                                            lemma₃ _) ⟩
@@ -487,41 +487,46 @@ open Temporarily-private public
              {p′ μ} {p⟶p′ : p [ μ ]⟶ p′} →
 
     cong (λ ch → proj₁ (ch p⟶p′))
-         (_↔_.to (implicit-extensionality-isomorphism ext) eq)  ≡⟨⟩
+         (_↔_.to (implicit-extensionality-isomorphism ext) eq)         ≡⟨⟩
 
     cong (λ ch → proj₁ (ch p⟶p′))
-         (implicit-extensionality (Eq.good-ext ext) eq)         ≡⟨ cong-∘ _ _ (Eq.good-ext ext eq) ⟩∎
+         (implicit-extensionality (Eq.good-ext ext) eq)                ≡⟨ cong-∘ _ _ (apply-ext (Eq.good-ext ext) eq) ⟩∎
 
-    cong (λ ch → proj₁ (ch p′ p⟶p′)) (Eq.good-ext ext eq)       ∎
+    cong (λ ch → proj₁ (ch p′ p⟶p′)) (apply-ext (Eq.good-ext ext) eq)  ∎
 
   lemma₃ = λ {p q} {f g : ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ (q [ μ ]↝_)}
              (eq : ∀ p′ μ → f {p′ = p′} {μ = μ} ≡ g)
              {p′ μ p⟶p′} →
 
     cong (λ (ch : ∀ _ {μ} → _) → proj₁ (ch p′ {μ = μ} p⟶p′))
-         (Eq.good-ext ext
-            (implicit-extensionality (Eq.good-ext ext) ∘ eq))     ≡⟨⟩
+         (apply-ext (Eq.good-ext ext)
+            (implicit-extensionality (Eq.good-ext ext) ∘ eq))             ≡⟨⟩
 
     cong (λ ch → proj₁ (ch p′ p⟶p′))
-         (Eq.good-ext ext
-            (cong (λ f {x} → f x) ∘ (Eq.good-ext ext ∘ eq)))      ≡⟨ cong (cong (λ ch → proj₁ (ch p′ p⟶p′))) $ sym $
-                                                                     Eq.cong-post-∘-good-ext {h = λ f {x} → f x} ext ext (Eq.good-ext ext ∘ eq) ⟩
+         (apply-ext (Eq.good-ext ext)
+            (cong (λ f {x} → f x) ∘ (apply-ext (Eq.good-ext ext) ∘ eq)))  ≡⟨ cong (cong (λ ch → proj₁ (ch p′ p⟶p′))) $ sym $
+                                                                             Eq.cong-post-∘-good-ext {h = λ f {x} → f x} ext ext
+                                                                                                     (apply-ext (Eq.good-ext ext) ∘ eq) ⟩
     cong (λ ch → proj₁ (ch p′ p⟶p′))
          (cong (λ f x {y} → f x y)
-               (Eq.good-ext ext (Eq.good-ext ext ∘ eq)))          ≡⟨ cong-∘ _ _ (Eq.good-ext ext (Eq.good-ext ext ∘ eq)) ⟩
-
+               (apply-ext (Eq.good-ext ext)
+                  (apply-ext (Eq.good-ext ext) ∘ eq)))                    ≡⟨ cong-∘ _ _ (apply-ext (Eq.good-ext ext)
+                                                                                           (apply-ext (Eq.good-ext ext) ∘ eq)) ⟩
     cong (λ ch → proj₁ (ch p′ μ p⟶p′))
-         (Eq.good-ext ext (Eq.good-ext ext ∘ eq))                 ≡⟨ sym $ cong-∘ _ _ (Eq.good-ext ext (Eq.good-ext ext ∘ eq)) ⟩
+         (apply-ext (Eq.good-ext ext)
+            (apply-ext (Eq.good-ext ext) ∘ eq))                           ≡⟨ sym $ cong-∘ _ _ (apply-ext (Eq.good-ext ext)
+                                                                                                 (apply-ext (Eq.good-ext ext) ∘ eq)) ⟩
+    cong (λ ch → proj₁ (ch μ p⟶p′))
+         (cong (_$ p′) (apply-ext (Eq.good-ext ext)
+                          (apply-ext (Eq.good-ext ext) ∘ eq)))            ≡⟨ cong (cong (λ ch → proj₁ (ch μ p⟶p′))) $ Eq.cong-good-ext ext _ ⟩
 
     cong (λ ch → proj₁ (ch μ p⟶p′))
-         (cong (_$ p′) (Eq.good-ext ext (Eq.good-ext ext ∘ eq)))  ≡⟨ cong (cong (λ ch → proj₁ (ch μ p⟶p′))) $ Eq.cong-good-ext ext _ ⟩
-
-    cong (λ ch → proj₁ (ch μ p⟶p′)) (Eq.good-ext ext (eq p′))     ≡⟨ sym $ cong-∘ _ _ (Eq.good-ext ext (eq p′)) ⟩
+         (apply-ext (Eq.good-ext ext) (eq p′))                            ≡⟨ sym $ cong-∘ _ _ (apply-ext (Eq.good-ext ext) (eq p′)) ⟩
 
     cong (λ ch → proj₁ (ch p⟶p′))
-         (cong (_$ μ) (Eq.good-ext ext (eq p′)))                  ≡⟨ cong (cong (λ ch → proj₁ (ch p⟶p′))) $ Eq.cong-good-ext ext _ ⟩∎
+         (cong (_$ μ) (apply-ext (Eq.good-ext ext) (eq p′)))              ≡⟨ cong (cong (λ ch → proj₁ (ch p⟶p′))) $ Eq.cong-good-ext ext _ ⟩∎
 
-    cong (λ ch → proj₁ (ch p⟶p′)) (eq p′ μ)                       ∎
+    cong (λ ch → proj₁ (ch p⟶p′)) (eq p′ μ)                               ∎
 
   lemma₄ :
     ∀ {p′ μ} {p⟶p′ : p [ μ ]⟶ p′}

@@ -11,6 +11,7 @@ open import Delay-monad
 import Delay-monad.Partial-order as P
 import Delay-monad.Weak-bisimilarity as W
 open import Equality.Propositional
+open import Interval using (ext)
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 
@@ -59,7 +60,7 @@ everything-up-to em A-set F {R = R} R-prog {x = x , y} =
 
   everything-up-to′ : ∀ x y → R (x , y) → x ≈ y
   everything-up-to′ x y Rxy =
-    case P.⇑⊎⇓ em A-set x ,′ P.⇑⊎⇓ em A-set y of λ where
+    case P.⇑⊎⇓ em ext A-set x ,′ P.⇑⊎⇓ em ext A-set y of λ where
       (inj₂ x⇓ , _)       → lemma (S̲t̲e̲p̲.left-to-right (R-prog Rxy)) x⇓
       (_       , inj₂ y⇓) → symmetric
                               (lemma (S̲t̲e̲p̲.right-to-left (R-prog Rxy))

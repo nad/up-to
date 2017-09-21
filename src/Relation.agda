@@ -172,21 +172,26 @@ _⊆-cong_ :
   (∀ {x} → R₁ x ↝[ ⌊ k ⌋-sym ] R₂ x) →
   (∀ {x} → S₁ x ↝[ ⌊ k ⌋-sym ] S₂ x) →
   R₁ ⊆ S₁ ↝[ ⌊ k ⌋-sym ] R₂ ⊆ S₂
-R₁↝R₂ ⊆-cong S₁↝S₂ = implicit-∀-cong ext $ →-cong ext R₁↝R₂ S₁↝S₂
+_⊆-cong_ {k} R₁↝R₂ S₁↝S₂ =
+  implicit-∀-cong (forget-ext? ⌊ k ⌋-sym ext) $
+  →-cong (forget-ext? ⌊ k ⌋-sym ext) R₁↝R₂ S₁↝S₂
 
 _⊆-cong-→_ :
   ∀ {a r₁ r₂ s₁ s₂} {A : Set a}
     {R₁ : Rel r₁ A} {S₁ : Rel s₁ A}
     {R₂ : Rel r₂ A} {S₂ : Rel s₂ A} →
   R₂ ⊆ R₁ → S₁ ⊆ S₂ → R₁ ⊆ S₁ → R₂ ⊆ S₂
-R₂→R₁ ⊆-cong-→ S₁→S₂ = implicit-∀-cong ext $ →-cong-→ R₂→R₁ S₁→S₂
+R₂→R₁ ⊆-cong-→ S₁→S₂ = implicit-∀-cong _ $ →-cong-→ R₂→R₁ S₁→S₂
 
 ⊆-congʳ :
   ∀ {k a r s₁ s₂} {A : Set a}
     {R : Rel r A} {S₁ : Rel s₁ A} {S₂ : Rel s₂ A} →
   (∀ {x} → S₁ x ↝[ k ] S₂ x) →
   R ⊆ S₁ ↝[ k ] R ⊆ S₂
-⊆-congʳ S₁↝S₂ = implicit-∀-cong ext $ ∀-cong ext λ _ → S₁↝S₂
+⊆-congʳ {k} S₁↝S₂ =
+  implicit-∀-cong (forget-ext? k ext) $
+  ∀-cong (forget-ext? k ext) λ _ →
+  S₁↝S₂
 
 -- Monotonicity of relation transformers.
 

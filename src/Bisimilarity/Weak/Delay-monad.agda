@@ -158,7 +158,7 @@ private
   uninhabited→trivial : ¬ A → ∀ x y → x BW.≈ y
   uninhabited→trivial =
     ¬ A                 ↝⟨ DW.uninhabited→trivial ⟩
-    (∀ x y → x DW.≈ y)  ↝⟨ ∀-cong-→ (λ _ → ∀-cong-→ λ _ → _⇔_.to direct⇔indirect′) ⟩
+    (∀ x y → x DW.≈ y)  ↝⟨ ∀-cong _ (λ _ → ∀-cong _ λ _ → _⇔_.to direct⇔indirect′) ⟩
     (∀ x y → x BW.≈ y)  □
 
 -- One can define a size-preserving "later-cong" function iff A is
@@ -171,7 +171,7 @@ Later-cong =
 size-preserving-later-cong⇔uninhabited : Later-cong ⇔ ¬ A
 size-preserving-later-cong⇔uninhabited = record
   { to   = Later-cong                ↝⟨ (λ later-cong → now≈never (λ {i} → later-cong {i})) ⟩
-           (∀ x → now x BW.≈ never)  ↝⟨ ∀-cong-→ (λ _ → _⇔_.from direct⇔indirect′) ⟩
+           (∀ x → now x BW.≈ never)  ↝⟨ ∀-cong _ (λ _ → _⇔_.from direct⇔indirect′) ⟩
            (∀ x → now x DW.≈ never)  ↝⟨ (λ hyp → DW.now≉never ∘ hyp) ⟩□
            ¬ A                       □
   ; from = ¬ A                 ↝⟨ uninhabited→trivial ⟩
@@ -205,15 +205,15 @@ Transitivity-≳≈ = {x y z : Delay A ∞} → x ≳ y → y ≈ z → x ≳ z
 
 transitive-≈≳⇔uninhabited : Transitivity-≈≳ ⇔ ¬ A
 transitive-≈≳⇔uninhabited =
-  Transitivity-≈≳     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
-                         →-cong-⇔ direct⇔indirect (→-cong-⇔ ED.direct⇔indirect ED.direct⇔indirect) ⟩
+  Transitivity-≈≳     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                         →-cong _ direct⇔indirect (→-cong _ ED.direct⇔indirect ED.direct⇔indirect) ⟩
   DE.Transitivity-≈≳  ↝⟨ DE.transitive-≈≳⇔uninhabited ⟩□
   ¬ A                 □
 
 transitive-≳≈⇔uninhabited : Transitivity-≳≈ ⇔ ¬ A
 transitive-≳≈⇔uninhabited =
-  Transitivity-≳≈     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
-                         →-cong-⇔ ED.direct⇔indirect (→-cong-⇔ direct⇔indirect ED.direct⇔indirect) ⟩
+  Transitivity-≳≈     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                         →-cong _ ED.direct⇔indirect (→-cong _ direct⇔indirect ED.direct⇔indirect) ⟩
   DE.Transitivity-≳≈  ↝⟨ DE.transitive-≳≈⇔uninhabited ⟩□
   ¬ A                 □
 
@@ -226,8 +226,8 @@ Transitivityʳ =
 
 size-preserving-transitivityʳ⇔uninhabited : Transitivityʳ ⇔ ¬ A
 size-preserving-transitivityʳ⇔uninhabited =
-  Transitivityʳ     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
-                       →-cong-⇔ direct⇔indirect $ →-cong-⇔ direct⇔indirect direct⇔indirect ⟩
+  Transitivityʳ     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                       →-cong _ direct⇔indirect $ →-cong _ direct⇔indirect direct⇔indirect ⟩
   DW.Transitivityʳ  ↝⟨ DW.size-preserving-transitivityʳ⇔uninhabited ⟩□
   ¬ A               □
 
@@ -240,8 +240,8 @@ Transitivityˡ =
 
 size-preserving-transitivityˡ⇔uninhabited : Transitivityˡ ⇔ ¬ A
 size-preserving-transitivityˡ⇔uninhabited =
-  Transitivityˡ     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
-                       →-cong-⇔ direct⇔indirect $ →-cong-⇔ direct⇔indirect direct⇔indirect ⟩
+  Transitivityˡ     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                       →-cong _ direct⇔indirect $ →-cong _ direct⇔indirect direct⇔indirect ⟩
   DW.Transitivityˡ  ↝⟨ DW.size-preserving-transitivityˡ⇔uninhabited ⟩□
   ¬ A               □
 
@@ -254,8 +254,8 @@ Transitivity-≈∼ʳ =
 
 size-preserving-transitivity-≈∼ʳ⇔uninhabited : Transitivity-≈∼ʳ ⇔ ¬ A
 size-preserving-transitivity-≈∼ʳ⇔uninhabited =
-  Transitivity-≈∼ʳ     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
-                          →-cong-⇔ direct⇔indirect $ →-cong-⇔ SD.direct⇔indirect direct⇔indirect ⟩
+  Transitivity-≈∼ʳ     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                          →-cong _ direct⇔indirect $ →-cong _ SD.direct⇔indirect direct⇔indirect ⟩
   DW.Transitivity-≈∼ʳ  ↝⟨ DW.size-preserving-transitivity-≈∼ʳ⇔uninhabited ⟩□
   ¬ A                  □
 
@@ -268,8 +268,8 @@ Transitivity-∼≈ˡ =
 
 size-preserving-transitivity-∼≈ˡ⇔uninhabited : Transitivity-∼≈ˡ ⇔ ¬ A
 size-preserving-transitivity-∼≈ˡ⇔uninhabited =
-  Transitivity-∼≈ˡ     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
-                          →-cong-⇔ SD.direct⇔indirect $ →-cong-⇔ direct⇔indirect direct⇔indirect ⟩
+  Transitivity-∼≈ˡ     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                          →-cong _ SD.direct⇔indirect $ →-cong _ direct⇔indirect direct⇔indirect ⟩
   DW.Transitivity-∼≈ˡ  ↝⟨ DW.size-preserving-transitivity-∼≈ˡ⇔uninhabited ⟩□
   ¬ A                  □
 
@@ -282,8 +282,8 @@ Transitivity-≳≈ˡ =
 
 size-preserving-transitivity-≳≈ˡ⇔uninhabited : Transitivity-≳≈ˡ ⇔ ¬ A
 size-preserving-transitivity-≳≈ˡ⇔uninhabited =
-  Transitivity-≳≈ˡ     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
-                          →-cong-⇔ ED.direct⇔indirect (→-cong-⇔ direct⇔indirect direct⇔indirect) ⟩
+  Transitivity-≳≈ˡ     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                          →-cong _ ED.direct⇔indirect (→-cong _ direct⇔indirect direct⇔indirect) ⟩
   DE.Transitivity-≳≈ˡ  ↝⟨ DE.size-preserving-transitivity-≳≈ˡ⇔uninhabited ⟩□
   ¬ A                  □
 
@@ -296,8 +296,8 @@ Transitivity-≈≲ʳ =
 
 size-preserving-transitivity-≈≲ʳ⇔uninhabited : Transitivity-≈≲ʳ ⇔ ¬ A
 size-preserving-transitivity-≈≲ʳ⇔uninhabited =
-  Transitivity-≈≲ʳ     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
-                          →-cong-⇔ direct⇔indirect (→-cong-⇔ ED.direct⇔indirect direct⇔indirect) ⟩
+  Transitivity-≈≲ʳ     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                          →-cong _ direct⇔indirect (→-cong _ ED.direct⇔indirect direct⇔indirect) ⟩
   DE.Transitivity-≈≲ʳ  ↝⟨ DE.size-preserving-transitivity-≈≲ʳ⇔uninhabited ⟩□
   ¬ A                  □
 
@@ -311,8 +311,8 @@ Transitivity-≈≳ˡ =
 
 size-preserving-transitivity-≈≳ˡ⇔uninhabited : Transitivity-≈≳ˡ ⇔ ¬ A
 size-preserving-transitivity-≈≳ˡ⇔uninhabited =
-  Transitivity-≈≳ˡ     ↝⟨ inverse $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $ implicit-∀-cong-⇔ $
-                          →-cong-⇔ direct⇔indirect (→-cong-⇔ ED.direct⇔indirect direct⇔indirect) ⟩
+  Transitivity-≈≳ˡ     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                          →-cong _ direct⇔indirect (→-cong _ ED.direct⇔indirect direct⇔indirect) ⟩
   DE.Transitivity-≈≳ˡ  ↝⟨ DE.size-preserving-transitivity-≈≳ˡ⇔uninhabited ⟩□
   ¬ A                  □
 

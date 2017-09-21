@@ -105,7 +105,7 @@ map-∘ _ _ = refl
              {A : Rel ℓ₂ I} {B : Rel ℓ₃ I} →
            (∀ {i} → A i ↝[ k ] B i) → ⟦ C ⟧₁ A ↝[ k ] ⟦ C ⟧₁ B
 ⟦⟧₁-cong {C = S ◁₁ P} {A} {B} A↝B =
-  (∃ λ (s : S) → P s ⊆ A)  ↝⟨ (∃-cong λ _ → implicit-∀-cong ext $ ∀-cong ext λ _ → A↝B) ⟩□
+  (∃ λ (s : S) → P s ⊆ A)  ↝⟨ (∃-cong λ _ → ⊆-congʳ A↝B) ⟩□
   (∃ λ (s : S) → P s ⊆ B)  □
 
 ⟦_⟧-cong : ∀ {k ℓ₁ ℓ₂ ℓ₃} {I O : Set ℓ₁} (C : Container I O)
@@ -486,7 +486,7 @@ mutual
 
                                                              $⟨ (λ _ → proj₂ $ Bisimilarity.split x y bisim) ⟩
   (∀ o (p : Position C s o) → ν′-bisimilar ∞ (f₁ p , f₂ p))  ↝⟨ (ν′-ext ∘_) ∘_ ⟩
-  (∀ o (p : Position C s o) → f₁ p ≡ f₂ p)                   ↝⟨ implicit-extensionality ext ∘ (ext ∘_) ⟩
+  (∀ o (p : Position C s o) → f₁ p ≡ f₂ p)                   ↝⟨ implicit-extensionality ext ∘ (apply-ext ext ∘_) ⟩
   (λ {_} → f₁) ≡ f₂                                          ↝⟨ cong (s ,_) ⟩□
   x ≡ y                                                      □
 
@@ -507,7 +507,7 @@ mutual
   ν C ∞ ≡ ⟦ C ⟧ (ν C ∞)
 ν-fixpoint univ C ν′-ext =
   ν C ∞           ≡⟨⟩
-  ⟦ C ⟧ (ν′ C ∞)  ≡⟨ cong ⟦ C ⟧ (ext λ _ → ≃⇒≡ univ (Eq.↔⇒≃ ν′↔ν)) ⟩
+  ⟦ C ⟧ (ν′ C ∞)  ≡⟨ cong ⟦ C ⟧ (apply-ext ext λ _ → ≃⇒≡ univ (Eq.↔⇒≃ ν′↔ν)) ⟩
   ⟦ C ⟧ (ν C ∞)   ∎
   where
   ν′↔ν : ∀ {o} → ν′ C ∞ o ↔ ν C ∞ o

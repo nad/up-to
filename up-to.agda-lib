@@ -1,3 +1,3 @@
 name: up-to
-depend: equality partiality-monad
+depend: equality delay-monad
 include: src
