@@ -16,8 +16,7 @@ open import Univalence-axiom equality-with-J
 
 -- Labelled transition systems were perhaps first defined by Robert M.
 -- Keller (https://doi.org/10.1145/360248.360251). The definition
--- below is a variant with two fields "Silent" and "silent?", added by
--- me.
+-- below is a variant with a field "is-silent", added by me.
 --
 -- I don't know who first came up with the concept of a weak
 -- transition. The definitions of _⇒_, _[_]⇒_, _[_]⇒̂_ and _[_]⟶̂_ below
@@ -33,14 +32,25 @@ record LTS : Set₁ where
     -- Labels.
     Label : Set
 
-    -- Is the label silent?
-    Silent : Label → Set
-
-    -- Silence can be decided.
-    silent? : ∀ μ → Dec (Silent μ)
-
     -- Transitions.
     _[_]⟶_ : Proc → Label → Proc → Set
+
+    -- Is the label silent?
+    is-silent : Label → Bool
+
+  -- Is the label silent?
+
+  Silent : Label → Set
+  Silent μ with is-silent μ
+  ... | true  = ⊤
+  ... | false = ⊥
+
+  -- Silence can be decided.
+
+  silent? : ∀ μ → Dec (Silent μ)
+  silent? μ with is-silent μ
+  ... | true  = yes _
+  ... | false = no id
 
   -- Sequences of zero or more silent transitions.
 
@@ -398,11 +408,10 @@ record LTS : Set₁ where
 
 weak : LTS → LTS
 weak lts = record
-  { Proc    = Proc
-  ; Label   = Label
-  ; Silent  = Silent
-  ; silent? = silent?
-  ; _[_]⟶_  = _[_]⇒̂_
+  { Proc      = Proc
+  ; Label     = Label
+  ; _[_]⟶_    = _[_]⇒̂_
+  ; is-silent = is-silent
   }
   where
   open LTS lts
@@ -418,11 +427,10 @@ weak≡id :
   weak lts ≡ lts
 weak≡id ext univ lts ¬silent =
   cong (λ _[_]⟶_ → record
-          { Proc    = Proc
-          ; Label   = Label
-          ; Silent  = Silent
-          ; silent? = silent?
-          ; _[_]⟶_  = _[_]⟶_
+          { Proc      = Proc
+          ; Label     = Label
+          ; _[_]⟶_    = _[_]⟶_
+          ; is-silent = is-silent
           })
        (apply-ext ext λ p → apply-ext ext λ μ → apply-ext ext λ q →
           p [ μ ]⇒̂ q  ≡⟨ ≃⇒≡ univ $ ↔⇒≃ $ inverse $ ⟶↔⇒̂ (lower-extensionality _ _ ext) ¬silent ⟩∎
@@ -434,11 +442,10 @@ weak≡id ext univ lts ¬silent =
 
 empty : LTS
 empty = record
-  { Proc    = ⊥
-  ; Label   = ⊥
-  ; Silent  = λ _ → ⊥
-  ; silent? = λ _ → no λ ()
-  ; _[_]⟶_  = λ ()
+  { Proc      = ⊥
+  ; Label     = ⊥
+  ; _[_]⟶_    = λ ()
+  ; is-silent = λ ()
   }
 
 -- An LTS with a single process, a single (non-silent) label, and a
@@ -446,11 +453,10 @@ empty = record
 
 one-loop : LTS
 one-loop = record
-  { Proc    = ⊤
-  ; Label   = ⊤
-  ; Silent  = λ _ → ⊥
-  ; silent? = λ _ → no λ ()
-  ; _[_]⟶_  = λ _ _ _ → ⊤
+  { Proc      = ⊤
+  ; Label     = ⊤
+  ; _[_]⟶_    = λ _ _ _ → ⊤
+  ; is-silent = λ _ → false
   }
 
 -- An LTS with two distinct, but bisimilar, processes. There are
@@ -458,11 +464,10 @@ one-loop = record
 
 two-bisimilar-processes : LTS
 two-bisimilar-processes = record
-  { Proc    = Bool
-  ; Label   = ⊤
-  ; Silent  = λ _ → ⊥
-  ; silent? = λ _ → no λ ()
-  ; _[_]⟶_  = λ _ _ _ → ⊤
+  { Proc      = Bool
+  ; Label     = ⊤
+  ; _[_]⟶_    = λ _ _ _ → ⊤
+  ; is-silent = λ _ → false
   }
 
 -- A parametrised LTS for which bisimilarity is logically equivalent
@@ -470,9 +475,8 @@ two-bisimilar-processes = record
 
 bisimilarity⇔equality : Set → LTS
 bisimilarity⇔equality A = record
-  { Proc    = A
-  ; Label   = A
-  ; Silent  = λ _ → ⊥
-  ; silent? = λ _ → no λ ()
-  ; _[_]⟶_  = λ p μ q → p ≡ μ × p ≡ q
+  { Proc      = A
+  ; Label     = A
+  ; _[_]⟶_    = λ p μ q → p ≡ μ × p ≡ q
+  ; is-silent = λ _ → false
   }

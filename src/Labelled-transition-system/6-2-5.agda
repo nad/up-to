@@ -32,11 +32,10 @@ data _[_]⟶_ : Proc → Name → Proc → Set where
 
 6-2-5 : LTS
 6-2-5 = record
-  { Proc    = Proc
-  ; Label   = Name
-  ; Silent  = λ _ → ⊥
-  ; silent? = λ _ → no λ ()
-  ; _[_]⟶_  = _[_]⟶_
+  { Proc      = Proc
+  ; Label     = Name
+  ; _[_]⟶_    = _[_]⟶_
+  ; is-silent = λ _ → false
   }
 
 open LTS 6-2-5 public hiding (Proc; _[_]⟶_)

@@ -112,11 +112,10 @@ private
     q : q ⟶ r
 
   lts = record
-    { Proc    = Proc
-    ; Label   = ⊤
-    ; Silent  = λ _ → ⊥
-    ; silent? = λ _ → no λ ()
-    ; _[_]⟶_  = λ p _ q → p ⟶ q
+    { Proc      = Proc
+    ; Label     = ⊤
+    ; _[_]⟶_    = λ p _ q → p ⟶ q
+    ; is-silent = λ _ → false
     }
 
   open Combination lts hiding (Proc)
@@ -180,11 +179,10 @@ private
 
   one-transition : LTS
   one-transition = record
-    { Proc    = Bool
-    ; Label   = ⊤
-    ; Silent  = λ _ → ⊥
-    ; silent? = λ _ → no λ ()
-    ; _[_]⟶_  = λ x _ y → T (x ∧ not y)
+    { Proc      = Bool
+    ; Label     = ⊤
+    ; _[_]⟶_    = λ x _ y → T (x ∧ not y)
+    ; is-silent = λ _ → false
     }
 
   open Combination one-transition
@@ -287,11 +285,10 @@ module PQR where
 
   lts : LTS
   lts = record
-    { Proc    = Process
-    ; Label   = Label
-    ; Silent  = λ _ → ⊥
-    ; silent? = λ _ → no λ ()
-    ; _[_]⟶_  = _[_]⟶_
+    { Proc      = Process
+    ; Label     = Label
+    ; _[_]⟶_    = _[_]⟶_
+    ; is-silent = λ _ → false
     }
 
   open Combination lts public hiding (Label)

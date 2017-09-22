@@ -88,7 +88,7 @@ module Cong-lemmas
   ν-cong ν-cong′ {a} {μ} {P} P≳P′ (restriction {P′ = Q′} a∉μ P′⟶Q′) =
     case right-to-left P≳P′ P′⟶Q′ of λ where
       (Q , P⇒̂Q , Q≳′Q′) →
-        ν a P      →⟨ map-⇒̂′ (λ { refl → restriction _ }) (restriction a∉μ) P⇒̂Q ⟩■
+        ν a P      →⟨ map-⇒̂′ (restriction ∘ ∉τ) (restriction a∉μ) P⇒̂Q ⟩■
           ⇒̂[ μ ]′
         ν a Q      ∼⟨ ν-cong′ Q≳′Q′ ⟩■
         ν a Q′
@@ -378,13 +378,14 @@ mutual
     lr {Q} {μ} !P⟶Q = case SE.6-1-3-2 !P⟶Q of λ where
 
       (inj₁ (P″ , P⟶P″ , Q∼!P∣P″)) → case left-to-right P≳P′ P⟶P″ of λ where
-        (_ , done refl , P″≳′P′) →
-          Q          ∼⟨ Q∼!P∣P″ ⟩
-          ! P  ∣ P″  ∼′⟨ !-cong′ (convert P≳P′) ∣-cong′ P″≳′P′ ⟩ S.∼:
-          ! P′ ∣ P′  ∼⟨ SE.6-1-2 ⟩■
-          ! P′
-            ⟵̂[ τ ]
-          ! P′       ■
+        (_ , done s , P″≳′P′) → case silent≡τ s of λ where
+          refl →
+            Q          ∼⟨ Q∼!P∣P″ ⟩
+            ! P  ∣ P″  ∼′⟨ !-cong′ (convert P≳P′) ∣-cong′ P″≳′P′ ⟩ S.∼:
+            ! P′ ∣ P′  ∼⟨ SE.6-1-2 ⟩■
+            ! P′
+              ⟵̂[ τ ]
+            ! P′       ■
 
         (Q′ , step P′⟶Q′ , P″≳′Q′) →
           Q          ∼⟨ Q∼!P∣P″ ⟩
@@ -443,14 +444,14 @@ mutual
   τa⊕b≉a⊕b : ¬ τ · (a ·) ⊕ b · ≈ a · ⊕ b ·
   τa⊕b≉a⊕b τa⊕b≈a⊕b
     with W.left-to-right τa⊕b≈a⊕b (choice-left action)
-  ... | _ , non-silent ¬s _ , _ = ⊥-elim (¬s refl)
-  ... | _ , silent refl (step () (choice-left  action) _) , _
-  ... | _ , silent refl (step () (choice-right action) _) , _
-  ... | _ , silent refl done , a≈′a⊕b
+  ... | _ , non-silent ¬s _ , _ = ⊥-elim (¬s _)
+  ... | _ , silent _ (step () (choice-left  action) _) , _
+  ... | _ , silent _ (step () (choice-right action) _) , _
+  ... | _ , silent _ done , a≈′a⊕b
     with W.right-to-left (force a≈′a⊕b) (choice-right action)
   ...   | _ , silent () _ , _
   ...   | _ , non-silent _ (steps done () _) , _
-  ...   | _ , non-silent _ (steps (step refl () _) _ _) , _
+  ...   | _ , non-silent _ (steps (step () action _) _ _) , _
 
 -- It is not necessarily the case that, if Q expands Q′, then P ⊕ Q is
 -- weakly bisimilar to P ⊕ Q′ (assuming that Name is inhabited).

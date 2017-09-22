@@ -91,10 +91,12 @@ Up-to-context-size-preserving =
     , (λ _ → inj₁ base)
 
   !a[τ]⇒̂→≡ : ∀ {P} → ! a · [ τ ]⇒̂ P → P ≡ ! a ·
-  !a[τ]⇒̂→≡ (silent refl done)              = refl
-  !a[τ]⇒̂→≡ (silent refl (step refl !a⟶ _)) = ⊥-elim $ name≢τ $
-                                               !-only ·′-only !a⟶
-  !a[τ]⇒̂→≡ (non-silent ¬s _)               = ⊥-elim $ ¬s refl
+  !a[τ]⇒̂→≡ (non-silent ¬s _)                 = ⊥-elim $ ¬s _
+  !a[τ]⇒̂→≡ (silent _ done)                   = refl
+  !a[τ]⇒̂→≡ (silent _ (step {μ = μ} s !a⟶ _)) = ⊥-elim $ name≢τ (
+                                                 name a  ≡⟨ !-only ·′-only !a⟶ ⟩
+                                                 μ       ≡⟨ silent≡τ s ⟩∎
+                                                 τ       ∎)
 
   drop-[] : ∀ {P Q S} →
             Up-to-context R (P ∣ Q , ! S) → R (P ∣ Q , ! S)

@@ -23,11 +23,10 @@ data _[_]⟶_ : Delay A ∞ → Maybe A → Delay A ∞ → Set where
 
 delay-monad : LTS
 delay-monad = record
-  { Proc    = Delay A ∞
-  ; Label   = Maybe A
-  ; Silent  = if_then ⊤ else ⊥
-  ; silent? = [ yes , const (no λ ()) ]
-  ; _[_]⟶_  = _[_]⟶_
+  { Proc      = Delay A ∞
+  ; Label     = Maybe A
+  ; _[_]⟶_    = _[_]⟶_
+  ; is-silent = if_then true else false
   }
 
 open LTS delay-monad public hiding (_[_]⟶_)

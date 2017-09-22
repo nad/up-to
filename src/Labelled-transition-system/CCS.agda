@@ -82,13 +82,12 @@ pattern par-τ {P} {P′} {Q} {Q′} {a} tr₁ tr₂ =
 
 CCS : LTS
 CCS = record
-  { Proc    = Proc ∞
-  ; Label   = Action
-  ; Silent  = _≡ τ
-  ; silent? = λ { τ        → yes refl
-                ; (name _) → no λ ()
-                }
-  ; _[_]⟶_  = _[_]⟶_
+  { Proc      = Proc ∞
+  ; Label     = Action
+  ; _[_]⟶_    = _[_]⟶_
+  ; is-silent = λ { τ        → true
+                  ; (name _) → false
+                  }
   }
 
 open LTS CCS public hiding (Proc; _[_]⟶_)
@@ -240,6 +239,17 @@ cancel-name refl = refl
 
 name≢τ : ∀ {a} → name a ≢ τ
 name≢τ ()
+
+-- The only silent label is τ.
+
+silent≡τ : ∀ {μ} → Silent μ → μ ≡ τ
+silent≡τ {τ}      _  = refl
+silent≡τ {name _} ()
+
+-- Names do not match (the only silent label) τ.
+
+∉τ : ∀ {μ a} → Silent μ → a ∉ μ
+∉τ s rewrite silent≡τ s = _
 
 -- The process μ ·′ P can only make μ-transitions.
 
