@@ -9,7 +9,8 @@ module Relation where
 open import Equality.Propositional
 open import Prelude
 
-open import Bijection equality-with-J using (_↔_)
+open import Bijection equality-with-J as Bijection using (_↔_)
+open import Equality.Decision-procedures equality-with-J
 import Equality.Groupoid equality-with-J as EG
 open import Function-universe equality-with-J hiding (id; _∘_)
 open import Groupoid equality-with-J
@@ -195,6 +196,40 @@ R₂→R₁ ⊆-cong-→ S₁→S₂ = implicit-∀-cong _ $ →-cong-→ R₂�
   implicit-∀-cong (lower-extensionality? k r lzero ext) $
   ∀-cong (lower-extensionality? k a r ext) λ _ →
   S₁↝S₂
+
+-- Relation containment (_⊆_) is not antisymmetric (with respect to
+-- propositional equality) if the index type is inhabited.
+
+⊆-not-antisymmetric :
+  ∀ {ℓ x} {X : Set x} →
+  X →
+  ¬ ({R S : Rel ℓ X} → R ⊆ S → S ⊆ R → R ≡ S)
+⊆-not-antisymmetric {ℓ} {X = X} x antisym = Bool.true≢false true≡false
+  where
+  R S : Rel ℓ X
+  R = λ _ → ↑ _ ⊤
+  S = λ _ → ↑ _ Bool
+
+  R≡S : R ≡ S
+  R≡S = antisym (λ _ → lift true) _
+
+  ⊤≡Bool : ↑ _ ⊤ ≡ ↑ _ Bool
+  ⊤≡Bool = cong (_$ x) R≡S
+
+  ⊤↔Bool : ⊤ ↔ Bool
+  ⊤↔Bool =
+    ⊤         ↝⟨ inverse Bijection.↑↔ ⟩
+    ↑ _ ⊤     ↝⟨ ≡⇒↝ _ ⊤≡Bool ⟩
+    ↑ _ Bool  ↝⟨ Bijection.↑↔ ⟩□
+    Bool      □
+
+  true≡false : true ≡ false
+  true≡false =
+    true                                   ≡⟨ sym $ _↔_.right-inverse-of ⊤↔Bool _ ⟩
+    _↔_.to ⊤↔Bool (_↔_.from ⊤↔Bool true)   ≡⟨⟩
+    _↔_.to ⊤↔Bool tt                       ≡⟨⟩
+    _↔_.to ⊤↔Bool (_↔_.from ⊤↔Bool false)  ≡⟨ _↔_.right-inverse-of ⊤↔Bool _ ⟩∎
+    false                                  ∎
 
 -- Monotonicity of relation transformers.
 

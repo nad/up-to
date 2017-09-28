@@ -63,7 +63,7 @@ Sound⇔ F = record
 
   ; from = λ up-to → up-to (
 
-      ν (C ⊚ F) ∞                  ⊆⟨ ν-out ⟩
+      ν (C ⊚ F) ∞                  ⊆⟨ ν-out _ ⟩
 
       ⟦ C ⊚ F ⟧ (ν (C ⊚ F) ∞)      ⊆⟨ ⟦∘⟧↔ _ C ⟩∎
 

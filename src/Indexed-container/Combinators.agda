@@ -23,7 +23,7 @@ open import Relation
 -- McBride and Morris (JFP, 2015).
 
 id : ∀ {i} {I : Set i} → Container I I
-id i = ↑ _ ⊤ ◁₁ λ _ i′ → i ≡ i′
+id = (λ _ → ↑ _ ⊤) ◁ λ {i} _ i′ → i ≡ i′
 
 -- An unfolding lemma for ⟦ id ⟧.
 
@@ -222,7 +222,7 @@ C ∘ D =
 
 reindex₂ : ∀ {ℓ} {I O₁ O₂ : Set ℓ} →
            (O₂ → O₁) → Container I O₁ → Container I O₂
-reindex₂ f C = C ⊚ f
+reindex₂ f (S ◁ P) = (S ⊚ f) ◁ P
 
 -- An unfolding lemma for ⟦ reindex₂ f C ⟧.
 
@@ -242,17 +242,17 @@ reindex₂ f C = C ⊚ f
 
 ⟦reindex₂⟧₂↔ C f R x@(s , g) y@(t , h) =
 
-  ⟦ reindex₂ f C ⟧₂ R (x , y)                              ↔⟨⟩
+  ⟦ reindex₂ f C ⟧₂ R (x , y)                                     ↔⟨⟩
 
   (∃ λ (eq : s ≡ t) →
-   ∀ {o} (p : Position (C ⊚ f) s o) →
-   R (g p , h (subst (λ s → Position (C ⊚ f) s o) eq p)))  ↔⟨⟩
+   ∀ {o} (p : Position (reindex₂ f C) s o) →
+   R (g p , h (subst (λ s → Position (reindex₂ f C) s o) eq p)))  ↔⟨⟩
 
   (∃ λ (eq : s ≡ t) →
    ∀ {o} (p : Position C s o) →
-   R (g p , h (subst (λ s → Position C s o) eq p)))        ↔⟨⟩
+   R (g p , h (subst (λ s → Position C s o) eq p)))               ↔⟨⟩
 
-  ⟦ C ⟧₂ R (x , y)                                         □
+  ⟦ C ⟧₂ R (x , y)                                                □
 
   where
   open Container
@@ -990,14 +990,14 @@ mutual
   ν ⟷[ C ] ∞ p ⇔ ν (reindex₂ swap id ⊗ C) ∞ p
 ν-⟷⇔ {C = C} = record
   { to =
-      let R = ν ⟷[ C ] ∞ in                                   $⟨ (λ {_} → ν-out) ⟩
+      let R = ν ⟷[ C ] ∞ in                                   $⟨ (λ {_} → ν-out _) ⟩
       R ⊆ ⟦ ⟷[ C ] ⟧ R                                        ↝⟨ ⊆⟷→∪-swap⊆reindex₂-swap-⊗ ⟩
       R ∪ R ⊚ swap ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ (R ∪ R ⊚ swap)  ↝⟨ unfold _ ⟩
       R ∪ R ⊚ swap ⊆ ν (reindex₂ swap id ⊗ C) ∞               ↝⟨ (λ hyp {_} x → hyp (inj₁ x)) ⟩□
       R ⊆ ν (reindex₂ swap id ⊗ C) ∞                          □
 
   ; from =
-      let R = ν (reindex₂ swap id ⊗ C) ∞ in  $⟨ (λ {_} → ν-out) ⟩
+      let R = ν (reindex₂ swap id ⊗ C) ∞ in  $⟨ (λ {_} → ν-out _) ⟩
       R ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ R         ↝⟨ ⊆reindex₂-swap-⊗→⊆⟷ ⟩
       R ⊆ ⟦ ⟷[ C ] ⟧ R                       ↝⟨ unfold _ ⟩□
       R ⊆ ν ⟷[ C ] ∞                         □

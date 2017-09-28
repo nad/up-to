@@ -62,7 +62,7 @@ up-to→up-to-via {C = C} {F} up-to =
       R ⊆ ν C ∞                      ↝⟨ (λ hyp {_} →
 
           R ∪ ν C ∞                            ⊆⟨ [ hyp {_} , id ] ⟩
-          ν C ∞                                ⊆⟨ ν-out ⟩
+          ν C ∞                                ⊆⟨ ν-out _ ⟩
           ⟦ C ⟧ (ν C ∞)                        ⊆⟨ map C inj₂ ⟩∎
           ⟦ C ⟧ (R ∪ ν C ∞)                    ∎) ⟩
 
@@ -112,7 +112,7 @@ mutual
     ν (C₁ ⊚ F₁ ⊗ reindex f (C₂ ⊚ F₂)) ∞ ⊆ ν (C₁ ⊗ reindex f C₂) ∞
   up-to-via²→ν-∘⊆ν {ℓ} {I} {C₁} {C₂} {F₁} {F₂} {G} {f}
                    inv symm up-to₁ up-to₂ =
-                                                       $⟨ (λ {_} → ν-out) ⟩
+                                                       $⟨ (λ {_} → ν-out _) ⟩
     R ⊆ ⟦ C₁ ⊚ F₁ ⊗ reindex f (C₂ ⊚ F₂) ⟧ R            ↝⟨ ⊆-congʳ _ $ ⟦⊗⟧↔ _ (C₁ ⊚ F₁) (reindex f (C₂ ⊚ F₂)) ⟩
     R ⊆ ⟦ C₁ ⊚ F₁ ⟧ R ∩ ⟦ reindex f (C₂ ⊚ F₂) ⟧ R      ↝⟨ from-isomorphism implicit-ΠΣ-comm F.∘
                                                           implicit-∀-cong _ (from-isomorphism ΠΣ-comm) ⟩

@@ -25,72 +25,32 @@ open import Relation
 ------------------------------------------------------------------------
 -- Containers
 
--- Singly indexed containers.
-
-record Container₁ {ℓ} (I : Set ℓ) : Set (lsuc ℓ) where
-  constructor _◁₁_
-  field
-    Shape    : Set ℓ
-    Position : Shape → Rel ℓ I
-
 -- Doubly indexed containers.
 
-Container : ∀ {ℓ} → Set ℓ → Set ℓ → Set (lsuc ℓ)
-Container I O = O → Container₁ I
+record Container {ℓ} (I O : Set ℓ) : Set (lsuc ℓ) where
+  constructor _◁_
+  field
+    Shape    : Rel ℓ O
+    Position : ∀ {o} → Shape o → Rel ℓ I
 
--- A "constructor".
-
-_◁_ : ∀ {ℓ} {I O : Set ℓ} →
-      (S : Rel ℓ O) → (∀ {o} → S o → Rel ℓ I) → Container I O
-(S ◁ P) o = S o ◁₁ P
-
--- Some "projections".
-
-module Container {ℓ} {I O : Set ℓ} (C : Container I O) where
-
-  Shape : Rel ℓ O
-  Shape = Container₁.Shape ∘ C
-
-  Position : ∀ {o} → Shape o → Rel ℓ I
-  Position = Container₁.Position (C _)
-
--- Interpretations of containers.
-
-⟦_⟧₁ : ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} →
-       Container₁ I → Rel ℓ₂ I → Set (ℓ₁ ⊔ ℓ₂)
-⟦ S ◁₁ P ⟧₁ Q = ∃ λ (s : S) → P s ⊆ Q
+-- Interpretation of containers.
 
 ⟦_⟧ : ∀ {ℓ₁ ℓ₂} {I O : Set ℓ₁} →
       Container I O → Rel ℓ₂ I → Rel (ℓ₁ ⊔ ℓ₂) O
-⟦ C ⟧ Q o = ⟦ C o ⟧₁ Q
+⟦ S ◁ P ⟧ A = λ o → ∃ λ (s : S o) → P s ⊆ A
 
--- Map functions.
-
-map₁ : ∀ {ℓ₁ ℓ₂ ℓ₃} {I : Set ℓ₁} {C : Container₁ I}
-         {A : Rel ℓ₂ I} {B : Rel ℓ₃ I} →
-       A ⊆ B → ⟦ C ⟧₁ A → ⟦ C ⟧₁ B
-map₁ f = Σ-map id (λ g {_} → f ∘ g {_})
+-- A map function.
 
 map : ∀ {ℓ₁ ℓ₂ ℓ₃} {I O : Set ℓ₁} (C : Container I O)
         {A : Rel ℓ₂ I} {B : Rel ℓ₃ I} →
       A ⊆ B → ⟦ C ⟧ A ⊆ ⟦ C ⟧ B
-map _ f = map₁ f
+map _ f (s , g) = (s , f ∘ g)
 
 -- Functor laws.
-
-map₁-id : ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} {C : Container₁ I} {A : Rel ℓ₂ I} →
-          _≡_ {A = ⟦ C ⟧₁ A → _} (map₁ id) id
-map₁-id = refl
 
 map-id : ∀ {ℓ₁ ℓ₂} {I O : Set ℓ₁} {C : Container I O} {A : Rel ℓ₂ I} →
          _≡_ {A = ⟦ C ⟧ A ⊆ _} (map C id) id
 map-id = refl
-
-map₁-∘ : ∀ {ℓ₁ ℓ₂ ℓ₃ ℓ₄} {I : Set ℓ₁} {C : Container₁ I}
-           {D : Rel ℓ₂ I} {E : Rel ℓ₃ I} {F : Rel ℓ₄ I}
-         (f : E ⊆ F) (g : D ⊆ E) →
-         _≡_ {A = ⟦ C ⟧₁ D → _} (map₁ (f ∘ g)) (map₁ f ∘ map₁ g)
-map₁-∘ _ _ = refl
 
 map-∘ : ∀ {ℓ₁ ℓ₂ ℓ₃ ℓ₄} {I O : Set ℓ₁} {C : Container I O}
           {D : Rel ℓ₂ I} {E : Rel ℓ₃ I} {F : Rel ℓ₄ I}
@@ -98,26 +58,16 @@ map-∘ : ∀ {ℓ₁ ℓ₂ ℓ₃ ℓ₄} {I O : Set ℓ₁} {C : Container I 
         _≡_ {A = ⟦ C ⟧ D ⊆ _} (map C (f ∘ g)) (map C f ∘ map C g)
 map-∘ _ _ = refl
 
--- Some preservation lemmas.
-
-⟦⟧₁-cong : ∀ {k ℓ₁ ℓ₂ ℓ₃} {I : Set ℓ₁} {C : Container₁ I}
-             {A : Rel ℓ₂ I} {B : Rel ℓ₃ I} →
-           Extensionality? k ℓ₁ (ℓ₁ ⊔ ℓ₂ ⊔ ℓ₃) →
-           (∀ {i} → A i ↝[ k ] B i) → ⟦ C ⟧₁ A ↝[ k ] ⟦ C ⟧₁ B
-⟦⟧₁-cong {C = S ◁₁ P} {A} {B} ext A↝B =
-  (∃ λ (s : S) → P s ⊆ A)  ↝⟨ (∃-cong λ _ → ⊆-congʳ ext A↝B) ⟩□
-  (∃ λ (s : S) → P s ⊆ B)  □
+-- A preservation lemma.
 
 ⟦⟧-cong : ∀ {k ℓ₁ ℓ₂ ℓ₃} {I O : Set ℓ₁} →
           Extensionality? k ℓ₁ (ℓ₁ ⊔ ℓ₂ ⊔ ℓ₃) →
           (C : Container I O) {A : Rel ℓ₂ I} {B : Rel ℓ₃ I} →
           (∀ {i} → A i ↝[ k ] B i) →
           (∀ {o} → ⟦ C ⟧ A o ↝[ k ] ⟦ C ⟧ B o)
-⟦⟧-cong ext C {A} {B} A↝B {o} =
-  ⟦ C ⟧ A o   ↔⟨⟩
-  ⟦ C o ⟧₁ A  ↝⟨ ⟦⟧₁-cong ext A↝B ⟩
-  ⟦ C o ⟧₁ B  ↔⟨⟩
-  ⟦ C ⟧ B o   □
+⟦⟧-cong ext (S ◁ P) {A} {B} A↝B {o} =
+  (∃ λ (s : S o) → P s ⊆ A)  ↝⟨ (∃-cong λ _ → ⊆-congʳ ext A↝B) ⟩□
+  (∃ λ (s : S o) → P s ⊆ B)  □
 
 ------------------------------------------------------------------------
 -- Least fixpoints
@@ -127,50 +77,42 @@ mutual
   -- The least fixpoint of an indexed "endocontainer", expressed using
   -- sized types.
 
-  μ : ∀ {ℓ} {I : Set ℓ} → Container I I → Size → Rel ℓ I
+  μ : ∀ {ℓ} {X : Set ℓ} → Container X X → Size → Rel ℓ X
   μ C i = ⟦ C ⟧ (μ′ C i)
 
-  data μ′ {ℓ} {I : Set ℓ}
-          (C : Container I I) (i : Size) (o : I) : Set ℓ where
-    ⟨_⟩ : {j : Size< i} → μ C j o → μ′ C i o
+  data μ′ {ℓ} {X : Set ℓ}
+          (C : Container X X) (i : Size) (x : X) : Set ℓ where
+    ⟨_⟩ : {j : Size< i} → μ C j x → μ′ C i x
 
 -- An inverse of ⟨_⟩ (for fully defined values).
 
 ⟨_⟩⁻¹ :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} →
+  ∀ {ℓ} {X : Set ℓ} {C : Container X X} →
   μ′ C ∞ ⊆ μ C ∞
 ⟨ ⟨ x ⟩ ⟩⁻¹ = x
 
 -- The least fixpoint is a post-fixpoint.
 
 μ-out :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} →
+  ∀ {ℓ} {X : Set ℓ} {C : Container X X} →
   μ C ∞ ⊆ ⟦ C ⟧ (μ C ∞)
 μ-out {C = C} = map C ⟨_⟩⁻¹
 
 -- The greatest fixpoint is a pre-fixpoint.
 
 μ-in :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} →
+  ∀ {ℓ} {X : Set ℓ} {C : Container X X} →
   ⟦ C ⟧ (μ C ∞) ⊆ μ C ∞
 μ-in {C = C} = map C ⟨_⟩
 
-mutual
+-- The least fixpoint is smaller than or equal to every
+-- pre-fixpoint.
 
-  -- The least fixpoint is smaller than or equal to every
-  -- pre-fixpoint.
-
-  fold :
-    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : Rel ℓ₂ I} →
-    ⟦ C ⟧ X ⊆ X →
-    ∀ {i} → μ C i ⊆ X
-  fold C f x = f (map C (fold′ C f) x)
-
-  fold′ :
-    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : Rel ℓ₂ I} →
-    ⟦ C ⟧ X ⊆ X →
-    ∀ {i} → μ′ C i ⊆ X
-  fold′ C f ⟨ x ⟩ = fold C f x
+fold :
+  ∀ {ℓ₁ ℓ₂} {X : Set ℓ₁} (C : Container X X) {A : Rel ℓ₂ X} →
+  ⟦ C ⟧ A ⊆ A →
+  ∀ {i} → μ C i ⊆ A
+fold C f a = f (map C (λ { ⟨ a ⟩ → fold C f a }) a)
 
 ------------------------------------------------------------------------
 -- Greatest fixpoints
@@ -180,63 +122,54 @@ mutual
   -- The greatest fixpoint of an indexed "endocontainer", expressed
   -- using sized types.
 
-  ν : ∀ {ℓ} {I : Set ℓ} → Container I I → Size → Rel ℓ I
+  ν : ∀ {ℓ} {X : Set ℓ} → Container X X → Size → Rel ℓ X
   ν C i = ⟦ C ⟧ (ν′ C i)
 
-  record ν′ {ℓ} {I : Set ℓ}
-            (C : Container I I) (i : Size) (o : I) : Set ℓ where
+  record ν′ {ℓ} {X : Set ℓ}
+            (C : Container X X) (i : Size) (x : X) : Set ℓ where
     coinductive
     field
-      force : {j : Size< i} → ν C j o
+      force : {j : Size< i} → ν C j x
 
 open ν′ public
 
 -- The greatest fixpoint ν C ∞ is a post-fixpoint.
 
 ν-out :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} {i} {j : Size< i} →
+  ∀ {ℓ} {X : Set ℓ} {i} {j : Size< i} (C : Container X X) →
   ν C i ⊆ ⟦ C ⟧ (ν C j)
-ν-out {C = C} = map C (λ x → force x)
+ν-out C = map C (λ x → force x)
+
+private
+
+  ν-out-∞ :
+    ∀ {ℓ} {X : Set ℓ} (C : Container X X) →
+    ν C ∞ ⊆ ⟦ C ⟧ (ν C ∞)
+  ν-out-∞ = ν-out
 
 -- The greatest fixpoint is a pre-fixpoint.
 
 ν-in :
-  ∀ {ℓ} {I : Set ℓ} (C : Container I I) {i} →
+  ∀ {ℓ} {X : Set ℓ} {i} (C : Container X X) →
   ⟦ C ⟧ (ν C i) ⊆ ν C i
-ν-in C {i} =
-  map C {A = ν C i} (λ x → record { force = λ { {_} → x } })
-
-mutual
-
-  -- Generalisations of unfold and unfold′ (see below) with more sized
-  -- types.
-
-  sized-unfold :
-    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) (X : Size → Rel ℓ₂ I) →
-    (∀ {i} {j : Size< i} → X i ⊆ ⟦ C ⟧ (X j)) →
-    ∀ {i} {j : Size< i} → X i ⊆ ν C j
-  sized-unfold C X f x = map C (sized-unfold′ C X f) (f x)
-
-  sized-unfold′ :
-    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) (X : Size → Rel ℓ₂ I) →
-    (∀ {i} {j : Size< i} → X i ⊆ ⟦ C ⟧ (X j)) →
-    ∀ {i} → X i ⊆ ν′ C i
-  force (sized-unfold′ C X f x) = sized-unfold C X f x
+ν-in C = map C (λ x → λ { .force → x })
 
 -- The greatest fixpoint is greater than or equal to every
 -- post-fixpoint.
 
 unfold :
-  ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : Rel ℓ₂ I} {i} →
-  X ⊆ ⟦ C ⟧ X →
-  X ⊆ ν C i
-unfold C f = sized-unfold C _ (λ { {j = _} → f })
+  ∀ {ℓ₁ ℓ₂} {X : Set ℓ₁} {A : Rel ℓ₂ X} {i} (C : Container X X) →
+  A ⊆ ⟦ C ⟧ A → A ⊆ ν C i
+unfold C f = map C (λ a → λ { .force → unfold C f a }) ∘ f
 
-unfold′ :
-  ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : Rel ℓ₂ I} {i} →
-  X ⊆ ⟦ C ⟧ X →
-  X ⊆ ν′ C i
-unfold′ C f = sized-unfold′ C _ (λ { {j = _} → f })
+-- A generalisation of unfold with more sized types.
+
+sized-unfold :
+  ∀ {ℓ₁ ℓ₂} {X : Set ℓ₁} (C : Container X X) (A : Size → Rel ℓ₂ X) →
+  (∀ {i} {j : Size< i} → A i ⊆ ⟦ C ⟧ (A j)) →
+  ∀ {i} {j : Size< i} → A i ⊆ ν C j
+sized-unfold C A f =
+  map C (λ a → λ { .force → sized-unfold C A f a }) ∘ f
 
 ------------------------------------------------------------------------
 -- Bisimilarity
@@ -244,36 +177,36 @@ unfold′ C f = sized-unfold′ C _ (λ { {j = _} → f })
 -- A container corresponding to bisimilarity for a given container.
 
 Bisimilarity :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} →
-  let P = ∃ λ o → ν C ∞ o × ν C ∞ o in
+  ∀ {ℓ} {X : Set ℓ} {C : Container X X} →
+  let P = ∃ λ x → ν C ∞ x × ν C ∞ x in
   Container P P
 Bisimilarity {C = C} =
   (λ { (_ , (s₁ , _) , (s₂ , _)) → s₁ ≡ s₂ })
     ◁
-  (λ { {o = _ , (s₁ , f₁) , (s₂ , f₂)} eq (o , x₁ , x₂) →
-       ∃ λ (p : Container.Position C s₁ o) →
+  (λ { {o = _ , (s₁ , f₁) , (s₂ , f₂)} eq (x , x₁ , x₂) →
+       ∃ λ (p : Container.Position C s₁ x) →
        x₁ ≡ force (f₁ p)
          ×
-       x₂ ≡ force (f₂ (subst (λ s → Container.Position C s o) eq p)) })
+       x₂ ≡ force (f₂ (subst (λ s → Container.Position C s x) eq p)) })
 
 -- Bisimilarity for ν.
 
 ν-bisimilar :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} {o} →
-  Size → Rel₂ ℓ (ν C ∞ o)
+  ∀ {ℓ} {X : Set ℓ} {C : Container X X} {x} →
+  Size → Rel₂ ℓ (ν C ∞ x)
 ν-bisimilar i p = ν Bisimilarity i (_ , p)
 
 ν′-bisimilar :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} {o} →
-  Size → Rel₂ ℓ (ν′ C ∞ o)
+  ∀ {ℓ} {X : Set ℓ} {C : Container X X} {x} →
+  Size → Rel₂ ℓ (ν′ C ∞ x)
 ν′-bisimilar i (x , y) = ν′ Bisimilarity i (_ , force x , force y)
 
 -- Lifts a family of binary relations from X to ⟦ C ⟧ X.
 
 ⟦_⟧₂ :
-  ∀ {ℓ x} {I O : Set ℓ} {X : Rel x I} (C : Container I O) →
-  (∀ {i} → Rel₂ ℓ (X i)) →
-  ∀ {o} → Rel₂ ℓ (⟦ C ⟧ X o)
+  ∀ {ℓ₁ ℓ₂} {I O : Set ℓ₁} {A : Rel ℓ₂ I} (C : Container I O) →
+  (∀ {i} → Rel₂ ℓ₁ (A i)) →
+  ∀ {o} → Rel₂ ℓ₁ (⟦ C ⟧ A o)
 ⟦ C ⟧₂ R ((s , f) , (t , g)) =
   ∃ λ (eq : s ≡ t) →
   ∀ {o} (p : Position C s o) →
@@ -284,25 +217,25 @@ Bisimilarity {C = C} =
 -- An alternative characterisation of bisimilarity.
 
 ν-bisimilar↔ :
-  ∀ {k ℓ} {I : Set ℓ} {C : Container I I} {o i} →
+  ∀ {k ℓ} {X : Set ℓ} {C : Container X X} {x i} →
   Extensionality? k ℓ ℓ →
-  (x y : ν C ∞ o) →
+  (x y : ν C ∞ x) →
   ν-bisimilar i (x , y) ↝[ k ] ⟦ C ⟧₂ (ν′-bisimilar i) (x , y)
 ν-bisimilar↔ {C = C} {i = i} ext (s₁ , f₁) (s₂ , f₂) =
 
   ν-bisimilar i ((s₁ , f₁) , (s₂ , f₂))                             ↔⟨⟩
 
   (∃ λ (eq : s₁ ≡ s₂) →
-   ∀ {o} →
-   (∃ λ (p : Position C s₁ (proj₁ o)) →
-      proj₁ (proj₂ o) ≡ force (f₁ p) ×
-      proj₂ (proj₂ o) ≡
-        force (f₂ (subst (λ s → Position C s (proj₁ o)) eq p))) →
-   ν′ Bisimilarity i o)                                             ↝⟨ ∃-cong lemma ⟩
+   ∀ {x} →
+   (∃ λ (p : Position C s₁ (proj₁ x)) →
+      proj₁ (proj₂ x) ≡ force (f₁ p) ×
+      proj₂ (proj₂ x) ≡
+        force (f₂ (subst (λ s → Position C s (proj₁ x)) eq p))) →
+   ν′ Bisimilarity i x)                                             ↝⟨ ∃-cong lemma ⟩
 
   (∃ λ (eq : s₁ ≡ s₂) →
-   ∀ {o} (p : Position C s₁ o) →
-   ν′-bisimilar i (f₁ p , f₂ (subst (λ s → Position C s o) eq p)))  ↔⟨⟩
+   ∀ {x} (p : Position C s₁ x) →
+   ν′-bisimilar i (f₁ p , f₂ (subst (λ s → Position C s x) eq p)))  ↔⟨⟩
 
   ⟦ C ⟧₂ (ν′-bisimilar i) ((s₁ , f₁) , (s₂ , f₂))                   □
 
@@ -311,81 +244,81 @@ Bisimilarity {C = C} =
 
   lemma = λ eq →
 
-    (∀ {o} →
-     (∃ λ (p : Position C s₁ (proj₁ o)) →
-      proj₁ (proj₂ o) ≡ force (f₁ p) ×
-      proj₂ (proj₂ o) ≡
-        force (f₂ (subst (λ s → Position C s (proj₁ o)) eq p))) →
-     ν′ Bisimilarity i o)                                                 ↔⟨ Bijection.implicit-Π↔Π ⟩
+    (∀ {x} →
+     (∃ λ (p : Position C s₁ (proj₁ x)) →
+      proj₁ (proj₂ x) ≡ force (f₁ p) ×
+      proj₂ (proj₂ x) ≡
+        force (f₂ (subst (λ s → Position C s (proj₁ x)) eq p))) →
+     ν′ Bisimilarity i x)                                                 ↔⟨ Bijection.implicit-Π↔Π ⟩
 
-    (∀ o →
-     (∃ λ (p : Position C s₁ (proj₁ o)) →
-      proj₁ (proj₂ o) ≡ force (f₁ p) ×
-      proj₂ (proj₂ o) ≡
-        force (f₂ (subst (λ s → Position C s (proj₁ o)) eq p))) →
-     ν′ Bisimilarity i o)                                                 ↝⟨ (∀-cong ext λ _ → from-isomorphism currying) ⟩
+    (∀ x →
+     (∃ λ (p : Position C s₁ (proj₁ x)) →
+      proj₁ (proj₂ x) ≡ force (f₁ p) ×
+      proj₂ (proj₂ x) ≡
+        force (f₂ (subst (λ s → Position C s (proj₁ x)) eq p))) →
+     ν′ Bisimilarity i x)                                                 ↝⟨ (∀-cong ext λ _ → from-isomorphism currying) ⟩
 
-    (∀ o (p : Position C s₁ (proj₁ o)) →
-     proj₁ (proj₂ o) ≡ force (f₁ p) ×
-     proj₂ (proj₂ o) ≡
-       force (f₂ (subst (λ s → Position C s (proj₁ o)) eq p)) →
-     ν′ Bisimilarity i o)                                                 ↝⟨ (∀-cong ext λ _ → ∀-cong ext λ _ → from-isomorphism currying) ⟩
+    (∀ x (p : Position C s₁ (proj₁ x)) →
+     proj₁ (proj₂ x) ≡ force (f₁ p) ×
+     proj₂ (proj₂ x) ≡
+       force (f₂ (subst (λ s → Position C s (proj₁ x)) eq p)) →
+     ν′ Bisimilarity i x)                                                 ↝⟨ (∀-cong ext λ _ → ∀-cong ext λ _ → from-isomorphism currying) ⟩
 
-    (∀ o (p : Position C s₁ (proj₁ o)) →
-     proj₁ (proj₂ o) ≡ force (f₁ p) →
-     proj₂ (proj₂ o) ≡
-       force (f₂ (subst (λ s → Position C s (proj₁ o)) eq p)) →
-     ν′ Bisimilarity i o)                                                 ↔⟨ currying ⟩
+    (∀ x (p : Position C s₁ (proj₁ x)) →
+     proj₁ (proj₂ x) ≡ force (f₁ p) →
+     proj₂ (proj₂ x) ≡
+       force (f₂ (subst (λ s → Position C s (proj₁ x)) eq p)) →
+     ν′ Bisimilarity i x)                                                 ↔⟨ currying ⟩
 
-    (∀ o xy (p : Position C s₁ o) →
-     proj₁ xy ≡ force (f₁ p) →
-     proj₂ xy ≡ force (f₂ (subst (λ s → Position C s o) eq p)) →
-     ν′ Bisimilarity i (o , xy))                                          ↝⟨ (∀-cong ext λ _ → from-isomorphism Π-comm) ⟩
+    (∀ x yz (p : Position C s₁ x) →
+     proj₁ yz ≡ force (f₁ p) →
+     proj₂ yz ≡ force (f₂ (subst (λ s → Position C s x) eq p)) →
+     ν′ Bisimilarity i (x , yz))                                          ↝⟨ (∀-cong ext λ _ → from-isomorphism Π-comm) ⟩
 
-    (∀ o (p : Position C s₁ o) xy →
-     proj₁ xy ≡ force (f₁ p) →
-     proj₂ xy ≡ force (f₂ (subst (λ s → Position C s o) eq p)) →
-     ν′ Bisimilarity i (o , xy))                                          ↝⟨ (∀-cong ext λ _ → ∀-cong ext λ _ → from-isomorphism currying) ⟩
+    (∀ x (p : Position C s₁ x) yz →
+     proj₁ yz ≡ force (f₁ p) →
+     proj₂ yz ≡ force (f₂ (subst (λ s → Position C s x) eq p)) →
+     ν′ Bisimilarity i (x , yz))                                          ↝⟨ (∀-cong ext λ _ → ∀-cong ext λ _ → from-isomorphism currying) ⟩
 
-    (∀ o (p : Position C s₁ o) x y →
-     x ≡ force (f₁ p) →
-     y ≡ force (f₂ (subst (λ s → Position C s o) eq p)) →
-     ν′ Bisimilarity i (o , x , y))                                       ↝⟨ (∀-cong ext λ _ → ∀-cong ext λ _ → ∀-cong ext λ _ →
+    (∀ x (p : Position C s₁ x) y z →
+     y ≡ force (f₁ p) →
+     z ≡ force (f₂ (subst (λ s → Position C s x) eq p)) →
+     ν′ Bisimilarity i (x , y , z))                                       ↝⟨ (∀-cong ext λ _ → ∀-cong ext λ _ → ∀-cong ext λ _ →
                                                                               from-isomorphism Π-comm) ⟩
-    (∀ o (p : Position C s₁ o) →
-     ∀ x → x ≡ force (f₁ p) →
-     ∀ y → y ≡ force (f₂ (subst (λ s → Position C s o) eq p)) →
-     ν′ Bisimilarity i (o , x , y))                                       ↝⟨ (∀-cong ext λ _ → ∀-cong ext λ _ →
+    (∀ x (p : Position C s₁ x) →
+     ∀ y → y ≡ force (f₁ p) →
+     ∀ z → z ≡ force (f₂ (subst (λ s → Position C s x) eq p)) →
+     ν′ Bisimilarity i (x , y , z))                                       ↝⟨ (∀-cong ext λ _ → ∀-cong ext λ _ →
                                                                               from-isomorphism $ inverse currying) ⟩
-    (∀ o (p : Position C s₁ o) →
-     (x : ∃ λ x → x ≡ force (f₁ p)) →
-     ∀ y → y ≡ force (f₂ (subst (λ s → Position C s o) eq p)) →
-     ν′ Bisimilarity i (o , proj₁ x , y))                                 ↝⟨ (∀-cong ext λ _ → ∀-cong ext λ _ → drop-⊤-left-Π ext (
+    (∀ x (p : Position C s₁ x) →
+     (y : ∃ λ y → y ≡ force (f₁ p)) →
+     ∀ z → z ≡ force (f₂ (subst (λ s → Position C s x) eq p)) →
+     ν′ Bisimilarity i (x , proj₁ y , z))                                 ↝⟨ (∀-cong ext λ _ → ∀-cong ext λ _ → drop-⊤-left-Π ext (
                                                                               _⇔_.to contractible⇔↔⊤ $ singleton-contractible _)) ⟩
-    (∀ o (p : Position C s₁ o) →
-     ∀ y → y ≡ force (f₂ (subst (λ s → Position C s o) eq p)) →
-     ν′ Bisimilarity i (o , force (f₁ p) , y))                            ↝⟨ (∀-cong ext λ _ → ∀-cong ext λ _ →
+    (∀ x (p : Position C s₁ x) →
+     ∀ z → z ≡ force (f₂ (subst (λ s → Position C s x) eq p)) →
+     ν′ Bisimilarity i (x , force (f₁ p) , z))                            ↝⟨ (∀-cong ext λ _ → ∀-cong ext λ _ →
                                                                               from-isomorphism $ inverse currying) ⟩
-    (∀ o (p : Position C s₁ o) →
-     (y : ∃ λ y → y ≡ force (f₂ (subst (λ s → Position C s o) eq p))) →
-     ν′ Bisimilarity i (o , force (f₁ p) , proj₁ y))                      ↝⟨ (∀-cong ext λ _ → ∀-cong ext λ _ → drop-⊤-left-Π ext (
+    (∀ x (p : Position C s₁ x) →
+     (z : ∃ λ z → z ≡ force (f₂ (subst (λ s → Position C s x) eq p))) →
+     ν′ Bisimilarity i (x , force (f₁ p) , proj₁ z))                      ↝⟨ (∀-cong ext λ _ → ∀-cong ext λ _ → drop-⊤-left-Π ext (
                                                                               _⇔_.to contractible⇔↔⊤ $ singleton-contractible _)) ⟩
-    (∀ o (p : Position C s₁ o) →
+    (∀ x (p : Position C s₁ x) →
      ν′ Bisimilarity i
-       (o , force (f₁ p)
-          , force (f₂ (subst (λ s → Position C s o) eq p))))              ↔⟨ inverse $ Bijection.implicit-Π↔Π ⟩
+       (x , force (f₁ p)
+          , force (f₂ (subst (λ s → Position C s x) eq p))))              ↔⟨ inverse $ Bijection.implicit-Π↔Π ⟩
 
-    (∀ {o} (p : Position C s₁ o) →
+    (∀ {x} (p : Position C s₁ x) →
      ν′ Bisimilarity i
-       (o , force (f₁ p)
-          , force (f₂ (subst (λ s → Position C s o) eq p))))              ↔⟨⟩
+       (x , force (f₁ p)
+          , force (f₂ (subst (λ s → Position C s x) eq p))))              ↔⟨⟩
 
-    (∀ {o} (p : Position C s₁ o) →
-     ν′-bisimilar i (f₁ p , f₂ (subst (λ s → Position C s o) eq p)))      □
+    (∀ {x} (p : Position C s₁ x) →
+     ν′-bisimilar i (f₁ p , f₂ (subst (λ s → Position C s x) eq p)))      □
 
 module Bisimilarity
-         {ℓ} {I : Set ℓ} {C : Container I I} {o i}
-         (x y : ν C ∞ o)
+         {ℓ} {X : Set ℓ} {C : Container X X} {x i}
+         (x y : ν C ∞ x)
          where
 
   -- A "constructor".
@@ -405,95 +338,76 @@ module Bisimilarity
   split : ν-bisimilar i (x , y) → ⟦ C ⟧₂ (ν′-bisimilar i) (x , y)
   split = ν-bisimilar↔ _ x y
 
-mutual
+-- Bisimilarity is reflexive.
 
-  -- Bisimilarity is reflexive.
+reflexive-ν :
+  ∀ {ℓ} {X : Set ℓ} {C : Container X X} {x} (x : ν C ∞ x) {i} →
+  ν-bisimilar i (x , x)
+reflexive-ν x =
+  Bisimilarity.⟨ x , x , refl
+               , (λ { p .force → reflexive-ν (force (proj₂ x p)) })
+               ⟩
 
-  reflexive-ν :
-    ∀ {ℓ} {I : Set ℓ} {C : Container I I} {o} (x : ν C ∞ o) {i} →
-    ν-bisimilar i (x , x)
-  reflexive-ν x =
-    Bisimilarity.⟨ x , x , refl , (λ p → reflexive-ν′ (proj₂ x p)) ⟩
+-- Bisimilarity is symmetric.
 
-  reflexive-ν′ :
-    ∀ {ℓ} {I : Set ℓ} {C : Container I I} {o} (x : ν′ C ∞ o) {i} →
-    ν′-bisimilar i (x , x)
-  force (reflexive-ν′ x) = reflexive-ν (force x)
+symmetric-ν :
+  ∀ {ℓ} {X : Set ℓ} {C : Container X X} {x} (x y : ν C ∞ x) {i} →
+  ν-bisimilar i (x , y) → ν-bisimilar i (y , x)
+symmetric-ν x y bisim with Bisimilarity.split x y bisim
+... | refl , bisim′ =
+  Bisimilarity.⟨ y , x , refl
+               , (λ { p .force →
+                      symmetric-ν (force (proj₂ x p))
+                                  (force (proj₂ y p))
+                                  (force (bisim′ p)) })
+               ⟩
 
-mutual
+-- Bisimilarity is transitive.
 
-  -- Bisimilarity is symmetric.
-
-  symmetric-ν :
-    ∀ {ℓ} {I : Set ℓ} {C : Container I I} {o} (x y : ν C ∞ o) {i} →
-    ν-bisimilar i (x , y) → ν-bisimilar i (y , x)
-  symmetric-ν x y bisim with Bisimilarity.split x y bisim
-  ... | refl , bisim′ =
-    Bisimilarity.⟨ y
-                 , x
-                 , refl
-                 , (λ p → symmetric-ν′ (proj₂ x p) (proj₂ y p)
-                                       (bisim′ p))
-                 ⟩
-
-  symmetric-ν′ :
-    ∀ {ℓ} {I : Set ℓ} {C : Container I I} {o} (x y : ν′ C ∞ o) {i} →
-    ν′-bisimilar i (x , y) → ν′-bisimilar i (y , x)
-  force (symmetric-ν′ x y bisim) =
-    symmetric-ν (force x) (force y) (force bisim)
-
-mutual
-
-  -- Bisimilarity is transitive.
-
-  transitive-ν :
-    ∀ {ℓ} {I : Set ℓ} {C : Container I I} {o} (x y z : ν C ∞ o) {i} →
-    ν-bisimilar i (x , y) → ν-bisimilar i (y , z) →
-    ν-bisimilar i (x , z)
-  transitive-ν x y z bisim₁ bisim₂ with Bisimilarity.split x y bisim₁
-                                      | Bisimilarity.split y z bisim₂
-  ... | refl , bisim₁′ | refl , bisim₂′ =
-    Bisimilarity.⟨ x
-                 , z
-                 , refl
-                 , (λ p → transitive-ν′
-                            (proj₂ x p) (proj₂ y p) (proj₂ z p)
-                            (bisim₁′ p) (bisim₂′ p))
-                 ⟩
-
-  transitive-ν′ :
-    ∀ {ℓ} {I : Set ℓ} {C : Container I I} {o} (x y z : ν′ C ∞ o) {i} →
-    ν′-bisimilar i (x , y) → ν′-bisimilar i (y , z) →
-    ν′-bisimilar i (x , z)
-  force (transitive-ν′ x y z bisim₁ bisim₂) =
-    transitive-ν (force x) (force y) (force z)
-                 (force bisim₁) (force bisim₂)
+transitive-ν :
+  ∀ {ℓ} {X : Set ℓ} {C : Container X X} {x} (x y z : ν C ∞ x) {i} →
+  ν-bisimilar i (x , y) → ν-bisimilar i (y , z) →
+  ν-bisimilar i (x , z)
+transitive-ν x y z bisim₁ bisim₂ with Bisimilarity.split x y bisim₁
+                                    | Bisimilarity.split y z bisim₂
+... | refl , bisim₁′ | refl , bisim₂′ =
+  Bisimilarity.⟨ x
+               , z
+               , refl
+               , (λ { p .force →
+                      transitive-ν
+                        (force (proj₂ x p))
+                        (force (proj₂ y p))
+                        (force (proj₂ z p))
+                        (force (bisim₁′ p))
+                        (force (bisim₂′ p)) })
+               ⟩
 
 -- Extensionality for ν′ C: bisimilarity implies equality.
 --
 -- TODO: Is this a consistent assumption?
 
-ν′-extensionality : ∀ {ℓ} {I : Set ℓ} → Container I I → Set ℓ
+ν′-extensionality : ∀ {ℓ} {X : Set ℓ} → Container X X → Set ℓ
 ν′-extensionality C =
-  ∀ {o} {x y : ν′ C ∞ o} → ν′-bisimilar ∞ (x , y) → x ≡ y
+  ∀ {x} {y z : ν′ C ∞ x} → ν′-bisimilar ∞ (y , z) → y ≡ z
 
 -- The formulation of extensionality given above for ν′ can be used to
 -- derive a form of extensionality for ν (in the presence of
 -- extensionality for functions).
 
 ν-extensionality :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} →
+  ∀ {ℓ} {X : Set ℓ} {C : Container X X} →
   Extensionality ℓ ℓ →
   ν′-extensionality C →
-  ∀ {o} {x y : ν C ∞ o} → ν-bisimilar ∞ (x , y) → x ≡ y
+  ∀ {x} {y z : ν C ∞ x} → ν-bisimilar ∞ (y , z) → y ≡ z
 ν-extensionality {C = C} ext ν′-ext
-                 {x = x@(s , f₁)} {y = y@(.s , f₂)} bisim@(refl , _) =
+                 {y = y@(s , f₁)} {z = z@(.s , f₂)} bisim@(refl , _) =
 
-                                                             $⟨ (λ _ → proj₂ $ Bisimilarity.split x y bisim) ⟩
-  (∀ o (p : Position C s o) → ν′-bisimilar ∞ (f₁ p , f₂ p))  ↝⟨ (ν′-ext ∘_) ∘_ ⟩
-  (∀ o (p : Position C s o) → f₁ p ≡ f₂ p)                   ↝⟨ implicit-extensionality ext ∘ (apply-ext ext ∘_) ⟩
+                                                             $⟨ (λ _ → proj₂ $ Bisimilarity.split y z bisim) ⟩
+  (∀ x (p : Position C s x) → ν′-bisimilar ∞ (f₁ p , f₂ p))  ↝⟨ (ν′-ext ∘_) ∘_ ⟩
+  (∀ x (p : Position C s x) → f₁ p ≡ f₂ p)                   ↝⟨ implicit-extensionality ext ∘ (apply-ext ext ∘_) ⟩
   (λ {_} → f₁) ≡ f₂                                          ↝⟨ cong (s ,_) ⟩□
-  x ≡ y                                                      □
+  y ≡ z                                                      □
 
   where
   open Container
@@ -508,7 +422,7 @@ mutual
   ∀ {ℓ} →
   Extensionality ℓ (lsuc ℓ) →
   Univalence ℓ →
-  {I : Set ℓ} (C : Container I I) →
+  {X : Set ℓ} (C : Container X X) →
   ν′-extensionality C →
   ν C ∞ ≡ ⟦ C ⟧ (ν C ∞)
 ν-fixpoint ext univ C ν′-ext =
@@ -516,7 +430,7 @@ mutual
   ⟦ C ⟧ (ν′ C ∞)  ≡⟨ cong ⟦ C ⟧ (apply-ext ext λ _ → ≃⇒≡ univ (Eq.↔⇒≃ ν′↔ν)) ⟩
   ⟦ C ⟧ (ν C ∞)   ∎
   where
-  ν′↔ν : ∀ {o} → ν′ C ∞ o ↔ ν C ∞ o
+  ν′↔ν : ∀ {x} → ν′ C ∞ x ↔ ν C ∞ x
   ν′↔ν = record
     { surjection = record
       { logical-equivalence = record
@@ -529,68 +443,48 @@ mutual
         ν′-ext (record { force = reflexive-ν (force x) })
     }
 
--- The unfold and unfold′ functions make certain diagrams commute.
-
-unfold′-commute :
-  ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : Rel ℓ₂ I}
-  (f : X ⊆ ⟦ C ⟧ X) →
-  ∀ {i o} (x : X o) →
-  ν′-bisimilar i
-    ( unfold′ C f x
-    , record { force = map C (unfold′ C f) (f x) }
-    )
-force (unfold′-commute C f x) = reflexive-ν (unfold C f x)
+-- The unfold function makes a certain diagram commute.
 
 unfold-commute :
-  ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : Rel ℓ₂ I}
-  (f : X ⊆ ⟦ C ⟧ X) →
-  ∀ {i o} (x : X o) →
+  ∀ {ℓ₁ ℓ₂} {X : Set ℓ₁} (C : Container X X) {A : Rel ℓ₂ X}
+  (f : A ⊆ ⟦ C ⟧ A) →
+  ∀ {i x} (a : A x) →
   ν-bisimilar i
-    ( unfold C f x
-    , ν-in C (map C (unfold C f) (f x))
+    ( unfold C f a
+    , ν-in C (map C (unfold C f) (f a))
     )
-unfold-commute C f x =
-  Bisimilarity.⟨ unfold C f x
-               , ν-in C (map C (unfold C f) (f x))
+unfold-commute C f a =
+  Bisimilarity.⟨ unfold C f a
+               , ν-in C (map C (unfold C f) (f a))
                , refl
-               , unfold′-commute C f ∘ proj₂ (f x)
+               , (λ { p .force →
+                      reflexive-ν (unfold C f (proj₂ (f a) p)) })
                ⟩
 
-mutual
+-- A uniqueness property for unfold.
 
-  -- Uniqueness properties for unfold and unfold′.
-
-  unfold-unique :
-    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : Rel ℓ₂ I}
-    (f : X ⊆ ⟦ C ⟧ X) (u : X ⊆ ν C ∞) {i} →
-    (∀ {o} (x : X o) →
-     ν-bisimilar i (u x , ν-in C (map C u (f x)))) →
-    ∀ {o} (x : X o) → ν-bisimilar i (u x , unfold C f x)
-  unfold-unique C f u bisim x
-    with Bisimilarity.split (u x) (ν-in C (map C u (f x))) (bisim x)
-  ... | eq , bisim′ =
-    Bisimilarity.⟨ u x
-                 , unfold C f x
-                 , eq
-                 , (λ p →
+unfold-unique :
+  ∀ {ℓ₁ ℓ₂} {X : Set ℓ₁} (C : Container X X) {A : Rel ℓ₂ X}
+  (f : A ⊆ ⟦ C ⟧ A) (u : A ⊆ ν C ∞) {i} →
+  (∀ {x} (a : A x) →
+   ν-bisimilar i (u a , ν-in C (map C u (f a)))) →
+  ∀ {x} (a : A x) → ν-bisimilar i (u a , unfold C f a)
+unfold-unique C f u bisim a
+  with Bisimilarity.split (u a) (ν-in C (map C u (f a))) (bisim a)
+... | eq , bisim′ =
+  Bisimilarity.⟨ u a
+               , unfold C f a
+               , eq
+               , (λ { p .force →
                       let p′ = subst (λ s → Container.Position C s _)
                                      eq p in
-                      transitive-ν′
-                        (proj₂ (u x) p)
-                        (proj₂ (ν-in C (map C u (f x))) p′)
-                        (proj₂ (unfold C f x) p′)
-                        (bisim′ p)
-                        (unfold′-unique C f u bisim _))
-                 ⟩
-
-  unfold′-unique :
-    ∀ {ℓ₁ ℓ₂} {I : Set ℓ₁} (C : Container I I) {X : Rel ℓ₂ I}
-    (f : X ⊆ ⟦ C ⟧ X) (u : X ⊆ ν C ∞) {i} →
-    (∀ {o} (x : X o) →
-     ν-bisimilar i (u x , ν-in C (map C u (f x)))) →
-    ∀ {o} (x : X o) →
-    ν′-bisimilar i (record { force = u x } , unfold′ C f x)
-  force (unfold′-unique C f u bisim x) = unfold-unique C f u bisim x
+                      transitive-ν
+                        (force (proj₂ (u a) p))
+                        (force (proj₂ (ν-in C (map C u (f a))) p′))
+                        (force (proj₂ (unfold C f a) p′))
+                        (force (bisim′ p))
+                        (unfold-unique C f u bisim _) })
+               ⟩
 
 ------------------------------------------------------------------------
 -- An alternative definition of greatest fixpoints
@@ -598,22 +492,22 @@ mutual
 -- The greatest fixpoint of an indexed "endocontainer" (parametrised
 -- by a universe level).
 
-gfp : ∀ {ℓ₁} ℓ₂ {I : Set ℓ₁} → Container I I → Rel (lsuc (ℓ₁ ⊔ ℓ₂)) I
-gfp {ℓ₁} ℓ₂ {I} C i = ∃ λ (R : Rel (ℓ₁ ⊔ ℓ₂) I) → R ⊆ ⟦ C ⟧ R × R i
+gfp : ∀ {ℓ₁} ℓ₂ {X : Set ℓ₁} → Container X X → Rel (lsuc (ℓ₁ ⊔ ℓ₂)) X
+gfp {ℓ₁} ℓ₂ {X} C x = ∃ λ (R : Rel (ℓ₁ ⊔ ℓ₂) X) → R ⊆ ⟦ C ⟧ R × R x
 
 -- The greatest fixpoint is greater than or equal to every
 -- sufficiently small post-fixpoint.
 
 gfp-unfold :
-  ∀ {ℓ₁ ℓ₂} ℓ₃ {I : Set ℓ₁} {C : Container I I} {X : Rel ℓ₂ I} →
-  X ⊆ ⟦ C ⟧ X →
-  X ⊆ gfp (ℓ₂ ⊔ ℓ₃) C
-gfp-unfold {ℓ₁} ℓ₃ {C = C} {X} f x =
-  ↑ (ℓ₁ ⊔ ℓ₃) ∘ X , map C lift ∘ f ∘ lower , lift x
+  ∀ {ℓ₁ ℓ₂} ℓ₃ {X : Set ℓ₁} {C : Container X X} {A : Rel ℓ₂ X} →
+  A ⊆ ⟦ C ⟧ A →
+  A ⊆ gfp (ℓ₂ ⊔ ℓ₃) C
+gfp-unfold {ℓ₁} ℓ₃ {C = C} {A} f a =
+  ↑ (ℓ₁ ⊔ ℓ₃) ∘ A , map C lift ∘ f ∘ lower , lift a
 
 -- The greatest fixpoint is a post-fixpoint.
 
-gfp-out : ∀ {ℓ₁} ℓ₂ {I : Set ℓ₁} {C : Container I I} →
+gfp-out : ∀ {ℓ₁} ℓ₂ {X : Set ℓ₁} {C : Container X X} →
           gfp ℓ₂ C ⊆ ⟦ C ⟧ (gfp ℓ₂ C)
 gfp-out ℓ₂ {C = C} (R , R⊆CR , Ri) =
   map C (λ Ri → R , (λ {_} → R⊆CR) , Ri) (R⊆CR Ri)
@@ -625,20 +519,20 @@ gfp-out ℓ₂ {C = C} (R , R⊆CR , Ri) =
 -- The first definition of greatest fixpoints is contained in the
 -- second one.
 
-ν⊆gfp : ∀ {ℓ₁} ℓ₂ {I : Set ℓ₁} {C : Container I I} →
+ν⊆gfp : ∀ {ℓ₁} ℓ₂ {X : Set ℓ₁} {C : Container X X} →
         ν C ∞ ⊆ gfp ℓ₂ C
-ν⊆gfp ℓ₂ = gfp-unfold ℓ₂ (ν-out {i = ∞})
+ν⊆gfp ℓ₂ = gfp-unfold ℓ₂ (ν-out {i = ∞} _)
 
 -- The second definition of greatest fixpoints is contained in the first one.
 
-gfp⊆ν : ∀ {ℓ₁} ℓ₂ {I : Set ℓ₁} {C : Container I I} {i} →
+gfp⊆ν : ∀ {ℓ₁} ℓ₂ {X : Set ℓ₁} {C : Container X X} {i} →
         gfp ℓ₂ C ⊆ ν C i
 gfp⊆ν ℓ₂ = unfold _ (gfp-out ℓ₂)
 
 -- Thus the two definitions of greatest fixpoints are pointwise
 -- logically equivalent.
 
-gfp⇔ν : ∀ {ℓ₁} ℓ₂ {I : Set ℓ₁} {C : Container I I} {i} →
+gfp⇔ν : ∀ {ℓ₁} ℓ₂ {X : Set ℓ₁} {C : Container X X} {i} →
         gfp ℓ₂ C i ⇔ ν C ∞ i
 gfp⇔ν ℓ₂ = record
   { to   = gfp⊆ν ℓ₂
@@ -649,18 +543,13 @@ gfp⇔ν ℓ₂ = record
 -- bisimilarity).
 
 gfp⊆ν∘ν⊆gfp :
-  ∀ {ℓ₁} ℓ₂ {I : Set ℓ₁} {C : Container I I} {i} (x : ν C ∞ i) {i} →
+  ∀ {ℓ₁} ℓ₂ {X : Set ℓ₁} {C : Container X X} {x} (x : ν C ∞ x) {i} →
   ν-bisimilar i (gfp⊆ν ℓ₂ (ν⊆gfp ℓ₂ x) , x)
-gfp⊆ν∘ν⊆gfp {ℓ₁} ℓ₂ {I} {C} x =
+gfp⊆ν∘ν⊆gfp ℓ₂ {C = C} x =
   _⇔_.from (ν-bisimilar↔ _ (gfp⊆ν ℓ₂ (ν⊆gfp ℓ₂ x)) x)
     ( refl
-    , λ p → gfp⊆ν∘ν⊆gfp′ (proj₂ x p)
+    , (λ { p .force → gfp⊆ν∘ν⊆gfp ℓ₂ (force (proj₂ x p)) })
     )
-  where
-  gfp⊆ν∘ν⊆gfp′ :
-    ∀ {i} (x : ν′ C ∞ i) {i} →
-    ν′-bisimilar i (unfold′ _ (gfp-out ℓ₂) (ν⊆gfp ℓ₂ (force x)) , x)
-  force (gfp⊆ν∘ν⊆gfp′ x) = gfp⊆ν∘ν⊆gfp ℓ₂ (force x)
 
 -- There is a split surjection from the second definition of greatest
 -- fixpoints to the first one (assuming two kinds of extensionality).
@@ -668,9 +557,9 @@ gfp⊆ν∘ν⊆gfp {ℓ₁} ℓ₂ {I} {C} x =
 gfp↠ν :
   ∀ {ℓ₁} →
   Extensionality ℓ₁ ℓ₁ →
-  ∀ ℓ₂ {I : Set ℓ₁} {C : Container I I} →
+  ∀ ℓ₂ {X : Set ℓ₁} {C : Container X X} →
   ν′-extensionality C →
-  ∀ {i} → gfp ℓ₂ C i ↠ ν C ∞ i
+  ∀ {x} → gfp ℓ₂ C x ↠ ν C ∞ x
 gfp↠ν ext ℓ₂ ν′-ext = record
   { logical-equivalence = gfp⇔ν ℓ₂
   ; right-inverse-of    = λ x →
@@ -681,9 +570,9 @@ gfp↠ν ext ℓ₂ ν′-ext = record
 -- one.
 
 larger⇔smallest :
-  ∀ {ℓ₁} ℓ₂ {I : Set ℓ₁} {C : Container I I} {i} →
-  gfp ℓ₂ C i ⇔ gfp lzero C i
-larger⇔smallest {ℓ₁} ℓ₂ {C = C} {i} =
-  gfp ℓ₂ C i     ↝⟨ gfp⇔ν ℓ₂ ⟩
-  ν C ∞ i        ↝⟨ inverse $ gfp⇔ν lzero ⟩□
-  gfp lzero C i  □
+  ∀ {ℓ₁} ℓ₂ {X : Set ℓ₁} {C : Container X X} {x} →
+  gfp ℓ₂ C x ⇔ gfp lzero C x
+larger⇔smallest ℓ₂ {C = C} {x} =
+  gfp ℓ₂ C x     ↝⟨ gfp⇔ν ℓ₂ ⟩
+  ν C ∞ x        ↝⟨ inverse $ gfp⇔ν lzero ⟩□
+  gfp lzero C x  □

@@ -53,6 +53,9 @@ transitiveˢ = Delay-monad.Strong-bisimilarity.transitive
 -- Section 3 and Appendix A
 
 -- Indexed containers.
+--
+-- The paper defines indexed containers with one index type, but this
+-- definition uses two.
 
 Container = Indexed-container.Container
 ⟦_⟧       = Indexed-container.⟦_⟧
@@ -69,6 +72,11 @@ _⊆_ = Relation._⊆_
 ν-out  = Indexed-container.ν-out
 ν-in   = Indexed-container.ν-in
 unfold = Indexed-container.unfold
+
+-- Relation containment (_⊆_) is not antisymmetric if the index type
+-- is inhabited.
+
+⊆-not-antisymmetric = Relation.⊆-not-antisymmetric
 
 ------------------------------------------------------------------------
 -- Section 4
