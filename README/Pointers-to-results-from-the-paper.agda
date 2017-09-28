@@ -419,15 +419,18 @@ Capretta's-weak-bisimilarity = Delay-monad.Weak-bisimilarity.[_]_≈₃_
 
 direct⇔Capretta = Delay-monad.Weak-bisimilarity.≈⇔≈₃
 
+------------------------------------------------------------------------
+-- Section 9.1
+
+-- Weak bisimilarity is transitive for every LTS.
+
+transitiveʷ-lts = Bisimilarity.Weak.Coinductive.Other.transitive-≈
+
 -- The later constructors can be removed.
 
 laterʳ⁻¹ = Delay-monad.Weak-bisimilarity.laterʳ⁻¹
 laterˡ⁻¹ = Delay-monad.Weak-bisimilarity.laterˡ⁻¹
 later⁻¹  = Delay-monad.Weak-bisimilarity.later⁻¹
-
--- Weak bisimilarity is transitive for every LTS.
-
-transitiveʷ-lts = Bisimilarity.Weak.Coinductive.Other.transitive-≈
 
 -- Weak bisimilarity for the delay monad is transitive.
 
@@ -435,25 +438,84 @@ transitiveʷ-now   = Delay-monad.Weak-bisimilarity.transitive-now
 transitiveʷ-later = Delay-monad.Weak-bisimilarity.transitive-later
 transitiveʷ       = Delay-monad.Weak-bisimilarity.transitive
 
--- Transitivity cannot be made size-preserving.
+------------------------------------------------------------------------
+-- Section 9.2
 
-Drop-later            = Delay-monad.Weak-bisimilarity.Laterˡ⁻¹-∼≈
-now≉never             = Delay-monad.Weak-bisimilarity.now≉never
-basic-counterexample  =
+-- The Drop-later predicate.
+
+Drop-later = Delay-monad.Weak-bisimilarity.Laterˡ⁻¹-∼≈
+
+-- The computation now x is not weakly bisimilar to never.
+
+now≉never = Delay-monad.Weak-bisimilarity.now≉never
+
+-- Drop-later A implies that A is not inhabited, and vice versa.
+--
+-- The implementation of basic-counterexample in the paper is
+-- different, because it does not include the "and vice versa" part.
+
+basic-counterexample =
   Delay-monad.Weak-bisimilarity.size-preserving-laterˡ⁻¹-∼≈⇔uninhabited
-symmetryˢ             = Delay-monad.Strong-bisimilarity.symmetric
-symmetryʷ             = Delay-monad.Weak-bisimilarity.symmetric
+
+-- If there is a transitivity-like proof that takes a fully defined
+-- weak bisimilarity proof and a strong bisimilarity proof of size i
+-- to a weak bisimilarity proof of size i, then the carrier type is
+-- uninhabited (and vice versa).
+--
+-- The implementation is superficially different from the one in the
+-- paper (except for the "vice versa" part, which is not present in
+-- the paper).
+
 not-size-preservingʷˢ =
   Delay-monad.Weak-bisimilarity.size-preserving-transitivity-≈∼ʳ⇔uninhabited
-not-size-preservingˢʷ =
-  Delay-monad.Weak-bisimilarity.size-preserving-transitivity-∼≈ˡ⇔uninhabited
-strong-to-weak        = Delay-monad.Weak-bisimilarity.∼→≈
+
+-- A size-preserving translation from strong to weak bisimilarity.
+
+strong-to-weak = Delay-monad.Weak-bisimilarity.∼→≈
+
+-- If there is a proof of transitivity that takes a fully defined weak
+-- bisimilarity proof and a weak bisimilarity proof of size i to a
+-- weak bisimilarity proof of size i, then the carrier type is
+-- uninhabited (and vice versa).
+--
+-- The implementation is superficially different from the one in the
+-- paper (except for the "vice versa" part, which is not present in
+-- the paper).
+
 not-size-preservingʷʳ =
   Delay-monad.Weak-bisimilarity.size-preserving-transitivityʳ⇔uninhabited
+
+-- Size-preserving symmetry proofs for strong and weak bisimilarity.
+
+symmetryˢ = Delay-monad.Strong-bisimilarity.symmetric
+symmetryʷ = Delay-monad.Weak-bisimilarity.symmetric
+
+-- If there is a proof of transitivity that takes a strong (or
+-- alternatively weak) bisimilarity proof of size i and a fully
+-- defined weak bisimilarity proof to a weak bisimilarity proof of
+-- size i, then the carrier type is uninhabited (and vice versa).
+
+not-size-preservingˢʷ =
+  Delay-monad.Weak-bisimilarity.size-preserving-transitivity-∼≈ˡ⇔uninhabited
 not-size-preservingʷˡ =
   Delay-monad.Weak-bisimilarity.size-preserving-transitivityˡ⇔uninhabited
-trivial               = Delay-monad.Weak-bisimilarity.uninhabited→trivial
-size-preservingʷ      =
+
+-- If the carrier type is not inhabited, then weak bisimilarity is
+-- trivial.
+
+trivial = Delay-monad.Weak-bisimilarity.uninhabited→trivial
+
+-- If the type A is uninhabited, then Drop-later A is inhabited (and
+-- vice versa).
+
+basic-counterexample′ =
+  Delay-monad.Weak-bisimilarity.size-preserving-laterˡ⁻¹-∼≈⇔uninhabited
+
+-- If the carrier type is uninhabited, then there is a fully
+-- size-preserving transitivity proof for weak bisimilarity (and vice
+-- versa).
+
+size-preservingʷ =
   Delay-monad.Weak-bisimilarity.size-preserving-transitivity⇔uninhabited
 
 -- Size-preserving transitivity-like proofs involving strong
