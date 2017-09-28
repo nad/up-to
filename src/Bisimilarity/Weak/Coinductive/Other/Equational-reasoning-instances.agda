@@ -179,4 +179,5 @@ instance
       transitive-≈≲ (convert p≈′q) q≳′r
 
   trans≈′≲′ : ∀ {i} → Transitive′ [ i ]_≈′_ _≲′_
-  trans≈′≲′ = is-transitive (λ p≈′q q≲′r → transitive′ p≈′q (force q≲′r))
+  trans≈′≲′ = is-transitive (λ p≈′q q≲′r →
+                transitive′ p≈′q (force q≲′r))
