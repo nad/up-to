@@ -9,8 +9,7 @@ module Bisimilarity.Weak.Delay-monad {A : Set} where
 
 open import Delay-monad
 import Delay-monad.Expansion as DE
-open import Delay-monad.Weak-bisimilarity as DW
-  using (Weakly-bisimilar; ∞Weakly-bisimilar; force)
+open import Delay-monad.Weak-bisimilarity as DW using (force)
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
@@ -37,8 +36,7 @@ open import Expansion delay-monad as BE using ([_]_≳_; _≳_)
 -- Several definitions of weak bisimilarity are pointwise logically
 -- equivalent
 
--- Emulations of the constructors DW.later-cong, DW.laterˡ and
--- DW.laterʳ.
+-- Emulations of the constructors DW.later, DW.laterˡ and DW.laterʳ.
 
 later-cong : ∀ {i x y} →
              [ i ] force x ≈′ force y → [ i ] later x ≈ later y
@@ -59,71 +57,72 @@ laterʳ x≈y =
   , (λ { later⟶ → _ , silent _ done , convert x≈y })
   ⟩
 
-mutual
+-- The direct definition of weak bisimilarity is contained in the
+-- "other" form of weak bisimilarity obtained from the transition
+-- relation.
 
-  -- The direct definition of weak bisimilarity is contained in the
-  -- "other" form of weak bisimilarity obtained from the transition
-  -- relation.
-
-  direct→indirect : ∀ {i x y} →
-                    Weakly-bisimilar i x y → [ i ] x ≈ y
-  direct→indirect DW.now-cong       = reflexive
-  direct→indirect (DW.later-cong p) = later-cong (direct→indirect′ p)
-  direct→indirect (DW.laterˡ p)     = laterˡ (direct→indirect p)
-  direct→indirect (DW.laterʳ p)     = laterʳ (direct→indirect p)
-
-  direct→indirect′ : ∀ {i x y} →
-                     ∞Weakly-bisimilar i x y → [ i ] x ≈′ y
-  force (direct→indirect′ p) = direct→indirect (force p)
+direct→indirect : ∀ {i x y} →
+                  DW.[ i ] x ≈ y → [ i ] x ≈ y
+direct→indirect DW.now        = reflexive
+direct→indirect (DW.later  p) = later-cong λ { .force →
+                                  direct→indirect (force p) }
+direct→indirect (DW.laterˡ p) = laterˡ (direct→indirect p)
+direct→indirect (DW.laterʳ p) = laterʳ (direct→indirect p)
 
 mutual
 
   -- The "other" definition of weak bisimilarity obtained from the
   -- transition relation is contained in the direct one.
 
-  indirect→direct : ∀ {i} x y → [ i ] x ≈ y → Weakly-bisimilar i x y
+  indirect→direct : ∀ {i} x y → [ i ] x ≈ y → DW.[ i ] x ≈ y
   indirect→direct {i} (now x) y =
     [ i ] now x ≈ y                                  ↝⟨ (λ p → left-to-right p now⟶) ⟩
     (∃ λ y′ → y [ just x ]⇒̂ y′ × [ i ] now x ≈′ y′)  ↝⟨ DE.≳→≈ ∘ ED.[just]⇒̂→≳now ∘ proj₁ ∘ proj₂ ⟩
-    Weakly-bisimilar i y (now x)                     ↝⟨ DW.symmetric ⟩□
-    Weakly-bisimilar i (now x) y                     □
+    DW.[ i ] y ≈ now x                               ↝⟨ DW.symmetric ⟩□
+    DW.[ i ] now x ≈ y                               □
 
   indirect→direct {i} x (now y) =
     [ i ] x ≈ now y                                  ↝⟨ (λ p → right-to-left p now⟶) ⟩
     (∃ λ x′ → x [ just y ]⇒̂ x′ × [ i ] x′ ≈′ now y)  ↝⟨ DE.≳→≈ ∘ ED.[just]⇒̂→≳now ∘ proj₁ ∘ proj₂ ⟩□
-    Weakly-bisimilar i x (now y)                     □
+    DW.[ i ] x ≈ now y                               □
 
   indirect→direct (later x) (later y) lx≈ly
     with left-to-right lx≈ly later⟶
-  ... | y′ , non-silent contradiction _    , _     = ⊥-elim (contradiction _)
-  ... | y′ , silent _ (step _ later⟶ y⇒y′) , x≈′y′ = DW.later-cong $
-                                                     ∞indirect→direct′ y⇒y′ x≈′y′
-  ... | y′ , silent _ done                 , x≈′ly with right-to-left lx≈ly later⟶
-  ...   | x′ , non-silent contradiction _    , _     = ⊥-elim (contradiction _)
-  ...   | x′ , silent _ (step _ later⟶ x⇒x′) , x′≈′y = DW.Weakly-bisimilar.later-cong $
-                                                       DW.∞symmetric $
-                                                       ∞indirect→direct′ x⇒x′ $
-                                                       symmetric x′≈′y
-  ...   | x′ , silent _ done                 , lx≈′y = DW.Weakly-bisimilar.later-cong $
-                                                       DW.∞laterˡʳ⁻¹
-                                                         (∞indirect→direct lx≈′y)
-                                                         (∞indirect→direct x≈′ly)
 
-  -- Lemmas used by indirect→direct.
+  ... | y′ , non-silent contradiction _ , _ =
+    ⊥-elim (contradiction _)
 
-  indirect→direct′ : ∀ {i x y y′} →
-                     y ⇒ y′ → [ i ] x ≈ y′ → Weakly-bisimilar i x y
-  indirect→direct′ done               p = indirect→direct _ _ p
-  indirect→direct′ (step _ later⟶ tr) p = DW.laterʳ (indirect→direct′ tr p)
-  indirect→direct′ (step () now⟶ _)
+  ... | y′ , silent _ (step _ later⟶ y⇒y′) , x≈′y′ =
+    DW.later λ { .force →
+      indirect→direct′ y⇒y′ (force x≈′y′) }
 
-  ∞indirect→direct′ : ∀ {i x y y′} →
-                      y ⇒ y′ → [ i ] x ≈′ y′ → ∞Weakly-bisimilar i x y
-  force (∞indirect→direct′ tr p) = indirect→direct′ tr (force p)
+  ... | y′ , silent _ done , x≈′ly
+    with right-to-left lx≈ly later⟶
 
-  ∞indirect→direct : ∀ {i x y} →
-                     [ i ] x ≈′ y → ∞Weakly-bisimilar i x y
-  force (∞indirect→direct p) = indirect→direct _ _ (force p)
+  ...   | x′ , non-silent contradiction _ , _ =
+    ⊥-elim (contradiction _)
+
+  ...   | x′ , silent _ (step _ later⟶ x⇒x′) , x′≈′y =
+    DW.later λ { .force →
+      DW.symmetric $
+      indirect→direct′ x⇒x′ $
+      symmetric (force x′≈′y) }
+
+  ...   | x′ , silent _ done , lx≈′y =
+    DW.later λ { .force →
+      DW.laterˡʳ⁻¹
+        (indirect→direct _ _ (force lx≈′y))
+        (indirect→direct _ _ (force x≈′ly)) }
+
+  private
+
+    -- A lemma used by indirect→direct.
+
+    indirect→direct′ : ∀ {i x y y′} →
+                       y ⇒ y′ → [ i ] x ≈ y′ → DW.[ i ] x ≈ y
+    indirect→direct′ done               p = indirect→direct _ _ p
+    indirect→direct′ (step _ later⟶ tr) p = DW.laterʳ (indirect→direct′ tr p)
+    indirect→direct′ (step () now⟶ _)
 
 -- The direct definition of weak bisimilarity is logically
 -- equivalent to the "other" one obtained from the transition
@@ -131,7 +130,7 @@ mutual
 --
 -- TODO: Are the two definitions isomorphic?
 
-direct⇔indirect : ∀ {i x y} → Weakly-bisimilar i x y ⇔ [ i ] x ≈ y
+direct⇔indirect : ∀ {i x y} → DW.[ i ] x ≈ y ⇔ [ i ] x ≈ y
 direct⇔indirect = record
   { to   = direct→indirect
   ; from = indirect→direct _ _
@@ -182,16 +181,11 @@ size-preserving-later-cong⇔uninhabited = record
 
   module _ (later-cong : Later-cong) where
 
-    mutual
-
-      now≈never : ∀ {i} x → BW.[ i ] now x ≈ never
-      now≈never x =
-        now x                             ∼⟨ cwo⇒cw (laterʳ reflexive) ⟩
-        later (record { force = now x })  ∼⟨ later-cong (now≈never′ x) ⟩■
-        never
-
-      now≈never′ : ∀ {i} x → BW.[ i ] now x ≈′ never
-      force (now≈never′ x) = now≈never x
+    now≈never : ∀ {i} x → BW.[ i ] now x ≈ never
+    now≈never x =
+      now x                         ∼⟨ cwo⇒cw (laterʳ reflexive) ⟩
+      later (λ { .force → now x })  ∼⟨ later-cong (λ { .force → now≈never x }) ⟩■
+      never
 
 ------------------------------------------------------------------------
 -- Some non-existence results for the "other" indirect definition of

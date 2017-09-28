@@ -40,13 +40,13 @@ import Up-to
 -- The Delay monad.
 
 Delay  = Delay-monad.Delay
-Delay′ = Delay-monad.∞Delay
+Delay′ = Delay-monad.Delay′
 never  = Delay-monad.never
 
 -- Strong bisimilarity for the delay monad.
 
-[_]_∼D_     = Delay-monad.Strong-bisimilarity.Strongly-bisimilar
-[_]_∼′D_    = Delay-monad.Strong-bisimilarity.∞Strongly-bisimilar
+[_]_∼D_     = Delay-monad.Strong-bisimilarity.[_]_∼_
+[_]_∼′D_    = Delay-monad.Strong-bisimilarity.[_]_∼′_
 transitiveˢ = Delay-monad.Strong-bisimilarity.transitive
 
 ------------------------------------------------------------------------
@@ -126,7 +126,8 @@ _[_]⇒̂_ = Labelled-transition-system.LTS._[_]⇒̂_
 delay-monad-lts = Labelled-transition-system.Delay-monad.delay-monad
 
 -- The definition of bisimilarity obtained from this LTS is pointwise
--- logically equivalent to Strongly-bisimilar.
+-- logically equivalent to the direct definition of strong
+-- bisimilarity for the delay monad.
 
 delay-monad-direct⇔indirect =
   Bisimilarity.Coinductive.Delay-monad.direct⇔indirect
@@ -399,8 +400,8 @@ module Weak-bisimilarity-almost-congruence where
 
 -- Weak bisimilarity for the delay monad.
 
-[_]_≈D_  = Delay-monad.Weak-bisimilarity.Weakly-bisimilar
-[_]_≈′D_ = Delay-monad.Weak-bisimilarity.∞Weakly-bisimilar
+[_]_≈D_  = Delay-monad.Weak-bisimilarity.[_]_≈_
+[_]_≈′D_ = Delay-monad.Weak-bisimilarity.[_]_≈′_
 
 -- This definition is pointwise logically equivalent, in a
 -- size-preserving way, to the one obtained from the LTS for the delay
@@ -411,14 +412,12 @@ direct⇔indirect = Bisimilarity.Weak.Delay-monad.direct⇔indirect
 -- Capretta's definition of weak bisimilarity, formulated using sized
 -- types.
 
-Capretta's-weak-bisimilarity =
-  Delay-monad.Weak-bisimilarity.Weakly-bisimilar″
+Capretta's-weak-bisimilarity = Delay-monad.Weak-bisimilarity.[_]_≈₃_
 
 -- Capretta's definition is pointwise logically equivalent, in a
 -- size-preserving way, to the one used in the paper.
 
-direct⇔Capretta =
-  Delay-monad.Weak-bisimilarity.Weakly-bisimilar⇔Weakly-bisimilar″
+direct⇔Capretta = Delay-monad.Weak-bisimilarity.≈⇔≈₃
 
 -- The later constructors can be removed.
 
@@ -432,8 +431,8 @@ transitiveʷ-lts = Bisimilarity.Weak.Coinductive.Other.transitive-≈
 
 -- Weak bisimilarity for the delay monad is transitive.
 
-transitiveʷ-now   = Delay-monad.Weak-bisimilarity.⇓-respects-≈
-transitiveʷ-later = Delay-monad.Weak-bisimilarity.later-trans
+transitiveʷ-now   = Delay-monad.Weak-bisimilarity.transitive-now
+transitiveʷ-later = Delay-monad.Weak-bisimilarity.transitive-later
 transitiveʷ       = Delay-monad.Weak-bisimilarity.transitive
 
 -- Transitivity cannot be made size-preserving.
@@ -454,6 +453,8 @@ not-size-preservingʷʳ =
 not-size-preservingʷˡ =
   Delay-monad.Weak-bisimilarity.size-preserving-transitivityˡ⇔uninhabited
 trivial               = Delay-monad.Weak-bisimilarity.uninhabited→trivial
+size-preservingʷ      =
+  Delay-monad.Weak-bisimilarity.size-preserving-transitivity⇔uninhabited
 
 -- Size-preserving transitivity-like proofs involving strong
 -- bisimilarity.
@@ -463,7 +464,7 @@ transitiveʷˢ = Delay-monad.Weak-bisimilarity.transitive-≈∼
 
 -- The expansion relation.
 
-[_]_≳D_ = Delay-monad.Expansion.Expansion
+[_]_≳D_ = Delay-monad.Expansion.[_]_≳_
 
 -- Size-preserving transitivity-like proofs involving the expansion
 -- relation.
