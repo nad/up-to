@@ -385,7 +385,9 @@ transitive-ν x y z bisim₁ bisim₂ with Bisimilarity.split x y bisim₁
 
 -- Extensionality for ν′ C: bisimilarity implies equality.
 --
--- TODO: Is this a consistent assumption?
+-- Note that I have not, at the time of writing, determined whether
+-- this is a consistent assumption. Uses of this and similar
+-- assumptions are tracked using the type system.
 
 ν′-extensionality : ∀ {ℓ} {X : Set ℓ} → Container X X → Set ℓ
 ν′-extensionality C =
@@ -523,7 +525,8 @@ gfp-out ℓ₂ {C = C} (R , R⊆CR , Ri) =
         ν C ∞ ⊆ gfp ℓ₂ C
 ν⊆gfp ℓ₂ = gfp-unfold ℓ₂ (ν-out {i = ∞} _)
 
--- The second definition of greatest fixpoints is contained in the first one.
+-- The second definition of greatest fixpoints is contained in the
+-- first one.
 
 gfp⊆ν : ∀ {ℓ₁} ℓ₂ {X : Set ℓ₁} {C : Container X X} {i} →
         gfp ℓ₂ C ⊆ ν C i
