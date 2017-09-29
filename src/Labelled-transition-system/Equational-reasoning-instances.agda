@@ -11,7 +11,7 @@ open import Labelled-transition-system
 -- make it hard for Agda to infer what instance to use.
 
 module Labelled-transition-system.Equational-reasoning-instances
-         (lts : LTS) where
+         {ℓ} (lts : LTS ℓ) where
 
 open import Prelude
 

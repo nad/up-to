@@ -5,7 +5,8 @@
 
 {-# OPTIONS --without-K #-}
 
-module Bisimilarity.Weak.Coinductive.Up-to.Delay-monad {A : Set} where
+module Bisimilarity.Weak.Coinductive.Up-to.Delay-monad
+         {a} {A : Set a} where
 
 open import Delay-monad
 import Delay-monad.Partial-order as P
@@ -36,16 +37,16 @@ import Bisimilarity.Weak.Coinductive.Other delay-monad as CWO
 -- excluded middle and extensionality).
 
 everything-up-to :
-  Excluded-middle lzero →
-  Eq.Extensionality lzero lzero →
+  Excluded-middle a →
+  Eq.Extensionality a a →
   Is-set A →
-  (F : Trans₂ (# 0) (Delay A ∞)) →
+  (F : Trans₂ a (Delay A ∞)) →
   Up-to-technique F
 everything-up-to em ext A-set F {R = R} R-prog {x = x , y} =
   everything-up-to′ x y
   where
   lemma :
-    ∀ {x y} {P : Rel₂ (# 0) (Delay A ∞)} →
+    ∀ {x y} {P : Rel₂ a (Delay A ∞)} →
     (∀ {x′ z} → x [ just z ]⇒̂ x′ →
      ∃ λ y′ → y [ just z ]⇒̂ y′ × P (x′ , y′)) →
     (∃ λ z → now z W.≈ x) →

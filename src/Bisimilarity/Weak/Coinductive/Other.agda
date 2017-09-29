@@ -6,7 +6,7 @@
 
 open import Labelled-transition-system
 
-module Bisimilarity.Weak.Coinductive.Other (lts : LTS) where
+module Bisimilarity.Weak.Coinductive.Other {ℓ} (lts : LTS ℓ) where
 
 open import Prelude
 
@@ -44,24 +44,24 @@ open General public
 -- open public, to make hyperlinks to these definitions more
 -- informative.
 
-Weak-bisimilarity : Size → Rel₂ (# 0) Proc
+Weak-bisimilarity : Size → Rel₂ ℓ Proc
 Weak-bisimilarity = General.Bisimilarity
 
-Weak-bisimilarity′ : Size → Rel₂ (# 0) Proc
+Weak-bisimilarity′ : Size → Rel₂ ℓ Proc
 Weak-bisimilarity′ = General.Bisimilarity′
 
 infix 4 _≈_ _≈′_ [_]_≈_ [_]_≈′_
 
-[_]_≈_ : Size → Proc → Proc → Set
+[_]_≈_ : Size → Proc → Proc → Set ℓ
 [_]_≈_ = General.[_]_∼_
 
-[_]_≈′_ : Size → Proc → Proc → Set
+[_]_≈′_ : Size → Proc → Proc → Set ℓ
 [_]_≈′_ = General.[_]_∼′_
 
-_≈_ : Proc → Proc → Set
+_≈_ : Proc → Proc → Set ℓ
 _≈_ = General._∼_
 
-_≈′_ : Proc → Proc → Set
+_≈′_ : Proc → Proc → Set ℓ
 _≈′_ = General._∼′_
 
 -- Combinators that can perhaps make the code a bit nicer to read.
@@ -107,10 +107,10 @@ mutual
 -- Strongly bisimilar processes are weakly bisimilar.
 
 ∼⇒≈ : ∀ {i p q} → [ i ] p ∼ q → [ i ] p ≈ q
-∼⇒≈ = ≳⇒≈ ∘ convert
+∼⇒≈ = ≳⇒≈ ∘ convert {a = ℓ}
 
 ∼⇒≈′ : ∀ {i p q} → [ i ] p ∼′ q → [ i ] p ≈′ q
-∼⇒≈′ = ≳⇒≈′ ∘ convert
+∼⇒≈′ = ≳⇒≈′ ∘ convert {a = ℓ}
 
 -- Weak bisimilarity is a weak simulation (of a certain kind).
 
@@ -208,4 +208,4 @@ transitive-≈∼ : ∀ {i p q r} →
                 [ i ] p ≈ q → q ∼ r → [ i ] p ≈ r
 transitive-≈∼ p≈q q∼r =
   symmetric-≈ $
-    transitive-≳≈ (convert (symmetric q∼r)) (symmetric-≈ p≈q)
+    transitive-≳≈ (convert {a = ℓ} (symmetric q∼r)) (symmetric-≈ p≈q)

@@ -4,7 +4,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Expansion.CCS {Name : Set} where
+module Expansion.CCS {ℓ} {Name : Set ℓ} where
 
 open import Equality.Propositional
 open import Prelude hiding (module W)
@@ -31,7 +31,7 @@ import Labelled-transition-system.Equational-reasoning-instances CCS
 -- similar results in Bisimilarity.Weak.CCS.
 
 module Cong-lemmas
-  ({R} R′ : Proc ∞ → Proc ∞ → Set)
+  ({R} R′ : Proc ∞ → Proc ∞ → Set ℓ)
   ⦃ _ : Reflexive R′ ⦄
   ⦃ _ : Convertible R R′ ⦄
   ⦃ _ : Convertible R′ R′ ⦄
@@ -268,11 +268,11 @@ mutual
          ∃ λ R′ → P′ ∣ Q′ [ μ ]⟶̂ R′ × [ i ] R ≳′ R′
     lr P≳P′ Q≳Q′ (par-left  tr)  = Σ-map (_∣ _)
                                          (Σ-map (map-⟶̂ par-left)
-                                                (_∣-cong′ convert Q≳Q′))
+                                                (_∣-cong′ convert {a = ℓ} Q≳Q′))
                                      (left-to-right P≳P′ tr)
     lr P≳P′ Q≳Q′ (par-right tr)  = Σ-map (_ ∣_)
                                          (Σ-map (map-⟶̂ par-right)
-                                                (convert P≳P′ ∣-cong′_))
+                                                (convert {a = ℓ} P≳P′ ∣-cong′_))
                                      (left-to-right Q≳Q′ tr)
     lr P≳P′ Q≳Q′ (par-τ tr₁ tr₂) = Σ-zip _∣_
                                          (Σ-zip (zip-⟶̂ (λ ()) (λ _ ())
@@ -310,7 +310,7 @@ infix 12 _·-cong_ _·-cong′_
 
 _·-cong_ : ∀ {i μ μ′ P P′} →
            μ ≡ μ′ → [ i ] P ≳ P′ → [ i ] μ · P ≳ μ′ · P′
-refl ·-cong P≳P′ = refl ·′-cong convert P≳P′
+refl ·-cong P≳P′ = refl ·′-cong convert {a = ℓ} P≳P′
 
 _·-cong′_ : ∀ {i μ μ′ P P′} →
             μ ≡ μ′ → [ i ] P ≳′ P′ → [ i ] μ · P ≳′ μ′ · P′
@@ -381,7 +381,7 @@ mutual
         (_ , done s , P″≳′P′) → case silent≡τ s of λ where
           refl →
             Q          ∼⟨ Q∼!P∣P″ ⟩
-            ! P  ∣ P″  ∼′⟨ !-cong′ (convert P≳P′) ∣-cong′ P″≳′P′ ⟩ S.∼:
+            ! P  ∣ P″  ∼′⟨ !-cong′ (convert {a = ℓ} P≳P′) ∣-cong′ P″≳′P′ ⟩ S.∼:
             ! P′ ∣ P′  ∼⟨ SE.6-1-2 ⟩■
             ! P′
               ⟵̂[ τ ]
@@ -389,7 +389,7 @@ mutual
 
         (Q′ , step P′⟶Q′ , P″≳′Q′) →
           Q          ∼⟨ Q∼!P∣P″ ⟩
-          ! P  ∣ P″  ∼⟨ !-cong′ (convert P≳P′) ∣-cong′ P″≳′Q′ ⟩■
+          ! P  ∣ P″  ∼⟨ !-cong′ (convert {a = ℓ} P≳P′) ∣-cong′ P″≳′Q′ ⟩■
           ! P′ ∣ Q′
             ⟵̂[ μ ]   ←⟨ replication (par-right P′⟶Q′) ⟩■
           ! P′
@@ -400,7 +400,7 @@ mutual
           ((Q′ , step P′⟶Q′ , P″≳′Q′) ,
            (Q″ , step P′⟶Q″ , P‴≳′Q″)) →
             Q                 ∼⟨ Q≳!P∣P″∣P‴ ⟩
-            (! P ∣ P″) ∣ P‴   ∼⟨ (!-cong′ (convert P≳P′) ∣-cong′ P″≳′Q′) ∣-cong′ P‴≳′Q″ ⟩■
+            (! P ∣ P″) ∣ P‴   ∼⟨ (!-cong′ (convert {a = ℓ} P≳P′) ∣-cong′ P″≳′Q′) ∣-cong′ P‴≳′Q″ ⟩■
             (! P′ ∣ Q′) ∣ Q″
               ⟵̂[ μ ]          ←⟨ replication (par-τ (replication (par-right P′⟶Q′)) P′⟶Q″) ⟩■
             ! P′

@@ -4,7 +4,8 @@
 
 {-# OPTIONS --without-K #-}
 
-module Bisimilarity.Weak.Coinductive.Other.Up-to.CCS {Name : Set} where
+module Bisimilarity.Weak.Coinductive.Other.Up-to.CCS
+         {ℓ} {Name : Set ℓ} where
 
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
@@ -27,7 +28,7 @@ import Labelled-transition-system.Equational-reasoning-instances CCS
 -- Up to (non-degenerate) context for CCS (for polyadic, coinductive
 -- contexts).
 
-Up-to-context : Trans₂ (# 0) (Proc ∞)
+Up-to-context : Trans₂ ℓ (Proc ∞)
 Up-to-context R (p , q) =
   ∃ λ n →
   ∃ λ (C : Context ∞ n) →
@@ -73,10 +74,10 @@ Up-to-context-size-preserving =
   where
   a = x , true
 
-  data R₀ : Rel₂ (# 0) (Proc ∞) where
+  data R₀ : Rel₂ ℓ (Proc ∞) where
     base : R₀ (τ · (a ·) , a ·)
 
-  R : Rel₂ (# 0) (Proc ∞)
+  R : Rel₂ ℓ (Proc ∞)
   R = R₀ ⁼
 
   !τa[R]!a : Up-to-context R (! τ · (a ·) , ! a ·)

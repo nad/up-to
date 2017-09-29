@@ -30,7 +30,7 @@ data _[_]⟶_ : Proc → Name → Proc → Set where
 
 -- The LTS.
 
-6-2-5 : LTS
+6-2-5 : LTS lzero
 6-2-5 = record
   { Proc      = Proc
   ; Label     = Name

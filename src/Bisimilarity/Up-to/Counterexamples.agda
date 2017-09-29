@@ -33,7 +33,7 @@ private
 
   -- A combination of some parametrised modules.
 
-  module Combination (lts : LTS) where
+  module Combination {ℓ} (lts : LTS ℓ) where
 
     open Bisimilarity.Classical lts public
       using (Progression)
@@ -47,7 +47,7 @@ private
 -- monotone nor extensive.
 
 ∃size-preserving×¬[monotone⊎extensive] :
-  ∃ λ lts →
+  ∃ λ (lts : LTS lzero) →
   let open Combination lts in
   ∃ λ (F : Trans₂ (# 0) Proc) →
       Size-preserving F × ¬ (Monotone F ⊎ Extensive F)
@@ -160,7 +160,7 @@ private
 -- transformer that is not compatible.
 
 ∃monotone×extensive×size-preserving×¬compatible :
-  ∃ λ lts →
+  ∃ λ (lts : LTS lzero) →
   let open Combination lts in
   ∃ λ (F : Trans₂ (# 0) Proc) →
       Monotone F × Extensive F × Size-preserving F × ¬ Compatible F
@@ -177,7 +177,7 @@ private
   -- An LTS with two distinct processes and one transition from one to
   -- the other.
 
-  one-transition : LTS
+  one-transition : LTS lzero
   one-transition = record
     { Proc      = Bool
     ; Label     = ⊤
@@ -283,7 +283,7 @@ module PQR where
     qq : ∀ {s} → q s [ qq s ]⟶ q s
     rr : ∀ {s} → r s [ rr s ]⟶ r s
 
-  lts : LTS
+  lts : LTS lzero
   lts = record
     { Proc      = Process
     ; Label     = Label
@@ -543,7 +543,7 @@ module PQR where
 -- Section 6.5.4 of "Enhancements of the bisimulation proof method".
 
 ∃[monotone×extensive×up-to]²×¬∘-up-to :
-  ∃ λ lts →
+  ∃ λ (lts : LTS lzero) →
   let open Combination lts in
   ∃ λ (F : Trans₂ (# 0) Proc) →
   ∃ λ (G : Trans₂ (# 0) Proc) →
@@ -568,7 +568,8 @@ module PQR where
 -- monotone and extensive relation transformers.
 
 ¬-∘-closure :
-  ∃ λ lts → let open Combination lts in
+  ∃ λ (lts : LTS lzero) →
+  let open Combination lts in
   ¬ ({F G : Trans₂ (# 0) Proc} →
      Monotone F → Extensive F →
      Monotone G → Extensive G →
@@ -588,7 +589,7 @@ module PQR where
 -- size-preserving.
 
 ∃monotone×extensive×up-to×¬size-preserving :
-  ∃ λ lts →
+  ∃ λ (lts : LTS lzero) →
   let open Combination lts in
   ∃ λ (F : Trans₂ (# 0) Proc) →
       Monotone F × Extensive F × Up-to-technique F × ¬ Size-preserving F

@@ -4,7 +4,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Similarity.Strong.CCS {Name : Set} where
+module Similarity.Strong.CCS {ℓ} {Name : Set ℓ} where
 
 open import Equality.Propositional
 open import Prelude
@@ -72,7 +72,7 @@ infix 12 _·-cong_ _·-cong′_
 
 _·-cong_ : ∀ {i μ μ′ P P′} →
            μ ≡ μ′ → [ i ] P ≤ P′ → [ i ] μ · P ≤ μ′ · P′
-refl ·-cong P≤P′ = refl ·′-cong convert P≤P′
+refl ·-cong P≤P′ = refl ·′-cong convert {a = ℓ} P≤P′
 
 _·-cong′_ : ∀ {i μ μ′ P P′} →
             μ ≡ μ′ → [ i ] P ≤′ P′ → [ i ] μ · P ≤′ μ′ · P′
@@ -201,7 +201,7 @@ mutual
                     _
                   , (machine₂                      [ name pay ]⟶⟨ replication (par-right (choice-right action)) ⟩
                      machine₂ ∣ coffee · ⊕ tea ·)
-                  , (P                            ∼⟨ ≤: convert P∼ ⟩
+                  , (P                            ∼⟨ ≤: convert {a = ℓ} P∼ ⟩
                      machine₁ ∣ coffee · ⊕ tea ·  ∼⟨ machine₁≤′machine₂ ∣-cong′ (_ ■) ⟩■
                      machine₂ ∣ coffee · ⊕ tea ·))
          ⟩
@@ -232,21 +232,21 @@ mutual
     helper {P} (inj₁ (_ , choice-left (choice-left action) , P∼)) =
         _
       , lemma
-      , (P                            ∼⟨ ≤: convert P∼ ⟩
-         machine₂ ∣ coffee ·          ∼⟨ machine₂≤′machine₁ ∣-cong′ convert ≤-⊕-left ⟩■
+      , (P                            ∼⟨ ≤: convert {a = ℓ} P∼ ⟩
+         machine₂ ∣ coffee ·          ∼⟨ machine₂≤′machine₁ ∣-cong′ convert {a = ℓ} ≤-⊕-left ⟩■
          machine₁ ∣ coffee · ⊕ tea ·)
 
     helper {P} (inj₁ (_ , choice-left (choice-right action) , P∼)) =
         _
       , lemma
-      , (P                            ∼⟨ ≤: convert P∼ ⟩
-         machine₂ ∣ tea ·             ∼⟨ machine₂≤′machine₁ ∣-cong′ convert ≤-⊕-right ⟩■
+      , (P                            ∼⟨ ≤: convert {a = ℓ} P∼ ⟩
+         machine₂ ∣ tea ·             ∼⟨ machine₂≤′machine₁ ∣-cong′ convert {a = ℓ} ≤-⊕-right ⟩■
          machine₁ ∣ coffee · ⊕ tea ·)
 
     helper {P} (inj₁ (_ , choice-right action , P∼)) =
         _
       , lemma
-      , (P                            ∼⟨ ≤: convert P∼ ⟩
+      , (P                            ∼⟨ ≤: convert {a = ℓ} P∼ ⟩
          machine₂ ∣ coffee · ⊕ tea ·  ∼⟨ machine₂≤′machine₁ ∣-cong′ (_ ■) ⟩■
          machine₁ ∣ coffee · ⊕ tea ·)
 
@@ -271,7 +271,7 @@ mutual
     (∃ λ P → machine₁ [ name pay ]⟶ P × P ∼′ machine₂ ∣ coffee ·)  ↝⟨ Σ-map id (Σ-map (proj₂ ∘ machine₁⟶) id) ⟩
 
     (∃ λ P → P ∼ machine₁ ∣ (coffee · ⊕ tea ·) ×
-             P ∼′ machine₂ ∣ coffee ·)                             ↝⟨ (λ { (_ , P∼ , P∼′) → transitive (symmetric P∼) (convert P∼′) }) ⟩
+             P ∼′ machine₂ ∣ coffee ·)                             ↝⟨ (λ { (_ , P∼ , P∼′) → transitive {a = ℓ} (symmetric P∼) (convert {a = ℓ} P∼′) }) ⟩
 
     machine₁ ∣ (coffee · ⊕ tea ·) ∼ machine₂ ∣ coffee ·            ↝⟨ (λ hyp → Σ-map id proj₁ $
                                                                                  B.left-to-right hyp (par-right (choice-right action))) ⟩

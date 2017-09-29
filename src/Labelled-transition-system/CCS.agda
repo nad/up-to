@@ -4,7 +4,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Labelled-transition-system.CCS (Name : Set) where
+module Labelled-transition-system.CCS {ℓ} (Name : Set ℓ) where
 
 open import Equality.Propositional
 open import Prelude
@@ -20,13 +20,13 @@ open import Labelled-transition-system
 -- processes (instead of the named process constants presented in
 -- "Coinduction All the Way Up" by Pous)
 
-Name-with-kind : Set
+Name-with-kind : Set ℓ
 Name-with-kind = Name × Bool
 
 co : Name-with-kind → Name-with-kind
 co (a , kind) = a , not kind
 
-data Action : Set where
+data Action : Set ℓ where
   τ    : Action
   name : Name-with-kind → Action
 
@@ -40,14 +40,14 @@ infix   4 _[_]⟶_ _∉_
 
 mutual
 
-  data Proc (i : Size) : Set where
+  data Proc (i : Size) : Set ℓ where
     ∅       : Proc i
     _∣_ _⊕_ : Proc i → Proc i → Proc i
     _·′_    : Action → Proc′ i → Proc i
     ν       : Name → Proc i → Proc i
     !_      : Proc i → Proc i
 
-  record Proc′ (i : Size) : Set where
+  record Proc′ (i : Size) : Set ℓ where
     coinductive
     field
       force : {j : Size< i} → Proc j
@@ -60,11 +60,11 @@ _·_ : ∀ {i} → Action → Proc i → Proc i
 _· : Name-with-kind → Proc ∞
 a · = name a · ∅
 
-_∉_ : Name → Action → Set
-a ∉ τ            = ⊤
+_∉_ : Name → Action → Set ℓ
+a ∉ τ            = ↑ ℓ ⊤
 a ∉ name (b , _) = a ≢ b
 
-data _[_]⟶_ : Proc ∞ → Action → Proc ∞ → Set where
+data _[_]⟶_ : Proc ∞ → Action → Proc ∞ → Set ℓ where
   par-left     : ∀ {P Q P′ μ} → P [ μ ]⟶ P′ → P ∣ Q [ μ ]⟶ P′ ∣ Q
   par-right    : ∀ {P Q Q′ μ} → Q [ μ ]⟶ Q′ → P ∣ Q [ μ ]⟶ P  ∣ Q′
   par-τ′       : ∀ {P P′ Q Q′ a b} →
@@ -80,7 +80,7 @@ data _[_]⟶_ : Proc ∞ → Action → Proc ∞ → Set where
 pattern par-τ {P} {P′} {Q} {Q′} {a} tr₁ tr₂ =
   par-τ′ {P} {P′} {Q} {Q′} {a} refl tr₁ tr₂
 
-CCS : LTS
+CCS : LTS ℓ
 CCS = record
   { Proc      = Proc ∞
   ; Label     = Action
@@ -96,7 +96,7 @@ mutual
 
   -- Polyadic contexts.
 
-  data Context (i : Size) (n : ℕ) : Set where
+  data Context (i : Size) (n : ℕ) : Set ℓ where
     hole    : (x : Fin n) → Context i n
     ∅       : Context i n
     _∣_ _⊕_ : Context i n → Context i n → Context i n
@@ -104,7 +104,7 @@ mutual
     ν       : (a : Name) → Context i n → Context i n
     !_      : Context i n → Context i n
 
-  record Context′ (i : Size) (n : ℕ) : Set where
+  record Context′ (i : Size) (n : ℕ) : Set ℓ where
     coinductive
     field
       force : {j : Size< i} → Context j n
@@ -127,7 +127,7 @@ mutual
   _[_]′ : ∀ {i n} → Context′ i n → (Fin n → Proc ∞) → Proc′ i
   force (C [ Ps ]′) = force C [ Ps ]
 
-data Weakly-guarded {n : ℕ} : Context ∞ n → Set where
+data Weakly-guarded {n : ℕ} : Context ∞ n → Set ℓ where
   ∅      : Weakly-guarded ∅
   _∣_    : ∀ {C₁ C₂} →
            Weakly-guarded C₁ → Weakly-guarded C₂ →
@@ -153,7 +153,7 @@ context (! P)     = ! context P
 
 mutual
 
-  data Non-degenerate (i : Size) {n : ℕ} : Context ∞ n → Set where
+  data Non-degenerate (i : Size) {n : ℕ} : Context ∞ n → Set ℓ where
     hole   : ∀ {x} → Non-degenerate i (hole x)
     ∅      : Non-degenerate i ∅
     _∣_    : ∀ {C₁ C₂} →
@@ -169,13 +169,13 @@ mutual
     !_     : ∀ {C} → Non-degenerate i C → Non-degenerate i (! C)
 
   data Non-degenerate-summand (i : Size) {n : ℕ} :
-                              Context ∞ n → Set where
+                              Context ∞ n → Set ℓ where
     process : ∀ P → Non-degenerate-summand i (context P)
     action  : ∀ {μ C} →
               Non-degenerate′ i (force C) →
               Non-degenerate-summand i (μ ·′ C)
 
-  record Non-degenerate′ (i : Size) {n} (C : Context ∞ n) : Set where
+  record Non-degenerate′ (i : Size) {n} (C : Context ∞ n) : Set ℓ where
     coinductive
     field
       force : {j : Size< i} → Non-degenerate j C
@@ -186,7 +186,7 @@ open Non-degenerate′ public
 
 mutual
 
-  data Equal (i : Size) : Proc ∞ → Proc ∞ → Set where
+  data Equal (i : Size) : Proc ∞ → Proc ∞ → Set ℓ where
     ∅    : Equal i ∅ ∅
     _∣_  : ∀ {P₁ P₂ Q₁ Q₂} →
            Equal i P₁ P₂ → Equal i Q₁ Q₂ → Equal i (P₁ ∣ Q₁) (P₂ ∣ Q₂)
@@ -199,7 +199,7 @@ mutual
            a₁ ≡ a₂ → Equal i P₁ P₂ → Equal i (ν a₁ P₁) (ν a₂ P₂)
     !_   : ∀ {P₁ P₂} → Equal i P₁ P₂ → Equal i (! P₁) (! P₂)
 
-  record Equal′ (i : Size) (P₁ P₂ : Proc ∞) : Set where
+  record Equal′ (i : Size) (P₁ P₂ : Proc ∞) : Set ℓ where
     coinductive
     field
       force : {j : Size< i} → Equal j P₁ P₂
@@ -208,7 +208,7 @@ open Equal′ public
 
 -- Extensionality for very strong bisimilarity.
 
-Proc-extensionality : Set
+Proc-extensionality : Set ℓ
 Proc-extensionality = ∀ {P Q} → Equal ∞ P Q → P ≡ Q
 
 ------------------------------------------------------------------------
@@ -430,7 +430,7 @@ mutual
   -- A relation expressing that a certain process matches a certain
   -- context.
 
-  data Matches (i : Size) {n} : Proc ∞ → Context ∞ n → Set where
+  data Matches (i : Size) {n} : Proc ∞ → Context ∞ n → Set ℓ where
     hole   : ∀ {P} (x : Fin n) → Matches i P (hole x)
     ∅      : Matches i ∅ ∅
     _∣_    : ∀ {P₁ P₂ C₁ C₂} →
@@ -446,7 +446,7 @@ mutual
     !_     : ∀ {P C} → Matches i P C → Matches i (! P) (! C)
 
   record Matches′
-           (i : Size) {n} (P : Proc ∞) (C : Context ∞ n) : Set where
+           (i : Size) {n} (P : Proc ∞) (C : Context ∞ n) : Set ℓ where
     coinductive
     field
       force : {j : Size< i} → Matches j P C

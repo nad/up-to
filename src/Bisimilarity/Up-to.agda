@@ -6,7 +6,7 @@
 
 open import Labelled-transition-system
 
-module Bisimilarity.Up-to (lts : LTS) where
+module Bisimilarity.Up-to {ℓ} (lts : LTS ℓ) where
 
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
@@ -30,7 +30,7 @@ open Up-to S̲t̲e̲p̲ public
 
 -- Up to bisimilarity.
 
-Up-to-bisimilarity : Trans₂ (# 0) Proc
+Up-to-bisimilarity : Trans₂ ℓ Proc
 Up-to-bisimilarity R = Bisimilarity ∞ ⊙ R ⊙ Bisimilarity ∞
 
 -- Up to bisimilarity is monotone.
@@ -58,7 +58,7 @@ Up-to-bisimilarity-size-preserving =
 
 -- Up to union with bisimilarity.
 
-Up-to-∪∼ : Trans₂ (# 0) Proc
+Up-to-∪∼ : Trans₂ ℓ Proc
 Up-to-∪∼ R = R ∪ Bisimilarity ∞
 
 -- Up to union with bisimilarity is monotone.
@@ -80,7 +80,7 @@ Up-to-∪∼-size-preserving =
 
 -- Up to transitive closure.
 
-Up-to-* : Trans₂ (# 0) Proc
+Up-to-* : Trans₂ ℓ Proc
 Up-to-* R = R *
 
 -- Up to transitive closure is monotone.

@@ -23,17 +23,17 @@ open import Univalence-axiom equality-with-J
 -- are based on definitions in "Enhancements of the bisimulation proof
 -- method" by Pous and Sangiorgi.
 
-record LTS : Set₁ where
+record LTS ℓ : Set (lsuc ℓ) where
   infix 4 _[_]⟶_ _⇒_ _[_]⇒_ _[_]⇒̂_ _[_]⟶̂_
   field
     -- Processes.
-    Proc : Set
+    Proc : Set ℓ
 
     -- Labels.
-    Label : Set
+    Label : Set ℓ
 
     -- Transitions.
-    _[_]⟶_ : Proc → Label → Proc → Set
+    _[_]⟶_ : Proc → Label → Proc → Set ℓ
 
     -- Is the label silent?
     is-silent : Label → Bool
@@ -54,24 +54,24 @@ record LTS : Set₁ where
 
   -- Sequences of zero or more silent transitions.
 
-  data _⇒_ : Proc → Proc → Set where
+  data _⇒_ : Proc → Proc → Set ℓ where
     done : ∀ {p} → p ⇒ p
     step : ∀ {p q r μ} → Silent μ → p [ μ ]⟶ q → q ⇒ r → p ⇒ r
 
   -- Weak transitions (one kind).
 
-  data _[_]⇒_ (p : Proc) (μ : Label) (q : Proc) : Set where
+  data _[_]⇒_ (p : Proc) (μ : Label) (q : Proc) : Set ℓ where
     steps : ∀ {p′ q′} → p ⇒ p′ → p′ [ μ ]⟶ q′ → q′ ⇒ q → p [ μ ]⇒ q
 
   -- Weak transitions (another kind).
 
-  data _[_]⇒̂_ (p : Proc) (μ : Label) (q : Proc) : Set where
+  data _[_]⇒̂_ (p : Proc) (μ : Label) (q : Proc) : Set ℓ where
     silent     : Silent μ → p ⇒ q → p [ μ ]⇒̂ q
     non-silent : ¬ Silent μ → p [ μ ]⇒ q → p [ μ ]⇒̂ q
 
   -- Weak transitions (yet another kind).
 
-  data _[_]⟶̂_ (p : Proc) (μ : Label) : Proc → Set where
+  data _[_]⟶̂_ (p : Proc) (μ : Label) : Proc → Set ℓ where
     done : Silent μ → p [ μ ]⟶̂ p
     step : ∀ {q} → p [ μ ]⟶ q → p [ μ ]⟶̂ q
 
@@ -190,8 +190,8 @@ record LTS : Set₁ where
   -- simulation (of a certain kind).
 
   is-weak :
-    {_%_ _%′_ : Proc → Proc → Set}
-    {_[_]%_ : Proc → Label → Proc → Set} →
+    ∀ {ℓ} {_%_ _%′_ : Proc → Proc → Set ℓ}
+      {_[_]%_ : Proc → Label → Proc → Set ℓ} →
     (∀ {p q} → p % q → ∀ {p′ μ} →
      p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]% q′ × p′ %′ q′) →
     (∀ {p q} → p %′ q → p % q) →
@@ -200,7 +200,7 @@ record LTS : Set₁ where
     ∀ {p p′ q μ} →
     p % q → p [ μ ]⇒̂ p′ →
     ∃ λ q′ → q [ μ ]⇒̂ q′ × (p′ % q′)
-  is-weak {_%_} left-to-right %′⇒% %⇒⇒ %⇒⇒̂ = lr⇒̂
+  is-weak {_%_ = _%_} left-to-right %′⇒% %⇒⇒ %⇒⇒̂ = lr⇒̂
     where
     lr⇒ : ∀ {q q′ r} →
           q % r → q ⇒ q′ →
@@ -406,7 +406,7 @@ record LTS : Set₁ where
 -- Transforms an LTS into one which uses weak transitions as
 -- transitions.
 
-weak : LTS → LTS
+weak : ∀ {ℓ} → LTS ℓ → LTS ℓ
 weak lts = record
   { Proc      = Proc
   ; Label     = Label
@@ -420,9 +420,10 @@ weak lts = record
 -- extensionality and univalence).
 
 weak≡id :
-  Extensionality lzero (lsuc lzero) →
-  Univalence lzero →
-  ∀ lts →
+  ∀ {ℓ} →
+  Extensionality ℓ (lsuc ℓ) →
+  Univalence ℓ →
+  (lts : LTS ℓ) →
   (∀ μ → ¬ LTS.Silent lts μ) →
   weak lts ≡ lts
 weak≡id ext univ lts ¬silent =
@@ -440,7 +441,7 @@ weak≡id ext univ lts ¬silent =
 
 -- An LTS with no processes or labels.
 
-empty : LTS
+empty : LTS lzero
 empty = record
   { Proc      = ⊥
   ; Label     = ⊥
@@ -451,7 +452,7 @@ empty = record
 -- An LTS with a single process, a single (non-silent) label, and a
 -- single transition.
 
-one-loop : LTS
+one-loop : LTS lzero
 one-loop = record
   { Proc      = ⊤
   ; Label     = ⊤
@@ -462,7 +463,7 @@ one-loop = record
 -- An LTS with two distinct, but bisimilar, processes. There are
 -- transitions between the two processes.
 
-two-bisimilar-processes : LTS
+two-bisimilar-processes : LTS lzero
 two-bisimilar-processes = record
   { Proc      = Bool
   ; Label     = ⊤
@@ -473,7 +474,7 @@ two-bisimilar-processes = record
 -- A parametrised LTS for which bisimilarity is logically equivalent
 -- to equality.
 
-bisimilarity⇔equality : Set → LTS
+bisimilarity⇔equality : ∀ {ℓ} → Set ℓ → LTS ℓ
 bisimilarity⇔equality A = record
   { Proc      = A
   ; Label     = A

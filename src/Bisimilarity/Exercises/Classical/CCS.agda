@@ -7,7 +7,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Bisimilarity.Exercises.Classical.CCS {Name : Set} where
+module Bisimilarity.Exercises.Classical.CCS {ℓ} {Name : Set ℓ} where
 
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
@@ -29,7 +29,7 @@ open import Bisimilarity.Classical CCS
 ∣-comm : ∀ {P Q} → P ∣ Q ∼ Q ∣ P
 ∣-comm = ⟨ R , R-is-a-bisimulation , base ⟩
   where
-  data R : Rel₂ (# 0) (Proc ∞) where
+  data R : Rel₂ ℓ (Proc ∞) where
     base : ∀ {P Q} → R (P ∣ Q , Q ∣ P)
 
   R-is-symmetric : ∀ {P Q} → R (P , Q) → R (Q , P)
@@ -58,7 +58,7 @@ open import Bisimilarity.Classical CCS
 ∣-assoc : ∀ {P Q R} → P ∣ (Q ∣ R) ∼ (P ∣ Q) ∣ R
 ∣-assoc = ⟨ S , S-is-a-bisimulation , base ⟩
   where
-  data S : Rel₂ (# 0) (Proc ∞) where
+  data S : Rel₂ ℓ (Proc ∞) where
     base : ∀ {P Q R} → S (P ∣ (Q ∣ R) , (P ∣ Q) ∣ R)
 
   S-is-a-bisimulation : Bisimulation S
@@ -89,7 +89,7 @@ open import Bisimilarity.Classical CCS
 ∣-left-identity : ∀ {P} → ∅ ∣ P ∼ P
 ∣-left-identity = ⟨ R , R-is-a-bisimulation , base ⟩
   where
-  data R : Rel₂ (# 0) (Proc ∞) where
+  data R : Rel₂ ℓ (Proc ∞) where
     base : ∀ {P} → R (∅ ∣ P , P)
 
   R-is-a-bisimulation : Bisimulation R
@@ -123,7 +123,7 @@ P∼P′ ∣-cong Q∼Q′ with _⇔_.to (Bisimilarity↔ _) P∼P′
 ... | L , L-bisim , PLP′
     | R , R-bisim , QRQ′ = ⟨ LR , ⟪ lr , rl ⟫ , base PLP′ QRQ′ ⟩
   where
-  data LR : Rel₂ (# 0) (Proc ∞) where
+  data LR : Rel₂ ℓ (Proc ∞) where
     base : ∀ {P P′ Q Q′} →
            L (P , P′) → R (Q , Q′) → LR (P ∣ Q , P′ ∣ Q′)
 
@@ -165,7 +165,7 @@ P∼P′ ∣-cong Q∼Q′ with _⇔_.to (Bisimilarity↔ _) P∼P′
 6-1-2 : ∀ {P} → ! P ∣ P ∼ ! P
 6-1-2 {P} = ⟨ R , R-is-a-bisimulation , base ⟩
   where
-  data R : Rel₂ (# 0) (Proc ∞) where
+  data R : Rel₂ ℓ (Proc ∞) where
     base : R (! P ∣ P , ! P)
     refl : ∀ {P} → R (P , P)
 
@@ -206,7 +206,7 @@ open Bisimilarity.Exercises.Other.CCS.6-1-3-2 (record
 6-2-4 : ∀ {a} → ! ! a · ∼ ! a ·
 6-2-4 {a} = bisimulation-up-to-∼⊆∼ R-is base
   where
-  data R : Rel₂ (# 0) (Proc ∞) where
+  data R : Rel₂ ℓ (Proc ∞) where
     base : R (! ! a · , ! a ·)
 
   impossible : ∀ {μ P q} {Q : Set q} →
@@ -273,7 +273,7 @@ open Bisimilarity.Exercises.Other.CCS.6-1-3-2 (record
 ·∣·∼·· : ∀ {a} → a · ∣ a · ∼ name a · (a ·)
 ·∣·∼·· {a} = bisimulation-up-to-∪⊆∼ R-is base
   where
-  data R : Rel₂ (# 0) (Proc ∞) where
+  data R : Rel₂ ℓ (Proc ∞) where
     base : R (a · ∣ a · , name a · (a ·))
 
   R-is : Bisimulation-up-to-∪ R

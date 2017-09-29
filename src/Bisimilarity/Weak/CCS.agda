@@ -4,7 +4,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Bisimilarity.Weak.CCS {Name : Set} where
+module Bisimilarity.Weak.CCS {ℓ} {Name : Set ℓ} where
 
 open import Equality.Propositional
 open import Prelude
@@ -71,7 +71,7 @@ infix 12 _·-cong_ _·-cong′_
 
 _·-cong_ : ∀ {i μ μ′ P P′} →
            μ ≡ μ′ → [ i ] P ≈ P′ → [ i ] μ · P ≈ μ′ · P′
-refl ·-cong P≈P′ = refl ·′-cong convert P≈P′
+refl ·-cong P≈P′ = refl ·′-cong convert {a = ℓ} P≈P′
 
 _·-cong′_ : ∀ {i μ μ′ P P′} →
             μ ≡ μ′ → [ i ] P ≈′ P′ → [ i ] μ · P ≈′ μ′ · P′
@@ -220,7 +220,7 @@ D₁ ⊕ D₂  [ Ps≈Qs ]-cong = ⊕-cong Ps≈Qs D₁ D₂
     [ i ] (C₁ [ Ps ]) ⊕ (C₂ [ Ps ]) ≈ (C₁ [ Qs ]) ⊕ (C₂ [ Qs ])
   ⊕-cong {Ps = Ps} {Qs} Ps≈Qs = λ where
     (process P₁) (process P₂) →
-      (context P₁ [ Ps ]) ⊕ (context P₂ [ Ps ])  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁) SE.⊕-cong SE.≡→∼ (context-[] P₂)) ⟩
+      (context P₁ [ Ps ]) ⊕ (context P₂ [ Ps ])  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁) SE.⊕-cong SE.≡→∼ (context-[] P₂)) ⟩ ≈:
       P₁ ⊕ P₂                                    ∼⟨ SE.≡→∼ (context-[] P₁) SE.⊕-cong SE.≡→∼ (context-[] P₂) ⟩■
       (context P₁ [ Qs ]) ⊕ (context P₂ [ Qs ])
 

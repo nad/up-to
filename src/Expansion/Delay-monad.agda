@@ -4,7 +4,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Expansion.Delay-monad {A : Set} where
+module Expansion.Delay-monad {a} {A : Set a} where
 
 open import Delay-monad
 open import Delay-monad.Expansion as D using (force)
@@ -37,7 +37,7 @@ later-cong x≳′y =
 
 laterˡ : ∀ {i x y} → [ i ] force x ≳ y → [ i ] later x ≳ y
 laterˡ x≳y =
-  ⟨ (λ { later⟶ → _ , done _ , convert x≳y })
+  ⟨ (λ { later⟶ → _ , done _ , convert {a = a} x≳y })
   , Σ-map id (Σ-map later⇒̂ id) ∘ right-to-left x≳y
   ⟩
 

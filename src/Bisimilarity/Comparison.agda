@@ -28,7 +28,7 @@ open import Indexed-container as IC hiding (⟨_⟩; larger⇔smallest)
 open import Labelled-transition-system
 open import Relation
 
-module _ {lts : LTS} where
+module _ {ℓ} {lts : LTS ℓ} where
 
   open LTS lts
 
@@ -39,12 +39,12 @@ module _ {lts : LTS} where
   -- Classically bisimilar processes are coinductively bisimilar.
 
   cl⇒co : ∀ {i p q} → p Cl.∼ q → Co.[ i ] p ∼ q
-  cl⇒co = gfp⊆ν _
+  cl⇒co = gfp⊆ν ℓ
 
   -- Coinductively bisimilar processes are classically bisimilar.
 
   co⇒cl : ∀ {p q} → p Co.∼ q → p Cl.∼ q
-  co⇒cl = ν⊆gfp _
+  co⇒cl = ν⊆gfp ℓ
 
   -- The function cl⇒co is a left inverse of co⇒cl (up to pointwise
   -- bisimilarity).
@@ -52,7 +52,7 @@ module _ {lts : LTS} where
   cl⇒co∘co⇒cl : ∀ {i p q}
                 (p∼q : p Co.∼ q) →
                 Co.[ i ] cl⇒co (co⇒cl p∼q) ≡ p∼q
-  cl⇒co∘co⇒cl p∼q = gfp⊆ν∘ν⊆gfp _ p∼q
+  cl⇒co∘co⇒cl p∼q = gfp⊆ν∘ν⊆gfp ℓ p∼q
 
   -- If there are two processes that are not equal, but bisimilar,
   -- then co⇒cl is not a left inverse of cl⇒co.
@@ -72,17 +72,17 @@ module _ {lts : LTS} where
   -- The two definitions of bisimilarity are logically equivalent.
 
   classical⇔coinductive : ∀ {p q} → p Cl.∼ q ⇔ p Co.∼ q
-  classical⇔coinductive = gfp⇔ν _
+  classical⇔coinductive = gfp⇔ν ℓ
 
   -- There is a split surjection from the classical definition of
   -- bisimilarity to the coinductive one (assuming two kinds of
   -- extensionality).
 
   classical↠coinductive :
-    Extensionality lzero lzero →
+    Extensionality ℓ ℓ →
     Co.Extensionality →
     ∀ {p q} → p Cl.∼ q ↠ p Co.∼ q
-  classical↠coinductive ext co-ext = gfp↠ν ext _ co-ext
+  classical↠coinductive ext co-ext = gfp↠ν ext ℓ co-ext
 
 -- There is at least one LTS for which there is a split surjection
 -- from the coinductive definition of bisimilarity to the classical
@@ -143,13 +143,13 @@ classical-bisimilarity-is-not-propositional {ℓ} =
   open Bisimilarity.Classical one-loop
 
   tt∼tt₁ : Bisimilarity′ ℓ (tt , tt)
-  tt∼tt₁ = reflexive-∼
+  tt∼tt₁ = reflexive-∼′ _
 
   tt∼tt₂ : Bisimilarity′ ℓ (tt , tt)
   tt∼tt₂ =
     let R , R-is-a-bisimulation , ttRtt =
-          _⇔_.to (Bisimilarity↔ _) tt∼tt₁ in
-    _⇔_.from (Bisimilarity↔ _)
+          _⇔_.to (Bisimilarity′↔ _ _) tt∼tt₁ in
+    _⇔_.from (Bisimilarity′↔ _ _)
       ( (R ∪ R)
       , ×2-preserves-bisimulations R-is-a-bisimulation
       , inj₁ ttRtt
@@ -221,10 +221,10 @@ coinductive-bisimilarity-is-not-propositional =
 -- on A.
 
 bisimilarity↠equality :
-  {A : Set} →
+  ∀ {a} {A : Set a} →
   let open Bisimilarity.Coinductive (bisimilarity⇔equality A) in
   ∀ {i} {p q : A} → ([ i ] p ∼ q) ↠ p ≡ q
-bisimilarity↠equality {A} {i} = record
+bisimilarity↠equality {A = A} {i} = record
   { logical-equivalence = record
     { to   = to
     ; from = from

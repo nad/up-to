@@ -6,7 +6,7 @@
 
 open import Labelled-transition-system
 
-module Bisimilarity.Weak.Classical (lts : LTS) where
+module Bisimilarity.Weak.Classical {ℓ} (lts : LTS ℓ) where
 
 open import Prelude
 

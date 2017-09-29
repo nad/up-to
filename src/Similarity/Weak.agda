@@ -6,7 +6,7 @@
 
 open import Labelled-transition-system
 
-module Similarity.Weak (lts : LTS) where
+module Similarity.Weak {ℓ} (lts : LTS ℓ) where
 
 open import Prelude
 

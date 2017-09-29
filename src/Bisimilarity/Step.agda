@@ -8,9 +8,10 @@
 open import Labelled-transition-system
 
 module Bisimilarity.Step
-         (lts : LTS)
+         {ℓ}
+         (lts : LTS ℓ)
          (open LTS lts)
-         (_[_]↝₁_ _[_]↝₂_ : Proc → Label → Proc → Set)
+         (_[_]↝₁_ _[_]↝₂_ : Proc → Label → Proc → Set ℓ)
          where
 
 open import Equality.Propositional
@@ -41,7 +42,8 @@ private
   -- instantiated with _[_]⇒̂_, then we get the expansion relation's
   -- "step" function.
 
-  record Step {r} (R : Rel₂ r Proc) (pq : Proc × Proc) : Set r where
+  record Step {r} (R : Rel₂ r Proc) (pq : Proc × Proc) :
+              Set (ℓ ⊔ r) where
     constructor ⟨_,_⟩
 
     private
@@ -68,7 +70,7 @@ S̲t̲e̲p̲ = One-sided.S̲t̲e̲p̲ _[_]↝₁_ ⟷ One-sided.S̲t̲e̲p̲ _[_
 
 Step↔S̲t̲e̲p̲ :
   ∀ {k r} {R : Rel₂ r Proc} {pq} →
-  Extensionality? k lzero r →
+  Extensionality? k ℓ (ℓ ⊔ r) →
   Step R pq ↝[ k ] ⟦ S̲t̲e̲p̲ ⟧ R pq
 Step↔S̲t̲e̲p̲ {R = R} {pq} ext =
   Step R pq                                        ↔⟨ lemma ⟩

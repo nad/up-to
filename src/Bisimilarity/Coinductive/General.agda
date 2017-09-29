@@ -8,9 +8,10 @@
 open import Labelled-transition-system
 
 module Bisimilarity.Coinductive.General
-         (lts : LTS)
+         {ℓ}
+         (lts : LTS ℓ)
          (open LTS lts)
-         (_[_]↝₁_ _[_]↝₂_ : Proc → Label → Proc → Set)
+         (_[_]↝₁_ _[_]↝₂_ : Proc → Label → Proc → Set ℓ)
          (⟶→↝₁ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]↝₁ q)
          (⟶→↝₂ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]↝₂ q)
          where
@@ -41,22 +42,22 @@ open Indexed-container public using (force)
 
 infix 4 _∼_ _∼′_ [_]_∼_ [_]_∼′_
 
-Bisimilarity : Size → Rel₂ (# 0) Proc
+Bisimilarity : Size → Rel₂ ℓ Proc
 Bisimilarity i = ν S̲t̲e̲p̲ i
 
-Bisimilarity′ : Size → Rel₂ (# 0) Proc
+Bisimilarity′ : Size → Rel₂ ℓ Proc
 Bisimilarity′ i = ν′ S̲t̲e̲p̲ i
 
-[_]_∼_ : Size → Proc → Proc → Set
+[_]_∼_ : Size → Proc → Proc → Set ℓ
 [_]_∼_ = curry ∘ Bisimilarity
 
-[_]_∼′_ : Size → Proc → Proc → Set
+[_]_∼′_ : Size → Proc → Proc → Set ℓ
 [_]_∼′_ = curry ∘ Bisimilarity′
 
-_∼_ : Proc → Proc → Set
+_∼_ : Proc → Proc → Set ℓ
 _∼_ = [ ∞ ]_∼_
 
-_∼′_ : Proc → Proc → Set
+_∼′_ : Proc → Proc → Set ℓ
 _∼′_ = [ ∞ ]_∼′_
 
 -- Bisimilarity is reflexive.
@@ -93,17 +94,17 @@ infix -2 ∼:_ ∼′:_
 
 infix 4 [_]_≡_ [_]_≡′_
 
-[_]_≡_ : ∀ {p q} → Size → (_ _ : ν S̲t̲e̲p̲ ∞ (p , q)) → Set
+[_]_≡_ : ∀ {p q} → Size → (_ _ : ν S̲t̲e̲p̲ ∞ (p , q)) → Set ℓ
 [_]_≡_ = curry ∘ ν-bisimilar
 
-[_]_≡′_ : ∀ {p q} → Size → (_ _ : ν′ S̲t̲e̲p̲ ∞ (p , q)) → Set
+[_]_≡′_ : ∀ {p q} → Size → (_ _ : ν′ S̲t̲e̲p̲ ∞ (p , q)) → Set ℓ
 [_]_≡′_ = curry ∘ ν′-bisimilar
 
 -- An alternative characterisation of bisimilarity of bisimilarity
 -- proofs.
 
 []≡↔ :
-  Eq.Extensionality lzero lzero →
+  Eq.Extensionality ℓ ℓ →
   ∀ {p q} {i : Size} (p∼q₁ p∼q₂ : ν S̲t̲e̲p̲ ∞ (p , q)) →
 
   [ i ] p∼q₁ ≡ p∼q₂
@@ -189,7 +190,7 @@ infix 4 [_]_≡_ [_]_≡′_
   S̲t̲e̲p̲₂ = Step₂.S̲t̲e̲p̲
 
 module Bisimilarity-of-∼
-         (ext : Eq.Extensionality lzero lzero)
+         (ext : Eq.Extensionality ℓ ℓ)
          {p q} {i : Size}
          (p∼q₁ p∼q₂ : ν S̲t̲e̲p̲ ∞ (p , q))
          where
@@ -240,14 +241,14 @@ module Bisimilarity-of-∼
 
 -- A statement of extensionality for bisimilarity.
 
-Extensionality : Set
+Extensionality : Set ℓ
 Extensionality = ν′-extensionality S̲t̲e̲p̲
 
 -- This form of extensionality can be used to derive another form
 -- (in the presence of extensionality for functions).
 
 extensionality :
-  Eq.Extensionality lzero lzero →
+  Eq.Extensionality ℓ ℓ →
   Extensionality →
   ∀ {p q} {p∼q₁ p∼q₂ : ν S̲t̲e̲p̲ ∞ (p , q)} →
   [ ∞ ] p∼q₁ ≡ p∼q₂ → p∼q₁ ≡ p∼q₂

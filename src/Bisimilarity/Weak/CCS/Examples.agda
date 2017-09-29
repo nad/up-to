@@ -8,7 +8,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Bisimilarity.Weak.CCS.Examples {Name : Set} where
+module Bisimilarity.Weak.CCS.Examples {ℓ} {Name : Set ℓ} where
 
 open import Equality.Propositional
 open import Prelude hiding (module W)
@@ -40,7 +40,7 @@ mutual
   6-5-4 {i} {a} {b} = W.⟨ lr , rl ⟩
     where
     lemma =
-      (! a · ∣ ! b ·) ∣ b ·  ∼⟨ symmetric ∣-assoc ⟩
+      (! a · ∣ ! b ·) ∣ b ·  ∼⟨ symmetric ∣-assoc ⟩ ∼:
       ! a · ∣ (! b · ∣ b ·)  ∼⟨ symmetric ∣-right-identity ∣-cong 6-1-2 ⟩■
       (! a · ∣ ∅) ∣ ! b ·
 
@@ -314,10 +314,10 @@ mutual
       Q                                                   ∼⟨ Q∼!νa[ba∣a̅P]∣νa[a∣a̅P] ⟩
 
       ! ν (proj₁ a) (name b · (a ·) ∣ name (co a) · P) ∣
-      ν (proj₁ a) (a · ∣ name (co a) · P)                 ∼⟨ (_ ■) EL.∣-cong 6-5-8-1 _ ⟩
+      ν (proj₁ a) (a · ∣ name (co a) · P)                 ∼⟨ (_ ■) EL.∣-cong 6-5-8-1 _ ⟩ ≈′:
 
       ! ν (proj₁ a) (name b · (a ·) ∣ name (co a) · P) ∣
-      ν (proj₁ a) (∅ ∣ P)                                 ∼⟨ 6-5-8-2′ WL.∣-cong′ convert (ν-cong refl ∣-left-identity) ⟩■
+      ν (proj₁ a) (∅ ∣ P)                                 ∼⟨ 6-5-8-2′ WL.∣-cong′ convert {a = ℓ} (ν-cong refl ∣-left-identity) ⟩■
 
       ! name b · ν (proj₁ a) P ∣ ν (proj₁ a) P
 
@@ -378,9 +378,9 @@ mutual
         W.⇒̂[ name b ]
 
       ! ν (proj₁ a) (name b · (a ·) ∣ name (co a) · P) ∣
-      ν (proj₁ a) (a · ∣ name (co a) · P)                 ∼′⟨ 6-5-8-2′ WL.∣-cong′ convert (6-5-8-1 a) ⟩ ∼:
+      ν (proj₁ a) (a · ∣ name (co a) · P)                 ∼′⟨ 6-5-8-2′ WL.∣-cong′ convert {a = ℓ} (6-5-8-1 a) ⟩
 
-      ! name b · ν (proj₁ a) P ∣ ν (proj₁ a) (∅ ∣ P)      ∼⟨ (_ ■) ∣-cong ν-cong refl ∣-left-identity ⟩
+      ! name b · ν (proj₁ a) P ∣ ν (proj₁ a) (∅ ∣ P)      ∼⟨ (_ ■) ∣-cong ν-cong refl ∣-left-identity ⟩ ∼:
 
       ! name b · ν (proj₁ a) P ∣ ν (proj₁ a) P            ∼⟨ symmetric Q′∼!bνaP∣νaP ⟩■
 

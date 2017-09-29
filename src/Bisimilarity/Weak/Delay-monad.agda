@@ -5,7 +5,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Bisimilarity.Weak.Delay-monad {A : Set} where
+module Bisimilarity.Weak.Delay-monad {a} {A : Set a} where
 
 open import Delay-monad
 import Delay-monad.Expansion as DE
@@ -47,14 +47,14 @@ later-cong x≈′y =
 
 laterˡ : ∀ {i x y} → [ i ] force x ≈ y → [ i ] later x ≈ y
 laterˡ x≈y =
-  ⟨ (λ { later⟶ → _ , silent _ done , convert x≈y })
+  ⟨ (λ { later⟶ → _ , silent _ done , convert {a = a} x≈y })
   , Σ-map id (Σ-map later⇒̂ id) ∘ right-to-left x≈y
   ⟩
 
 laterʳ : ∀ {i x y} → [ i ] x ≈ force y → [ i ] x ≈ later y
 laterʳ x≈y =
   ⟨ Σ-map id (Σ-map later⇒̂ id) ∘ left-to-right x≈y
-  , (λ { later⟶ → _ , silent _ done , convert x≈y })
+  , (λ { later⟶ → _ , silent _ done , convert {a = a} x≈y })
   ⟩
 
 -- The direct definition of weak bisimilarity is contained in the
@@ -322,7 +322,7 @@ size-preserving-cwo⇒cw⇔uninhabited :
   (∀ {i p q} → [ i ] p ≈ q → BW.[ i ] p ≈ q) ⇔ ¬ A
 size-preserving-cwo⇒cw⇔uninhabited = record
   { to =
-      (∀ {i p q} → [ i ] p ≈ q → BW.[ i ] p ≈ q)  ↝⟨ (λ cwo⇒cw x≈y y≈z → cw⇒cwo (transitive (cwo⇒cw x≈y) (cwo⇒cw y≈z))) ⟩
+      (∀ {i p q} → [ i ] p ≈ q → BW.[ i ] p ≈ q)  ↝⟨ (λ cwo⇒cw x≈y y≈z → cw⇒cwo (transitive {a = a} (cwo⇒cw x≈y) (cwo⇒cw y≈z))) ⟩
       Transitivityʳ                               ↝⟨ _⇔_.to size-preserving-transitivityʳ⇔uninhabited ⟩□
       ¬ A                                         □
   ; from =

@@ -9,7 +9,7 @@
 
 open import Labelled-transition-system
 
-module Expansion (lts : LTS) where
+module Expansion {ℓ} (lts : LTS ℓ) where
 
 open import Prelude
 
@@ -43,40 +43,40 @@ open General public
 -- open public, to make hyperlinks to these definitions more
 -- informative.
 
-Expansion : Size → Rel₂ (# 0) Proc
+Expansion : Size → Rel₂ ℓ Proc
 Expansion = General.Bisimilarity
 
-Expansion′ : Size → Rel₂ (# 0) Proc
+Expansion′ : Size → Rel₂ ℓ Proc
 Expansion′ = General.Bisimilarity′
 
 infix 4 _≳_ _≳′_ [_]_≳_ [_]_≳′_
 
-[_]_≳_ : Size → Proc → Proc → Set
+[_]_≳_ : Size → Proc → Proc → Set ℓ
 [_]_≳_ = General.[_]_∼_
 
-[_]_≳′_ : Size → Proc → Proc → Set
+[_]_≳′_ : Size → Proc → Proc → Set ℓ
 [_]_≳′_ = General.[_]_∼′_
 
-_≳_ : Proc → Proc → Set
+_≳_ : Proc → Proc → Set ℓ
 _≳_ = General._∼_
 
-_≳′_ : Proc → Proc → Set
+_≳′_ : Proc → Proc → Set ℓ
 _≳′_ = General._∼′_
 
 -- The converse relation.
 
 infix 4 _≲_ _≲′_ [_]_≲_ [_]_≲′_
 
-[_]_≲_ : Size → Proc → Proc → Set
+[_]_≲_ : Size → Proc → Proc → Set ℓ
 [_]_≲_ i = flip [ i ]_≳_
 
-[_]_≲′_ : Size → Proc → Proc → Set
+[_]_≲′_ : Size → Proc → Proc → Set ℓ
 [_]_≲′_ i = flip [ i ]_≳′_
 
-_≲_ : Proc → Proc → Set
+_≲_ : Proc → Proc → Set ℓ
 _≲_ = [ ∞ ]_≲_
 
-_≲′_ : Proc → Proc → Set
+_≲′_ : Proc → Proc → Set ℓ
 _≲′_ = [ ∞ ]_≲′_
 
 -- Combinators that can perhaps make the code a bit nicer to read.

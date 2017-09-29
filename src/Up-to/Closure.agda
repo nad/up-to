@@ -13,15 +13,21 @@ open import Prelude as P
 open import Bijection equality-with-J using (_↔_)
 open import Function-universe equality-with-J hiding (id; _∘_)
 
+import Bisimilarity.Coinductive
 open import Indexed-container hiding (Bisimilarity)
 open import Indexed-container.Combinators hiding (id; _∘_)
-open import Labelled-transition-system.CCS ⊤ hiding (ν)
+import Labelled-transition-system.CCS
 open import Relation
+import Similarity.Strong
 import Similarity.Strong.CCS as SC
 open import Up-to
 
-open import Bisimilarity.Coinductive CCS as B
-open import Similarity.Strong CCS as S
+private
+  module CCS {ℓ} where
+    open Labelled-transition-system.CCS (↑ ℓ ⊤) public hiding (ν)
+    open module B = Bisimilarity.Coinductive CCS public
+    open module S = Similarity.Strong CCS public using (Similarity)
+open CCS
 
 ------------------------------------------------------------------------
 -- Closure properties for Compatible
@@ -141,30 +147,31 @@ Size-preserving-reindex {C = C} {F} {f}
 --   even if F is monotone.
 
 ¬-Size-preserving-⟷/⊗ :
-  ¬ ({I : Set} {C₁ C₂ : Container (I × I) (I × I)}
-     {F : Trans₂ (# 0) I} →
+  ∀ {ℓ} →
+  ¬ ({I : Set ℓ} {C₁ C₂ : Container (I × I) (I × I)}
+     {F : Trans₂ ℓ I} →
      Monotone F → Symmetric swap F →
      Size-preserving C₁ F → Size-preserving C₂ F →
      Size-preserving (C₁ ⟷ C₂) F)
     ×
-  ¬ ({F : Trans₂ (# 0) (Proc ∞)} →
+  ¬ ({F : Trans₂ ℓ (Proc ∞)} →
      Monotone F → Symmetric swap F →
      Size-preserving S.S̲t̲e̲p̲ F →
      Size-preserving B.S̲t̲e̲p̲ F)
     ×
-  ¬ ({I : Set} {C₁ C₂ : Container I I} {F : Trans (# 0) I} →
+  ¬ ({I : Set ℓ} {C₁ C₂ : Container I I} {F : Trans ℓ I} →
      Monotone F →
      Size-preserving C₁ F → Size-preserving C₂ F →
      Size-preserving (C₁ ⊗ C₂) F)
-¬-Size-preserving-⟷/⊗ =
+¬-Size-preserving-⟷/⊗ {ℓ} =
 
-    (({I : Set} {C₁ C₂ : Container (I × I) (I × I)}
-      {F : Trans₂ (# 0) I} →
+    (({I : Set ℓ} {C₁ C₂ : Container (I × I) (I × I)}
+      {F : Trans₂ ℓ I} →
       Monotone F → Symmetric swap F →
       Size-preserving C₁ F → Size-preserving C₂ F →
       Size-preserving (C₁ ⟷ C₂) F)                   ↝⟨ (λ closed mono symm pres → closed mono symm pres pres) ⟩
 
-     ({F : Trans₂ (# 0) (Proc ∞)} →
+     ({F : Trans₂ ℓ (Proc ∞)} →
       Monotone F → Symmetric swap F →
       Size-preserving S.S̲t̲e̲p̲ F →
       Size-preserving B.S̲t̲e̲p̲ F)                      ↝⟨ contradiction₂ ⟩□
@@ -173,8 +180,8 @@ Size-preserving-reindex {C = C} {F} {f}
 
   , contradiction₂
 
-  , (({I : Set} {C₁ C₂ : Container I I}
-      {F : Trans (# 0) I} →
+  , (({I : Set ℓ} {C₁ C₂ : Container I I}
+      {F : Trans ℓ I} →
       Monotone F →
       Size-preserving C₁ F → Size-preserving C₂ F →
       Size-preserving (C₁ ⊗ C₂) F)                   ↝⟨ (λ closed → closed mono pres) ⟩
@@ -187,12 +194,12 @@ Size-preserving-reindex {C = C} {F} {f}
      ⊥                                               □)
 
   where
-  ≤≥≁ = SC.≤≥≁ tt
+  ≤≥≁ = SC.≤≥≁ (lift tt)
 
   m₁ = proj₁ ≤≥≁
   m₂ = proj₁ (proj₂ ≤≥≁)
 
-  F : Trans₂ (# 0) (Proc ∞)
+  F : Trans₂ ℓ (Proc ∞)
   F R = R ∪ (_≡ (m₁ , m₂)) ∪ (_≡ (m₂ , m₁))
 
   mono : Monotone F
@@ -225,7 +232,7 @@ Size-preserving-reindex {C = C} {F} {f}
     ⊥                                    □
 
   contradiction₂ =
-    ({F : Trans₂ (# 0) (Proc ∞)} →
+    ({F : Trans₂ ℓ (Proc ∞)} →
      Monotone F → Symmetric swap F →
      Size-preserving S.S̲t̲e̲p̲ F →
      Size-preserving B.S̲t̲e̲p̲ F)        ↝⟨ (λ closed → closed mono symm pres) ⟩

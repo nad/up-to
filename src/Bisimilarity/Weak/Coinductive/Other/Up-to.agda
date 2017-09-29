@@ -6,7 +6,8 @@
 
 open import Labelled-transition-system
 
-module Bisimilarity.Weak.Coinductive.Other.Up-to (lts : LTS) where
+module Bisimilarity.Weak.Coinductive.Other.Up-to
+         {ℓ} (lts : LTS ℓ) where
 
 open import Logical-equivalence using (_⇔_)
 open import Prelude
@@ -35,7 +36,7 @@ open Up-to S̲t̲e̲p̲ public
 -- I took this definition from "Enhancements of the bisimulation proof
 -- method" by Pous and Sangiorgi.
 
-Up-to-expansion : Trans₂ (# 0) Proc
+Up-to-expansion : Trans₂ ℓ Proc
 Up-to-expansion R = Expansion ∞ ⊙ R ⊙ Expansion ∞ ⁻¹
 
 -- Up to expansion is monotone.

@@ -7,7 +7,7 @@
 
 open import Labelled-transition-system
 
-module Bisimilarity.Weak.Coinductive.Equivalent {lts : LTS} where
+module Bisimilarity.Weak.Coinductive.Equivalent {ℓ} {lts : LTS ℓ} where
 
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)

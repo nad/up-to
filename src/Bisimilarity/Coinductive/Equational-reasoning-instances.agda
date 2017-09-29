@@ -9,7 +9,7 @@ open import Prelude
 open import Labelled-transition-system
 
 module Bisimilarity.Coinductive.Equational-reasoning-instances
-         {lts : LTS} {i : Size} where
+         {ℓ} {lts : LTS ℓ} {i : Size} where
 
 open import Bisimilarity.Coinductive lts
 open import Equational-reasoning

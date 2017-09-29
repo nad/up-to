@@ -4,7 +4,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Bisimilarity.Up-to.CCS {Name : Set} where
+module Bisimilarity.Up-to.CCS {ℓ} {Name : Set ℓ} where
 
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
@@ -28,7 +28,7 @@ open import Bisimilarity.Up-to CCS
 
 -- Up to context for a very simple kind of context.
 
-Up-to-!-context : Trans₂ (# 0) (Proc ∞)
+Up-to-!-context : Trans₂ ℓ (Proc ∞)
 Up-to-!-context R (P , Q) =
   ∃ λ P′ → ∃ λ Q′ → P ≡ ! P′ × R (P′ , Q′) × ! Q′ ≡ Q
 
@@ -45,7 +45,7 @@ Up-to-!-context-size-preserving
 
 -- Up to context for CCS (for polyadic contexts).
 
-Up-to-context : Trans₂ (# 0) (Proc ∞)
+Up-to-context : Trans₂ ℓ (Proc ∞)
 Up-to-context R (p , q) =
   ∃ λ n →
   ∃ λ (C : Context ∞ n) →
@@ -97,13 +97,13 @@ Up-to-context-size-preserving =
   a≢b : ¬ a ≡ b
   a≢b ()
 
-  data R : Rel₂ (# 0) (Proc ∞) where
+  data R : Rel₂ ℓ (Proc ∞) where
     base : R (! name a · (b ·) , ! name a · (c ·))
 
-  data S₀ : Rel₂ (# 0) (Proc ∞) where
+  data S₀ : Rel₂ ℓ (Proc ∞) where
     base : S₀ (! name a · (b ·) ∣ b · , ! name a · (c ·) ∣ c ·)
 
-  S : Rel₂ (# 0) (Proc ∞)
+  S : Rel₂ ℓ (Proc ∞)
   S = Up-to-bisimilarity S₀
 
   d!ab[R]d!ac : Up-to-context R ( name d · (! name a · (b ·))
@@ -135,7 +135,7 @@ Up-to-context-size-preserving =
     helper !ab≡ _ (hole x) = case PsSQs x of λ where
       (_ , Ps[x]∼!ab∣b , _ , base , _) →
                                                     $⟨ Ps[x]∼!ab∣b ⟩
-        Ps x ∼ ! name a · (b ·) ∣ b ·               ↝⟨ transitive (≡→∼ !ab≡) ⟩
+        Ps x ∼ ! name a · (b ·) ∣ b ·               ↝⟨ transitive {a = ℓ} (≡→∼ !ab≡) ⟩
         ! name a · (b ·) ∼ ! name a · (b ·) ∣ b ·   ↝⟨ (λ !ab∼!ab∣b → Σ-map id proj₁ $ S̲t̲e̲p̲.right-to-left !ab∼!ab∣b (par-right action)) ⟩
         (∃ λ P′ → ! name a · (b ·) [ name b ]⟶ P′)  ↝⟨ cancel-name ∘ !-only ·′-only ∘ proj₂ ⟩
         a ≡ b                                       ↝⟨ a≢b ⟩□
@@ -144,7 +144,7 @@ Up-to-context-size-preserving =
     helper (! ab≡) (! ac≡) (! hole x) = case PsSQs x of λ where
       (_ , Ps[x]∼!ab∣b , _ , base , _) →
                                                   $⟨ Ps[x]∼!ab∣b ⟩
-        Ps x ∼ ! name a · (b ·) ∣ b ·             ↝⟨ transitive (≡→∼ ab≡) ⟩
+        Ps x ∼ ! name a · (b ·) ∣ b ·             ↝⟨ transitive {a = ℓ} (≡→∼ ab≡) ⟩
         name a · (b ·) ∼ ! name a · (b ·) ∣ b ·   ↝⟨ (λ ab∼!ab∣b → Σ-map id proj₁ $ S̲t̲e̲p̲.right-to-left ab∼!ab∣b (par-right action)) ⟩
         (∃ λ P′ → name a · (b ·) [ name b ]⟶ P′)  ↝⟨ cancel-name ∘ ·′-only ∘ proj₂ ⟩
         a ≡ b                                     ↝⟨ a≢b ⟩□
@@ -158,7 +158,7 @@ Up-to-context-size-preserving =
         (._ , b≡ , _ , hole x) → case PsSQs x of λ where
           (_ , Ps[x]∼!ab∣b , _ , base , _) →
                                            $⟨ Ps[x]∼!ab∣b ⟩
-            Ps x ∼ ! name a · (b ·) ∣ b ·  ↝⟨ transitive (≡→∼ b≡) ⟩
+            Ps x ∼ ! name a · (b ·) ∣ b ·  ↝⟨ transitive {a = ℓ} (≡→∼ b≡) ⟩
             b · ∼ ! name a · (b ·) ∣ b ·   ↝⟨ (λ b∼!ab∣b → Σ-map id proj₁ $
                                                              S̲t̲e̲p̲.right-to-left b∼!ab∣b (par-left (replication (par-right action)))) ⟩
             (∃ λ P′ → b · [ name a ]⟶ P′)  ↝⟨ cancel-name ∘ ·′-only ∘ proj₂ ⟩

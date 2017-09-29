@@ -8,7 +8,8 @@ open import Prelude
 
 open import Labelled-transition-system
 
-module Similarity.Weak.Equational-reasoning-instances {lts : LTS} where
+module Similarity.Weak.Equational-reasoning-instances
+         {ℓ} {lts : LTS ℓ} where
 
 open import Bisimilarity.Coinductive lts
 open import Bisimilarity.Weak.Coinductive.Other lts
@@ -74,19 +75,19 @@ instance
   convert≈′≼′ = is-convertible ≈⇒≼′
 
   convert∼≼ : ∀ {i} → Convertible [ i ]_∼_ [ i ]_≼_
-  convert∼≼ = is-convertible (≈⇒≼ ∘ convert)
+  convert∼≼ = is-convertible (≈⇒≼ ∘ convert {a = ℓ})
 
   convert∼′≼ : ∀ {i} → Convertible [ ssuc i ]_∼′_ [ i ]_≼_
-  convert∼′≼ = is-convertible (convert ∘ ≈⇒≼′ ∘ convert)
+  convert∼′≼ = is-convertible (convert ∘ ≈⇒≼′ ∘ convert {a = ℓ})
 
   convert∼≼′ : ∀ {i} → Convertible [ i ]_∼_ [ i ]_≼′_
   convert∼≼′ {i} = is-convertible lemma
     where
     lemma : ∀ {p q} → [ i ] p ∼ q → [ i ] p ≼′ q
-    force (lemma p∼q) = ≈⇒≼ (convert p∼q)
+    force (lemma p∼q) = ≈⇒≼ (convert {a = ℓ} p∼q)
 
   convert∼′≼′ : ∀ {i} → Convertible [ i ]_∼′_ [ i ]_≼′_
-  convert∼′≼′ = is-convertible (≈⇒≼′ ∘ convert)
+  convert∼′≼′ = is-convertible (≈⇒≼′ ∘ convert {a = ℓ})
 
   trans≼≼ : ∀ {i} → Transitive′ [ i ]_≼_ _≼_
   trans≼≼ = is-transitive transitive-≼
@@ -104,10 +105,10 @@ instance
   trans≳≼ = is-transitive transitive-≳≼
 
   trans≳′≼ : ∀ {i} → Transitive [ ssuc i ]_≳′_ [ i ]_≼_
-  trans≳′≼ = is-transitive (transitive-≳≼ ∘ convert)
+  trans≳′≼ = is-transitive (transitive-≳≼ ∘ convert {a = ℓ})
 
   trans≳′≼′ : ∀ {i} → Transitive [ i ]_≳′_ [ i ]_≼′_
   trans≳′≼′ = is-transitive transitive-≳≼′
 
   trans≳≼′ : ∀ {i} → Transitive [ i ]_≳_ [ i ]_≼′_
-  trans≳≼′ = is-transitive (transitive-≳≼′ ∘ convert)
+  trans≳≼′ = is-transitive (transitive-≳≼′ ∘ convert {a = ℓ})

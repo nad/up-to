@@ -4,7 +4,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Labelled-transition-system.Delay-monad (A : Set) where
+module Labelled-transition-system.Delay-monad {a} (A : Set a) where
 
 open import Delay-monad
 open import Equality.Propositional
@@ -17,11 +17,11 @@ open import Labelled-transition-system
 
 infix 4 _[_]⟶_
 
-data _[_]⟶_ : Delay A ∞ → Maybe A → Delay A ∞ → Set where
+data _[_]⟶_ : Delay A ∞ → Maybe A → Delay A ∞ → Set a where
   now⟶   : ∀ {x} → now x   [ just x  ]⟶ now x
   later⟶ : ∀ {x} → later x [ nothing ]⟶ force x
 
-delay-monad : LTS
+delay-monad : LTS a
 delay-monad = record
   { Proc      = Delay A ∞
   ; Label     = Maybe A

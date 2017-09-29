@@ -6,7 +6,7 @@
 
 open import Labelled-transition-system
 
-module Similarity.Weak.Up-to (lts : LTS) where
+module Similarity.Weak.Up-to {ℓ} (lts : LTS ℓ) where
 
 open import Logical-equivalence using (_⇔_)
 open import Prelude
@@ -34,7 +34,7 @@ open Up-to S̲t̲e̲p̲ public
 -- presented by Pous and Sangiorgi in Section 6.5.2.4 of "Enhancements
 -- of the bisimulation proof method".
 
-Up-to-expansion-and-weak-similarity : Trans₂ (# 0) Proc
+Up-to-expansion-and-weak-similarity : Trans₂ ℓ Proc
 Up-to-expansion-and-weak-similarity R =
   Expansion ∞ ⊙ R ⊙ Weak-similarity ∞
 

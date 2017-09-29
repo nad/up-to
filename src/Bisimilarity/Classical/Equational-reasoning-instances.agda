@@ -9,7 +9,7 @@ open import Prelude
 open import Labelled-transition-system
 
 module Bisimilarity.Classical.Equational-reasoning-instances
-         {lts : LTS} where
+         {ℓ} {lts : LTS ℓ} where
 
 open import Bisimilarity.Classical lts
 

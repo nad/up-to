@@ -8,7 +8,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Bisimilarity.Exercises.Coinductive.CCS {Name : Set} where
+module Bisimilarity.Exercises.Coinductive.CCS {ℓ} {Name : Set ℓ} where
 
 open import Equality.Propositional
 open import Prelude
@@ -28,7 +28,7 @@ import Labelled-transition-system.Equational-reasoning-instances CCS
 -- similar results in Similarity.Strong.CCS.
 
 module Cong-lemmas
-  ({R} R′ : Proc ∞ → Proc ∞ → Set)
+  ({R} R′ : Proc ∞ → Proc ∞ → Set ℓ)
   ⦃ _ : Convertible R R′ ⦄
   ⦃ _ : Convertible R′ R′ ⦄
   ⦃ _ : Convertible _∼_ R′ ⦄
@@ -234,7 +234,7 @@ mutual
 
 ∣-right-identity : ∀ {P} → P ∣ ∅ ∼ P
 ∣-right-identity {P} =
-  P ∣ ∅  ∼⟨ ∣-comm ⟩
+  P ∣ ∅  ∼⟨ ∣-comm ⟩ ∼:
   ∅ ∣ P  ∼⟨ ∣-left-identity ⟩■
   P
 
@@ -318,7 +318,7 @@ swap-in-the-middle : ∀ {P Q R S} →
 swap-in-the-middle {P} {Q} {R} {S} =
   (P ∣ Q) ∣ (R ∣ S)  ∼⟨ swap-rightmost ⟩
   (P ∣ (R ∣ S)) ∣ Q  ∼⟨ ∣-assoc ∣-cong reflexive ⟩
-  ((P ∣ R) ∣ S) ∣ Q  ∼⟨ symmetric ∣-assoc ⟩
+  ((P ∣ R) ∣ S) ∣ Q  ∼⟨ symmetric ∣-assoc ⟩ ∼:
   (P ∣ R) ∣ (S ∣ Q)  ∼⟨ reflexive ∣-cong ∣-comm ⟩■
   (P ∣ R) ∣ (Q ∣ S)
 
@@ -334,23 +334,23 @@ mutual
   !·⊕·∼!·∣!· {i} = ⟨ lr , rl ⟩
     where
     lemma = λ {a b} → ∼′:
-      ! (a · ⊕ b ·) ∣ ∅  ∼⟨ ∣-right-identity ⟩
+      ! (a · ⊕ b ·) ∣ ∅  ∼⟨ ∣-right-identity ⟩ ∼′:
       ! (a · ⊕ b ·)      ∼⟨ !·⊕·∼′!·∣!· {i = i} ⟩■
       ! a · ∣ ! b ·
 
     left-lemma = λ {a b} → ∼′:
-      ! (a · ⊕ b ·) ∣ ∅    ∼⟨ lemma ⟩
+      ! (a · ⊕ b ·) ∣ ∅    ∼⟨ lemma ⟩ ∼′:
       ! a · ∣ ! b ·        ∼⟨ symmetric ∣-right-identity ∣-cong reflexive ⟩■
       (! a · ∣ ∅) ∣ ! b ·
 
     right-lemma = λ {a b} → ∼′:
-      ! (a · ⊕ b ·) ∣ ∅    ∼⟨ lemma ⟩
+      ! (a · ⊕ b ·) ∣ ∅    ∼⟨ lemma ⟩ ∼′:
       ! a · ∣  ! b ·       ∼⟨ reflexive ∣-cong symmetric ∣-right-identity ⟩■
       ! a · ∣ (! b · ∣ ∅)
 
     τ-lemma = λ {a b} → ∼′:
       (! (a · ⊕ b ·) ∣ ∅) ∣ ∅    ∼⟨ ∣-right-identity ⟩
-      ! (a · ⊕ b ·) ∣ ∅          ∼⟨ lemma ⟩
+      ! (a · ⊕ b ·) ∣ ∅          ∼⟨ lemma ⟩ ∼′:
       ! a · ∣ ! b ·              ∼⟨ symmetric (∣-right-identity ∣-cong ∣-right-identity) ⟩■
       (! a · ∣ ∅) ∣ (! b · ∣ ∅)
 
@@ -360,13 +360,13 @@ mutual
     lr {a} {b} {P} tr = case 6-1-3-2 tr of λ where
 
       (inj₁ (.∅ , choice-left action , P∼![a⊕b]∣∅)) →
-        P                    ∼⟨ P∼![a⊕b]∣∅ ⟩
+        P                    ∼⟨ P∼![a⊕b]∣∅ ⟩ ∼′:
         ! (a · ⊕ b ·) ∣ ∅    ∼⟨ left-lemma ⟩■
         (! a · ∣ ∅) ∣ ! b ·  [ name a ]⟵⟨ par-left (replication (par-right action)) ⟩
         ! a ·       ∣ ! b ·
 
       (inj₁ (.∅ , choice-right action , P∼![a⊕b]∣∅)) →
-        P                    ∼⟨ P∼![a⊕b]∣∅ ⟩
+        P                    ∼⟨ P∼![a⊕b]∣∅ ⟩ ∼′:
         ! (a · ⊕ b ·) ∣ ∅    ∼⟨ right-lemma ⟩■
         ! a · ∣ (! b · ∣ ∅)  [ name b ]⟵⟨ par-right (replication (par-right action)) ⟩
         ! a · ∣ ! b ·
@@ -376,7 +376,7 @@ mutual
                                      (·′⊕·′-co a⊕b⟶P′ a⊕b⟶P″) in
 
         P                          ∼⟨ P∼![a⊕b]∣P′∣P″ ⟩
-        (! (a · ⊕ b ·) ∣ P′) ∣ P″  ∼⟨ (reflexive ∣-cong ≡⇒∼ P′≡∅) ∣-cong ≡⇒∼ P″≡∅ ⟩
+        (! (a · ⊕ b ·) ∣ P′) ∣ P″  ∼⟨ (reflexive ∣-cong ≡⇒∼ P′≡∅) ∣-cong ≡⇒∼ P″≡∅ ⟩ ∼′:
         (! (a · ⊕ b ·) ∣ ∅) ∣ ∅    ∼⟨ τ-lemma ⟩■
         (! a · ∣ ∅) ∣ (! b · ∣ ∅)  [ τ ]⟵⟨ par-τ′ b≡co-a (replication (par-right action))
                                                          (replication (par-right action)) ⟩
@@ -390,7 +390,7 @@ mutual
 
         (inj₁ (.∅ , action , P′∼!a∣∅)) →
           ! (a · ⊕ b ·)        [ name a ]⟶⟨ replication (par-right (choice-left action)) ⟩ʳˡ
-          ! (a · ⊕ b ·) ∣ ∅    ∼⟨ left-lemma ⟩
+          ! (a · ⊕ b ·) ∣ ∅    ∼⟨ left-lemma ⟩ ∼′:
           (! a · ∣ ∅) ∣ ! b ·  ∼⟨ symmetric P′∼!a∣∅ ∣-cong reflexive ⟩■
           P′ ∣ ! b ·
 
@@ -402,7 +402,7 @@ mutual
 
         (inj₁ (.∅ , action , Q′∼!b∣∅)) →
           ! (a · ⊕ b ·)        [ name b ]⟶⟨ replication (par-right (choice-right action)) ⟩ʳˡ
-          ! (a · ⊕ b ·) ∣ ∅    ∼⟨ right-lemma ⟩
+          ! (a · ⊕ b ·) ∣ ∅    ∼⟨ right-lemma ⟩ ∼′:
           ! a · ∣ (! b · ∣ ∅)  ∼⟨ reflexive ∣-cong symmetric Q′∼!b∣∅ ⟩■
           ! a · ∣ Q′
 
@@ -416,7 +416,7 @@ mutual
          inj₁ (.∅ , action , Q′∼!co-a∣∅)) →
           ! (a · ⊕ co a ·)              [ τ ]⟶⟨ replication (par-τ (replication (par-right (choice-left action)))
                                                                    (choice-right action)) ⟩ʳˡ
-          (! (a · ⊕ co a ·) ∣ ∅) ∣ ∅    ∼⟨ τ-lemma ⟩
+          (! (a · ⊕ co a ·) ∣ ∅) ∣ ∅    ∼⟨ τ-lemma ⟩ ∼′:
           (! a · ∣ ∅) ∣ (! co a · ∣ ∅)  ∼⟨ symmetric (P′∼!a∣∅ ∣-cong Q′∼!co-a∣∅) ⟩■
           P′ ∣ Q′
 
@@ -447,7 +447,7 @@ mutual
       ! ! a · ∣ P            ∼⟨ reflexive ∣-cong P∼!a∣∅ ⟩
       ! ! a · ∣ (! a · ∣ ∅)  ∼⟨ reflexive ∣-cong ∣-right-identity ⟩
       ! ! a · ∣ ! a ·        ∼⟨ 6-1-2 ⟩
-      ! ! a ·                ∼⟨ 6-2-4′ {i = i} ⟩
+      ! ! a ·                ∼⟨ 6-2-4′ {i = i} ⟩ ∼′:
       ! a ·                  ∼⟨ symmetric ∣-right-identity ⟩■
       ! a · ∣ ∅
 
@@ -459,7 +459,7 @@ mutual
       (inj₁ (P′ , !a⟶P′ , P∼!!a∣P′)) → case 6-1-3-2 !a⟶P′ of λ where
         (inj₂ (μ≡τ , _))               → impossible !!a⟶P μ≡τ
         (inj₁ (.∅ , action , P′∼!a∣∅)) →
-          P             ∼⟨ P∼!!a∣P′ ⟩
+          P             ∼⟨ P∼!!a∣P′ ⟩ ∼′:
           ! ! a · ∣ P′  ∼⟨ lemma P′∼!a∣∅ ⟩■
           ! a · ∣ ∅     [ name a ]⟵⟨ replication (par-right action) ⟩
           ! a ·
@@ -472,7 +472,7 @@ mutual
         ⊥-elim (names-are-not-inverted a⟶Q″)
       (inj₁ (.∅ , action , P∼!a∣∅)) →
         ! ! a ·      [ name a ]⟶⟨ replication (par-right !a⟶P) ⟩ʳˡ
-        ! ! a · ∣ P  ∼⟨ lemma P∼!a∣∅ ⟩
+        ! ! a · ∣ P  ∼⟨ lemma P∼!a∣∅ ⟩ ∼′:
         ! a · ∣ ∅    ∼⟨ symmetric P∼!a∣∅ ⟩■
         P
 
@@ -550,7 +550,7 @@ infix 12 _·-cong_ _·-cong′_
 _·-cong_ :
   ∀ {i μ μ′ P P′} →
   μ ≡ μ′ → [ i ] P ∼ P′ → [ i ] μ · P ∼ μ′ · P′
-refl ·-cong P∼P′ = refl ·′-cong convert P∼P′
+refl ·-cong P∼P′ = refl ·′-cong convert {a = ℓ} P∼P′
 
 _·-cong′_ :
   ∀ {i μ μ′ P P′} →
@@ -731,17 +731,17 @@ mutual
   6-2-14 {i} = ⟨ lr , rl ⟩
     where
     left-lemma = λ {a b P Q} → ∼′:
-      ! (name a · P ⊕ name b · Q) ∣ P    ∼⟨ 6-2-14′ {i = i} ∣-cong′ reflexive ⟩
+      ! (name a · P ⊕ name b · Q) ∣ P    ∼⟨ 6-2-14′ {i = i} ∣-cong′ reflexive ⟩ ∼′:
       (! name a · P ∣ ! name b · Q) ∣ P  ∼⟨ swap-rightmost ⟩■
       (! name a · P ∣ P) ∣ ! name b · Q
 
     right-lemma = λ {a b P Q} → ∼′:
-      ! (name a · P ⊕ name b · Q) ∣ Q    ∼⟨ 6-2-14′ {i = i} ∣-cong′ reflexive ⟩
+      ! (name a · P ⊕ name b · Q) ∣ Q    ∼⟨ 6-2-14′ {i = i} ∣-cong′ reflexive ⟩ ∼′:
       (! name a · P ∣ ! name b · Q) ∣ Q  ∼⟨ symmetric ∣-assoc ⟩■
       ! name a · P ∣ (! name b · Q ∣ Q)
 
     τ-lemma = λ {a b P Q} → ∼′:
-      (! (name a · P ⊕ name b · Q) ∣ P) ∣ Q    ∼⟨ left-lemma ∣-cong′ reflexive ⟩
+      (! (name a · P ⊕ name b · Q) ∣ P) ∣ Q    ∼⟨ left-lemma ∣-cong′ reflexive ⟩ ∼′:
       ((! name a · P ∣ P) ∣ ! name b · Q) ∣ Q  ∼⟨ symmetric ∣-assoc ⟩■
       (! name a · P ∣ P) ∣ (! name b · Q ∣ Q)
 
@@ -751,13 +751,13 @@ mutual
     lr {a} {b} {P} {Q} {R} tr = case 6-1-3-2 tr of λ where
 
       (inj₁ (.P , choice-left action , R∼![aP⊕bQ]∣P)) →
-        R                                  ∼⟨ R∼![aP⊕bQ]∣P ⟩
+        R                                  ∼⟨ R∼![aP⊕bQ]∣P ⟩ ∼′:
         ! (name a · P ⊕ name b · Q) ∣ P    ∼⟨ left-lemma ⟩■
         (! name a · P ∣ P) ∣ ! name b · Q  [ name a ]⟵⟨ par-left (replication (par-right action)) ⟩
         ! name a · P       ∣ ! name b · Q
 
       (inj₁ (.Q , choice-right action , R∼![aP⊕bQ]∣Q)) →
-        R                                  ∼⟨ R∼![aP⊕bQ]∣Q ⟩
+        R                                  ∼⟨ R∼![aP⊕bQ]∣Q ⟩ ∼′:
         ! (name a · P ⊕ name b · Q) ∣ Q    ∼⟨ right-lemma ⟩■
         ! name a · P ∣ (! name b · Q ∣ Q)  [ name b ]⟵⟨ par-right (replication (par-right action)) ⟩
         ! name a · P ∣ ! name b · Q
@@ -773,12 +773,12 @@ mutual
                 (! (name a · P ⊕ name b · Q) ∣ R′) ∣ R″  ∼⟨ (reflexive ∣-cong ≡⇒∼ R′≡P) ∣-cong ≡⇒∼ R″≡Q ⟩■
                 (! (name a · P ⊕ name b · Q) ∣ P) ∣ Q
               (inj₂ (R′≡Q , R″≡P)) →
-                (! (name a · P ⊕ name b · Q) ∣ R′) ∣ R″  ∼⟨ (reflexive ∣-cong ≡⇒∼ R′≡Q) ∣-cong ≡⇒∼ R″≡P ⟩
+                (! (name a · P ⊕ name b · Q) ∣ R′) ∣ R″  ∼⟨ (reflexive ∣-cong ≡⇒∼ R′≡Q) ∣-cong ≡⇒∼ R″≡P ⟩ ∼:
                 (! (name a · P ⊕ name b · Q) ∣ Q) ∣ P    ∼⟨ swap-rightmost ⟩■
                 (! (name a · P ⊕ name b · Q) ∣ P) ∣ Q
         in
         R                                        ∼⟨ R∼![aP⊕bQ]∣R′∣R″ ⟩
-        (! (name a · P ⊕ name b · Q) ∣ R′) ∣ R″  ∼⟨ lemma R′≡,R″≡ ⟩
+        (! (name a · P ⊕ name b · Q) ∣ R′) ∣ R″  ∼⟨ lemma R′≡,R″≡ ⟩ ∼′:
         (! (name a · P ⊕ name b · Q) ∣ P) ∣ Q    ∼⟨ τ-lemma ⟩■
         (! name a · P ∣ P) ∣ (! name b · Q ∣ Q)  [ τ ]⟵⟨ par-τ′ b≡co-a (replication (par-right action))
                                                                        (replication (par-right action)) ⟩
@@ -791,7 +791,7 @@ mutual
       case 6-1-3-2 tr of λ where
         (inj₁ (.P , action , S∼!aP∣P)) →
           ! (name a · P ⊕ name b · Q)        [ name a ]⟶⟨ replication (par-right (choice-left action)) ⟩ʳˡ
-          ! (name a · P ⊕ name b · Q) ∣ P    ∼⟨ left-lemma ⟩
+          ! (name a · P ⊕ name b · Q) ∣ P    ∼⟨ left-lemma ⟩ ∼′:
           (! name a · P ∣ P) ∣ ! name b · Q  ∼⟨ symmetric S∼!aP∣P ∣-cong reflexive ⟩■
           S ∣ ! name b · Q
 
@@ -802,7 +802,7 @@ mutual
       case 6-1-3-2 tr of λ where
         (inj₁ (.Q , action , S∼!bQ∣Q)) →
           ! (name a · P ⊕ name b · Q)        [ name b ]⟶⟨ replication (par-right (choice-right action)) ⟩ʳˡ
-          ! (name a · P ⊕ name b · Q) ∣ Q    ∼⟨ right-lemma ⟩
+          ! (name a · P ⊕ name b · Q) ∣ Q    ∼⟨ right-lemma ⟩ ∼′:
           ! name a · P ∣ (! name b · Q ∣ Q)  ∼⟨ reflexive ∣-cong symmetric S∼!bQ∣Q ⟩■
           ! name a · P ∣ S
 
@@ -815,7 +815,7 @@ mutual
          inj₁ (.Q , action , S′∼!co-aQ∣Q)) →
           ! (name a · P ⊕ name (co a) · Q)              [ τ ]⟶⟨ replication (par-τ (replication (par-right (choice-left action)))
                                                                                    (choice-right action)) ⟩ʳˡ
-          (! (name a · P ⊕ name (co a) · Q) ∣ P) ∣ Q    ∼⟨ τ-lemma ⟩
+          (! (name a · P ⊕ name (co a) · Q) ∣ P) ∣ Q    ∼⟨ τ-lemma ⟩ ∼′:
           (! name a · P ∣ P) ∣ (! name (co a) · Q ∣ Q)  ∼⟨ symmetric (S∼!aP∣P ∣-cong S′∼!co-aQ∣Q) ⟩■
           S ∣ S′
 
@@ -917,7 +917,7 @@ force ⊕-idempotent′ = ⊕-idempotent
 
 6-2-17-1-lemma₁ : ∀ {P Q} → (! P ∣ ! Q) ∣ (P ∣ Q) ∼ ! P ∣ ! Q
 6-2-17-1-lemma₁ {P} {Q} =
-  (! P ∣ ! Q) ∣ (P ∣ Q)  ∼⟨ swap-in-the-middle ⟩
+  (! P ∣ ! Q) ∣ (P ∣ Q)  ∼⟨ swap-in-the-middle ⟩ ∼:
   (! P ∣ P) ∣ (! Q ∣ Q)  ∼⟨ 6-1-2 ∣-cong 6-1-2 ⟩■
   ! P ∣ ! Q
 
@@ -945,14 +945,14 @@ abstract
       let T , !P∣!Q⟶T , !P∣!Q∣[R′∣R″]∼T =
             left-to-right
               ((! P ∣ ! Q) ∣ ((P ∣ Q) ∣ (P ∣ Q))  ∼⟨ ∣-assoc ⟩
-               ((! P ∣ ! Q) ∣ (P ∣ Q)) ∣ (P ∣ Q)  ∼⟨ 6-2-17-1-lemma₁ ∣-cong reflexive ⟩
+               ((! P ∣ ! Q) ∣ (P ∣ Q)) ∣ (P ∣ Q)  ∼⟨ 6-2-17-1-lemma₁ ∣-cong reflexive ⟩ ∼:
                (! P ∣ ! Q) ∣ (P ∣ Q)              ∼⟨ 6-2-17-1-lemma₁ ⟩■
                ! P ∣ ! Q)
               ((! P ∣ ! Q) ∣ ((P ∣ Q) ∣ (P ∣ Q))  ⟶⟨ par-right (par-τ P∣Q⟶R′ P∣Q⟶R″) ⟩
                (! P ∣ ! Q) ∣ (R′ ∣ R″))
       in
         _
-      , (R                      ∼⟨ R∼![P∣Q]∣R′∣R″ ⟩
+      , (R                      ∼⟨ R∼![P∣Q]∣R′∣R″ ⟩ ∼:
          (! (P ∣ Q) ∣ R′) ∣ R″  ∼⟨ symmetric ∣-assoc ⟩■
          ! (P ∣ Q) ∣ (R′ ∣ R″))
       , _
@@ -972,23 +972,23 @@ mutual
             6-2-17-1-lemma₂ tr in
 
       R                ∼⟨ R∼![P∣Q]∣S ⟩
-      ! (P ∣ Q) ∣ S    ∼⟨ 6-2-17-1′ ∣-cong′ reflexive ⟩
+      ! (P ∣ Q) ∣ S    ∼⟨ 6-2-17-1′ ∣-cong′ reflexive ⟩ ∼′:
       (! P ∣ ! Q) ∣ S  ∼⟨ !P∣!Q∣S∼T ⟩■
       T                ⟵⟨ !P∣!Q⟶T ⟩
       ! P ∣ ! Q
 
     lemma = λ {P Q R S} → ∼′:
-      ! (P ∣ Q) ∣ (R ∣ S)    ∼⟨ 6-2-17-1′ {i = i} ∣-cong′ reflexive ⟩
+      ! (P ∣ Q) ∣ (R ∣ S)    ∼⟨ 6-2-17-1′ {i = i} ∣-cong′ reflexive ⟩ ∼′:
       (! P ∣ ! Q) ∣ (R ∣ S)  ∼⟨ swap-in-the-middle ⟩■
       (! P ∣ R) ∣ (! Q ∣ S)
 
     left-lemma = λ {P Q R} → ∼′:
-      ! (P ∣ Q) ∣ (R ∣ Q)    ∼⟨ lemma ⟩
+      ! (P ∣ Q) ∣ (R ∣ Q)    ∼⟨ lemma ⟩ ∼′:
       (! P ∣ R) ∣ (! Q ∣ Q)  ∼⟨ reflexive ∣-cong 6-1-2 ⟩■
       (! P ∣ R) ∣ ! Q
 
     right-lemma = λ {P Q R} → ∼′:
-      ! (P ∣ Q) ∣ (P ∣ R)    ∼⟨ lemma ⟩
+      ! (P ∣ Q) ∣ (P ∣ R)    ∼⟨ lemma ⟩ ∼′:
       (! P ∣ P) ∣ (! Q ∣ R)  ∼⟨ 6-1-2 ∣-cong reflexive ⟩■
       ! P ∣ (! Q ∣ R)
 
@@ -1001,7 +1001,7 @@ mutual
         of λ where
         (inj₁ (P′ , P⟶P′ , S∼!P∣P′)) →
           ! (P ∣ Q)             ⟶⟨ replication (par-right (par-left P⟶P′)) ⟩ʳˡ
-          ! (P ∣ Q) ∣ (P′ ∣ Q)  ∼⟨ left-lemma ⟩
+          ! (P ∣ Q) ∣ (P′ ∣ Q)  ∼⟨ left-lemma ⟩ ∼′:
           (! P ∣ P′) ∣ ! Q      ∼⟨ symmetric S∼!P∣P′ ∣-cong reflexive ⟩■
           S ∣ ! Q
 
@@ -1010,7 +1010,7 @@ mutual
                                                                         (par-left P⟶P″)) ⟩ʳˡ
           (! (P ∣ Q) ∣ (P′ ∣ Q)) ∣ (P″ ∣ Q)  ∼⟨ left-lemma ∣-cong′ reflexive ⟩
           ((! P ∣ P′) ∣ ! Q) ∣ (P″ ∣ Q)      ∼⟨ swap-in-the-middle ⟩
-          ((! P ∣ P′) ∣ P″) ∣ (! Q ∣ Q)      ∼⟨ reflexive ∣-cong 6-1-2 ⟩
+          ((! P ∣ P′) ∣ P″) ∣ (! Q ∣ Q)      ∼⟨ reflexive ∣-cong 6-1-2 ⟩ ∼′:
           ((! P ∣ P′) ∣ P″) ∣ ! Q            ∼⟨ symmetric S∼!P∣P′∣P″ ∣-cong reflexive ⟩■
           S ∣ ! Q
 
@@ -1020,7 +1020,7 @@ mutual
         of λ where
         (inj₁ (Q′ , Q⟶Q′ , S∼!Q∣Q′)) →
           ! (P ∣ Q)             ⟶⟨ replication (par-right (par-right Q⟶Q′)) ⟩ʳˡ
-          ! (P ∣ Q) ∣ (P ∣ Q′)  ∼⟨ right-lemma ⟩
+          ! (P ∣ Q) ∣ (P ∣ Q′)  ∼⟨ right-lemma ⟩ ∼′:
           ! P ∣ (! Q ∣ Q′)      ∼⟨ reflexive ∣-cong symmetric S∼!Q∣Q′ ⟩■
           ! P ∣ S
 
@@ -1029,7 +1029,7 @@ mutual
                                                                         (par-right Q⟶Q″)) ⟩ʳˡ
           (! (P ∣ Q) ∣ (P ∣ Q′)) ∣ (P ∣ Q″)  ∼⟨ right-lemma ∣-cong′ reflexive ⟩
           (! P ∣ (! Q ∣ Q′)) ∣ (P ∣ Q″)      ∼⟨ swap-in-the-middle ⟩
-          (! P ∣ P) ∣ ((! Q ∣ Q′) ∣ Q″)      ∼⟨ 6-1-2 ∣-cong reflexive ⟩
+          (! P ∣ P) ∣ ((! Q ∣ Q′) ∣ Q″)      ∼⟨ 6-1-2 ∣-cong reflexive ⟩ ∼′:
           ! P ∣ ((! Q ∣ Q′) ∣ Q″)            ∼⟨ reflexive ∣-cong symmetric S∼!Q∣Q′∣Q″ ⟩■
           ! P ∣ S
 
@@ -1042,7 +1042,7 @@ mutual
           (! (P ∣ Q) ∣ (P′ ∣ Q)) ∣ (P ∣ Q′)  ∼⟨ left-lemma ∣-cong′ reflexive ⟩
           ((! P ∣ P′) ∣ ! Q) ∣ (P ∣ Q′)      ∼⟨ swap-in-the-middle ⟩
           ((! P ∣ P′) ∣ P) ∣ (! Q ∣ Q′)      ∼⟨ swap-rightmost ∣-cong reflexive ⟩
-          ((! P ∣ P) ∣ P′) ∣ (! Q ∣ Q′)      ∼⟨ (6-1-2 ∣-cong reflexive) ∣-cong reflexive ⟩
+          ((! P ∣ P) ∣ P′) ∣ (! Q ∣ Q′)      ∼⟨ (6-1-2 ∣-cong reflexive) ∣-cong reflexive ⟩ ∼′:
           (! P ∣ P′) ∣ (! Q ∣ Q′)            ∼⟨ symmetric (S∼!P∣P′ ∣-cong S′∼!Q∣Q′) ⟩■
           S ∣ S′
 
@@ -1058,27 +1058,27 @@ mutual
   6-2-17-2 {i} = ⟨ lr , rl ⟩
     where
     left-lemma = λ {P Q R} → ∼′:
-      ! (P ⊕ Q) ∣ R    ∼⟨ 6-2-17-2′ {i = i} ∣-cong′ reflexive ⟩
+      ! (P ⊕ Q) ∣ R    ∼⟨ 6-2-17-2′ {i = i} ∣-cong′ reflexive ⟩ ∼′:
       (! P ∣ ! Q) ∣ R  ∼⟨ swap-rightmost ⟩■
       (! P ∣ R) ∣ ! Q
 
     right-lemma = λ {P Q R} → ∼′:
-      ! (P ⊕ Q) ∣ R    ∼⟨ 6-2-17-2′ {i = i} ∣-cong′ reflexive ⟩
+      ! (P ⊕ Q) ∣ R    ∼⟨ 6-2-17-2′ {i = i} ∣-cong′ reflexive ⟩ ∼′:
       (! P ∣ ! Q) ∣ R  ∼⟨ symmetric ∣-assoc ⟩■
       ! P ∣ (! Q ∣ R)
 
     τ-lemma₁ = λ {P P′ P″ Q} → ∼′:
-      (! (P ⊕ Q) ∣ P′) ∣ P″    ∼⟨ left-lemma ∣-cong′ reflexive ⟩
+      (! (P ⊕ Q) ∣ P′) ∣ P″    ∼⟨ left-lemma ∣-cong′ reflexive ⟩ ∼′:
       ((! P ∣ P′) ∣ ! Q) ∣ P″  ∼⟨ swap-rightmost ⟩■
       ((! P ∣ P′) ∣ P″) ∣ ! Q
 
     τ-lemma₂ = λ {P P′ Q Q′} → ∼′:
-      (! (P ⊕ Q) ∣ P′) ∣ Q′    ∼⟨ left-lemma ∣-cong′ reflexive ⟩
+      (! (P ⊕ Q) ∣ P′) ∣ Q′    ∼⟨ left-lemma ∣-cong′ reflexive ⟩ ∼′:
       ((! P ∣ P′) ∣ ! Q) ∣ Q′  ∼⟨ symmetric ∣-assoc ⟩■
       (! P ∣ P′) ∣ (! Q ∣ Q′)
 
     τ-lemma₃ = λ {P Q Q′ Q″} → ∼′:
-      (! (P ⊕ Q) ∣ Q′) ∣ Q″    ∼⟨ right-lemma ∣-cong′ reflexive ⟩
+      (! (P ⊕ Q) ∣ Q′) ∣ Q″    ∼⟨ right-lemma ∣-cong′ reflexive ⟩ ∼′:
       (! P ∣ (! Q ∣ Q′)) ∣ Q″  ∼⟨ symmetric ∣-assoc ⟩■
       ! P ∣ ((! Q ∣ Q′) ∣ Q″)
 
@@ -1091,13 +1091,13 @@ mutual
         of λ where
 
         (inj₁ (P′ , choice-left P⟶P′ , R∼![P⊕Q]∣P′)) →
-          R                 ∼⟨ R∼![P⊕Q]∣P′ ⟩
+          R                 ∼⟨ R∼![P⊕Q]∣P′ ⟩ ∼′:
           ! (P ⊕ Q) ∣ P′    ∼⟨ left-lemma ⟩■
           (! P ∣ P′) ∣ ! Q  ⟵⟨ par-left (replication (par-right P⟶P′)) ⟩
           ! P        ∣ ! Q
 
         (inj₁ (Q′ , choice-right Q⟶Q′ , R∼![P⊕Q]∣Q′)) →
-          R                 ∼⟨ R∼![P⊕Q]∣Q′ ⟩
+          R                 ∼⟨ R∼![P⊕Q]∣Q′ ⟩ ∼′:
           ! (P ⊕ Q) ∣ Q′    ∼⟨ right-lemma ⟩■
           ! P ∣ (! Q ∣ Q′)  ⟵⟨ par-right (replication (par-right Q⟶Q′)) ⟩
           ! P ∣  ! Q
@@ -1106,7 +1106,7 @@ mutual
               , choice-left P⟶P′ , choice-left P⟶P″
               , R∼![P⊕Q]∣P′∣P″
               )) →
-          R                        ∼⟨ R∼![P⊕Q]∣P′∣P″ ⟩
+          R                        ∼⟨ R∼![P⊕Q]∣P′∣P″ ⟩ ∼′:
           (! (P ⊕ Q) ∣ P′) ∣ P″    ∼⟨ τ-lemma₁ ⟩■
           ((! P ∣ P′) ∣ P″) ∣ ! Q  [ τ ]⟵⟨ par-left (replication (par-τ (replication (par-right P⟶P′)) P⟶P″)) ⟩
           ! P ∣ ! Q
@@ -1115,7 +1115,7 @@ mutual
               , choice-left P⟶P′ , choice-right Q⟶Q′
               , R∼![P⊕Q]∣P′∣Q′
               )) →
-          R                        ∼⟨ R∼![P⊕Q]∣P′∣Q′ ⟩
+          R                        ∼⟨ R∼![P⊕Q]∣P′∣Q′ ⟩ ∼′:
           (! (P ⊕ Q) ∣ P′) ∣ Q′    ∼⟨ τ-lemma₂ ⟩■
           (! P ∣ P′) ∣ (! Q ∣ Q′)  [ τ ]⟵⟨ par-τ (replication (par-right P⟶P′))
                                                  (replication (par-right Q⟶Q′)) ⟩
@@ -1126,7 +1126,7 @@ mutual
               , R∼![P⊕Q]∣Q′∣P′
               )) →
           R                        ∼⟨ R∼![P⊕Q]∣Q′∣P′ ⟩
-          (! (P ⊕ Q) ∣ Q′) ∣ P′    ∼⟨ right-lemma ∣-cong′ reflexive ⟩
+          (! (P ⊕ Q) ∣ Q′) ∣ P′    ∼⟨ right-lemma ∣-cong′ reflexive ⟩ ∼′:
           (! P ∣ (! Q ∣ Q′)) ∣ P′  ∼⟨ swap-rightmost ⟩■
           (! P ∣ P′) ∣ (! Q ∣ Q′)  [ τ ]⟵⟨ par-τ′ (sym $ co-involutive c)
                                                   (replication (par-right P⟶P′))
@@ -1137,7 +1137,7 @@ mutual
               , choice-right Q⟶Q′ , choice-right Q⟶Q″
               , R∼![P⊕Q]∣Q′∣Q″
               )) →
-          R                        ∼⟨ R∼![P⊕Q]∣Q′∣Q″ ⟩
+          R                        ∼⟨ R∼![P⊕Q]∣Q′∣Q″ ⟩ ∼′:
           (! (P ⊕ Q) ∣ Q′) ∣ Q″    ∼⟨ τ-lemma₃ ⟩■
           ! P ∣ ((! Q ∣ Q′) ∣ Q″)  [ τ ]⟵⟨ par-right (replication (par-τ (replication (par-right Q⟶Q′)) Q⟶Q″)) ⟩
           ! P ∣ ! Q
@@ -1151,14 +1151,14 @@ mutual
         of λ where
         (inj₁ (P′ , P⟶P′ , S∼!P∣P′)) →
           ! (P ⊕ Q)         ⟶⟨ replication (par-right (choice-left P⟶P′)) ⟩ʳˡ
-          ! (P ⊕ Q) ∣ P′    ∼⟨ left-lemma ⟩
+          ! (P ⊕ Q) ∣ P′    ∼⟨ left-lemma ⟩ ∼′:
           (! P ∣ P′) ∣ ! Q  ∼⟨ symmetric S∼!P∣P′ ∣-cong reflexive ⟩■
           S ∣ ! Q
 
         (inj₂ (refl , P′ , P″ , a , P⟶P′ , P⟶P″ , S∼!P∣P′∣P″)) →
           ! (P ⊕ Q)                [ τ ]⟶⟨ replication (par-τ (replication (par-right (choice-left P⟶P′)))
                                                               (choice-left P⟶P″)) ⟩ʳˡ
-          (! (P ⊕ Q) ∣ P′) ∣ P″    ∼⟨ τ-lemma₁ ⟩
+          (! (P ⊕ Q) ∣ P′) ∣ P″    ∼⟨ τ-lemma₁ ⟩ ∼′:
           ((! P ∣ P′) ∣ P″) ∣ ! Q  ∼⟨ symmetric S∼!P∣P′∣P″ ∣-cong reflexive ⟩■
           S ∣ ! Q
 
@@ -1168,14 +1168,14 @@ mutual
         of λ where
         (inj₁ (Q′ , Q⟶Q′ , S∼!Q∣Q′)) →
           ! (P ⊕ Q)         ⟶⟨ replication (par-right (choice-right Q⟶Q′)) ⟩ʳˡ
-          ! (P ⊕ Q) ∣ Q′    ∼⟨ right-lemma ⟩
+          ! (P ⊕ Q) ∣ Q′    ∼⟨ right-lemma ⟩ ∼′:
           ! P ∣ (! Q ∣ Q′)  ∼⟨ reflexive ∣-cong symmetric S∼!Q∣Q′ ⟩■
           ! P ∣ S
 
         (inj₂ (refl , Q′ , Q″ , a , Q⟶Q′ , Q⟶Q″ , S∼!Q∣Q′∣Q″)) →
           ! (P ⊕ Q)                [ τ ]⟶⟨ replication (par-τ (replication (par-right (choice-right Q⟶Q′)))
                                                               (choice-right Q⟶Q″)) ⟩ʳˡ
-          (! (P ⊕ Q) ∣ Q′) ∣ Q″    ∼⟨ τ-lemma₃ ⟩
+          (! (P ⊕ Q) ∣ Q′) ∣ Q″    ∼⟨ τ-lemma₃ ⟩ ∼′:
           ! P ∣ ((! Q ∣ Q′) ∣ Q″)  ∼⟨ reflexive ∣-cong symmetric S∼!Q∣Q′∣Q″ ⟩■
           ! P ∣ S
 
@@ -1185,7 +1185,7 @@ mutual
          inj₁ (Q′ , Q⟶Q′ , S′∼!Q∣Q′)) →
           ! (P ⊕ Q)                [ τ ]⟶⟨ replication (par-τ (replication (par-right (choice-left P⟶P′)))
                                                                                       (choice-right Q⟶Q′)) ⟩ʳˡ
-          (! (P ⊕ Q) ∣ P′) ∣ Q′    ∼⟨ τ-lemma₂ ⟩
+          (! (P ⊕ Q) ∣ P′) ∣ Q′    ∼⟨ τ-lemma₂ ⟩ ∼′:
           (! P ∣ P′) ∣ (! Q ∣ Q′)  ∼⟨ symmetric (S∼!P∣P′ ∣-cong S′∼!Q∣Q′) ⟩■
           S ∣ S′
 
@@ -1197,7 +1197,7 @@ mutual
 
 6-2-17-3 : ∀ {P} → ! P ∣ ! P ∼ ! P
 6-2-17-3 {P} =
-  ! P ∣ ! P  ∼⟨ symmetric 6-2-17-2 ⟩
+  ! P ∣ ! P  ∼⟨ symmetric 6-2-17-2 ⟩ ∼:
   ! (P ⊕ P)  ∼⟨ !-cong ⊕-idempotent ⟩■
   ! P
 
@@ -1209,7 +1209,7 @@ mutual
   (inj₁ (P′ , P⟶P′ , Q∼!P∣P′)) →
     Q                 ∼⟨ Q∼!P∣P′ ⟩
     ! P ∣ P′          ∼⟨ symmetric 6-2-17-3 ∣-cong reflexive ⟩
-    (! P ∣ ! P) ∣ P′  ∼⟨ symmetric ∣-assoc ⟩
+    (! P ∣ ! P) ∣ P′  ∼⟨ symmetric ∣-assoc ⟩ ∼:
     ! P ∣ (! P ∣ P′)  ∼⟨ reflexive ∣-cong symmetric Q∼!P∣P′ ⟩■
     ! P ∣ Q
 
@@ -1218,7 +1218,7 @@ mutual
     (! P ∣ P′) ∣ P″          ∼⟨ symmetric ∣-assoc ⟩
     ! P ∣ (P′ ∣ P″)          ∼⟨ symmetric 6-2-17-3 ∣-cong reflexive ⟩
     (! P ∣ ! P) ∣ (P′ ∣ P″)  ∼⟨ symmetric ∣-assoc ⟩
-    ! P ∣ (! P ∣ (P′ ∣ P″))  ∼⟨ reflexive ∣-cong ∣-assoc ⟩
+    ! P ∣ (! P ∣ (P′ ∣ P″))  ∼⟨ reflexive ∣-cong ∣-assoc ⟩ ∼:
     ! P ∣ ((! P ∣ P′) ∣ P″)  ∼⟨ reflexive ∣-cong symmetric Q∼!P∣P′∣P″ ⟩■
     ! P ∣ Q
 
@@ -1228,7 +1228,7 @@ mutual
   6-2-17-4 {P} {i} = ⟨ lr , rl ⟩
     where
     lemma = λ {Q μ} (!P⟶Q : ! P [ μ ]⟶ Q) → ∼′:
-      ! ! P ∣ Q  ∼⟨ 6-2-17-4′ {i = i} ∣-cong′ reflexive ⟩
+      ! ! P ∣ Q  ∼⟨ 6-2-17-4′ {i = i} ∣-cong′ reflexive ⟩ ∼′:
       ! P ∣ Q    ∼⟨ symmetric (6-2-17-4-lemma !P⟶Q) ⟩■
       Q
 
@@ -1237,7 +1237,7 @@ mutual
          ∃ λ Q′ → ! P [ μ ]⟶ Q′ × [ i ] Q ∼′ Q′
     lr {Q} !!P⟶Q = case 6-1-3-2 !!P⟶Q of λ where
       (inj₁ (Q′ , !P⟶Q′ , Q∼!!P∣Q′)) →
-        Q           ∼⟨ Q∼!!P∣Q′ ⟩
+        Q           ∼⟨ Q∼!!P∣Q′ ⟩ ∼′:
         ! ! P ∣ Q′  ∼⟨ lemma !P⟶Q′ ⟩■
         Q′          ⟵⟨ !P⟶Q′ ⟩
         ! P
@@ -1253,7 +1253,7 @@ mutual
             Q                          ∼⟨ Q∼!!P∣Q′∣Q″ ⟩
             (! ! P ∣ Q′) ∣ Q″          ∼⟨ reflexive ∣-cong Q″∼!P∣Q‴ ⟩
             (! ! P ∣ Q′) ∣ (! P ∣ Q‴)  ∼⟨ swap-in-the-middle ⟩
-            (! ! P ∣ ! P) ∣ (Q′ ∣ Q‴)  ∼⟨ 6-1-2 ∣-cong reflexive ⟩
+            (! ! P ∣ ! P) ∣ (Q′ ∣ Q‴)  ∼⟨ 6-1-2 ∣-cong reflexive ⟩ ∼′:
             ! ! P ∣ (Q′ ∣ Q‴)          ∼⟨ lemma !P⟶Q′∣Q″ ⟩■
             Q′ ∣ Q‴                    [ τ ]⟵⟨ !P⟶Q′∣Q″ ⟩
             ! P

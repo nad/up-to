@@ -6,7 +6,7 @@
 
 open import Labelled-transition-system
 
-module Bisimilarity.Coinductive (lts : LTS) where
+module Bisimilarity.Coinductive {ℓ} (lts : LTS ℓ) where
 
 open import Prelude
 
@@ -26,24 +26,24 @@ open General public
 -- open public, to make hyperlinks to these definitions more
 -- informative.
 
-Bisimilarity : Size → Rel₂ (# 0) Proc
+Bisimilarity : Size → Rel₂ ℓ Proc
 Bisimilarity = General.Bisimilarity
 
-Bisimilarity′ : Size → Rel₂ (# 0) Proc
+Bisimilarity′ : Size → Rel₂ ℓ Proc
 Bisimilarity′ = General.Bisimilarity′
 
 infix 4 _∼_ _∼′_ [_]_∼_ [_]_∼′_
 
-[_]_∼_ : Size → Proc → Proc → Set
+[_]_∼_ : Size → Proc → Proc → Set ℓ
 [_]_∼_ = General.[_]_∼_
 
-[_]_∼′_ : Size → Proc → Proc → Set
+[_]_∼′_ : Size → Proc → Proc → Set ℓ
 [_]_∼′_ = General.[_]_∼′_
 
-_∼_ : Proc → Proc → Set
+_∼_ : Proc → Proc → Set ℓ
 _∼_ = General._∼_
 
-_∼′_ : Proc → Proc → Set
+_∼′_ : Proc → Proc → Set ℓ
 _∼′_ = General._∼′_
 
 -- Combinators that can perhaps make the code a bit nicer to read.

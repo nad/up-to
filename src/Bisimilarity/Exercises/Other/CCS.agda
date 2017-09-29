@@ -7,7 +7,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Bisimilarity.Exercises.Other.CCS {Name : Set} where
+module Bisimilarity.Exercises.Other.CCS {ℓ} {Name : Set ℓ} where
 
 open import Equality.Propositional
 open import List equality-with-J
@@ -47,10 +47,10 @@ open import Labelled-transition-system.CCS Name
      6-1-3-1-proc P P″ n ∣ P    ≡⟨ refl ⟩∎
      6-1-3-1-proc P P″ (suc n)  ∎)
 
-One-step-away : {A : Set} → (A → Action) → Proc ∞ → Set
+One-step-away : {A : Set ℓ} → (A → Action) → Proc ∞ → Set ℓ
 One-step-away f P = ∃ λ a → ∃ λ P′ → P [ f a ]⟶ P′
 
-cons : {A B : Set} → A → List A × B → List A × B
+cons : {A B : Set ℓ} → A → List A × B → List A × B
 cons x (xs , y) = x ∷ xs , y
 
 6-1-3-1-proc′ :
@@ -97,7 +97,7 @@ cons x (xs , y) = x ∷ xs , y
 
 -- Assumptions used to state and solve the exercise.
 
-record 6-1-3-2-assumptions ℓ : Set (lsuc ℓ) where
+record 6-1-3-2-assumptions ℓ′ : Set (ℓ ⊔ lsuc ℓ′) where
   infix 4 _∼_
   infix  -1 finally-∼
   infixr -2 step-∼
@@ -105,7 +105,7 @@ record 6-1-3-2-assumptions ℓ : Set (lsuc ℓ) where
   syntax step-∼ p q∼r p∼q  = p ∼⟨ p∼q ⟩ q∼r
 
   field
-    _∼_       : Proc ∞ → Proc ∞ → Set ℓ
+    _∼_       : Proc ∞ → Proc ∞ → Set ℓ′
     step-∼    : ∀ P {Q R} → Q ∼ R → P ∼ Q → P ∼ R
     finally-∼ : ∀ P Q → P ∼ Q → P ∼ Q
     reflexive : ∀ {P} → P ∼ P
@@ -115,7 +115,7 @@ record 6-1-3-2-assumptions ℓ : Set (lsuc ℓ) where
     _∣-cong_  : ∀ {P P′ Q Q′} → P ∼ P′ → Q ∼ Q′ → P ∣ Q ∼ P′ ∣ Q′
     6-1-2     : ∀ {P} → ! P ∣ P ∼ ! P
 
-module 6-1-3-2 {ℓ} (assumptions : 6-1-3-2-assumptions ℓ) where
+module 6-1-3-2 {ℓ′} (assumptions : 6-1-3-2-assumptions ℓ′) where
 
   open 6-1-3-2-assumptions assumptions
 

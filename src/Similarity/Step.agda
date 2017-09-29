@@ -8,9 +8,10 @@
 open import Labelled-transition-system
 
 module Similarity.Step
-         (lts : LTS)
+         {ℓ}
+         (lts : LTS ℓ)
          (open LTS lts)
-         (_[_]↝_ : Proc → Label → Proc → Set)
+         (_[_]↝_ : Proc → Label → Proc → Set ℓ)
          where
 
 open import Equality.Propositional
@@ -38,7 +39,8 @@ private
   -- basically the function w from Section 6.5.2.4, except that
   -- "P R Q" is omitted.
 
-  record Step {r} (R : Rel₂ r Proc) (pq : Proc × Proc) : Set r where
+  record Step {r} (R : Rel₂ r Proc) (pq : Proc × Proc) :
+              Set (ℓ ⊔ r) where
     constructor ⟨_⟩
 
     private
@@ -89,7 +91,7 @@ S̲t̲e̲p̲ =
 
 Step↔S̲t̲e̲p̲ :
   ∀ {k r} {R : Rel₂ r Proc} {pq} →
-  Extensionality? k lzero r →
+  Extensionality? k ℓ (ℓ ⊔ r) →
   Step R pq ↝[ k ] ⟦ S̲t̲e̲p̲ ⟧ R pq
 Step↔S̲t̲e̲p̲ {r = r} {R} {pq} = generalise-ext? Step⇔S̲t̲e̲p̲ λ ext → record
   { surjection = record
@@ -97,7 +99,9 @@ Step↔S̲t̲e̲p̲ {r = r} {R} {pq} = generalise-ext? Step⇔S̲t̲e̲p̲ λ ex
     ; right-inverse-of    = λ where
         (_ , f) →
           Σ-≡,≡→≡ refl $
-            implicit-extensionality ext λ _ → apply-ext ext (to₂∘from f)
+            implicit-extensionality ext λ _ →
+            apply-ext (lower-extensionality lzero ℓ ext) $
+              to₂∘from f
     }
   ; left-inverse-of = λ _ → refl
   }
@@ -154,8 +158,8 @@ open Temporarily-private public
 
 ⟦S̲t̲e̲p̲⟧₂↔ :
   ∀ {x} {X : Rel₂ x Proc} →
-  Extensionality lzero lzero →
-  (R : ∀ {o} → Rel₂ (# 0) (X o)) →
+  Extensionality ℓ ℓ →
+  (R : ∀ {o} → Rel₂ ℓ (X o)) →
   ∀ {p q} (p∼q₁ p∼q₂ : ⟦ S̲t̲e̲p̲ ⟧ X (p , q)) →
 
   ⟦ S̲t̲e̲p̲ ⟧₂ R (p∼q₁ , p∼q₂)

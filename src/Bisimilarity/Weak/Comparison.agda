@@ -22,7 +22,7 @@ import Bisimilarity.Weak.Classical
 import Bisimilarity.Weak.Coinductive
 open import Labelled-transition-system
 
-module _ {lts : LTS} where
+module _ {ℓ} {lts : LTS ℓ} where
 
   open LTS lts
 
@@ -69,7 +69,7 @@ module _ {lts : LTS} where
   -- extensionality).
 
   classical↠coinductive :
-    Extensionality lzero lzero →
+    Extensionality ℓ ℓ →
     Co.Extensionality →
     ∀ {p q} → p Cl.≈ q ↠ p Co.≈ q
   classical↠coinductive = Comp.classical↠coinductive
@@ -158,13 +158,14 @@ coinductive-weak-bisimilarity-is-not-propositional ext univ =
 -- (assuming extensionality and univalence).
 
 weak-bisimilarity↠equality :
-  Extensionality lzero (lsuc lzero) →
-  Univalence lzero →
-  {A : Set} →
+  ∀ {a} →
+  Extensionality a (lsuc a) →
+  Univalence a →
+  {A : Set a} →
   let open Bisimilarity.Weak.Coinductive (bisimilarity⇔equality A) in
   {p q : A} → p ≈ q ↠ p ≡ q
 weak-bisimilarity↠equality ext univ {A} =
   subst (λ lts → let open Bisimilarity.Coinductive lts in
                  ∀ {p q} → p ∼ q ↠ p ≡ q)
         (sym $ weak≡id ext univ (bisimilarity⇔equality A) (λ _ ()))
-        Comp.bisimilarity↠equality
+        (Comp.bisimilarity↠equality {A = A})

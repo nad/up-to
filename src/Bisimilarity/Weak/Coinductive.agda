@@ -6,7 +6,7 @@
 
 open import Labelled-transition-system
 
-module Bisimilarity.Weak.Coinductive (lts : LTS) where
+module Bisimilarity.Weak.Coinductive {ℓ} (lts : LTS ℓ) where
 
 open import Prelude
 

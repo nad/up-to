@@ -4,7 +4,7 @@
 
 {-# OPTIONS --without-K #-}
 
-module Bisimilarity.Coinductive.Delay-monad {A : Set} where
+module Bisimilarity.Coinductive.Delay-monad {a} {A : Set a} where
 
 open import Delay-monad
 open import Delay-monad.Strong-bisimilarity as D using (force)
