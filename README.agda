@@ -179,8 +179,8 @@ import
 
 import Bisimilarity.Weak.Comparison
 
--- The two coinductive definitions of weak bisimilarity are logically
--- equivalent.
+-- The two coinductive definitions of weak bisimilarity are pointwise
+-- logically equivalent.
 
 import Bisimilarity.Weak.Coinductive.Equivalent
 

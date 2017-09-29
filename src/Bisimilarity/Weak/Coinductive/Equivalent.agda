@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------
--- The two coinductive definitions of weak bisimilarity are logically
--- equivalent
+-- The two coinductive definitions of weak bisimilarity are pointwise
+-- logically equivalent
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K #-}
