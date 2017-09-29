@@ -22,7 +22,8 @@ private
 
 open WB public
   using (⟪_,_⟫)
-  renaming ( Bisimulation to Weak-bisimulation
-           ; _∼_          to _≈_
-           ; [_]_∼_       to [_]_≈_
+  renaming ( Bisimulation  to Weak-bisimulation
+           ; Bisimilarity′ to Weak-bisimilarity′
+           ; Bisimilarity  to Weak-bisimilarity
+           ; _∼_           to _≈_
            )

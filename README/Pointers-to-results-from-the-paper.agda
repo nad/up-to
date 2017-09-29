@@ -106,7 +106,7 @@ container-isomorphic-to-record = Bisimilarity.Step.Step↔S̲t̲e̲p̲
 
 -- The traditional definition of bisimilarity.
 
-Bisimilar = Bisimilarity.Classical.[_]_∼_
+Bisimilar = Bisimilarity.Classical._∼_
 
 -- The definition using ν.
 

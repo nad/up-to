@@ -38,48 +38,41 @@ module _ {lts : LTS} where
 
   -- Classically bisimilar processes are coinductively bisimilar.
 
-  cl⇒co : ∀ {ℓ i p q} → Cl.[ ℓ ] p ∼ q → Co.[ i ] p ∼ q
+  cl⇒co : ∀ {i p q} → p Cl.∼ q → Co.[ i ] p ∼ q
   cl⇒co = gfp⊆ν _
 
   -- Coinductively bisimilar processes are classically bisimilar.
 
-  co⇒cl : ∀ {ℓ p q} → p Co.∼ q → Cl.[ ℓ ] p ∼ q
+  co⇒cl : ∀ {p q} → p Co.∼ q → p Cl.∼ q
   co⇒cl = ν⊆gfp _
 
   -- The function cl⇒co is a left inverse of co⇒cl (up to pointwise
   -- bisimilarity).
 
-  cl⇒co∘co⇒cl : ∀ {ℓ i p q}
+  cl⇒co∘co⇒cl : ∀ {i p q}
                 (p∼q : p Co.∼ q) →
-                Co.[ i ] cl⇒co (co⇒cl {ℓ = ℓ} p∼q) ≡ p∼q
+                Co.[ i ] cl⇒co (co⇒cl p∼q) ≡ p∼q
   cl⇒co∘co⇒cl p∼q = gfp⊆ν∘ν⊆gfp _ p∼q
 
   -- If there are two processes that are not equal, but bisimilar,
   -- then co⇒cl is not a left inverse of cl⇒co.
 
-  co⇒cl∘cl⇒co : ∀ {p q ℓ} →
+  co⇒cl∘cl⇒co : ∀ {p q} →
                 p ≢ q → p Co.∼ q →
-                ∃ λ (p∼p : Cl.[ ℓ ] p ∼ p) → co⇒cl (cl⇒co p∼p) ≢ p∼p
+                ∃ λ (p∼p : p Cl.∼ p) → co⇒cl (cl⇒co p∼p) ≢ p∼p
   co⇒cl∘cl⇒co {p} {q} p≢q p∼q =
       reflexive
 
     , (co⇒cl (cl⇒co reflexive) ≡ reflexive  ↝⟨ cong (λ R → proj₁ R (p , q)) ⟩
        ↑ _ (p Co.∼ q) ≡ ↑ _ (p ≡ q)         ↝⟨ (λ eq → ≡⇒↝ _ eq $ lift p∼q) ⟩
-       ↑ _ (p ≡ q)                          ↝⟨ lower ⟩
+       ↑ _ (p ≡ q)                          ↔⟨ Bijection.↑↔ ⟩
        p ≡ q                                ↝⟨ p≢q ⟩□
        ⊥                                    □)
 
   -- The two definitions of bisimilarity are logically equivalent.
 
-  classical⇔coinductive :
-    ∀ {ℓ p q} → Cl.[ ℓ ] p ∼ q ⇔ p Co.∼ q
+  classical⇔coinductive : ∀ {p q} → p Cl.∼ q ⇔ p Co.∼ q
   classical⇔coinductive = gfp⇔ν _
-
-  -- The larger classical versions of bisimilarity are logically
-  -- equivalent to the smallest one.
-
-  larger⇔smallest : ∀ {ℓ p q} → Cl.[ ℓ ] p ∼ q ⇔ p Cl.∼ q
-  larger⇔smallest = IC.larger⇔smallest _
 
   -- There is a split surjection from the classical definition of
   -- bisimilarity to the coinductive one (assuming two kinds of
@@ -88,7 +81,7 @@ module _ {lts : LTS} where
   classical↠coinductive :
     Extensionality lzero lzero →
     Co.Extensionality →
-    ∀ {ℓ p q} → Cl.[ ℓ ] p ∼ q ↠ p Co.∼ q
+    ∀ {p q} → p Cl.∼ q ↠ p Co.∼ q
   classical↠coinductive ext co-ext = gfp↠ν ext _ co-ext
 
 -- There is at least one LTS for which there is a split surjection
@@ -96,9 +89,9 @@ module _ {lts : LTS} where
 -- one.
 
 coinductive↠classical :
-  ∀ {ℓ p q} →
-  Bisimilarity.Coinductive._∼_  empty   p q ↠
-  Bisimilarity.Classical.[_]_∼_ empty ℓ p q
+  ∀ {p q} →
+  Bisimilarity.Coinductive._∼_ empty p q ↠
+  Bisimilarity.Classical._∼_   empty p q
 coinductive↠classical {p = ()}
 
 -- There is an LTS for which coinductive bisimilarity is pointwise
@@ -128,62 +121,69 @@ coinductive-bisimilarity-is-sometimes-propositional ext co-ext =
     irr′ : ∀ {i} ∼₁ ∼₂ → [ i ] ∼₁ ≡′ ∼₂
     force (irr′ ∼₁ ∼₂) = irr (force ∼₁) (force ∼₂)
 
--- However, classical bisimilarity is, for the same LTS, not pointwise
--- propositional.
+-- However, classical bisimilarity (of any size) is, for the same LTS,
+-- not pointwise propositional.
 
 classical-bisimilarity-is-not-propositional :
   let module Cl = Bisimilarity.Classical one-loop in
-  ∀ {ℓ} → ¬ Is-proposition (Cl.[ ℓ ] tt ∼ tt)
+  ∀ {ℓ} → ¬ Is-proposition (Cl.Bisimilarity′ ℓ (tt , tt))
 classical-bisimilarity-is-not-propositional {ℓ} =
-  Is-proposition ([ ℓ ] tt ∼ tt)    ↝⟨ (λ is-prop → _⇔_.to propositional⇔irrelevant is-prop) ⟩
-  Proof-irrelevant ([ ℓ ] tt ∼ tt)  ↝⟨ (λ f → f tt∼tt₁ tt∼tt₂) ⟩
-  tt∼tt₁ ≡ tt∼tt₂                   ↝⟨ cong (λ R → proj₁ R (tt , tt)) {x = tt∼tt₁} {y = tt∼tt₂} ⟩
-  Unit ≡ (Unit ⊎ Unit)              ↝⟨ (λ eq → Fin 1          ↝⟨ inverse Unit↔Fin1 ⟩
-                                               Unit           ↝⟨ ≡⇒↝ _ eq ⟩
-                                               Unit ⊎ Unit    ↝⟨ Unit↔Fin1 ⊎-cong Unit↔Fin1 ⟩
-                                               Fin 1 ⊎ Fin 1  ↝⟨ Fin⊎Fin↔Fin+ 1 1 ⟩□
-                                               Fin 2          □) ⟩
-  Fin 1 ↔ Fin 2                     ↝⟨ _⇔_.to isomorphic-same-size ⟩
-  1 ≡ 2                             ↝⟨ from-⊎ (1 Nat.≟ 2) ⟩□
-  ⊥                                 □
+  Is-proposition (Bisimilarity′ ℓ (tt , tt))    ↝⟨ (λ is-prop → _⇔_.to propositional⇔irrelevant is-prop) ⟩
+  Proof-irrelevant (Bisimilarity′ ℓ (tt , tt))  ↝⟨ (λ f → f tt∼tt₁ tt∼tt₂) ⟩
+  tt∼tt₁ ≡ tt∼tt₂                               ↝⟨ cong (λ R → proj₁ R (tt , tt)) {x = tt∼tt₁} {y = tt∼tt₂} ⟩
+  Unit ≡ (Unit ⊎ Unit)                          ↝⟨ (λ eq → Fin 1          ↝⟨ inverse Unit↔Fin1 ⟩
+                                                           Unit           ↝⟨ ≡⇒↝ _ eq ⟩
+                                                           Unit ⊎ Unit    ↝⟨ Unit↔Fin1 ⊎-cong Unit↔Fin1 ⟩
+                                                           Fin 1 ⊎ Fin 1  ↝⟨ Fin⊎Fin↔Fin+ 1 1 ⟩□
+                                                           Fin 2          □) ⟩
+  Fin 1 ↔ Fin 2                                 ↝⟨ _⇔_.to isomorphic-same-size ⟩
+  1 ≡ 2                                         ↝⟨ from-⊎ (1 Nat.≟ 2) ⟩□
+  ⊥                                             □
   where
   open Bisimilarity.Classical one-loop
 
-  tt∼tt₁ : [ ℓ ] tt ∼ tt
-  tt∼tt₁ = reflexive
+  tt∼tt₁ : Bisimilarity′ ℓ (tt , tt)
+  tt∼tt₁ = reflexive-∼
 
-  tt∼tt₂ : [ ℓ ] tt ∼ tt
+  tt∼tt₂ : Bisimilarity′ ℓ (tt , tt)
   tt∼tt₂ =
-    let R , R-is-a-bisimulation , ttRtt = _⇔_.to (Bisimilarity↔ _) tt∼tt₁ in
-    ⟨ (R ∪ R)
-    , ×2-preserves-bisimulations R-is-a-bisimulation
-    , inj₁ ttRtt
-    ⟩
+    let R , R-is-a-bisimulation , ttRtt =
+          _⇔_.to (Bisimilarity↔ _) tt∼tt₁ in
+    _⇔_.from (Bisimilarity↔ _)
+      ( (R ∪ R)
+      , ×2-preserves-bisimulations R-is-a-bisimulation
+      , inj₁ ttRtt
+      )
 
-  Unit = ↑ _ (tt ≡ tt)
+  Unit = ↑ ℓ (tt ≡ tt)
 
   Unit↔Fin1 =
-    Unit     ↝⟨ Bijection.↑↔ ⟩
+    Unit     ↔⟨ Bijection.↑↔ ⟩
     tt ≡ tt  ↝⟨ _⇔_.to contractible⇔↔⊤ (mono₁ 0 ⊤-contractible _ _) ⟩
     ⊤        ↝⟨ inverse ⊎-right-identity ⟩□
     Fin 1    □
 
--- Thus there is, in general, no split surjection from the coinductive
--- definition of bisimilarity to the classical one (assuming two kinds
--- of extensionality).
+-- Thus, assuming two kinds of extensionality, there is in general no
+-- split surjection from the coinductive definition of bisimilarity to
+-- the classical one (of any size).
 
 ¬coinductive↠classical :
   Extensionality lzero lzero →
-  ∀ {ℓ} →
   Bisimilarity.Coinductive.Extensionality one-loop →
-  ¬ (∀ {p q} → Bisimilarity.Coinductive._∼_  one-loop   p q ↠
-               Bisimilarity.Classical.[_]_∼_ one-loop ℓ p q)
-¬coinductive↠classical ext {ℓ} co-ext =
-  (∀ {p q} → p Co.∼ q ↠ Cl.[ ℓ ] p ∼ q)                              ↝⟨ (λ co↠cl → co↠cl {q = _}) ⟩
-  tt Co.∼ tt ↠ Cl.[ ℓ ] tt ∼ tt                                      ↝⟨ (λ co↠cl → H-level.respects-surjection co↠cl 1) ⟩
-  (Is-proposition (tt Co.∼ tt) → Is-proposition (Cl.[ ℓ ] tt ∼ tt))  ↝⟨ (_$ coinductive-bisimilarity-is-sometimes-propositional ext co-ext) ⟩
-  Is-proposition (Cl.[ ℓ ] tt ∼ tt)                                  ↝⟨ classical-bisimilarity-is-not-propositional ⟩□
-  ⊥                                                                  □
+  ∀ {ℓ} →
+  ¬ (∀ {p q} → Bisimilarity.Coinductive._∼_         one-loop    p   q ↠
+               Bisimilarity.Classical.Bisimilarity′ one-loop ℓ (p , q))
+¬coinductive↠classical ext co-ext {ℓ} =
+  (∀ {p q} → p Co.∼ q ↠ Cl.Bisimilarity′ ℓ (p , q))  ↝⟨ (λ co↠cl → co↠cl {q = _}) ⟩
+
+  tt Co.∼ tt ↠ Cl.Bisimilarity′ ℓ (tt , tt)          ↝⟨ (λ co↠cl → H-level.respects-surjection co↠cl 1) ⟩
+
+  (Is-proposition (tt Co.∼ tt) →
+   Is-proposition (Cl.Bisimilarity′ ℓ (tt , tt)))    ↝⟨ (_$ coinductive-bisimilarity-is-sometimes-propositional ext co-ext) ⟩
+
+  Is-proposition (Cl.Bisimilarity′ ℓ (tt , tt))      ↝⟨ classical-bisimilarity-is-not-propositional ⟩□
+
+  ⊥                                                  □
   where
   module Cl = Bisimilarity.Classical   one-loop
   module Co = Bisimilarity.Coinductive one-loop

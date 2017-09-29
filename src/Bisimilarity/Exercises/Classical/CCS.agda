@@ -14,7 +14,6 @@ open import Logical-equivalence using (_⇔_)
 open import Prelude
 
 import Bisimilarity.Classical.Equational-reasoning-instances
-open import Bisimilarity.Comparison
 import Bisimilarity.Exercises.Other.CCS
 open import Equational-reasoning
 open import Labelled-transition-system.CCS Name
@@ -205,8 +204,7 @@ open Bisimilarity.Exercises.Other.CCS.6-1-3-2 (record
 -- Exercise 6.2.4
 
 6-2-4 : ∀ {a} → ! ! a · ∼ ! a ·
-6-2-4 {a} =
-  _⇔_.to larger⇔smallest (bisimulation-up-to-∼⊆∼ R-is base)
+6-2-4 {a} = bisimulation-up-to-∼⊆∼ R-is base
   where
   data R : Rel₂ (# 0) (Proc ∞) where
     base : R (! ! a · , ! a ·)
@@ -218,7 +216,7 @@ open Bisimilarity.Exercises.Other.CCS.6-1-3-2 (record
      μ       ≡⟨ μ≡τ ⟩∎
      τ       ∎)
 
-  R-is : Bisimulation-up-to-bisimilarity lzero R
+  R-is : Bisimulation-up-to-bisimilarity R
   R-is = ⟪ lr , rl ⟫
     where
     lemma = λ {P} P∼!a∣∅ →
@@ -230,7 +228,7 @@ open Bisimilarity.Exercises.Other.CCS.6-1-3-2 (record
     lr : ∀ {P P′ Q μ} →
          R (P , Q) → P [ μ ]⟶ P′ →
          ∃ λ Q′ → Q [ μ ]⟶ Q′ ×
-                  (Bisimilarity _ ⊙ R ⊙ Bisimilarity _) (P′ , Q′)
+                  (Bisimilarity ⊙ R ⊙ Bisimilarity) (P′ , Q′)
     lr {P′ = P′} base !!a⟶P′ = case 6-1-3-2 !!a⟶P′ of λ where
       (inj₂ (μ≡τ , _)) → impossible !!a⟶P′ μ≡τ
       (inj₁ (P″ , !a⟶P″ , P′∼!!a∣P″)) → case 6-1-3-2 !a⟶P″ of λ where
@@ -251,7 +249,7 @@ open Bisimilarity.Exercises.Other.CCS.6-1-3-2 (record
     rl : ∀ {P Q Q′ μ} →
          R (P , Q) → Q [ μ ]⟶ Q′ →
          ∃ λ P′ → P [ μ ]⟶ P′ ×
-                  (Bisimilarity _ ⊙ R ⊙ Bisimilarity _) (P′ , Q′)
+                  (Bisimilarity ⊙ R ⊙ Bisimilarity) (P′ , Q′)
     rl {Q′ = Q′} base !a⟶Q′ = case 6-1-3-2 !a⟶Q′ of λ where
       (inj₂ (refl , .∅ , Q″ , .a , action , a⟶Q″ , _)) →
         ⊥-elim (names-are-not-inverted a⟶Q″)
@@ -273,18 +271,17 @@ open Bisimilarity.Exercises.Other.CCS.6-1-3-2 (record
 -- method"
 
 ·∣·∼·· : ∀ {a} → a · ∣ a · ∼ name a · (a ·)
-·∣·∼·· {a} =
-  _⇔_.to larger⇔smallest (bisimulation-up-to-∪⊆∼ R-is base)
+·∣·∼·· {a} = bisimulation-up-to-∪⊆∼ R-is base
   where
   data R : Rel₂ (# 0) (Proc ∞) where
     base : R (a · ∣ a · , name a · (a ·))
 
-  R-is : Bisimulation-up-to-∪ lzero R
+  R-is : Bisimulation-up-to-∪ R
   R-is = ⟪ lr , rl ⟫
     where
     lr : ∀ {P P′ Q μ} →
          R (P , Q) → P [ μ ]⟶ P′ →
-         ∃ λ Q′ → Q [ μ ]⟶ Q′ × (R ∪ Bisimilarity _) (P′ , Q′)
+         ∃ λ Q′ → Q [ μ ]⟶ Q′ × (R ∪ Bisimilarity) (P′ , Q′)
     lr base (par-left action) =
         _
       , (name a · (a ·)  [ name a ]⟶⟨ action ⟩
@@ -303,7 +300,7 @@ open Bisimilarity.Exercises.Other.CCS.6-1-3-2 (record
 
     rl : ∀ {P Q Q′ μ} →
          R (P , Q) → Q [ μ ]⟶ Q′ →
-         ∃ λ P′ → P [ μ ]⟶ P′ × (R ∪ Bisimilarity _) (P′ , Q′)
+         ∃ λ P′ → P [ μ ]⟶ P′ × (R ∪ Bisimilarity) (P′ , Q′)
     rl base action =
         _
       , (a · ∣ a ·  [ name a ]⟶⟨ par-right action ⟩

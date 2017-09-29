@@ -20,7 +20,8 @@ open import Function-universe equality-with-J hiding (id; _∘_)
 open LTS lts
 
 open import Bisimilarity.Step lts _[_]⟶_ _[_]⟶_ as S hiding (⟨_,_⟩)
-open import Indexed-container hiding (⟨_⟩; Bisimilarity)
+open import Indexed-container
+  hiding (⟨_⟩; Bisimilarity; larger⇔smallest)
 open import Relation
 
 ------------------------------------------------------------------------
@@ -66,31 +67,43 @@ open Progression public
 Bisimulation : ∀ {r} → Rel₂ r Proc → Set r
 Bisimulation R = Progression R R
 
+-- Bisimilarity with a level argument.
+
+Bisimilarity′ : ∀ ℓ → Rel₂ (lsuc ℓ) Proc
+Bisimilarity′ ℓ = gfp ℓ S̲t̲e̲p̲
+
+-- Bisimilarity′ ℓ is pointwise logically equivalent to
+-- Bisimilarity′ lzero.
+--
+-- For this reason the code below is mostly restricted to
+-- Bisimilarity′ lzero.
+
+larger⇔smallest :
+  ∀ ℓ {p} → Bisimilarity′ ℓ p ⇔ Bisimilarity′ lzero p
+larger⇔smallest ℓ = Indexed-container.larger⇔smallest ℓ
+
 -- Bisimilarity.
 
-Bisimilarity : ∀ ℓ → Rel₂ (lsuc ℓ) Proc
-Bisimilarity ℓ = gfp ℓ S̲t̲e̲p̲
+Bisimilarity : Rel₂ (# 1) Proc
+Bisimilarity = Bisimilarity′ lzero
 
-infix 4 [_]_∼_ _∼_
-
-[_]_∼_ : ∀ ℓ → Proc → Proc → Set (lsuc ℓ)
-[_]_∼_ ℓ = curry (Bisimilarity ℓ)
+infix 4 _∼_
 
 _∼_ : Proc → Proc → Set₁
-p ∼ q = [ lzero ] p ∼ q
+_∼_ = curry Bisimilarity
 
--- An unfolding lemma for Bisimilarity.
+-- An unfolding lemma for Bisimilarity′.
 
 Bisimilarity↔ :
   ∀ {k ℓ pq} →
   Extensionality? k ℓ ℓ →
 
-  Bisimilarity ℓ pq
+  Bisimilarity′ ℓ pq
     ↝[ k ]
   ∃ λ (R : Rel₂ ℓ Proc) → Bisimulation R × R pq
 
 Bisimilarity↔ {k} {ℓ} {pq} ext =
-  Bisimilarity ℓ pq                                ↔⟨⟩
+  Bisimilarity′ ℓ pq                               ↔⟨⟩
   gfp ℓ S̲t̲e̲p̲ pq                                    ↔⟨⟩
   (∃ λ (R : Rel₂ ℓ Proc) → R ⊆ ⟦ S̲t̲e̲p̲ ⟧ R × R pq)  ↝⟨ (∃-cong λ _ → ×-cong₁ λ _ → ⊆-congʳ ext $
                                                        inverse-ext? Step↔S̲t̲e̲p̲ (lower-extensionality? k _ lzero ext)) ⟩
@@ -98,29 +111,32 @@ Bisimilarity↔ {k} {ℓ} {pq} ext =
 
 -- A "constructor".
 
-⟨_,_,_⟩ : ∀ {ℓ p q} →
-          (R : Rel₂ ℓ Proc) → Bisimulation R → R (p , q) → [ ℓ ] p ∼ q
+⟨_,_,_⟩ :
+  ∀ {p q} →
+  (R : Rel₂ (# 0) Proc) → Bisimulation R → R (p , q) → p ∼ q
 ⟨ R , bisim , pRq ⟩ = _⇔_.from (Bisimilarity↔ _) (R , bisim , pRq)
 
 ------------------------------------------------------------------------
 -- Bisimilarity is an equivalence relation
 
 -- Reflexivity.
+--
+-- (Proved generally for Bisimilarity′.)
 
-reflexive-∼ : ∀ {ℓ p} → [ ℓ ] p ∼ p
-reflexive-∼ {ℓ} =
-  ⟨ (λ { (p , q) → ↑ ℓ (p ≡ q) })
-  , ⟪ (λ { (lift p≡q) p⟶p′ →
-           _ , subst (_[ _ ]⟶ _) p≡q       p⟶p′ , lift refl })
-    , (λ { (lift p≡q) q⟶q′ →
-           _ , subst (_[ _ ]⟶ _) (sym p≡q) q⟶q′ , lift refl })
-    ⟫
+reflexive-∼ : ∀ {ℓ p} → Bisimilarity′ ℓ (p , p)
+reflexive-∼ = _⇔_.from (Bisimilarity↔ _)
+  ( ↑ _ ∘ uncurry _≡_
+  ,  ⟪ (λ p≡q p⟶p′ →
+          _ , subst (_[ _ ]⟶ _)       (lower p≡q) p⟶p′ , lift refl)
+     , (λ p≡q q⟶q′ →
+          _ , subst (_[ _ ]⟶ _) (sym $ lower p≡q) q⟶q′ , lift refl)
+     ⟫
   , lift refl
-  ⟩
+  )
 
 -- Symmetry.
 
-symmetric-∼ : ∀ {ℓ p q} → [ ℓ ] p ∼ q → [ ℓ ] q ∼ p
+symmetric-∼ : ∀ {p q} → p ∼ q → q ∼ p
 symmetric-∼ p∼q with _⇔_.to (Bisimilarity↔ _) p∼q
 ... | R , R-is-a-bisimulation , pRq =
   ⟨ R ⁻¹
@@ -132,7 +148,7 @@ symmetric-∼ p∼q with _⇔_.to (Bisimilarity↔ _) p∼q
 
 -- Transitivity.
 
-transitive-∼ : ∀ {ℓ p q r} → [ ℓ ] p ∼ q → [ ℓ ] q ∼ r → [ ℓ ] p ∼ r
+transitive-∼ : ∀ {p q r} → p ∼ q → q ∼ r → p ∼ r
 transitive-∼ p∼q q∼r with _⇔_.to (Bisimilarity↔ _) p∼q
                         | _⇔_.to (Bisimilarity↔ _) q∼r
 ... | R₁ , R-is₁ , pR₁q | R₂ , R-is₂ , qR₂r =
@@ -154,7 +170,7 @@ transitive-∼ p∼q q∼r with _⇔_.to (Bisimilarity↔ _) p∼q
 
 infix -2 ∼:_
 
-∼:_ : ∀ {ℓ p q} → [ ℓ ] p ∼ q → [ ℓ ] p ∼ q
+∼:_ : ∀ {p q} → p ∼ q → p ∼ q
 ∼:_ = id
 
 ------------------------------------------------------------------------
@@ -162,23 +178,27 @@ infix -2 ∼:_
 
 -- Bisimilarity is a bisimulation.
 
-bisimilarity-is-a-bisimulation :
-  ∀ {ℓ} → Bisimulation (Bisimilarity ℓ)
-bisimilarity-is-a-bisimulation {ℓ} =
-  Bisimilarity ℓ             ⊆⟨ gfp-out _ ⟩
-  ⟦ S̲t̲e̲p̲ ⟧ (Bisimilarity ℓ)  ⊆⟨ _⇔_.from (Step↔S̲t̲e̲p̲ _) ⟩∎
-  Step (Bisimilarity ℓ)      ∎
+bisimilarity-is-a-bisimulation : Bisimulation Bisimilarity
+bisimilarity-is-a-bisimulation =
+  Bisimilarity           ⊆⟨ gfp-out _ ⟩
+  ⟦ S̲t̲e̲p̲ ⟧ Bisimilarity  ⊆⟨ _⇔_.from (Step↔S̲t̲e̲p̲ _) ⟩∎
+  Step Bisimilarity      ∎
 
 -- Bisimilarity is larger than every bisimulation.
 
 bisimulation⊆∼ :
-  ∀ {ℓ} {R : Rel₂ ℓ Proc} →
-  Bisimulation R → R ⊆ Bisimilarity ℓ
-bisimulation⊆∼ {ℓ} {R} R-is-a-bisimulation =
-  gfp-unfold ℓ
-     (R           ⊆⟨ R-is-a-bisimulation ⟩
-      Step R      ⊆⟨ Step↔S̲t̲e̲p̲ _ ⟩∎
-      ⟦ S̲t̲e̲p̲ ⟧ R  ∎)
+  ∀ {r} {R : Rel₂ r Proc} →
+  Bisimulation R → R ⊆ Bisimilarity
+bisimulation⊆∼ {r} {R} R-is-a-bisimulation =
+  R                ⊆⟨ gfp-unfold lzero (
+
+      R                 ⊆⟨ R-is-a-bisimulation ⟩
+      Step R            ⊆⟨ Step↔S̲t̲e̲p̲ _ ⟩∎
+      ⟦ S̲t̲e̲p̲ ⟧ R        ∎) ⟩
+
+  Bisimilarity′ r  ⊆⟨ _⇔_.to (larger⇔smallest r) ⟩∎
+
+  Bisimilarity     ∎
 
 ------------------------------------------------------------------------
 -- Bisimulations up to bisimilarity
@@ -186,17 +206,17 @@ bisimulation⊆∼ {ℓ} {R} R-is-a-bisimulation =
 -- Bisimulations up to bisimilarity.
 
 Bisimulation-up-to-bisimilarity :
-  (ℓ : Level) → ∀ {r} → Rel₂ r Proc → Set (lsuc ℓ ⊔ r)
-Bisimulation-up-to-bisimilarity ℓ R =
-  Progression R (Bisimilarity ℓ ⊙ R ⊙ Bisimilarity ℓ)
+  ∀ {r} → Rel₂ r Proc → Set (# 1 ⊔ r)
+Bisimulation-up-to-bisimilarity R =
+  Progression R (Bisimilarity ⊙ R ⊙ Bisimilarity)
 
 -- If R is a bisimulation up to bisimilarity, then ∼R∼ is a
 -- bisimulation.
 
 bisimulation-up-to-∼⇒bisimulation :
-  ∀ {ℓ r} {R : Rel₂ r Proc} →
-  Bisimulation-up-to-bisimilarity ℓ R →
-  Bisimulation (Bisimilarity ℓ ⊙ R ⊙ Bisimilarity ℓ)
+  ∀ {r} {R : Rel₂ r Proc} →
+  Bisimulation-up-to-bisimilarity R →
+  Bisimulation (Bisimilarity ⊙ R ⊙ Bisimilarity)
 bisimulation-up-to-∼⇒bisimulation R-is =
   ⟪ (λ { (q , p∼q , r , qRr , r∼s) p⟶p′ →
        let q′ , q⟶q′ , p′∼q′ =
@@ -228,30 +248,28 @@ bisimulation-up-to-∼⇒bisimulation R-is =
 -- bisimilarity.
 
 bisimulation-up-to-∼⊆∼ :
-  ∀ {ℓ r} {R : Rel₂ r Proc} →
-  Bisimulation-up-to-bisimilarity ℓ R →
-  R ⊆ Bisimilarity (lsuc ℓ ⊔ r)
-bisimulation-up-to-∼⊆∼ {ℓ} {r} {R} R-is =
-  R                                    ⊆⟨ (λ { {p , q} pRq → p , reflexive-∼ , q , pRq , reflexive-∼ }) ⟩
-  Bisimilarity ℓ ⊙ R ⊙ Bisimilarity ℓ  ⊆⟨ bisimulation⊆∼ (bisimulation-up-to-∼⇒bisimulation R-is) ⟩∎
-  Bisimilarity (lsuc ℓ ⊔ r)            ∎
+  ∀ {r} {R : Rel₂ r Proc} →
+  Bisimulation-up-to-bisimilarity R →
+  R ⊆ Bisimilarity
+bisimulation-up-to-∼⊆∼ {R = R} R-is =
+  R                                ⊆⟨ (λ { {p , q} pRq → p , reflexive-∼ , q , pRq , reflexive-∼ }) ⟩
+  Bisimilarity ⊙ R ⊙ Bisimilarity  ⊆⟨ bisimulation⊆∼ (bisimulation-up-to-∼⇒bisimulation R-is) ⟩∎
+  Bisimilarity                     ∎
 
 ------------------------------------------------------------------------
 -- Bisimulations up to union
 
 -- Bisimulations up to ∪.
 
-Bisimulation-up-to-∪ :
-  (ℓ : Level) → ∀ {r} → Rel₂ r Proc → Set (lsuc ℓ ⊔ r)
-Bisimulation-up-to-∪ ℓ R =
-  Progression R (R ∪ Bisimilarity ℓ)
+Bisimulation-up-to-∪ : ∀ {r} → Rel₂ r Proc → Set (# 1 ⊔ r)
+Bisimulation-up-to-∪ R = Progression R (R ∪ Bisimilarity)
 
 -- If _R_ is a bisimulation up to ∪, then _R_ ∪ _∼_ is a bisimulation.
 
 bisimulation-up-to-∪⇒bisimulation :
-  ∀ {ℓ r} {R : Rel₂ r Proc} →
-  Bisimulation-up-to-∪ ℓ R →
-  Bisimulation (R ∪ Bisimilarity ℓ)
+  ∀ {r} {R : Rel₂ r Proc} →
+  Bisimulation-up-to-∪ R →
+  Bisimulation (R ∪ Bisimilarity)
 bisimulation-up-to-∪⇒bisimulation R-is =
   ⟪ [ left-to-right R-is
     , (λ p∼q → Σ-map id (Σ-map id inj₂) ∘
@@ -267,13 +285,13 @@ bisimulation-up-to-∪⇒bisimulation R-is =
 -- bisimilarity.
 
 bisimulation-up-to-∪⊆∼ :
-  ∀ {ℓ r} {R : Rel₂ r Proc} →
-  Bisimulation-up-to-∪ ℓ R →
-  R ⊆ Bisimilarity (lsuc ℓ ⊔ r)
-bisimulation-up-to-∪⊆∼ {ℓ} {r} {R} R-is =
-  R                          ⊆⟨ inj₁ ⟩
-  R ∪ Bisimilarity ℓ         ⊆⟨ bisimulation⊆∼ (bisimulation-up-to-∪⇒bisimulation R-is) ⟩∎
-  Bisimilarity (lsuc ℓ ⊔ r)  ∎
+  ∀ {r} {R : Rel₂ r Proc} →
+  Bisimulation-up-to-∪ R →
+  R ⊆ Bisimilarity
+bisimulation-up-to-∪⊆∼ {R = R} R-is =
+  R                 ⊆⟨ inj₁ ⟩
+  R ∪ Bisimilarity  ⊆⟨ bisimulation⊆∼ (bisimulation-up-to-∪⇒bisimulation R-is) ⟩∎
+  Bisimilarity      ∎
 
 ------------------------------------------------------------------------
 -- Bisimulations up to reflexive transitive closure
@@ -312,11 +330,11 @@ bisimulation-up-to-*⇒bisimulation {R} R-is = ⟪ lr , rl ⟫
 -- is contained in bisimilarity.
 
 bisimulation-up-to-*⊆∼ :
-  ∀ {R} → Bisimulation-up-to-* R → R ⊆ Bisimilarity (# 0)
+  ∀ {R} → Bisimulation-up-to-* R → R ⊆ Bisimilarity
 bisimulation-up-to-*⊆∼ {R} R-is =
-  R                   ⊆⟨ (λ pRq → 1 , _ , pRq , refl) ⟩
-  (R *)               ⊆⟨ bisimulation⊆∼ (bisimulation-up-to-*⇒bisimulation R-is) ⟩∎
-  Bisimilarity (# 0)  ∎
+  R             ⊆⟨ (λ pRq → 1 , _ , pRq , refl) ⟩
+  (R *)         ⊆⟨ bisimulation⊆∼ (bisimulation-up-to-*⇒bisimulation R-is) ⟩∎
+  Bisimilarity  ∎
 
 ------------------------------------------------------------------------
 -- Some preservation results
@@ -326,7 +344,7 @@ bisimulation-up-to-*⊆∼ {R} R-is =
 
 -- Equal processes are bisimilar.
 
-≡⇒∼ : ∀ {ℓ p q} → p ≡ q → [ ℓ ] p ∼ q
+≡⇒∼ : ∀ {p q} → p ≡ q → p ∼ q
 ≡⇒∼ refl = reflexive-∼
 
 -- Precomposition with the lifting operator preserves the "is a
@@ -344,7 +362,7 @@ bisimulation-up-to-*⊆∼ {R} R-is =
 -- relation.
 
 ×2-preserves-bisimulations :
-  ∀ {ℓ} {R : Rel₂ ℓ Proc} →
+  ∀ {r} {R : Rel₂ r Proc} →
   Bisimulation R →
   Bisimulation (R ∪ R)
 ×2-preserves-bisimulations R-is =
