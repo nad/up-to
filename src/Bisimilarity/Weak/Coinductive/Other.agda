@@ -38,6 +38,7 @@ open General public
            ; ≡⇒∼ to ≡⇒≈
            ; ∼:_ to ≈:_
            ; ∼′:_ to ≈′:_
+           ; module Bisimilarity-of-∼ to Bisimilarity-of-≈
            )
 
 -- Some definitions are given in the following way, rather than via
