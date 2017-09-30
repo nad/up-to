@@ -64,7 +64,7 @@ indirect→direct (later x) (now y) lx∼ny
   with left-to-right lx∼ny later⟶
 ... | _ , () , _
 
--- The direct definition of the expansion relation is logically
+-- The direct definition of strong bisimilarity is pointwise logically
 -- equivalent to the one obtained from the transition relation.
 --
 -- TODO: Are the two definitions isomorphic?
