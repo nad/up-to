@@ -171,7 +171,7 @@ Up-to-bisimilarity-and-context-monotone =
     (op (hole fzero) , a · ∅ , a · a · ∅ , refl , refl , base) ,
     op··∅
 
-  R⊆ : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ (Up-to-bisimilarity-and-context R)
+  R⊆ : R ⊆ ⟦ StepC ⟧ (Up-to-bisimilarity-and-context R)
   R⊆ base =
     ⟨ (λ { action → a · ∅ , action , lemma })
     , (λ { action → ∅     , action , lemma })

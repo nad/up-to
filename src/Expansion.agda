@@ -29,7 +29,7 @@ private
     Bisimilarity.Coinductive.General lts _[_]⟶̂_ _[_]⇒̂_ ⟶→⟶̂ ⟶→⇒̂
 
 open General public
-  using (S̲t̲e̲p̲; ⟨_,_⟩; left-to-right; right-to-left; force;
+  using (StepC; ⟨_,_⟩; left-to-right; right-to-left; force;
          [_]_≡_; [_]_≡′_; []≡↔;
          Extensionality; extensionality)
   renaming ( reflexive-∼ to reflexive-≳
@@ -109,7 +109,7 @@ syntax rl-result-⟶̂ μ p⟶̂p′ p′≲′q′ = p⟶̂p′ ⟶̂[ μ ] p�
 mutual
 
   ∼⇒≳ : ∀ {i p q} → [ i ] p ∼ q → [ i ] p ≳ q
-  ∼⇒≳ {i} = λ p∼q → S̲t̲e̲p̲.⟨ lr p∼q , rl p∼q ⟩
+  ∼⇒≳ {i} = λ p∼q → StepC.⟨ lr p∼q , rl p∼q ⟩
     where
     lr : ∀ {p p′ q μ} →
          [ i ] p ∼ q → p [ μ ]⟶ p′ →
@@ -135,7 +135,7 @@ expansion-is-weak :
   p ≳ q → p [ μ ]⇒̂ p′ →
   ∃ λ q′ → q [ μ ]⇒̂ q′ × p′ ≳ q′
 expansion-is-weak =
-  is-weak S̲t̲e̲p̲.left-to-right (λ p≳′q → force p≳′q) ⟶̂→⇒ ⟶̂→⇒̂
+  is-weak StepC.left-to-right (λ p≳′q → force p≳′q) ⟶̂→⇒ ⟶̂→⇒̂
 
 -- The converse of expansion is a weak simulation (of a certain kind).
 
@@ -144,7 +144,7 @@ converse-of-expansion-is-weak :
   p ≲ q → p [ μ ]⇒̂ p′ →
   ∃ λ q′ → q [ μ ]⇒̂ q′ × p′ ≲ q′
 converse-of-expansion-is-weak =
-  is-weak S̲t̲e̲p̲.right-to-left (λ p≲′q → force p≲′q) ⇒̂→⇒ id
+  is-weak StepC.right-to-left (λ p≲′q → force p≲′q) ⇒̂→⇒ id
 
 mutual
 
@@ -156,24 +156,24 @@ mutual
   -- Expansion.Delay-monad.size-preserving-transitivityˡ⇔uninhabited.
 
   transitive-≳ : ∀ {i p q r} → p ≳ q → [ i ] q ≳ r → [ i ] p ≳ r
-  transitive-≳ {i} = λ p≳q q≳r → S̲t̲e̲p̲.⟨ lr p≳q q≳r , rl p≳q q≳r ⟩
+  transitive-≳ {i} = λ p≳q q≳r → StepC.⟨ lr p≳q q≳r , rl p≳q q≳r ⟩
     where
     lr : ∀ {p p′ q r μ} →
          p ≳ q → [ i ] q ≳ r → p [ μ ]⟶ p′ →
          ∃ λ r′ → r [ μ ]⟶̂ r′ × [ i ] p′ ≳′ r′
-    lr p≳q q≳r p⟶p′ with S̲t̲e̲p̲.left-to-right p≳q p⟶p′
+    lr p≳q q≳r p⟶p′ with StepC.left-to-right p≳q p⟶p′
     ... | _  , done s , p′≳′q  =
       _ , done s
         , transitive-≳′ p′≳′q (record { force = λ { {_} → q≳r } })
     ... | q′ , step q⟶q′ , p′≳′q′ =
-      let r′ , r⟶̂r′ , q′≳′r′ = S̲t̲e̲p̲.left-to-right q≳r q⟶q′
+      let r′ , r⟶̂r′ , q′≳′r′ = StepC.left-to-right q≳r q⟶q′
       in r′ , r⟶̂r′ , transitive-≳′ p′≳′q′ q′≳′r′
 
     rl : ∀ {p q r r′ μ} →
          p ≳ q → [ i ] q ≳ r → r [ μ ]⟶ r′ →
          ∃ λ p′ → p [ μ ]⇒̂ p′ × [ i ] p′ ≳′ r′
     rl p≳q q≳r r⟶r′ =
-      let q′ , q⇒̂q′ , q′≳′r′ = S̲t̲e̲p̲.right-to-left q≳r r⟶r′
+      let q′ , q⇒̂q′ , q′≳′r′ = StepC.right-to-left q≳r r⟶r′
           p′ , p⇒̂p′ , p′≳q′  = converse-of-expansion-is-weak p≳q q⇒̂q′
       in p′ , p⇒̂p′ , transitive-≳′ (record { force = p′≳q′ }) q′≳′r′
 
@@ -186,19 +186,19 @@ mutual
 
   transitive-≳∼ : ∀ {i p q r} →
                   [ i ] p ≳ q → [ i ] q ∼ r → [ i ] p ≳ r
-  transitive-≳∼ {i} {p} {r = r} p≳q q∼r = S̲t̲e̲p̲.⟨ lr , rl ⟩
+  transitive-≳∼ {i} {p} {r = r} p≳q q∼r = StepC.⟨ lr , rl ⟩
     where
     rl : ∀ {r′ μ} → r [ μ ]⟶ r′ →
          ∃ λ p′ → p [ μ ]⇒̂ p′ × [ i ] p′ ≳′ r′
     rl r⟶r′ =
       let q′ , q⟶q′ , q′∼′r′ = SB.right-to-left q∼r r⟶r′
-          p′ , p⇒̂p′ , p′≳′q′ = S̲t̲e̲p̲.right-to-left p≳q q⟶q′
+          p′ , p⇒̂p′ , p′≳′q′ = StepC.right-to-left p≳q q⟶q′
       in p′ , p⇒̂p′ , transitive-≳∼′ p′≳′q′ q′∼′r′
 
     lr : ∀ {p′ μ} → p [ μ ]⟶ p′ →
          ∃ λ r′ → r [ μ ]⟶̂ r′ × [ i ] p′ ≳′ r′
     lr p⟶p′ =
-      let q′ , q⟶̂q′ , p′≳′q′ = S̲t̲e̲p̲.left-to-right p≳q p⟶p′
+      let q′ , q⟶̂q′ , p′≳′q′ = StepC.left-to-right p≳q p⟶p′
           r′ , r⇒̂r′ , q′∼r′  = lemma q∼r q⟶̂q′
       in r′ , r⇒̂r′ , transitive-≳∼′ p′≳′q′ q′∼r′
       where

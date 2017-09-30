@@ -195,16 +195,16 @@ mutual
 
   machine₁≤machine₂ : ∀ {i} → [ i ] machine₁ ≤ machine₂
   machine₁≤machine₂ {i} =
-    S̲t̲e̲p̲.⟨ (λ {P} tr →
-              case machine₁⟶ tr of λ where
-                (refl , P∼) →
-                    _
-                  , (machine₂                      [ name pay ]⟶⟨ replication (par-right (choice-right action)) ⟩
-                     machine₂ ∣ coffee · ⊕ tea ·)
-                  , (P                            ∼⟨ ≤: convert {a = ℓ} P∼ ⟩
-                     machine₁ ∣ coffee · ⊕ tea ·  ∼⟨ machine₁≤′machine₂ ∣-cong′ (_ ■) ⟩■
-                     machine₂ ∣ coffee · ⊕ tea ·))
-         ⟩
+    StepC.⟨ (λ {P} tr →
+               case machine₁⟶ tr of λ where
+                 (refl , P∼) →
+                     _
+                   , (machine₂                      [ name pay ]⟶⟨ replication (par-right (choice-right action)) ⟩
+                      machine₂ ∣ coffee · ⊕ tea ·)
+                   , (P                            ∼⟨ ≤: convert {a = ℓ} P∼ ⟩
+                      machine₁ ∣ coffee · ⊕ tea ·  ∼⟨ machine₁≤′machine₂ ∣-cong′ (_ ■) ⟩■
+                      machine₂ ∣ coffee · ⊕ tea ·))
+          ⟩
     where
     machine₁≤′machine₂ : [ i ] machine₁ ≤′ machine₂
     force machine₁≤′machine₂ = machine₁≤machine₂
@@ -212,7 +212,7 @@ mutual
   -- The second machine is similar to the first one.
 
   machine₂≤machine₁ : ∀ {i} → [ i ] machine₂ ≤ machine₁
-  machine₂≤machine₁ {i} = S̲t̲e̲p̲.⟨ helper ∘ BE.6-1-3-2 ⟩
+  machine₂≤machine₁ {i} = StepC.⟨ helper ∘ BE.6-1-3-2 ⟩
     where
     machine₂≤′machine₁ : [ i ] machine₂ ≤′ machine₁
     force machine₂≤′machine₁ = machine₂≤machine₁

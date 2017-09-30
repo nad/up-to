@@ -70,7 +70,7 @@ Bisimulation R = Progression R R
 -- Bisimilarity with a level argument.
 
 Bisimilarity′ : ∀ ℓ′ → Rel₂ (lsuc (ℓ ⊔ ℓ′)) Proc
-Bisimilarity′ ℓ′ = gfp ℓ′ S̲t̲e̲p̲
+Bisimilarity′ ℓ′ = gfp ℓ′ StepC
 
 -- Bisimilarity′ ℓ′ is pointwise logically equivalent to
 -- Bisimilarity′ lzero.
@@ -103,11 +103,11 @@ Bisimilarity′↔ :
   ∃ λ (R : Rel₂ (ℓ ⊔ ℓ′) Proc) → Bisimulation R × R pq
 
 Bisimilarity′↔ {k} ℓ′ {pq} ext =
-  Bisimilarity′ ℓ′ pq                                     ↔⟨⟩
-  gfp ℓ′ S̲t̲e̲p̲ pq                                          ↔⟨⟩
-  (∃ λ (R : Rel₂ (ℓ ⊔ ℓ′) Proc) → R ⊆ ⟦ S̲t̲e̲p̲ ⟧ R × R pq)  ↝⟨ (∃-cong λ _ → ×-cong₁ λ _ → ⊆-congʳ ext $
-                                                              inverse-ext? Step↔S̲t̲e̲p̲ (lower-extensionality? k ℓ′ lzero ext)) ⟩□
-  (∃ λ (R : Rel₂ (ℓ ⊔ ℓ′) Proc) → Bisimulation R × R pq)  □
+  Bisimilarity′ ℓ′ pq                                      ↔⟨⟩
+  gfp ℓ′ StepC pq                                          ↔⟨⟩
+  (∃ λ (R : Rel₂ (ℓ ⊔ ℓ′) Proc) → R ⊆ ⟦ StepC ⟧ R × R pq)  ↝⟨ (∃-cong λ _ → ×-cong₁ λ _ → ⊆-congʳ ext $
+                                                               inverse-ext? Step↔StepC (lower-extensionality? k ℓ′ lzero ext)) ⟩□
+  (∃ λ (R : Rel₂ (ℓ ⊔ ℓ′) Proc) → Bisimulation R × R pq)   □
 
 -- An unfolding lemma for Bisimilarity.
 
@@ -195,9 +195,9 @@ infix -2 ∼:_
 
 bisimilarity-is-a-bisimulation : Bisimulation Bisimilarity
 bisimilarity-is-a-bisimulation =
-  Bisimilarity           ⊆⟨ gfp-out ℓ ⟩
-  ⟦ S̲t̲e̲p̲ ⟧ Bisimilarity  ⊆⟨ _⇔_.from (Step↔S̲t̲e̲p̲ _) ⟩∎
-  Step Bisimilarity      ∎
+  Bisimilarity            ⊆⟨ gfp-out ℓ ⟩
+  ⟦ StepC ⟧ Bisimilarity  ⊆⟨ _⇔_.from (Step↔StepC _) ⟩∎
+  Step Bisimilarity       ∎
 
 -- Bisimilarity is larger than every bisimulation.
 
@@ -208,8 +208,8 @@ bisimulation⊆∼ {r} {R} R-is-a-bisimulation =
   R                ⊆⟨ gfp-unfold lzero (
 
       R                 ⊆⟨ R-is-a-bisimulation ⟩
-      Step R            ⊆⟨ Step↔S̲t̲e̲p̲ _ ⟩∎
-      ⟦ S̲t̲e̲p̲ ⟧ R        ∎) ⟩
+      Step R            ⊆⟨ Step↔StepC _ ⟩∎
+      ⟦ StepC ⟧ R       ∎) ⟩
 
   Bisimilarity′ r  ⊆⟨ _⇔_.to (larger⇔smallest r) ⟩∎
 

@@ -55,9 +55,9 @@ open Temporarily-private using (Step)
 
 -- Used to aid type inference. Note that this type is parametrised
 -- (see the module telescope above). The inclusion of a value of this
--- type in the definition of S̲t̲e̲p̲ below makes it easier for Agda to
--- infer the LTS parameter from the types ν S̲t̲e̲p̲ i (p , q) and
--- ν′ S̲t̲e̲p̲ i (p , q).
+-- type in the definition of StepC below makes it easier for Agda to
+-- infer the LTS parameter from the types ν StepC i (p , q) and
+-- ν′ StepC i (p , q).
 
 record Magic : Set where
 
@@ -73,8 +73,8 @@ Magic↔⊤ = record
 
 -- The Step function, expressed as an indexed container.
 
-S̲t̲e̲p̲ : Container (Proc × Proc) (Proc × Proc)
-S̲t̲e̲p̲ =
+StepC : Container (Proc × Proc) (Proc × Proc)
+StepC =
   (λ { (p , q) → Magic  -- Included in order to aid type inference.
                    ×
                  (∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝ q′)
@@ -89,13 +89,13 @@ S̲t̲e̲p̲ =
 -- of extensionality it is pointwise isomorphic to the direct
 -- definition.
 
-Step↔S̲t̲e̲p̲ :
+Step↔StepC :
   ∀ {k r} {R : Rel₂ r Proc} {pq} →
   Extensionality? k ℓ (ℓ ⊔ r) →
-  Step R pq ↝[ k ] ⟦ S̲t̲e̲p̲ ⟧ R pq
-Step↔S̲t̲e̲p̲ {r = r} {R} {pq} = generalise-ext? Step⇔S̲t̲e̲p̲ λ ext → record
+  Step R pq ↝[ k ] ⟦ StepC ⟧ R pq
+Step↔StepC {r = r} {R} {pq} = generalise-ext? Step⇔StepC λ ext → record
   { surjection = record
-    { logical-equivalence = Step⇔S̲t̲e̲p̲
+    { logical-equivalence = Step⇔StepC
     ; right-inverse-of    = λ where
         (_ , f) →
           Σ-≡,≡→≡ refl $
@@ -106,111 +106,112 @@ Step↔S̲t̲e̲p̲ {r = r} {R} {pq} = generalise-ext? Step⇔S̲t̲e̲p̲ λ ex
   ; left-inverse-of = λ _ → refl
   }
   where
-  to₁ : Step R pq → Container.Shape S̲t̲e̲p̲ pq
+  to₁ : Step R pq → Container.Shape StepC pq
   to₁ Step.⟨ lr ⟩ =
       _
     , (λ p⟶p′ → Σ-map id proj₁ (lr p⟶p′))
 
   to₂ :
     (s : Step R pq) →
-    Container.Position S̲t̲e̲p̲ (to₁ s) ⊆ R
+    Container.Position StepC (to₁ s) ⊆ R
   to₂ Step.⟨ lr ⟩ (_ , p⟶p′ , refl) = proj₂ (proj₂ (lr p⟶p′))
 
-  from : ⟦ S̲t̲e̲p̲ ⟧ R pq → Step R pq
+  from : ⟦ StepC ⟧ R pq → Step R pq
   from ((_ , lr) , f) =
     Step.⟨ (λ p⟶p′ →
               let q′ , q⟶q′ = lr p⟶p′
               in  q′ , q⟶q′ , f (_ , p⟶p′ , refl))
          ⟩
 
-  Step⇔S̲t̲e̲p̲ : Step R pq ⇔ ⟦ S̲t̲e̲p̲ ⟧ R pq
-  Step⇔S̲t̲e̲p̲ = record
+  Step⇔StepC : Step R pq ⇔ ⟦ StepC ⟧ R pq
+  Step⇔StepC = record
     { to   = λ s → to₁ s , to₂ s
     ; from = from
     }
 
   to₂∘from :
-    ∀ {p′q′} {s : Container.Shape S̲t̲e̲p̲ pq}
-    (f : Container.Position S̲t̲e̲p̲ s ⊆ R) →
-    (pos : Container.Position S̲t̲e̲p̲ s p′q′) →
-    proj₂ (_⇔_.to Step⇔S̲t̲e̲p̲ (_⇔_.from Step⇔S̲t̲e̲p̲ (s , f))) pos ≡ f pos
+    ∀ {p′q′} {s : Container.Shape StepC pq}
+    (f : Container.Position StepC s ⊆ R) →
+    (pos : Container.Position StepC s p′q′) →
+    proj₂ (_⇔_.to Step⇔StepC (_⇔_.from Step⇔StepC (s , f))) pos ≡ f pos
   to₂∘from f (_ , _ , refl) = refl
 
-module S̲t̲e̲p̲ {r} {R : Rel₂ r Proc} {p q} where
+module StepC {r} {R : Rel₂ r Proc} {p q} where
 
   -- A "constructor".
 
   ⟨_⟩ :
     (∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝ q′ × R (p′ , q′)) →
-    ⟦ S̲t̲e̲p̲ ⟧ R (p , q)
-  ⟨ lr ⟩ = _⇔_.to (Step↔S̲t̲e̲p̲ _) Step.⟨ lr ⟩
+    ⟦ StepC ⟧ R (p , q)
+  ⟨ lr ⟩ = _⇔_.to (Step↔StepC _) Step.⟨ lr ⟩
 
   -- A "projection".
 
   challenge :
-    ⟦ S̲t̲e̲p̲ ⟧ R (p , q) →
+    ⟦ StepC ⟧ R (p , q) →
     ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝ q′ × R (p′ , q′)
-  challenge = Step.challenge ∘ _⇔_.from (Step↔S̲t̲e̲p̲ _)
+  challenge = Step.challenge ∘ _⇔_.from (Step↔StepC _)
 
 open Temporarily-private public
 
--- An unfolding lemma for ⟦ S̲t̲e̲p̲ ⟧₂.
+-- An unfolding lemma for ⟦ StepC ⟧₂.
 
-⟦S̲t̲e̲p̲⟧₂↔ :
+⟦StepC⟧₂↔ :
   ∀ {x} {X : Rel₂ x Proc} →
   Extensionality ℓ ℓ →
   (R : ∀ {o} → Rel₂ ℓ (X o)) →
-  ∀ {p q} (p∼q₁ p∼q₂ : ⟦ S̲t̲e̲p̲ ⟧ X (p , q)) →
+  ∀ {p q} (p∼q₁ p∼q₂ : ⟦ StepC ⟧ X (p , q)) →
 
-  ⟦ S̲t̲e̲p̲ ⟧₂ R (p∼q₁ , p∼q₂)
+  ⟦ StepC ⟧₂ R (p∼q₁ , p∼q₂)
 
     ↔
 
   (∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
-   let q′₁ , q⟶q′₁ , p′≤q′₁ = S̲t̲e̲p̲.challenge p∼q₁ p⟶p′
-       q′₂ , q⟶q′₂ , p′≤q′₂ = S̲t̲e̲p̲.challenge p∼q₂ p⟶p′
+   let q′₁ , q⟶q′₁ , p′≤q′₁ = StepC.challenge p∼q₁ p⟶p′
+       q′₂ , q⟶q′₂ , p′≤q′₂ = StepC.challenge p∼q₂ p⟶p′
    in ∃ λ (q′₁≡q′₂ : q′₁ ≡ q′₂) →
         subst (q [ μ ]↝_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
           ×
         R (subst (X ∘ (p′ ,_)) q′₁≡q′₂ p′≤q′₁ , p′≤q′₂))
 
-⟦S̲t̲e̲p̲⟧₂↔ {X = X} ext R {p} {q}
-         (s₁@(_ , ch₁) , f₁) (s₂@(_ , ch₂) , f₂) =
+⟦StepC⟧₂↔ {X = X} ext R {p} {q}
+          (s₁@(_ , ch₁) , f₁) (s₂@(_ , ch₂) , f₂) =
 
   (∃ λ (eq : s₁ ≡ s₂) →
-   ∀ {o} (p : Container.Position S̲t̲e̲p̲ s₁ o) →
-   R (f₁ p , f₂ (subst (λ s → Container.Position S̲t̲e̲p̲ s o) eq p)))     ↝⟨ inverse $ Σ-cong ≡×≡↔≡ (λ _ → F.id) ⟩
+   ∀ {o} (p : Container.Position StepC s₁ o) →
+   R (f₁ p , f₂ (subst (λ s → Container.Position StepC s o) eq p)))    ↝⟨ inverse $ Σ-cong ≡×≡↔≡ (λ _ → F.id) ⟩
 
   (∃ λ (eq : proj₁ s₁ ≡ proj₁ s₂ × (λ {_ _} → ch₁) ≡ ch₂) →
-   ∀ {o} (p : Container.Position S̲t̲e̲p̲ s₁ o) →
-   R (f₁ p , f₂ (subst (λ s → Container.Position S̲t̲e̲p̲ s o)
+   ∀ {o} (p : Container.Position StepC s₁ o) →
+   R (f₁ p , f₂ (subst (λ s → Container.Position StepC s o)
                        (cong₂ _,_ (proj₁ eq) (proj₂ eq)) p)))          ↝⟨ inverse Σ-assoc ⟩
 
   (∃ λ (eq₁ : proj₁ s₁ ≡ proj₁ s₂) →
    ∃ λ (eq₂ : (λ {_ _} → ch₁) ≡ ch₂) →
-   ∀ {o} (p : Container.Position S̲t̲e̲p̲ s₁ o) →
-   R (f₁ p , f₂ (subst (λ s → Container.Position S̲t̲e̲p̲ s o)
+   ∀ {o} (p : Container.Position StepC s₁ o) →
+   R (f₁ p , f₂ (subst (λ s → Container.Position StepC s o)
                        (cong₂ _,_ eq₁ eq₂) p)))                        ↝⟨ drop-⊤-left-Σ (_⇔_.to contractible⇔↔⊤ $
                                                                           mono₁ 0 (_⇔_.from contractible⇔↔⊤ Magic↔⊤) _ _) ⟩
   (∃ λ (eq : (λ {_ _} → ch₁) ≡ ch₂) →
-   ∀ {o} (p : Container.Position S̲t̲e̲p̲ s₁ o) →
-   R (f₁ p , f₂ (subst (λ s → Container.Position S̲t̲e̲p̲ s o)
+   ∀ {o} (p : Container.Position StepC s₁ o) →
+   R (f₁ p , f₂ (subst (λ s → Container.Position StepC s o)
                        (cong₂ _,_ refl eq) p)))                        ↝⟨ (∃-cong λ eq → implicit-∀-cong ext $ ∀-cong ext λ _ →
                                                                            ≡⇒↝ _ $
                                                                            cong (λ (eq : s₁ ≡ s₂) →
-                                                                                   R (f₁ _ , f₂ (subst (λ s → Container.Position S̲t̲e̲p̲ s _) eq _))) $
+                                                                                   R (f₁ _ ,
+                                                                                      f₂ (subst (λ s → Container.Position StepC s _) eq _))) $
                                                                            trans-reflˡ (cong (_ ,_) eq)) ⟩
   (∃ λ (eq : (λ {_ _} → ch₁) ≡ ch₂) →
-   ∀ {o} (p : Container.Position S̲t̲e̲p̲ s₁ o) →
-   R (f₁ p , f₂ (subst (λ s → Container.Position S̲t̲e̲p̲ s o)
+   ∀ {o} (p : Container.Position StepC s₁ o) →
+   R (f₁ p , f₂ (subst (λ s → Container.Position StepC s o)
                        (cong (_ ,_) eq) p)))                           ↝⟨ (∃-cong λ eq → implicit-∀-cong ext λ {o} → ∀-cong ext λ p →
                                                                            ≡⇒↝ _ $ cong (λ p → R {o = o} (f₁ _ , f₂ p)) $ sym $
-                                                                           subst-∘ (λ (s : Container.Shape S̲t̲e̲p̲ _) → Container.Position S̲t̲e̲p̲ s o)
+                                                                           subst-∘ (λ (s : Container.Shape StepC _) → Container.Position StepC s o)
                                                                                    _ eq) ⟩
   (∃ λ (eq : (λ {_ _} → ch₁) ≡ ch₂) →
-   ∀ {o} (p : Container.Position S̲t̲e̲p̲ s₁ o) →
+   ∀ {o} (p : Container.Position StepC s₁ o) →
    R (f₁ p , f₂ (subst (λ (ch : ∀ {_ _} → _) →
-                          Container.Position S̲t̲e̲p̲ (_ , ch) o)
+                          Container.Position StepC (_ , ch) o)
                        eq p)))                                         ↔⟨⟩
 
   (∃ λ (eq : _≡_ {A = ∀ {p′ μ} → _} ch₁ ch₂) →
@@ -403,8 +404,8 @@ open Temporarily-private public
            f₂ (_ , p⟶p′ , refl)))                                      ↔⟨⟩
 
   (∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
-   let q′₁ , q⟶q′₁ , p′≤q′₁ = S̲t̲e̲p̲.challenge (s₁ , f₁) p⟶p′
-       q′₂ , q⟶q′₂ , p′≤q′₂ = S̲t̲e̲p̲.challenge (s₂ , f₂) p⟶p′
+   let q′₁ , q⟶q′₁ , p′≤q′₁ = StepC.challenge (s₁ , f₁) p⟶p′
+       q′₂ , q⟶q′₂ , p′≤q′₂ = StepC.challenge (s₂ , f₂) p⟶p′
    in ∃ λ (q′₁≡q′₂ : q′₁ ≡ q′₂) →
         subst (q [ μ ]↝_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
           ×

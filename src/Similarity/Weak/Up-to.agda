@@ -21,9 +21,9 @@ import Up-to
 open LTS lts
 
 ------------------------------------------------------------------------
--- The general up-to machinery, instantiated with the S̲t̲e̲p̲ container
+-- The general up-to machinery, instantiated with the StepC container
 
-open Up-to S̲t̲e̲p̲ public
+open Up-to StepC public
 
 ------------------------------------------------------------------------
 -- An example

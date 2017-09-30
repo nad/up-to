@@ -80,7 +80,7 @@ strong-is-weak :
   p ∼ q → p [ μ ]⇒̂ p′ →
   ∃ λ q′ → q [ μ ]⇒̂ q′ × p′ ∼ q′
 strong-is-weak =
-  is-weak S̲t̲e̲p̲.left-to-right (λ p∼′q → force p∼′q)
+  is-weak StepC.left-to-right (λ p∼′q → force p∼′q)
           (λ s tr → step s tr done) ⟶→⇒̂
 
 mutual
@@ -89,9 +89,9 @@ mutual
 
   symmetric-∼ : ∀ {i p q} → [ i ] p ∼ q → [ i ] q ∼ p
   symmetric-∼ p∼q =
-    S̲t̲e̲p̲.⟨ Σ-map id (Σ-map id symmetric-∼′) ∘ S̲t̲e̲p̲.right-to-left p∼q
-         , Σ-map id (Σ-map id symmetric-∼′) ∘ S̲t̲e̲p̲.left-to-right p∼q
-         ⟩
+    StepC.⟨ Σ-map id (Σ-map id symmetric-∼′) ∘ StepC.right-to-left p∼q
+          , Σ-map id (Σ-map id symmetric-∼′) ∘ StepC.left-to-right p∼q
+          ⟩
 
   symmetric-∼′ : ∀ {i p q} → [ i ] p ∼′ q → [ i ] q ∼′ p
   force (symmetric-∼′ p∼q) = symmetric-∼ (force p∼q)
@@ -102,17 +102,17 @@ mutual
 
   transitive-∼ : ∀ {i p q r} → [ i ] p ∼ q → [ i ] q ∼ r → [ i ] p ∼ r
   transitive-∼ {i} = λ p∼q q∼r →
-    S̲t̲e̲p̲.⟨ lr p∼q q∼r
-         , Σ-map id (Σ-map id symmetric-∼′) ∘
-           lr (symmetric-∼ q∼r) (symmetric-∼ p∼q)
-         ⟩
+    StepC.⟨ lr p∼q q∼r
+          , Σ-map id (Σ-map id symmetric-∼′) ∘
+            lr (symmetric-∼ q∼r) (symmetric-∼ p∼q)
+          ⟩
     where
     lr : ∀ {p p′ q r μ} →
          [ i ] p ∼ q → [ i ] q ∼ r → p [ μ ]⟶ p′ →
          ∃ λ r′ → r [ μ ]⟶ r′ × [ i ] p′ ∼′ r′
     lr p∼q q∼r p⟶p′ =
-      let q′ , q⟶q′ , p′∼q′ = S̲t̲e̲p̲.left-to-right p∼q p⟶p′
-          r′ , r⟶r′ , q′∼r′ = S̲t̲e̲p̲.left-to-right q∼r q⟶q′
+      let q′ , q⟶q′ , p′∼q′ = StepC.left-to-right p∼q p⟶p′
+          r′ , r⟶r′ , q′∼r′ = StepC.left-to-right q∼r q⟶q′
       in r′ , r⟶r′ , transitive-∼′ p′∼q′ q′∼r′
 
   transitive-∼′ :

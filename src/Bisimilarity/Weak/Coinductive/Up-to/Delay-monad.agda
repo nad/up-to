@@ -62,9 +62,9 @@ everything-up-to em ext A-set F {R = R} R-prog {x = x , y} =
   everything-up-to′ : ∀ x y → R (x , y) → x ≈ y
   everything-up-to′ x y Rxy =
     case P.⇑⊎⇓ em ext A-set x ,′ P.⇑⊎⇓ em ext A-set y of λ where
-      (inj₂ x⇓ , _)       → lemma (S̲t̲e̲p̲.left-to-right (R-prog Rxy)) x⇓
+      (inj₂ x⇓ , _)       → lemma (StepC.left-to-right (R-prog Rxy)) x⇓
       (_       , inj₂ y⇓) → symmetric
-                              (lemma (S̲t̲e̲p̲.right-to-left (R-prog Rxy))
+                              (lemma (StepC.right-to-left (R-prog Rxy))
                                      y⇓)
       (inj₁ x⇑ , inj₁ y⇑) →
         x      ∼⟨ symmetric (_⇔_.to W′.direct⇔indirect′ x⇑) ⟩

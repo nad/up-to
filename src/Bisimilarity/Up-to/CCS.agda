@@ -23,7 +23,7 @@ open import Relation
 
 open import Bisimilarity.Coinductive CCS
 open import Bisimilarity.Exercises.Coinductive.CCS
-open import Bisimilarity.Step CCS _[_]⟶_ using (Step; Step↔S̲t̲e̲p̲)
+open import Bisimilarity.Step CCS _[_]⟶_ using (Step; Step↔StepC)
 open import Bisimilarity.Up-to CCS
 
 -- Up to context for a very simple kind of context.
@@ -136,7 +136,7 @@ Up-to-context-size-preserving =
       (_ , Ps[x]∼!ab∣b , _ , base , _) →
                                                     $⟨ Ps[x]∼!ab∣b ⟩
         Ps x ∼ ! name a · (b ·) ∣ b ·               ↝⟨ transitive {a = ℓ} (≡→∼ !ab≡) ⟩
-        ! name a · (b ·) ∼ ! name a · (b ·) ∣ b ·   ↝⟨ (λ !ab∼!ab∣b → Σ-map id proj₁ $ S̲t̲e̲p̲.right-to-left !ab∼!ab∣b (par-right action)) ⟩
+        ! name a · (b ·) ∼ ! name a · (b ·) ∣ b ·   ↝⟨ (λ !ab∼!ab∣b → Σ-map id proj₁ $ StepC.right-to-left !ab∼!ab∣b (par-right action)) ⟩
         (∃ λ P′ → ! name a · (b ·) [ name b ]⟶ P′)  ↝⟨ cancel-name ∘ !-only ·′-only ∘ proj₂ ⟩
         a ≡ b                                       ↝⟨ a≢b ⟩□
         ⊥                                           □
@@ -145,7 +145,7 @@ Up-to-context-size-preserving =
       (_ , Ps[x]∼!ab∣b , _ , base , _) →
                                                   $⟨ Ps[x]∼!ab∣b ⟩
         Ps x ∼ ! name a · (b ·) ∣ b ·             ↝⟨ transitive {a = ℓ} (≡→∼ ab≡) ⟩
-        name a · (b ·) ∼ ! name a · (b ·) ∣ b ·   ↝⟨ (λ ab∼!ab∣b → Σ-map id proj₁ $ S̲t̲e̲p̲.right-to-left ab∼!ab∣b (par-right action)) ⟩
+        name a · (b ·) ∼ ! name a · (b ·) ∣ b ·   ↝⟨ (λ ab∼!ab∣b → Σ-map id proj₁ $ StepC.right-to-left ab∼!ab∣b (par-right action)) ⟩
         (∃ λ P′ → name a · (b ·) [ name b ]⟶ P′)  ↝⟨ cancel-name ∘ ·′-only ∘ proj₂ ⟩
         a ≡ b                                     ↝⟨ a≢b ⟩□
         ⊥                                         □
@@ -160,7 +160,7 @@ Up-to-context-size-preserving =
                                            $⟨ Ps[x]∼!ab∣b ⟩
             Ps x ∼ ! name a · (b ·) ∣ b ·  ↝⟨ transitive {a = ℓ} (≡→∼ b≡) ⟩
             b · ∼ ! name a · (b ·) ∣ b ·   ↝⟨ (λ b∼!ab∣b → Σ-map id proj₁ $
-                                                             S̲t̲e̲p̲.right-to-left b∼!ab∣b (par-left (replication (par-right action)))) ⟩
+                                                             StepC.right-to-left b∼!ab∣b (par-left (replication (par-right action)))) ⟩
             (∃ λ P′ → b · [ name a ]⟶ P′)  ↝⟨ cancel-name ∘ ·′-only ∘ proj₂ ⟩
             b ≡ a                          ↝⟨ a≢b ∘ sym ⟩□
             ⊥                              □
@@ -171,8 +171,8 @@ Up-to-context-size-preserving =
           c ≡ b            ↝⟨ a≢b ⟩□
           ⊥                □
 
-  R⊆StepS : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ S
-  R⊆StepS base = S̲t̲e̲p̲.⟨ lr , rl ⟩
+  R⊆StepS : R ⊆ ⟦ StepC ⟧ S
+  R⊆StepS base = StepC.⟨ lr , rl ⟩
     where
     lr : ∀ {P′ μ} →
          ! name a · (b ·) [ μ ]⟶ P′ →
@@ -214,27 +214,27 @@ Up-to-context-size-preserving =
 
   -- Note the use of compatibility in [R]⊆Step[S].
 
-  [R]⊆Step[S] : Up-to-context R ⊆ ⟦ S̲t̲e̲p̲ ⟧ (Up-to-context S)
+  [R]⊆Step[S] : Up-to-context R ⊆ ⟦ StepC ⟧ (Up-to-context S)
   [R]⊆Step[S] =
-    Up-to-context R             ⊆⟨ Up-to-context-monotone (λ {x} → R⊆StepS {x}) ⟩
-    Up-to-context (⟦ S̲t̲e̲p̲ ⟧ S)  ⊆⟨ comp _ ⟩∎
-    ⟦ S̲t̲e̲p̲ ⟧ (Up-to-context S)  ∎
+    Up-to-context R              ⊆⟨ Up-to-context-monotone (λ {x} → R⊆StepS {x}) ⟩
+    Up-to-context (⟦ StepC ⟧ S)  ⊆⟨ comp _ ⟩∎
+    ⟦ StepC ⟧ (Up-to-context S)  ∎
 
   contradiction : ⊥
   contradiction =
-                                                              $⟨ d!ab[R]d!ac ⟩
+                                                               $⟨ d!ab[R]d!ac ⟩
     Up-to-context R ( name d · (! name a · (b ·))
                     , name d · (! name a · (c ·))
-                    )                                         ↝⟨ [R]⊆Step[S] ⟩
+                    )                                          ↝⟨ [R]⊆Step[S] ⟩
 
-    ⟦ S̲t̲e̲p̲ ⟧ (Up-to-context S) ( name d · (! name a · (b ·))
-                               , name d · (! name a · (c ·))
-                               )                              ↝⟨ (λ s → S̲t̲e̲p̲.left-to-right s action) ⟩
+    ⟦ StepC ⟧ (Up-to-context S) ( name d · (! name a · (b ·))
+                                , name d · (! name a · (c ·))
+                                )                              ↝⟨ (λ s → StepC.left-to-right s action) ⟩
 
     (∃ λ P → name d · (! name a · (c ·)) [ name d ]⟶ P ×
-             Up-to-context S (! name a · (b ·) , P))          ↝⟨ (λ { (P , d!ac[d]⟶P  , !ab[S]P) →
-                                                                      subst (Up-to-context S ∘ (_ ,_)) (·′-only⟶ d!ac[d]⟶P) !ab[S]P }) ⟩
+             Up-to-context S (! name a · (b ·) , P))           ↝⟨ (λ { (P , d!ac[d]⟶P  , !ab[S]P) →
+                                                                       subst (Up-to-context S ∘ (_ ,_)) (·′-only⟶ d!ac[d]⟶P) !ab[S]P }) ⟩
 
-    Up-to-context S (! name a · (b ·) , ! name a · (c ·))     ↝⟨ ¬!ab[S]!ac ⟩□
+    Up-to-context S (! name a · (b ·) , ! name a · (c ·))      ↝⟨ ¬!ab[S]!ac ⟩□
 
-    ⊥                                                         □
+    ⊥                                                          □

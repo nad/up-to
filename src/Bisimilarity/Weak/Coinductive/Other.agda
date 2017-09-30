@@ -30,7 +30,7 @@ private
     Bisimilarity.Coinductive.General lts _[_]⇒̂_ _[_]⇒̂_ ⟶→⇒̂ ⟶→⇒̂
 
 open General public
-  using (S̲t̲e̲p̲; ⟨_,_⟩; left-to-right; right-to-left; force;
+  using (StepC; ⟨_,_⟩; left-to-right; right-to-left; force;
          [_]_≡_; [_]_≡′_; []≡↔;
          Extensionality; extensionality)
   renaming ( reflexive-∼ to reflexive-≈
@@ -85,7 +85,7 @@ syntax rl-result μ p⇒̂p′ p′≈′q′ = p⇒̂p′ ⇒̂[ μ ] p′≈�
 mutual
 
   ≳⇒≈ : ∀ {i p q} → [ i ] p ≳ q → [ i ] p ≈ q
-  ≳⇒≈ {i} = λ p≳q → S̲t̲e̲p̲.⟨ lr p≳q , rl p≳q ⟩
+  ≳⇒≈ {i} = λ p≳q → StepC.⟨ lr p≳q , rl p≳q ⟩
     where
     lr : ∀ {p p′ q μ} →
          [ i ] p ≳ q → p [ μ ]⟶ p′ →
@@ -118,7 +118,7 @@ weak-is-weak :
   ∀ {p p′ q μ} →
   p ≈ q → p [ μ ]⇒̂ p′ →
   ∃ λ q′ → q [ μ ]⇒̂ q′ × p′ ≈ q′
-weak-is-weak = is-weak S̲t̲e̲p̲.left-to-right (λ p≈′q → force p≈′q) ⇒̂→⇒ id
+weak-is-weak = is-weak StepC.left-to-right (λ p≈′q → force p≈′q) ⇒̂→⇒ id
 
 mutual
 
@@ -126,9 +126,9 @@ mutual
 
   symmetric-≈ : ∀ {i p q} → [ i ] p ≈ q → [ i ] q ≈ p
   symmetric-≈ p≈q =
-    S̲t̲e̲p̲.⟨ Σ-map id (Σ-map id symmetric-≈′) ∘ S̲t̲e̲p̲.right-to-left p≈q
-         , Σ-map id (Σ-map id symmetric-≈′) ∘ S̲t̲e̲p̲.left-to-right p≈q
-         ⟩
+    StepC.⟨ Σ-map id (Σ-map id symmetric-≈′) ∘ StepC.right-to-left p≈q
+          , Σ-map id (Σ-map id symmetric-≈′) ∘ StepC.left-to-right p≈q
+          ⟩
 
   symmetric-≈′ : ∀ {i p q} → [ i ] p ≈′ q → [ i ] q ≈′ p
   force (symmetric-≈′ p≈q) = symmetric-≈ (force p≈q)
@@ -145,16 +145,16 @@ mutual
 
   transitive-≈ : ∀ {i p q r} → p ≈ q → q ≈ r → [ i ] p ≈ r
   transitive-≈ {i} = λ p≈q q≈r →
-    S̲t̲e̲p̲.⟨ lr p≈q q≈r
-         , Σ-map id (Σ-map id symmetric-≈′) ∘
-           lr (symmetric-≈ q≈r) (symmetric-≈ p≈q)
-         ⟩
+    StepC.⟨ lr p≈q q≈r
+          , Σ-map id (Σ-map id symmetric-≈′) ∘
+            lr (symmetric-≈ q≈r) (symmetric-≈ p≈q)
+          ⟩
     where
     lr : ∀ {p p′ q r μ} →
          p ≈ q → q ≈ r → p [ μ ]⟶ p′ →
          ∃ λ r′ → r [ μ ]⇒̂ r′ × [ i ] p′ ≈′ r′
     lr p≈q q≈r p⟶p′ =
-      let q′ , q⇒̂q′ , p′≈′q′ = S̲t̲e̲p̲.left-to-right p≈q p⟶p′
+      let q′ , q⇒̂q′ , p′≈′q′ = StepC.left-to-right p≈q p⟶p′
           r′ , r⇒̂r′ , q′≈r′  = weak-is-weak q≈r q⇒̂q′
       in r′ , r⇒̂r′ , transitive-≈′ p′≈′q′ q′≈r′
 
@@ -175,7 +175,7 @@ mutual
 
   transitive-≳≈ : ∀ {i p q r} →
                   p ≳ q → [ i ] q ≈ r → [ i ] p ≈ r
-  transitive-≳≈ {i} {p} {r = r} p≳q q≈r = S̲t̲e̲p̲.⟨ lr , rl ⟩
+  transitive-≳≈ {i} {p} {r = r} p≳q q≈r = StepC.⟨ lr , rl ⟩
     where
     lr : ∀ {p′ μ} → p [ μ ]⟶ p′ →
          ∃ λ r′ → r [ μ ]⇒̂ r′ × [ i ] p′ ≈′ r′
@@ -184,13 +184,13 @@ mutual
       r , silent s done
         , transitive-≳≈′ p≳′q′ (record { force = λ { {_} → q≈r } })
     ... | q′ , step q⟶q′ , p′≳′q′ =
-      let r′ , r⇒̂r′ , q′≈′r′ = S̲t̲e̲p̲.left-to-right q≈r q⟶q′
+      let r′ , r⇒̂r′ , q′≈′r′ = StepC.left-to-right q≈r q⟶q′
       in r′ , r⇒̂r′ , transitive-≳≈′ p′≳′q′ q′≈′r′
 
     rl : ∀ {r′ μ} → r [ μ ]⟶ r′ →
          ∃ λ p′ → p [ μ ]⇒̂ p′ × [ i ] p′ ≈′ r′
     rl r⟶r′ =
-      let q′ , q⇒̂q′ , q′≈′r′ = S̲t̲e̲p̲.right-to-left q≈r r⟶r′
+      let q′ , q⇒̂q′ , q′≈′r′ = StepC.right-to-left q≈r r⟶r′
           p′ , p⇒̂p′ , p′≳q′  = E.converse-of-expansion-is-weak p≳q q⇒̂q′
       in p′ , p⇒̂p′ , transitive-≳≈′ (record { force = p′≳q′ }) q′≈′r′
 

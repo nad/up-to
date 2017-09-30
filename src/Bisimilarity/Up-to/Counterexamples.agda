@@ -39,7 +39,7 @@ private
       using (Progression)
     open Bisimilarity.Coinductive lts public
     open Bisimilarity.Step lts (LTS._[_]⟶_ lts) (LTS._[_]⟶_ lts) public
-      using (Step; Step↔S̲t̲e̲p̲)
+      using (Step; Step↔StepC)
     open Bisimilarity.Up-to lts public
     open LTS lts public hiding (_[_]⟶_)
 
@@ -92,15 +92,15 @@ private
       (∀ {i} → F (ν C i) ⊆ ν C i) × ¬ Up-to.Up-to-technique C F
 ∃special-case-of-size-preserving×¬up-to =
     (Proc × Proc)
-  , S̲t̲e̲p̲
+  , StepC
   , G
   , bisimilarity-pre-fixpoint
-  , (Up-to-technique G                          ↝⟨ (λ up-to → up-to) ⟩
-     (S ⊆ ⟦ S̲t̲e̲p̲ ⟧ (G S) → S ⊆ Bisimilarity ∞)  ↝⟨ (λ hyp below → hyp (Step↔S̲t̲e̲p̲ _ ∘ below)) ⟩
-     (S ⊆ Step (G S) → S ⊆ Bisimilarity ∞)      ↝⟨ _$ S⊆StepGS ⟩
-     S ⊆ Bisimilarity ∞                         ↝⟨ _$ pq ⟩
-     Bisimilarity ∞ (p , q)                     ↝⟨ p≁q ⟩□
-     ⊥                                          □)
+  , (Up-to-technique G                           ↝⟨ (λ up-to → up-to) ⟩
+     (S ⊆ ⟦ StepC ⟧ (G S) → S ⊆ Bisimilarity ∞)  ↝⟨ (λ hyp below → hyp (Step↔StepC _ ∘ below)) ⟩
+     (S ⊆ Step (G S) → S ⊆ Bisimilarity ∞)       ↝⟨ _$ S⊆StepGS ⟩
+     S ⊆ Bisimilarity ∞                          ↝⟨ _$ pq ⟩
+     Bisimilarity ∞ (p , q)                      ↝⟨ p≁q ⟩□
+     ⊥                                           □)
 
   where
 
@@ -237,22 +237,22 @@ private
 
   ¬comp : ¬ Compatible F
   ¬comp =
-    Compatible F                                                   ↝⟨ (λ comp {x} → comp R {x}) ⟩
+    Compatible F                                                     ↝⟨ (λ comp {x} → comp R {x}) ⟩
 
-    F (⟦ S̲t̲e̲p̲ ⟧ R) ⊆ ⟦ S̲t̲e̲p̲ ⟧ (F R)                                ↝⟨ (λ le → le {true , true}) ⟩
+    F (⟦ StepC ⟧ R) ⊆ ⟦ StepC ⟧ (F R)                                ↝⟨ (λ le → le {true , true}) ⟩
 
-    (F (⟦ S̲t̲e̲p̲ ⟧ R) (true , true) → ⟦ S̲t̲e̲p̲ ⟧ (F R) (true , true))  ↔⟨⟩
+    (F (⟦ StepC ⟧ R) (true , true) → ⟦ StepC ⟧ (F R) (true , true))  ↔⟨⟩
 
-    (⟦ S̲t̲e̲p̲ ⟧ R (false , false) ⊎ ⟦ S̲t̲e̲p̲ ⟧ R (true , true) →
-     ⟦ S̲t̲e̲p̲ ⟧ (F R) (true , true))                                 ↝⟨ _$ inj₁ (_⇔_.to (Step↔S̲t̲e̲p̲ _) StepRff) ⟩
+    (⟦ StepC ⟧ R (false , false) ⊎ ⟦ StepC ⟧ R (true , true) →
+     ⟦ StepC ⟧ (F R) (true , true))                                  ↝⟨ _$ inj₁ (_⇔_.to (Step↔StepC _) StepRff) ⟩
 
-    ⟦ S̲t̲e̲p̲ ⟧ (F R) (true , true)                                   ↝⟨ (λ step → S̲t̲e̲p̲.left-to-right {p = true} {q = true} step {p′ = false} _ ) ⟩
+    ⟦ StepC ⟧ (F R) (true , true)                                    ↝⟨ (λ step → StepC.left-to-right {p = true} {q = true} step {p′ = false} _ ) ⟩
 
-    (∃ λ y → T (not y) × F R (false , y))                          ↔⟨⟩
+    (∃ λ y → T (not y) × F R (false , y))                            ↔⟨⟩
 
-    (∃ λ y → T (not y) × ⊥)                                        ↝⟨ proj₂ ∘ proj₂ ⟩□
+    (∃ λ y → T (not y) × ⊥)                                          ↝⟨ proj₂ ∘ proj₂ ⟩□
 
-    ⊥                                                              □
+    ⊥                                                                □
 
 -- An LTS used in a couple of lemmas below, along with some
 -- properties.
@@ -306,21 +306,21 @@ module PQR where
 
   -- A relation that adds one pair to reflexivity.
 
-  data R̲ : Rel₂ (# 0) Proc where
-    pp   : R̲ (p left , p right)
-    refl : ∀ {x} → R̲ (x , x)
+  data S : Rel₂ (# 0) Proc where
+    pp   : S (p left , p right)
+    refl : ∀ {x} → S (x , x)
 
-  -- R̲ progresses to F (G R̲).
+  -- S progresses to F (G S).
 
-  R̲-prog : Progression R̲ (F (G R̲))
-  R̲-prog pp   = Step.⟨ (λ where
+  S-prog : Progression S (F (G S))
+  S-prog pp   = Step.⟨ (λ where
                           pq → _ , pq , qq
                           pr → _ , pr , [ rr ])
                      , (λ where
                           pq → _ , pq , qq
                           pr → _ , pr , [ rr ])
                      ⟩
-  R̲-prog refl = Step.⟨ (λ where
+  S-prog refl = Step.⟨ (λ where
                           pq → _ , pq , [ [ refl ] ]
                           pr → _ , pr , [ [ refl ] ]
                           qq → _ , qq , [ [ refl ] ]
@@ -332,14 +332,14 @@ module PQR where
                           rr → _ , rr , [ [ refl ] ])
                      ⟩
 
-  R̲-prog′ : R̲ ⊆ ⟦ S̲t̲e̲p̲ ⟧ (F (G R̲))
-  R̲-prog′ Rx = _⇔_.to (Step↔S̲t̲e̲p̲ _) (R̲-prog Rx)
+  S-prog′ : S ⊆ ⟦ StepC ⟧ (F (G S))
+  S-prog′ Sx = _⇔_.to (Step↔StepC _) (S-prog Sx)
 
   -- The two processes q left and q right are not bisimilar.
 
   q≁q : ¬ q left ∼ q right
   q≁q =
-    q left ∼ q right                                ↝⟨ (λ rel → S̲t̲e̲p̲.left-to-right rel qq) ⟩
+    q left ∼ q right                                ↝⟨ (λ rel → StepC.left-to-right rel qq) ⟩
     (∃ λ y → q right [ qq left ]⟶ y × q left ∼′ y)  ↝⟨ (λ { (_ , () , _) }) ⟩□
     ⊥                                               □
 
@@ -347,7 +347,7 @@ module PQR where
 
   r≁r : ¬ r left ∼ r right
   r≁r =
-    r left ∼ r right                                ↝⟨ (λ rel → S̲t̲e̲p̲.left-to-right rel rr) ⟩
+    r left ∼ r right                                ↝⟨ (λ rel → StepC.left-to-right rel rr) ⟩
     (∃ λ y → r right [ rr left ]⟶ y × r left ∼′ y)  ↝⟨ (λ { (_ , () , _) }) ⟩□
     ⊥                                               □
 
@@ -355,9 +355,9 @@ module PQR where
 
   ¬-F∘G-up-to : ¬ Up-to-technique (F ∘ G)
   ¬-F∘G-up-to =
-    Up-to-technique (F ∘ G)                    ↝⟨ (λ up-to → up-to R̲-prog′) ⟩
-    R̲ ⊆ Bisimilarity ∞                         ↝⟨ (λ le → le pp) ⟩
-    p left ∼ p right                           ↝⟨ (λ rel → S̲t̲e̲p̲.left-to-right rel pq) ⟩
+    Up-to-technique (F ∘ G)                    ↝⟨ (λ up-to → up-to S-prog′) ⟩
+    S ⊆ Bisimilarity ∞                         ↝⟨ (λ le → le pp) ⟩
+    p left ∼ p right                           ↝⟨ (λ rel → StepC.left-to-right rel pq) ⟩
     (∃ λ y → p right [ pq ]⟶ y × q left ∼′ y)  ↝⟨ (λ { (.(q right) , pq , rel) → rel }) ⟩
     q left ∼′ q right                          ↝⟨ (λ rel → q≁q (force rel)) ⟩
     ⊥                                          □
@@ -386,10 +386,10 @@ module PQR where
 
     -- F is an up-to technique.
 
-    module _ {R} (R-prog′ : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ (F R)) where
+    module _ {R} (R-prog′ : R ⊆ ⟦ StepC ⟧ (F R)) where
 
       R-prog : Progression R (F R)
-      R-prog Rx = _⇔_.from (Step↔S̲t̲e̲p̲ _) (R-prog′ Rx)
+      R-prog Rx = _⇔_.from (Step↔StepC _) (R-prog′ Rx)
 
       ¬rr : ∀ {s} → ¬ R (r s , r (not s))
       ¬rr rel with Progression.left-to-right R-prog rel rr
@@ -473,10 +473,10 @@ module PQR where
 
     -- G is an up-to technique.
 
-    module _ {R} (R-prog′ : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ (G R)) where
+    module _ {R} (R-prog′ : R ⊆ ⟦ StepC ⟧ (G R)) where
 
       R-prog : Progression R (G R)
-      R-prog Rx = _⇔_.from (Step↔S̲t̲e̲p̲ _) (R-prog′ Rx)
+      R-prog Rx = _⇔_.from (Step↔StepC _) (R-prog′ Rx)
 
       ¬rr : ∀ {s} → ¬ R (r s , r (not s))
       ¬rr rel with Progression.left-to-right R-prog rel rr

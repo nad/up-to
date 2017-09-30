@@ -26,7 +26,7 @@ open import H-level equality-with-J
 open import H-level.Closure equality-with-J
 
 open import Bisimilarity.Step lts _[_]↝₁_ _[_]↝₂_ as Step public
-  using (S̲t̲e̲p̲)
+  using (StepC)
 open import Indexed-container hiding (⟨_⟩; Bisimilarity)
 open import Indexed-container.Combinators hiding (id; _∘_)
 open import Relation
@@ -43,10 +43,10 @@ open Indexed-container public using (force)
 infix 4 _∼_ _∼′_ [_]_∼_ [_]_∼′_
 
 Bisimilarity : Size → Rel₂ ℓ Proc
-Bisimilarity i = ν S̲t̲e̲p̲ i
+Bisimilarity i = ν StepC i
 
 Bisimilarity′ : Size → Rel₂ ℓ Proc
-Bisimilarity′ i = ν′ S̲t̲e̲p̲ i
+Bisimilarity′ i = ν′ StepC i
 
 [_]_∼_ : Size → Proc → Proc → Set ℓ
 [_]_∼_ = curry ∘ Bisimilarity
@@ -66,9 +66,9 @@ mutual
 
   reflexive-∼ : ∀ {p i} → [ i ] p ∼ p
   reflexive-∼ =
-    S̲t̲e̲p̲.⟨ (λ p⟶p′ → _ , ⟶→↝₁ p⟶p′ , reflexive-∼′)
-         , (λ q⟶q′ → _ , ⟶→↝₂ q⟶q′ , reflexive-∼′)
-         ⟩
+    StepC.⟨ (λ p⟶p′ → _ , ⟶→↝₁ p⟶p′ , reflexive-∼′)
+          , (λ q⟶q′ → _ , ⟶→↝₂ q⟶q′ , reflexive-∼′)
+          ⟩
 
   reflexive-∼′ : ∀ {p i} → [ i ] p ∼′ p
   force reflexive-∼′ = reflexive-∼
@@ -94,10 +94,10 @@ infix -2 ∼:_ ∼′:_
 
 infix 4 [_]_≡_ [_]_≡′_
 
-[_]_≡_ : ∀ {p q} → Size → (_ _ : ν S̲t̲e̲p̲ ∞ (p , q)) → Set ℓ
+[_]_≡_ : ∀ {p q} → Size → (_ _ : ν StepC ∞ (p , q)) → Set ℓ
 [_]_≡_ = curry ∘ ν-bisimilar
 
-[_]_≡′_ : ∀ {p q} → Size → (_ _ : ν′ S̲t̲e̲p̲ ∞ (p , q)) → Set ℓ
+[_]_≡′_ : ∀ {p q} → Size → (_ _ : ν′ StepC ∞ (p , q)) → Set ℓ
 [_]_≡′_ = curry ∘ ν′-bisimilar
 
 -- An alternative characterisation of bisimilarity of bisimilarity
@@ -105,113 +105,113 @@ infix 4 [_]_≡_ [_]_≡′_
 
 []≡↔ :
   Eq.Extensionality ℓ ℓ →
-  ∀ {p q} {i : Size} (p∼q₁ p∼q₂ : ν S̲t̲e̲p̲ ∞ (p , q)) →
+  ∀ {p q} {i : Size} (p∼q₁ p∼q₂ : ν StepC ∞ (p , q)) →
 
   [ i ] p∼q₁ ≡ p∼q₂
 
     ↔
 
   (∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
-   let q′₁ , q⟶q′₁ , p′∼q′₁ = S̲t̲e̲p̲.left-to-right p∼q₁ p⟶p′
-       q′₂ , q⟶q′₂ , p′∼q′₂ = S̲t̲e̲p̲.left-to-right p∼q₂ p⟶p′
+   let q′₁ , q⟶q′₁ , p′∼q′₁ = StepC.left-to-right p∼q₁ p⟶p′
+       q′₂ , q⟶q′₂ , p′∼q′₂ = StepC.left-to-right p∼q₂ p⟶p′
    in ∃ λ (q′₁≡q′₂ : q′₁ ≡ q′₂) →
         subst (q [ μ ]↝₁_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
           ×
-        [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (p′ ,_)) q′₁≡q′₂ p′∼q′₁ ≡′ p′∼q′₂)
+        [ i ] subst (ν′ StepC ∞ ∘ (p′ ,_)) q′₁≡q′₂ p′∼q′₁ ≡′ p′∼q′₂)
     ×
   (∀ {q′ μ} (q⟶q′ : q [ μ ]⟶ q′) →
-   let p′₁ , p⟶p′₁ , p′∼q′₁ = S̲t̲e̲p̲.right-to-left p∼q₁ q⟶q′
-       p′₂ , p⟶p′₂ , p′∼q′₂ = S̲t̲e̲p̲.right-to-left p∼q₂ q⟶q′
+   let p′₁ , p⟶p′₁ , p′∼q′₁ = StepC.right-to-left p∼q₁ q⟶q′
+       p′₂ , p⟶p′₂ , p′∼q′₂ = StepC.right-to-left p∼q₂ q⟶q′
    in ∃ λ (p′₁≡p′₂ : p′₁ ≡ p′₂) →
         subst (p [ μ ]↝₂_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
           ×
-        [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (_, q′)) p′₁≡p′₂ p′∼q′₁ ≡′ p′∼q′₂)
+        [ i ] subst (ν′ StepC ∞ ∘ (_, q′)) p′₁≡p′₂ p′∼q′₁ ≡′ p′∼q′₂)
 
 []≡↔ ext {p} {q} {i} p∼q₁@(s₁ , f₁) p∼q₂@(s₂ , f₂) =
 
-  [ i ] p∼q₁ ≡ p∼q₂                                                     ↝⟨ ν-bisimilar↔ ext p∼q₁ p∼q₂ ⟩
+  [ i ] p∼q₁ ≡ p∼q₂                                                    ↝⟨ ν-bisimilar↔ ext p∼q₁ p∼q₂ ⟩
 
-  ⟦ S̲t̲e̲p̲₁ ⟷ S̲t̲e̲p̲₂ ⟧₂ (ν′-bisimilar i) (p∼q₁ , p∼q₂)                     ↝⟨ ⟦⟷⟧₂↔ ext S̲t̲e̲p̲₁ S̲t̲e̲p̲₂ (ν′-bisimilar i) p∼q₁ p∼q₂ ⟩
+  ⟦ StepC₁ ⟷ StepC₂ ⟧₂ (ν′-bisimilar i) (p∼q₁ , p∼q₂)                  ↝⟨ ⟦⟷⟧₂↔ ext StepC₁ StepC₂ (ν′-bisimilar i) p∼q₁ p∼q₂ ⟩
 
-  ⟦ S̲t̲e̲p̲₁ ⟧₂ (ν′-bisimilar i)
+  ⟦ StepC₁ ⟧₂ (ν′-bisimilar i)
     ((proj₁ s₁ , f₁ ∘ inj₁) , (proj₁ s₂ , f₂ ∘ inj₁))
     ×
-  ⟦ S̲t̲e̲p̲₂ ⟧₂ (ν′-bisimilar i)
+  ⟦ StepC₂ ⟧₂ (ν′-bisimilar i)
     ( (proj₂ s₁ , λ p → f₁ (inj₂ (_ , refl , p)))
     , (proj₂ s₂ , λ p → f₂ (inj₂ (_ , refl , p)))
-    )                                                                   ↝⟨ Step₁.⟦S̲t̲e̲p̲⟧₂↔ ext (ν′-bisimilar i) (proj₁ s₁ , f₁ ∘ inj₁)
+    )                                                                  ↝⟨ Step₁.⟦StepC⟧₂↔ ext (ν′-bisimilar i) (proj₁ s₁ , f₁ ∘ inj₁)
                                                                                                                (proj₁ s₂ , f₂ ∘ inj₁)
-                                                                             ×-cong
-                                                                           Step₂.⟦S̲t̲e̲p̲⟧₂↔ ext (ν′-bisimilar i)
-                                                                             (proj₂ s₁ , λ p → f₁ (inj₂ (_ , refl , p)))
-                                                                             (proj₂ s₂ , λ p → f₂ (inj₂ (_ , refl , p))) ⟩
+                                                                            ×-cong
+                                                                          Step₂.⟦StepC⟧₂↔ ext (ν′-bisimilar i)
+                                                                            (proj₂ s₁ , λ p → f₁ (inj₂ (_ , refl , p)))
+                                                                            (proj₂ s₂ , λ p → f₂ (inj₂ (_ , refl , p))) ⟩
   (∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
    let q′₁ , q⟶q′₁ , p′∼q′₁ =
-         Step₁.S̲t̲e̲p̲.challenge (proj₁ s₁ , f₁ ∘ inj₁) p⟶p′
+         Step₁.StepC.challenge (proj₁ s₁ , f₁ ∘ inj₁) p⟶p′
        q′₂ , q⟶q′₂ , p′∼q′₂ =
-         Step₁.S̲t̲e̲p̲.challenge (proj₁ s₂ , f₂ ∘ inj₁) p⟶p′
+         Step₁.StepC.challenge (proj₁ s₂ , f₂ ∘ inj₁) p⟶p′
    in ∃ λ (q′₁≡q′₂ : q′₁ ≡ q′₂) →
         subst (q [ μ ]↝₁_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
           ×
-        [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (p′ ,_)) q′₁≡q′₂ p′∼q′₁ ≡′ p′∼q′₂)
+        [ i ] subst (ν′ StepC ∞ ∘ (p′ ,_)) q′₁≡q′₂ p′∼q′₁ ≡′ p′∼q′₂)
     ×
   ((∀ {q′ μ} (q⟶q′ : q [ μ ]⟶ q′) →
    let p′₁ , p⟶p′₁ , p′∼q′₁ =
-          Step₂.S̲t̲e̲p̲.challenge
+          Step₂.StepC.challenge
              (proj₂ s₁ , λ p → f₁ (inj₂ (_ , refl , p))) q⟶q′
        p′₂ , p⟶p′₂ , p′∼q′₂ =
-          Step₂.S̲t̲e̲p̲.challenge
+          Step₂.StepC.challenge
              (proj₂ s₂ , λ p → f₂ (inj₂ (_ , refl , p))) q⟶q′
    in ∃ λ (p′₁≡p′₂ : p′₁ ≡ p′₂) →
         subst (p [ μ ]↝₂_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
           ×
-        [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (_, q′)) p′₁≡p′₂ p′∼q′₁ ≡′ p′∼q′₂))    ↔⟨⟩
+        [ i ] subst (ν′ StepC ∞ ∘ (_, q′)) p′₁≡p′₂ p′∼q′₁ ≡′ p′∼q′₂))  ↔⟨⟩
 
   (∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
-   let q′₁ , q⟶q′₁ , p′∼q′₁ = S̲t̲e̲p̲.left-to-right p∼q₁ p⟶p′
-       q′₂ , q⟶q′₂ , p′∼q′₂ = S̲t̲e̲p̲.left-to-right p∼q₂ p⟶p′
+   let q′₁ , q⟶q′₁ , p′∼q′₁ = StepC.left-to-right p∼q₁ p⟶p′
+       q′₂ , q⟶q′₂ , p′∼q′₂ = StepC.left-to-right p∼q₂ p⟶p′
    in ∃ λ (q′₁≡q′₂ : q′₁ ≡ q′₂) →
         subst (q [ μ ]↝₁_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
           ×
-        [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (p′ ,_)) q′₁≡q′₂ p′∼q′₁ ≡′ p′∼q′₂)
+        [ i ] subst (ν′ StepC ∞ ∘ (p′ ,_)) q′₁≡q′₂ p′∼q′₁ ≡′ p′∼q′₂)
     ×
   (∀ {q′ μ} (q⟶q′ : q [ μ ]⟶ q′) →
-   let p′₁ , p⟶p′₁ , p′∼q′₁ = S̲t̲e̲p̲.right-to-left p∼q₁ q⟶q′
-       p′₂ , p⟶p′₂ , p′∼q′₂ = S̲t̲e̲p̲.right-to-left p∼q₂ q⟶q′
+   let p′₁ , p⟶p′₁ , p′∼q′₁ = StepC.right-to-left p∼q₁ q⟶q′
+       p′₂ , p⟶p′₂ , p′∼q′₂ = StepC.right-to-left p∼q₂ q⟶q′
    in ∃ λ (p′₁≡p′₂ : p′₁ ≡ p′₂) →
         subst (p [ μ ]↝₂_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
           ×
-        [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (_, q′)) p′₁≡p′₂ p′∼q′₁ ≡′ p′∼q′₂)     □
+        [ i ] subst (ν′ StepC ∞ ∘ (_, q′)) p′₁≡p′₂ p′∼q′₁ ≡′ p′∼q′₂)   □
 
   where
   open Container
 
-  S̲t̲e̲p̲₁ = Step₁.S̲t̲e̲p̲
-  S̲t̲e̲p̲₂ = Step₂.S̲t̲e̲p̲
+  StepC₁ = Step₁.StepC
+  StepC₂ = Step₂.StepC
 
 module Bisimilarity-of-∼
          (ext : Eq.Extensionality ℓ ℓ)
          {p q} {i : Size}
-         (p∼q₁ p∼q₂ : ν S̲t̲e̲p̲ ∞ (p , q))
+         (p∼q₁ p∼q₂ : ν StepC ∞ (p , q))
          where
 
   -- A "constructor".
 
   ⟨_,_,_,_,_⟩ :
     (∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
-     let q′₁ , q⟶q′₁ , p′∼q′₁ = S̲t̲e̲p̲.left-to-right p∼q₁ p⟶p′
-         q′₂ , q⟶q′₂ , p′∼q′₂ = S̲t̲e̲p̲.left-to-right p∼q₂ p⟶p′
+     let q′₁ , q⟶q′₁ , p′∼q′₁ = StepC.left-to-right p∼q₁ p⟶p′
+         q′₂ , q⟶q′₂ , p′∼q′₂ = StepC.left-to-right p∼q₂ p⟶p′
      in ∃ λ (q′₁≡q′₂ : q′₁ ≡ q′₂) →
           subst (q [ μ ]↝₁_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
             ×
-          [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (p′ ,_)) q′₁≡q′₂ p′∼q′₁ ≡′ p′∼q′₂) →
+          [ i ] subst (ν′ StepC ∞ ∘ (p′ ,_)) q′₁≡q′₂ p′∼q′₁ ≡′ p′∼q′₂) →
     (∀ {q′ μ} (q⟶q′ : q [ μ ]⟶ q′) →
-     let p′₁ , p⟶p′₁ , p′∼q′₁ = S̲t̲e̲p̲.right-to-left p∼q₁ q⟶q′
-         p′₂ , p⟶p′₂ , p′∼q′₂ = S̲t̲e̲p̲.right-to-left p∼q₂ q⟶q′
+     let p′₁ , p⟶p′₁ , p′∼q′₁ = StepC.right-to-left p∼q₁ q⟶q′
+         p′₂ , p⟶p′₂ , p′∼q′₂ = StepC.right-to-left p∼q₂ q⟶q′
      in ∃ λ (p′₁≡p′₂ : p′₁ ≡ p′₂) →
           subst (p [ μ ]↝₂_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
             ×
-          [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (_, q′)) p′₁≡p′₂ p′∼q′₁ ≡′ p′∼q′₂) →
+          [ i ] subst (ν′ StepC ∞ ∘ (_, q′)) p′₁≡p′₂ p′∼q′₁ ≡′ p′∼q′₂) →
     [ i ] p∼q₁ ≡ p∼q₂
   ⟨_,_,_,_,_⟩ = curry (_↔_.from ([]≡↔ ext p∼q₁ p∼q₂))
 
@@ -220,29 +220,29 @@ module Bisimilarity-of-∼
   left-to-right :
     [ i ] p∼q₁ ≡ p∼q₂ →
     ∀ {p′ μ} (p⟶p′ : p [ μ ]⟶ p′) →
-    let q′₁ , q⟶q′₁ , p′∼q′₁ = S̲t̲e̲p̲.left-to-right p∼q₁ p⟶p′
-        q′₂ , q⟶q′₂ , p′∼q′₂ = S̲t̲e̲p̲.left-to-right p∼q₂ p⟶p′
+    let q′₁ , q⟶q′₁ , p′∼q′₁ = StepC.left-to-right p∼q₁ p⟶p′
+        q′₂ , q⟶q′₂ , p′∼q′₂ = StepC.left-to-right p∼q₂ p⟶p′
     in ∃ λ (q′₁≡q′₂ : q′₁ ≡ q′₂) →
          subst (q [ μ ]↝₁_) q′₁≡q′₂ q⟶q′₁ ≡ q⟶q′₂
            ×
-         [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (p′ ,_)) q′₁≡q′₂ p′∼q′₁ ≡′ p′∼q′₂
+         [ i ] subst (ν′ StepC ∞ ∘ (p′ ,_)) q′₁≡q′₂ p′∼q′₁ ≡′ p′∼q′₂
   left-to-right = proj₁ ∘ _↔_.to ([]≡↔ ext p∼q₁ p∼q₂)
 
   right-to-left :
     [ i ] p∼q₁ ≡ p∼q₂ →
     ∀ {q′ μ} (q⟶q′ : q [ μ ]⟶ q′) →
-    let p′₁ , p⟶p′₁ , p′∼q′₁ = S̲t̲e̲p̲.right-to-left p∼q₁ q⟶q′
-        p′₂ , p⟶p′₂ , p′∼q′₂ = S̲t̲e̲p̲.right-to-left p∼q₂ q⟶q′
+    let p′₁ , p⟶p′₁ , p′∼q′₁ = StepC.right-to-left p∼q₁ q⟶q′
+        p′₂ , p⟶p′₂ , p′∼q′₂ = StepC.right-to-left p∼q₂ q⟶q′
     in ∃ λ (p′₁≡p′₂ : p′₁ ≡ p′₂) →
          subst (p [ μ ]↝₂_) p′₁≡p′₂ p⟶p′₁ ≡ p⟶p′₂
            ×
-         [ i ] subst (ν′ S̲t̲e̲p̲ ∞ ∘ (_, q′)) p′₁≡p′₂ p′∼q′₁ ≡′ p′∼q′₂
+         [ i ] subst (ν′ StepC ∞ ∘ (_, q′)) p′₁≡p′₂ p′∼q′₁ ≡′ p′∼q′₂
   right-to-left = proj₂ ∘ _↔_.to ([]≡↔ ext p∼q₁ p∼q₂)
 
 -- A statement of extensionality for bisimilarity.
 
 Extensionality : Set ℓ
-Extensionality = ν′-extensionality S̲t̲e̲p̲
+Extensionality = ν′-extensionality StepC
 
 -- This form of extensionality can be used to derive another form
 -- (in the presence of extensionality for functions).
@@ -250,8 +250,8 @@ Extensionality = ν′-extensionality S̲t̲e̲p̲
 extensionality :
   Eq.Extensionality ℓ ℓ →
   Extensionality →
-  ∀ {p q} {p∼q₁ p∼q₂ : ν S̲t̲e̲p̲ ∞ (p , q)} →
+  ∀ {p q} {p∼q₁ p∼q₂ : ν StepC ∞ (p , q)} →
   [ ∞ ] p∼q₁ ≡ p∼q₂ → p∼q₁ ≡ p∼q₂
 extensionality ext ν-ext = ν-extensionality ext ν-ext
 
-open S̲t̲e̲p̲ public using (⟨_,_⟩; left-to-right; right-to-left)
+open StepC public using (⟨_,_⟩; left-to-right; right-to-left)

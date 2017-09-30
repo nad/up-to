@@ -60,30 +60,30 @@ open Temporarily-private using (Step)
 
 -- The Step function, expressed as an indexed container.
 
-S̲t̲e̲p̲ : Container (Proc × Proc) (Proc × Proc)
-S̲t̲e̲p̲ = One-sided.S̲t̲e̲p̲ _[_]↝₁_ ⟷ One-sided.S̲t̲e̲p̲ _[_]↝₂_
+StepC : Container (Proc × Proc) (Proc × Proc)
+StepC = One-sided.StepC _[_]↝₁_ ⟷ One-sided.StepC _[_]↝₂_
 
 -- The definition of Step in terms of a container is pointwise
 -- logically equivalent to the direct definition, and in the presence
 -- of extensionality it is pointwise isomorphic to the direct
 -- definition.
 
-Step↔S̲t̲e̲p̲ :
+Step↔StepC :
   ∀ {k r} {R : Rel₂ r Proc} {pq} →
   Extensionality? k ℓ (ℓ ⊔ r) →
-  Step R pq ↝[ k ] ⟦ S̲t̲e̲p̲ ⟧ R pq
-Step↔S̲t̲e̲p̲ {R = R} {pq} ext =
-  Step R pq                                        ↔⟨ lemma ⟩
+  Step R pq ↝[ k ] ⟦ StepC ⟧ R pq
+Step↔StepC {R = R} {pq} ext =
+  Step R pq                                         ↔⟨ lemma ⟩
 
   One-sided.Step _[_]↝₁_ R pq
     ×
-  One-sided.Step _[_]↝₂_ (R ∘ swap) (swap pq)      ↝⟨ One-sided.Step↔S̲t̲e̲p̲ _ ext ×-cong One-sided.Step↔S̲t̲e̲p̲ _ ext ⟩
+  One-sided.Step _[_]↝₂_ (R ∘ swap) (swap pq)       ↝⟨ One-sided.Step↔StepC _ ext ×-cong One-sided.Step↔StepC _ ext ⟩
 
-  ⟦ One-sided.S̲t̲e̲p̲ _[_]↝₁_ ⟧ R pq
+  ⟦ One-sided.StepC _[_]↝₁_ ⟧ R pq
     ×
-  ⟦ One-sided.S̲t̲e̲p̲ _[_]↝₂_ ⟧ (R ∘ swap) (swap pq)  ↝⟨ inverse-ext? (λ ext → ⟦⟷⟧↔ ext (One-sided.S̲t̲e̲p̲ _[_]↝₁_) (One-sided.S̲t̲e̲p̲ _[_]↝₂_)) ext ⟩□
+  ⟦ One-sided.StepC _[_]↝₂_ ⟧ (R ∘ swap) (swap pq)  ↝⟨ inverse-ext? (λ ext → ⟦⟷⟧↔ ext (One-sided.StepC _[_]↝₁_) (One-sided.StepC _[_]↝₂_)) ext ⟩□
 
-  ⟦ S̲t̲e̲p̲ ⟧ R pq                                    □
+  ⟦ StepC ⟧ R pq                                    □
   where
   lemma : _ ↔ _
   lemma = record
@@ -101,26 +101,26 @@ Step↔S̲t̲e̲p̲ {R = R} {pq} ext =
     ; left-inverse-of = λ _ → refl
     }
 
-module S̲t̲e̲p̲ {r} {R : Rel₂ r Proc} {p q} where
+module StepC {r} {R : Rel₂ r Proc} {p q} where
 
   -- A "constructor".
 
   ⟨_,_⟩ :
     (∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝₁ q′ × R (p′ , q′)) →
     (∀ {q′ μ} → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]↝₂ p′ × R (p′ , q′)) →
-    ⟦ S̲t̲e̲p̲ ⟧ R (p , q)
-  ⟨ lr , rl ⟩ = _⇔_.to (Step↔S̲t̲e̲p̲ _) Step.⟨ lr , rl ⟩
+    ⟦ StepC ⟧ R (p , q)
+  ⟨ lr , rl ⟩ = _⇔_.to (Step↔StepC _) Step.⟨ lr , rl ⟩
 
   -- Some "projections".
 
   left-to-right :
-    ⟦ S̲t̲e̲p̲ ⟧ R (p , q) →
+    ⟦ StepC ⟧ R (p , q) →
     ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝₁ q′ × R (p′ , q′)
-  left-to-right = Step.left-to-right ∘ _⇔_.from (Step↔S̲t̲e̲p̲ _)
+  left-to-right = Step.left-to-right ∘ _⇔_.from (Step↔StepC _)
 
   right-to-left :
-    ⟦ S̲t̲e̲p̲ ⟧ R (p , q) →
+    ⟦ StepC ⟧ R (p , q) →
     ∀ {q′ μ} → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]↝₂ p′ × R (p′ , q′)
-  right-to-left = Step.right-to-left ∘ _⇔_.from (Step↔S̲t̲e̲p̲ _)
+  right-to-left = Step.right-to-left ∘ _⇔_.from (Step↔StepC _)
 
 open Temporarily-private public

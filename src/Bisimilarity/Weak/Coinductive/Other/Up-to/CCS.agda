@@ -111,7 +111,7 @@ Up-to-context-size-preserving =
   drop-[] (_ , ν _ _  , _ , _ , _ , () , _)
   drop-[] (_ , ! _    , _ , _ , _ , () , _)
 
-  R⊆StepR : R ⊆ ⟦ S̲t̲e̲p̲ ⟧ R
+  R⊆StepR : R ⊆ ⟦ StepC ⟧ R
   R⊆StepR (inj₁ base) = ⟨ lr , rl ⟩
     where
     lr :
@@ -146,16 +146,16 @@ Up-to-context-size-preserving =
 
   -- Note the use of compatibility in [R]⊆Step[S].
 
-  [R]⊆Step[R] : Up-to-context R ⊆ ⟦ S̲t̲e̲p̲ ⟧ (Up-to-context R)
+  [R]⊆Step[R] : Up-to-context R ⊆ ⟦ StepC ⟧ (Up-to-context R)
   [R]⊆Step[R] =
-    Up-to-context R             ⊆⟨ Up-to-context-monotone (λ {x} → R⊆StepR {x}) ⟩
-    Up-to-context (⟦ S̲t̲e̲p̲ ⟧ R)  ⊆⟨ comp _ ⟩∎
-    ⟦ S̲t̲e̲p̲ ⟧ (Up-to-context R)  ∎
+    Up-to-context R              ⊆⟨ Up-to-context-monotone (λ {x} → R⊆StepR {x}) ⟩
+    Up-to-context (⟦ StepC ⟧ R)  ⊆⟨ comp _ ⟩∎
+    ⟦ StepC ⟧ (Up-to-context R)  ∎
 
   contradiction : ⊥
   contradiction =                                                       $⟨ !τa[R]!a ⟩
     Up-to-context R (! τ · (a ·) , ! a ·)                               ↝⟨ [R]⊆Step[R] ⟩
-    ⟦ S̲t̲e̲p̲ ⟧ (Up-to-context R) (! τ · (a ·) , ! a ·)                    ↝⟨ (λ s → S̲t̲e̲p̲.left-to-right s (replication (par-right action))) ⟩
+    ⟦ StepC ⟧ (Up-to-context R) (! τ · (a ·) , ! a ·)                   ↝⟨ (λ s → StepC.left-to-right s (replication (par-right action))) ⟩
     (∃ λ P → ! a · [ τ ]⇒̂ P × Up-to-context R (! τ · (a ·) ∣ a · , P))  ↝⟨ (λ { (_ , !a⟶ , hyp) →
                                                                                   subst (Up-to-context R ∘ (_ ,_)) (!a[τ]⇒̂→≡ !a⟶) hyp }) ⟩
     Up-to-context R (! τ · (a ·) ∣ a · , ! a ·)                         ↝⟨ drop-[] ⟩

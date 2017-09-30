@@ -156,8 +156,8 @@ Size-preserving-reindex {C = C} {F} {f}
     ×
   ¬ ({F : Trans₂ ℓ (Proc ∞)} →
      Monotone F → Symmetric swap F →
-     Size-preserving S.S̲t̲e̲p̲ F →
-     Size-preserving B.S̲t̲e̲p̲ F)
+     Size-preserving S.StepC F →
+     Size-preserving B.StepC F)
     ×
   ¬ ({I : Set ℓ} {C₁ C₂ : Container I I} {F : Trans ℓ I} →
      Monotone F →
@@ -173,8 +173,8 @@ Size-preserving-reindex {C = C} {F} {f}
 
      ({F : Trans₂ ℓ (Proc ∞)} →
       Monotone F → Symmetric swap F →
-      Size-preserving S.S̲t̲e̲p̲ F →
-      Size-preserving B.S̲t̲e̲p̲ F)                      ↝⟨ contradiction₂ ⟩□
+      Size-preserving S.StepC F →
+      Size-preserving B.StepC F)                     ↝⟨ contradiction₂ ⟩□
 
      ⊥                                               □)
 
@@ -186,10 +186,10 @@ Size-preserving-reindex {C = C} {F} {f}
       Size-preserving C₁ F → Size-preserving C₂ F →
       Size-preserving (C₁ ⊗ C₂) F)                   ↝⟨ (λ closed → closed mono pres) ⟩
 
-     (Size-preserving (reindex swap S.S̲t̲e̲p̲) F →
-      Size-preserving B.S̲t̲e̲p̲ F)                      ↝⟨ _$ Size-preserving-reindex refl symm pres ⟩
+     (Size-preserving (reindex swap S.StepC) F →
+      Size-preserving B.StepC F)                     ↝⟨ _$ Size-preserving-reindex refl symm pres ⟩
 
-     Size-preserving B.S̲t̲e̲p̲ F                        ↝⟨ contradiction ⟩□
+     Size-preserving B.StepC F                       ↝⟨ contradiction ⟩□
 
      ⊥                                               □)
 
@@ -215,7 +215,7 @@ Size-preserving-reindex {C = C} {F} {f}
     lemma : {p₁ p₂ : Proc ∞ × Proc ∞} → p₁ ≡ swap p₂ → swap p₁ ≡ p₂
     lemma refl = refl
 
-  pres : Size-preserving S.S̲t̲e̲p̲ F
+  pres : Size-preserving S.StepC F
   pres {R = R} {i = i} R⊆ =
     F R                                  ⊆⟨⟩
     R ∪ (_≡ (m₁ , m₂)) ∪ (_≡ (m₂ , m₁))  ⊆⟨ [ R⊆ , helper ] ⟩∎
@@ -226,7 +226,7 @@ Size-preserving-reindex {C = C} {F} {f}
     helper (inj₂ refl) = proj₁ (proj₂ (proj₂ (proj₂ ≤≥≁)))
 
   contradiction =
-    Size-preserving B.S̲t̲e̲p̲ F             ↝⟨ (λ hyp → _⇔_.to (monotone→⇔ _ mono) hyp) ⟩
+    Size-preserving B.StepC F            ↝⟨ (λ hyp → _⇔_.to (monotone→⇔ _ mono) hyp) ⟩
     F (Bisimilarity ∞) ⊆ Bisimilarity ∞  ↝⟨ _$ inj₂ (inj₁ refl) ⟩
     m₁ ∼ m₂                              ↝⟨ proj₂ (proj₂ (proj₂ (proj₂ ≤≥≁))) ⟩□
     ⊥                                    □
@@ -234,9 +234,9 @@ Size-preserving-reindex {C = C} {F} {f}
   contradiction₂ =
     ({F : Trans₂ ℓ (Proc ∞)} →
      Monotone F → Symmetric swap F →
-     Size-preserving S.S̲t̲e̲p̲ F →
-     Size-preserving B.S̲t̲e̲p̲ F)        ↝⟨ (λ closed → closed mono symm pres) ⟩
+     Size-preserving S.StepC F →
+     Size-preserving B.StepC F)       ↝⟨ (λ closed → closed mono symm pres) ⟩
 
-    Size-preserving B.S̲t̲e̲p̲ F          ↝⟨ contradiction ⟩□
+    Size-preserving B.StepC F         ↝⟨ contradiction ⟩□
 
     ⊥                                 □
