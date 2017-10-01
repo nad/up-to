@@ -9,6 +9,7 @@ module README.Pointers-to-results-from-the-paper where
 import Bisimilarity.Classical
 import Bisimilarity.Coinductive
 import Bisimilarity.Coinductive.Delay-monad
+import Bisimilarity.Coinductive.Equational-reasoning-instances
 import Bisimilarity.Comparison
 import Bisimilarity.Exercises.Coinductive.CCS
 import Bisimilarity.Step
@@ -173,6 +174,7 @@ transitive = Bisimilarity.Coinductive.transitive-∼
 Name-with-kind      = Labelled-transition-system.CCS.Name-with-kind
 co                  = Labelled-transition-system.CCS.co
 Action              = Labelled-transition-system.CCS.Action
+silent              = Labelled-transition-system.CCS.is-silent
 Proc                = Labelled-transition-system.CCS.Proc
 Proc′               = Labelled-transition-system.CCS.Proc′
 transition-relation = Labelled-transition-system.CCS._[_]⟶_
@@ -192,7 +194,8 @@ Restricted∼∅ = Bisimilarity.Exercises.Coinductive.CCS.Restricted∼∅
 -- strong bisimilarity.)
 --
 -- The proofs are written in such a way that the arguments can be
--- reused for similar proofs about strong similarity.
+-- reused for similar proofs about strong similarity. (See below for
+-- proofs that are closer to the proofs in the paper.)
 
 module Strong-bisimilarity-congruence where
 
@@ -203,16 +206,39 @@ module Strong-bisimilarity-congruence where
   ⟨ν_⟩-cong = Bisimilarity.Exercises.Coinductive.CCS.⟨ν_⟩-cong
   ∅-cong    = Bisimilarity.Coinductive.reflexive-∼
 
+-- Some proofs have been repeated in order to provide code which is
+-- closer to that presented in the paper.
+
+module As-in-the-paper where
+
+  _∣-cong_ = Bisimilarity.Exercises.Coinductive.CCS._∣-congP_
+  ·-cong   = Bisimilarity.Exercises.Coinductive.CCS.·-congP
+  !-cong   = Bisimilarity.Exercises.Coinductive.CCS.!-congP
+
+-- The code uses overloaded equational reasoning combinators.
+
+import Equational-reasoning
+
+-- The proof As-in-the-paper._∣-cong_ does not use symmetric′, but the
+-- overloaded combinator symmetric. Agda resolves this use of
+-- symmetric to an instance corresponding to symmetric′.
+
+symmetric′-instance =
+  Bisimilarity.Coinductive.Equational-reasoning-instances.symmetric∼′
+
 -- The example with P and Q.
 
 P   = Bisimilarity.Exercises.Coinductive.CCS.Another-example.P
 Q   = Bisimilarity.Exercises.Coinductive.CCS.Another-example.Q
 P∼Q = Bisimilarity.Exercises.Coinductive.CCS.Another-example.P∼Q
 
--- The code uses overloaded equational reasoning combinators.
+-- The combinators _■ and _∼⟨_⟩_ presented in the paper correspond to
+-- two instances.
 
-import Equational-reasoning
-import Bisimilarity.Coinductive.Equational-reasoning-instances
+_■ =
+  Bisimilarity.Coinductive.Equational-reasoning-instances.reflexive∼
+_∼⟨_⟩_ =
+  Bisimilarity.Coinductive.Equational-reasoning-instances.trans∼∼
 
 -- Equations of the form [ ∞ ] P ∼ (C [ P ]) have unique solutions for
 -- contexts C where every hole is under a prefix.
@@ -361,17 +387,24 @@ companion-up-to             = Up-to.companion-up-to
 
 6-1-3-2 = Bisimilarity.Exercises.Coinductive.CCS.6-1-3-2
 
+-- Instances corresponding to some equational reasoning combinators
+-- mentioned in the paper.
+
+_∼′⟨_⟩′_ =
+  Bisimilarity.Coinductive.Equational-reasoning-instances.trans∼′∼′
+_∼⟨_⟩′_ =
+  Bisimilarity.Coinductive.Equational-reasoning-instances.trans∼∼′
+_■′ =
+  Bisimilarity.Coinductive.Equational-reasoning-instances.reflexive∼′
+
 -- The primed variant of _∣-cong_.
 
 _∣-cong′_ = Bisimilarity.Exercises.Coinductive.CCS._∣-cong′_
 
 -- Replication preserves strong bisimilarity (already mentioned
 -- above).
---
--- As mentioned above the proof is written in such a way that the
--- argument can be reused for a similar proof about strong similarity.
 
-!-cong₂ = Bisimilarity.Exercises.Coinductive.CCS.!-cong_
+!-cong₂ = Bisimilarity.Exercises.Coinductive.CCS.!-congP
 
 -- Proofs showing that all the CCS process constructors preserve
 -- strong bisimilarity (already mentioned above).

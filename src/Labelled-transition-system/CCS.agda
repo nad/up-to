@@ -42,8 +42,14 @@ co (a , kind) = a , not kind
 -- Actions.
 
 data Action : Set ℓ where
-  τ    : Action
   name : Name-with-kind → Action
+  τ    : Action
+
+-- The only silent action is τ.
+
+is-silent : Action → Bool
+is-silent (name _) = false
+is-silent τ        = true
 
 -- Processes.
 
@@ -77,8 +83,8 @@ a ∙ = name a ∙ ∅
 -- any).
 
 _∉_ : Name → Action → Set ℓ
+a ∉ name (b , _) = ¬ a ≡ b
 a ∉ τ            = ↑ ℓ ⊤
-a ∉ name (b , _) = a ≢ b
 
 -- Transition relation.
 
@@ -102,12 +108,10 @@ CCS = record
   { Proc      = Proc ∞
   ; Label     = Action
   ; _[_]⟶_    = _[_]⟶_
-  ; is-silent = λ { τ        → true
-                  ; (name _) → false
-                  }
+  ; is-silent = is-silent
   }
 
-open LTS CCS public hiding (Proc; _[_]⟶_)
+open LTS CCS public hiding (Proc; _[_]⟶_; is-silent)
 
 mutual
 

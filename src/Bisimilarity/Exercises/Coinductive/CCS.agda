@@ -208,28 +208,19 @@ mutual
   ∣-assoc′ : ∀ {P Q R i} → [ i ] P ∣ (Q ∣ R) ∼′ (P ∣ Q) ∣ R
   force ∣-assoc′ = ∣-assoc
 
-mutual
+-- ∅ is a left identity of _∣_.
 
-  -- ∅ is a left identity of _∣_.
+∣-left-identity : ∀ {i P} → [ i ] ∅ ∣ P ∼ P
+∣-left-identity =
+  ⟨ (λ { (par-right tr) → (_ , tr , λ { .force → ∣-left-identity })
+       ; (par-left ())
+       ; (par-τ () _)
+       })
+  , (λ tr → (_ , par-right tr , λ { .force → ∣-left-identity }))
+  ⟩
 
-  ∣-left-identity : ∀ {P i} → [ i ] ∅ ∣ P ∼ P
-  ∣-left-identity {i = i} = ⟨ lr , rl ⟩
-    where
-
-    lr : ∀ {P P′ μ} →
-         ∅ ∣ P [ μ ]⟶ P′ →
-         ∃ λ Q′ → P [ μ ]⟶ Q′ × [ i ] P′ ∼′ Q′
-    lr (par-right tr) = _ , tr , ∣-left-identity′
-    lr (par-left ())
-    lr (par-τ () _)
-
-    rl : ∀ {P Q′ μ} →
-         P [ μ ]⟶ Q′ →
-         ∃ λ P′ → ∅ ∣ P [ μ ]⟶ P′ × [ i ] P′ ∼′ Q′
-    rl tr = _ , par-right tr , ∣-left-identity′
-
-  ∣-left-identity′ : ∀ {P i} → [ i ] ∅ ∣ P ∼′ P
-  force ∣-left-identity′ = ∣-left-identity
+∣-left-identity′ : ∀ {P i} → [ i ] ∅ ∣ P ∼′ P
+force ∣-left-identity′ = ∣-left-identity
 
 -- ∅ is a right identity of _∣_.
 
@@ -246,18 +237,45 @@ mutual
   infix 6 _∣-cong_ _∣-cong′_
 
   _∣-cong_ : ∀ {i P P′ Q Q′} →
-             [ i ] P ∼ P′ → [ i ] Q ∼ Q′ → [ i ] P ∣ Q ∼ P′ ∣ Q′
-  P∼P′ ∣-cong Q∼Q′ =
-    ⟨ lr P∼P′ Q∼Q′
+             [ i ] P ∼ Q → [ i ] P′ ∼ Q′ → [ i ] P ∣ P′ ∼ Q ∣ Q′
+  P∼Q ∣-cong P′∼Q′ =
+    ⟨ lr P∼Q P′∼Q′
     , Σ-map id (Σ-map id symmetric) ∘
-      lr (symmetric P∼P′) (symmetric Q∼Q′)
+      lr (symmetric P∼Q) (symmetric P′∼Q′)
     ⟩
     where
     lr = CL.∣-cong _∣-cong′_
 
   _∣-cong′_ : ∀ {i P P′ Q Q′} →
-              [ i ] P ∼′ P′ → [ i ] Q ∼′ Q′ → [ i ] P ∣ Q ∼′ P′ ∣ Q′
+              [ i ] P ∼′ Q → [ i ] P′ ∼′ Q′ → [ i ] P ∣ P′ ∼′ Q ∣ Q′
   force (P∼P′ ∣-cong′ Q∼Q′) = force P∼P′ ∣-cong force Q∼Q′
+
+-- An alternative proof that is closer to the one in the paper.
+
+infix 6 _∣-congP_
+
+_∣-congP_ : ∀ {i P P′ Q Q′} →
+            [ i ] P ∼ Q → [ i ] P′ ∼ Q′ → [ i ] P ∣ P′ ∼ Q ∣ Q′
+_∣-congP_ = λ p q →
+  ⟨ lr p q
+  , Σ-map id (Σ-map id symmetric) ∘ lr (symmetric p) (symmetric q)
+  ⟩
+  where
+  lr : ∀ {i P P′ P″ Q Q′ μ} →
+       [ i ] P ∼ Q → [ i ] P′ ∼ Q′ → P ∣ P′ [ μ ]⟶ P″ →
+       ∃ λ Q″ → Q ∣ Q′ [ μ ]⟶ Q″ × [ i ] P″ ∼′ Q″
+  lr p q (par-left tr) =
+    let (_ , tr′          , p′) = left-to-right p tr
+    in  (_ , par-left tr′ , λ { .force → force p′ ∣-congP q })
+
+  lr p q (par-right tr) =
+    let (_ , tr′           , q′) = left-to-right q tr
+    in  (_ , par-right tr′ , λ { .force → p ∣-congP force q′ })
+
+  lr p q (par-τ tr₁ tr₂) =
+    let (_ , tr₁′            , p′) = left-to-right p tr₁
+        (_ , tr₂′            , q′) = left-to-right q tr₂
+    in  (_ , par-τ tr₁′ tr₂′ , λ { .force → force p′ ∣-congP force q′ })
 
 ------------------------------------------------------------------------
 -- Exercise 6.1.2
@@ -303,12 +321,12 @@ private
     })
 
 6-1-3-2 :
-  ∀ {μ P P₀} →
-  ! P [ μ ]⟶ P₀ →
-  (∃ λ P′ → P [ μ ]⟶ P′ × P₀ ∼ ! P ∣ P′)
+  ∀ {P μ R} →
+  ! P [ μ ]⟶ R →
+  (∃ λ P′ → P [ μ ]⟶ P′ × R ∼ ! P ∣ P′)
     ⊎
   (μ ≡ τ × ∃ λ P′ → ∃ λ P″ → ∃ λ a →
-   P [ name a ]⟶ P′ × P [ name (co a) ]⟶ P″ × P₀ ∼ (! P ∣ P′) ∣ P″)
+   P [ name a ]⟶ P′ × P [ name (co a) ]⟶ P″ × R ∼ (! P ∣ P′) ∣ P″)
 6-1-3-2 = 6-1-3-2.6-1-3-2
 
 swap-rightmost : ∀ {P Q R} → (P ∣ Q) ∣ R ∼ (P ∣ R) ∣ Q
@@ -544,6 +562,14 @@ _·-cong′_ :
   μ ≡ μ′ → [ i ] force P ∼′ force P′ → [ i ] μ · P ∼′ μ′ · P′
 force (μ≡μ′ ·-cong′ P∼P′) = μ≡μ′ ·-cong P∼P′
 
+-- An alternative proof that is closer to the one in the paper.
+
+·-congP : ∀ {i μ P Q} → [ i ] force P ∼′ force Q → [ i ] μ · P ∼ μ · Q
+·-congP p =
+  ⟨ (λ { action → _ , action , p })
+  , (λ { action → _ , action , p })
+  ⟩
+
 -- _∙_ preserves bisimilarity.
 
 infix 12 _∙-cong_ _∙-cong′_
@@ -585,6 +611,41 @@ mutual
 
   !-cong′_ : ∀ {i P P′} → [ i ] P ∼′ P′ → [ i ] ! P ∼′ ! P′
   force (!-cong′ P∼P′) = !-cong force P∼P′
+
+-- An alternative proof that is closer to the one in the paper.
+
+!-congP : ∀ {i P Q} → [ i ] P ∼ Q → [ i ] ! P ∼ ! Q
+!-congP = λ p →
+  ⟨ lr p
+  , Σ-map id (Σ-map id symmetric) ∘ lr (symmetric p)
+  ⟩
+  where
+  lr : ∀ {P Q R μ i} →
+       [ i ] P ∼ Q → ! P [ μ ]⟶ R →
+       ∃ λ S → ! Q [ μ ]⟶ S × [ i ] R ∼′ S
+  lr {P} {Q} {R} P∼Q !P⟶R with 6-1-3-2 !P⟶R
+  ... | inj₁ (P′ , P⟶P′ , R∼!P∣P′) =
+    let (Q′ , Q⟶Q′ , P′∼′Q′) = left-to-right P∼Q P⟶P′
+    in
+    ( ! Q ∣ Q′
+    , replication (par-right Q⟶Q′)
+    , (R         ∼⟨ R∼!P∣P′ ⟩
+       ! P ∣ P′  ∼⟨ (λ { .force → !-congP P∼Q }) ∣-cong′ P′∼′Q′ ⟩ ∼′:
+       ! Q ∣ Q′  ■
+      )
+    )
+  ... | inj₂ (refl , P′ , P″ , a , P⟶P′ , P⟶P″ , R∼!P∣P′∣P″) =
+    let (Q′ , Q⟶Q′ , P′∼′Q′) = left-to-right P∼Q P⟶P′
+        (Q″ , Q⟶Q″ , P″∼′Q″) = left-to-right P∼Q P⟶P″
+    in
+    ( (! Q ∣ Q′) ∣ Q″
+    , replication (par-τ (replication (par-right Q⟶Q′)) Q⟶Q″)
+    , (R                ∼⟨ R∼!P∣P′∣P″ ⟩
+       (! P ∣ P′) ∣ P″  ∼⟨ ((λ { .force → !-congP P∼Q }) ∣-cong′ P′∼′Q′)
+                             ∣-cong′ P″∼′Q″ ⟩ ∼′:
+       (! Q ∣ Q′) ∣ Q″  ■
+      )
+    )
 
 mutual
 
@@ -1296,7 +1357,7 @@ module _ (a b : Name-with-kind) where
 -- Some other examples
 
 Restricted : Name → Proc ∞
-Restricted a = ⟨ν a ⟩ (name (a , true) ∙ ∅)
+Restricted a = ⟨ν a ⟩ (name (a , true) · λ { .force → ∅ })
 
 Restricted∼∅ : ∀ {a} → Restricted a ∼ ∅
 Restricted∼∅ =
@@ -1314,5 +1375,5 @@ module Another-example (a : Name) (μ : Action) where
 
   P∼Q : ∀ {i} → [ i ] P ∼ Q
   P∼Q = P      ∼⟨ Restricted∼∅ ∣-cong (refl ·-cong λ { .force → P∼Q }) ⟩
-        ∅ ∣ Q  ∼⟨ ∣-left-identity ⟩■
-        Q
+        ∅ ∣ Q  ∼⟨ ∣-left-identity ⟩
+        Q      ■
