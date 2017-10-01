@@ -143,12 +143,12 @@ mutual
 -- P is similar to P ⊕ Q.
 
 ≤-⊕-left : ∀ {i P Q} → [ i ] P ≤ P ⊕ Q
-≤-⊕-left = ⟨ (λ P⟶P′ → _ , choice-left P⟶P′ , reflexive) ⟩
+≤-⊕-left = ⟨ (λ P⟶P′ → _ , sum-left P⟶P′ , reflexive) ⟩
 
 -- Q is similar to P ⊕ Q.
 
 ≤-⊕-right : ∀ {i P Q} → [ i ] Q ≤ P ⊕ Q
-≤-⊕-right = ⟨ (λ Q⟶Q′ → _ , choice-right Q⟶Q′ , reflexive) ⟩
+≤-⊕-right = ⟨ (λ Q⟶Q′ → _ , sum-right Q⟶Q′ , reflexive) ⟩
 
 -- If Name is inhabited, then there are two processes that are similar
 -- in both directions, but not bisimilar.
@@ -199,7 +199,7 @@ mutual
                case machine₁⟶ tr of λ where
                  (refl , P∼) →
                      _
-                   , (machine₂                      [ name pay ]⟶⟨ replication (par-right (choice-right action)) ⟩
+                   , (machine₂                      [ name pay ]⟶⟨ replication (par-right (sum-right action)) ⟩
                       machine₂ ∣ coffee ∙ ⊕ tea ∙)
                    , (P                            ∼⟨ ≤: convert {a = ℓ} P∼ ⟩
                       machine₁ ∣ coffee ∙ ⊕ tea ∙  ∼⟨ machine₁≤′machine₂ ∣-cong′ (_ ■) ⟩■
@@ -229,44 +229,43 @@ mutual
        machine₂′ [ name a ]⟶ P′ × machine₂′ [ name (co a) ]⟶ P″ ×
        P ∼ (machine₂ ∣ P′) ∣ P″) →
       ∃ λ Q → machine₁ [ μ ]⟶ Q × [ i ] P ≤′ Q
-    helper {P} (inj₁ (_ , choice-left (choice-left action) , P∼)) =
+    helper {P} (inj₁ (_ , sum-left (sum-left action) , P∼)) =
         _
       , lemma
       , (P                            ∼⟨ ≤: convert {a = ℓ} P∼ ⟩
          machine₂ ∣ coffee ∙          ∼⟨ machine₂≤′machine₁ ∣-cong′ convert {a = ℓ} ≤-⊕-left ⟩■
          machine₁ ∣ coffee ∙ ⊕ tea ∙)
 
-    helper {P} (inj₁ (_ , choice-left (choice-right action) , P∼)) =
+    helper {P} (inj₁ (_ , sum-left (sum-right action) , P∼)) =
         _
       , lemma
       , (P                            ∼⟨ ≤: convert {a = ℓ} P∼ ⟩
          machine₂ ∣ tea ∙             ∼⟨ machine₂≤′machine₁ ∣-cong′ convert {a = ℓ} ≤-⊕-right ⟩■
          machine₁ ∣ coffee ∙ ⊕ tea ∙)
 
-    helper {P} (inj₁ (_ , choice-right action , P∼)) =
+    helper {P} (inj₁ (_ , sum-right action , P∼)) =
         _
       , lemma
       , (P                            ∼⟨ ≤: convert {a = ℓ} P∼ ⟩
          machine₂ ∣ coffee ∙ ⊕ tea ∙  ∼⟨ machine₂≤′machine₁ ∣-cong′ (_ ■) ⟩■
          machine₁ ∣ coffee ∙ ⊕ tea ∙)
 
-    helper (inj₂ (_ , _ , _ , _ , choice-left (choice-left action)  , choice-left (choice-left tr)  , _)) = ⊥-elim (names-are-not-inverted tr)
-    helper (inj₂ (_ , _ , _ , _ , choice-left (choice-left action)  , choice-left (choice-right tr) , _)) = ⊥-elim (names-are-not-inverted tr)
-    helper (inj₂ (_ , _ , _ , _ , choice-left (choice-left action)  , choice-right tr               , _)) = ⊥-elim (names-are-not-inverted tr)
-    helper (inj₂ (_ , _ , _ , _ , choice-left (choice-right action) , choice-left (choice-left tr)  , _)) = ⊥-elim (names-are-not-inverted tr)
-    helper (inj₂ (_ , _ , _ , _ , choice-left (choice-right action) , choice-left (choice-right tr) , _)) = ⊥-elim (names-are-not-inverted tr)
-    helper (inj₂ (_ , _ , _ , _ , choice-left (choice-right action) , choice-right tr               , _)) = ⊥-elim (names-are-not-inverted tr)
-    helper (inj₂ (_ , _ , _ , _ , choice-right action               , choice-left (choice-left tr)  , _)) = ⊥-elim (names-are-not-inverted tr)
-    helper (inj₂ (_ , _ , _ , _ , choice-right action               , choice-left (choice-right tr) , _)) = ⊥-elim (names-are-not-inverted tr)
-    helper (inj₂ (_ , _ , _ , _ , choice-right action               , choice-right tr               , _)) = ⊥-elim (names-are-not-inverted tr)
+    helper (inj₂ (_ , _ , _ , _ , sum-left (sum-left action)  , sum-left (sum-left tr)  , _)) = ⊥-elim (names-are-not-inverted tr)
+    helper (inj₂ (_ , _ , _ , _ , sum-left (sum-left action)  , sum-left (sum-right tr) , _)) = ⊥-elim (names-are-not-inverted tr)
+    helper (inj₂ (_ , _ , _ , _ , sum-left (sum-left action)  , sum-right tr            , _)) = ⊥-elim (names-are-not-inverted tr)
+    helper (inj₂ (_ , _ , _ , _ , sum-left (sum-right action) , sum-left (sum-left tr)  , _)) = ⊥-elim (names-are-not-inverted tr)
+    helper (inj₂ (_ , _ , _ , _ , sum-left (sum-right action) , sum-left (sum-right tr) , _)) = ⊥-elim (names-are-not-inverted tr)
+    helper (inj₂ (_ , _ , _ , _ , sum-left (sum-right action) , sum-right tr            , _)) = ⊥-elim (names-are-not-inverted tr)
+    helper (inj₂ (_ , _ , _ , _ , sum-right action            , sum-left (sum-left tr)  , _)) = ⊥-elim (names-are-not-inverted tr)
+    helper (inj₂ (_ , _ , _ , _ , sum-right action            , sum-left (sum-right tr) , _)) = ⊥-elim (names-are-not-inverted tr)
+    helper (inj₂ (_ , _ , _ , _ , sum-right action            , sum-right tr            , _)) = ⊥-elim (names-are-not-inverted tr)
 
   -- The two machines are not bisimilar.
 
   machine₁≁machine₂ : ¬ machine₁ ∼ machine₂
   machine₁≁machine₂ =
     machine₁ ∼ machine₂                                            ↝⟨ (λ hyp → B.right-to-left hyp
-                                                                                 (replication
-                                                                                    (par-right (choice-left (choice-left action))))) ⟩
+                                                                                 (replication (par-right (sum-left (sum-left action))))) ⟩
 
     (∃ λ P → machine₁ [ name pay ]⟶ P × P ∼′ machine₂ ∣ coffee ∙)  ↝⟨ Σ-map id (Σ-map (proj₂ ∘ machine₁⟶) id) ⟩
 
@@ -274,7 +273,7 @@ mutual
              P ∼′ machine₂ ∣ coffee ∙)                             ↝⟨ (λ { (_ , P∼ , P∼′) → transitive {a = ℓ} (symmetric P∼) (convert {a = ℓ} P∼′) }) ⟩
 
     machine₁ ∣ (coffee ∙ ⊕ tea ∙) ∼ machine₂ ∣ coffee ∙            ↝⟨ (λ hyp → Σ-map id proj₁ $
-                                                                                 B.left-to-right hyp (par-right (choice-right action))) ⟩
+                                                                                 B.left-to-right hyp (par-right (sum-right action))) ⟩
 
     (∃ λ P → machine₂ ∣ coffee ∙ [ name tea ]⟶ P)                  ↝⟨ helper ∘ proj₂ ⟩
 

@@ -219,13 +219,13 @@ module Cong-lemmas
     R′ (force Q) (force Q′) → P ⊕ μ · Q′ [ μ′ ]⟶ S′ →
     ∃ λ S → P ⊕ μ · Q [ μ′ ]⇒̂ S × R′ S S′
   ⊕·-cong {P} {Q} {Q′} {S′} {μ} {μ′} Q≳Q′ = λ where
-    (choice-left P⟶S′) →
-      P ⊕ μ · Q   →⟨ choice-left P⟶S′ ⟩■
+    (sum-left P⟶S′) →
+      P ⊕ μ · Q   →⟨ sum-left P⟶S′ ⟩■
         ⇒̂[ μ′ ]′
       S′          ■
 
-    (choice-right action) →
-      P ⊕ μ · Q  →⟨ choice-right action ⟩■
+    (sum-right action) →
+      P ⊕ μ · Q  →⟨ sum-right action ⟩■
         ⇒̂[ μ ]′
       force Q    ∼⟨ Q≳Q′ ⟩■
       force Q′
@@ -236,14 +236,14 @@ module Cong-lemmas
     μ₁ · P₁′ ⊕ μ₂ · P₂′ [ μ ]⟶ S′ →
     ∃ λ S → μ₁ · P₁ ⊕ μ₂ · P₂ [ μ ]⇒̂ S × R′ S S′
   ·⊕·-cong {μ₁} {μ₂} {P₁} {P₁′} {P₂} {P₂′} P₁≳P₁′ P₂≳P₂′ = λ where
-    (choice-left action) →
-      μ₁ · P₁ ⊕ μ₂ · P₂  →⟨ choice-left action ⟩■
+    (sum-left action) →
+      μ₁ · P₁ ⊕ μ₂ · P₂  →⟨ sum-left action ⟩■
         ⇒̂[ μ₁ ]′
       force P₁           ∼⟨ P₁≳P₁′ ⟩■
       force P₁′
 
-    (choice-right action) →
-      μ₁ · P₁ ⊕ μ₂ · P₂  →⟨ choice-right action ⟩■
+    (sum-right action) →
+      μ₁ · P₁ ⊕ μ₂ · P₂  →⟨ sum-right action ⟩■
         ⇒̂[ μ₂ ]′
       force P₂           ∼⟨ P₂≳P₂′ ⟩■
       force P₂′
@@ -444,12 +444,12 @@ mutual
 
   τa⊕b≉a⊕b : ¬ τ ∙ (a ∙) ⊕ b ∙ ≈ a ∙ ⊕ b ∙
   τa⊕b≉a⊕b τa⊕b≈a⊕b
-    with W.left-to-right τa⊕b≈a⊕b (choice-left action)
+    with W.left-to-right τa⊕b≈a⊕b (sum-left action)
   ... | _ , non-silent ¬s _ , _ = ⊥-elim (¬s _)
-  ... | _ , silent _ (step () (choice-left  action) _) , _
-  ... | _ , silent _ (step () (choice-right action) _) , _
+  ... | _ , silent _ (step () (sum-left  action) _) , _
+  ... | _ , silent _ (step () (sum-right action) _) , _
   ... | _ , silent _ done , a≈′a⊕b
-    with W.right-to-left (force a≈′a⊕b) (choice-right action)
+    with W.right-to-left (force a≈′a⊕b) (sum-right action)
   ...   | _ , silent () _ , _
   ...   | _ , non-silent _ (steps done () _) , _
   ...   | _ , non-silent _ (steps (step () action _) _ _) , _
@@ -496,15 +496,15 @@ mutual
        P ⊕ μ · Q [ μ′ ]⟶ R →
        ∃ λ R′ → P ⊕ μ · Q′ [ μ′ ]⟶̂ R′ × [ i ] R ≳′ R′
   lr {R} {μ′} = λ where
-    (choice-left P⟶R) →
+    (sum-left P⟶R) →
       R           ■
-        ⟵̂[ μ′ ]   ←⟨ choice-left P⟶R ⟩■
+        ⟵̂[ μ′ ]   ←⟨ sum-left P⟶R ⟩■
       P ⊕ μ · Q′
 
-    (choice-right action) →
+    (sum-right action) →
       force Q     ∼⟨ Q≳Q′ ⟩■
       force Q′
-        ⟵̂[ μ ]    ←⟨ choice-right action ⟩■
+        ⟵̂[ μ ]    ←⟨ sum-right action ⟩■
       P ⊕ μ · Q′
 
 ⊕·-cong′ : ∀ {i P μ Q Q′} →
@@ -535,16 +535,16 @@ _·⊕·-cong_ {i} {μ₁} {μ₂} {P₁} {P₁′} {P₂} {P₂′} P₁≳P₁
   lr : ∀ {R μ} → μ₁ · P₁ ⊕ μ₂ · P₂ [ μ ]⟶ R →
        ∃ λ R′ → μ₁ · P₁′ ⊕ μ₂ · P₂′ [ μ ]⟶̂ R′ × [ i ] R ≳′ R′
   lr = λ where
-    (choice-left action) →
+    (sum-left action) →
       force P₁             ∼⟨ P₁≳P₁′ ⟩■
       force P₁′
-        ⟵̂[ μ₁ ]            ←⟨ choice-left action ⟩■
+        ⟵̂[ μ₁ ]            ←⟨ sum-left action ⟩■
       μ₁ · P₁′ ⊕ μ₂ · P₂′
 
-    (choice-right action) →
+    (sum-right action) →
       force P₂             ∼⟨ P₂≳P₂′ ⟩■
       force P₂′
-        ⟵̂[ μ₂ ]            ←⟨ choice-right action ⟩■
+        ⟵̂[ μ₂ ]            ←⟨ sum-right action ⟩■
       μ₁ · P₁′ ⊕ μ₂ · P₂′
 
 _·⊕·-cong′_ :

@@ -83,17 +83,17 @@ a ∉ name (b , _) = a ≢ b
 -- Transition relation.
 
 data _[_]⟶_ : Proc ∞ → Action → Proc ∞ → Set ℓ where
-  par-left     : ∀ {P Q P′ μ} → P [ μ ]⟶ P′ → P ∣ Q [ μ ]⟶ P′ ∣ Q
-  par-right    : ∀ {P Q Q′ μ} → Q [ μ ]⟶ Q′ → P ∣ Q [ μ ]⟶ P  ∣ Q′
-  par-τ        : ∀ {P P′ Q Q′ a} →
-                 P [ name a ]⟶ P′ → Q [ name (co a) ]⟶ Q′ →
-                 P ∣ Q [ τ ]⟶ P′ ∣ Q′
-  choice-left  : ∀ {P Q P′ μ} → P [ μ ]⟶ P′ → P ⊕ Q [ μ ]⟶ P′
-  choice-right : ∀ {P Q Q′ μ} → Q [ μ ]⟶ Q′ → P ⊕ Q [ μ ]⟶ Q′
-  action       : ∀ {P μ} → μ · P [ μ ]⟶ force P
-  restriction  : ∀ {P P′ a μ} →
-                 a ∉ μ → P [ μ ]⟶ P′ → ⟨ν a ⟩ P [ μ ]⟶ ⟨ν a ⟩ P′
-  replication  : ∀ {P P′ μ} → ! P ∣ P [ μ ]⟶ P′ → ! P [ μ ]⟶ P′
+  par-left    : ∀ {P Q P′ μ} → P [ μ ]⟶ P′ → P ∣ Q [ μ ]⟶ P′ ∣ Q
+  par-right   : ∀ {P Q Q′ μ} → Q [ μ ]⟶ Q′ → P ∣ Q [ μ ]⟶ P  ∣ Q′
+  par-τ       : ∀ {P P′ Q Q′ a} →
+                P [ name a ]⟶ P′ → Q [ name (co a) ]⟶ Q′ →
+                P ∣ Q [ τ ]⟶ P′ ∣ Q′
+  sum-left    : ∀ {P Q P′ μ} → P [ μ ]⟶ P′ → P ⊕ Q [ μ ]⟶ P′
+  sum-right   : ∀ {P Q Q′ μ} → Q [ μ ]⟶ Q′ → P ⊕ Q [ μ ]⟶ Q′
+  action      : ∀ {P μ} → μ · P [ μ ]⟶ force P
+  restriction : ∀ {P P′ a μ} →
+                a ∉ μ → P [ μ ]⟶ P′ → ⟨ν a ⟩ P [ μ ]⟶ ⟨ν a ⟩ P′
+  replication : ∀ {P P′ μ} → ! P ∣ P [ μ ]⟶ P′ → ! P [ μ ]⟶ P′
 
 -- The CCS LTS.
 
@@ -333,8 +333,8 @@ names-are-not-inverted {a} {P} {Q} =
          (∀ {P′ μ} → P₁ [ μ ]⟶ P′ → μ₀ ≡ μ) →
          (∀ {P′ μ} → P₂ [ μ ]⟶ P′ → μ₀ ≡ μ) →
          ∀ {P′ μ} → P₁ ⊕ P₂ [ μ ]⟶ P′ → μ₀ ≡ μ
-⊕-only only₁ only₂ (choice-left tr)  = only₁ tr
-⊕-only only₁ only₂ (choice-right tr) = only₂ tr
+⊕-only only₁ only₂ (sum-left tr)  = only₁ tr
+⊕-only only₁ only₂ (sum-right tr) = only₂ tr
 
 -- If P can only make μ-transitions, then ⟨ν a ⟩ P can only make
 -- μ-transitions.
@@ -351,15 +351,15 @@ names-are-not-inverted {a} {P} {Q} =
   name a · P ⊕ name b · Q [ name c ]⟶      R →
   name a · P ⊕ name b · Q [ name (co c) ]⟶ S →
   b ≡ co a × (R ≡ force P × S ≡ force Q ⊎ R ≡ force Q × S ≡ force P)
-·⊕·-co (choice-left  action)
-       (choice-left  tr)     = ⊥-elim (names-are-not-inverted tr)
-·⊕·-co (choice-left  action)
-       (choice-right action) = refl , inj₁ (refl , refl)
-·⊕·-co (choice-right action)
-       (choice-left  action) =   sym (co-involutive _)
-                               , inj₂ (refl , refl)
-·⊕·-co (choice-right action)
-       (choice-right tr)     = ⊥-elim (names-are-not-inverted tr)
+·⊕·-co (sum-left  action)
+       (sum-left  tr)     = ⊥-elim (names-are-not-inverted tr)
+·⊕·-co (sum-left  action)
+       (sum-right action) = refl , inj₁ (refl , refl)
+·⊕·-co (sum-right action)
+       (sum-left  action) =   sym (co-involutive _)
+                            , inj₂ (refl , refl)
+·⊕·-co (sum-right action)
+       (sum-right tr)     = ⊥-elim (names-are-not-inverted tr)
 
 -- Lemma 6.2.15 from "Enhancements of the bisimulation proof method".
 -- That text claims that the lemma is proved by induction on the
@@ -380,8 +380,8 @@ names-are-not-inverted {a} {P} {Q} =
 6-2-15 (C₁ ∣ C₂)  (w₁ ∣ w₂) (par-τ tr₁ tr₂)      = Σ-zip _∣_ (Σ-zip (cong₂ _)
                                                                     (λ trs₁ trs₂ Qs → par-τ (trs₁ Qs) (trs₂ Qs)))
                                                      (6-2-15 C₁ w₁ tr₁) (6-2-15 C₂ w₂ tr₂)
-6-2-15 (C₁ ⊕ C₂)  (w₁ ⊕ w₂) (choice-left  tr)    = Σ-map id (Σ-map id (choice-left  ∘_)) (6-2-15 C₁ w₁ tr)
-6-2-15 (C₁ ⊕ C₂)  (w₁ ⊕ w₂) (choice-right tr)    = Σ-map id (Σ-map id (choice-right ∘_)) (6-2-15 C₂ w₂ tr)
+6-2-15 (C₁ ⊕ C₂)  (w₁ ⊕ w₂) (sum-left  tr)       = Σ-map id (Σ-map id (sum-left  ∘_)) (6-2-15 C₁ w₁ tr)
+6-2-15 (C₁ ⊕ C₂)  (w₁ ⊕ w₂) (sum-right tr)       = Σ-map id (Σ-map id (sum-right ∘_)) (6-2-15 C₂ w₂ tr)
 6-2-15 (μ · C)    action    action               = force C , refl , λ _ → action
 6-2-15 (⟨ν a ⟩ C) (⟨ν⟩ w)   (restriction a∉μ tr) = Σ-map ⟨ν a ⟩ (Σ-map (cong _) (restriction a∉μ ∘_)) (6-2-15 C w tr)
 6-2-15 (! C)      (! w)     (replication tr)     = Σ-map id (Σ-map id (replication ∘_)) (6-2-15 (! C ∣ C) (! w ∣ w) tr)

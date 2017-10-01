@@ -77,18 +77,18 @@ module Cong-lemmas
     R P₁ P₁′ → R P₂ P₂′ → P₁ ⊕ P₂ [ μ ]⟶ S →
     ∃ λ S′ → P₁′ ⊕ P₂′ [ μ ]⟶ S′ × R′ S S′
   ⊕-cong {P₁} {P₁′} {P₂} {P₂′} {S} {μ} P₁∼P₁′ P₂∼P₂′ = λ where
-    (choice-left P₁⟶S) → case left-to-right P₁∼P₁′ P₁⟶S of λ where
+    (sum-left P₁⟶S) → case left-to-right P₁∼P₁′ P₁⟶S of λ where
       (S′ , P₁′⟶S′ , S∼′S′) →
         S          ∼⟨ S∼′S′ ⟩■
         S′
-          [ μ ]⟵   ←⟨ choice-left P₁′⟶S′ ⟩■
+          [ μ ]⟵   ←⟨ sum-left P₁′⟶S′ ⟩■
         P₁′ ⊕ P₂′
 
-    (choice-right P₂⟶S) → case left-to-right P₂∼P₂′ P₂⟶S of λ where
+    (sum-right P₂⟶S) → case left-to-right P₂∼P₂′ P₂⟶S of λ where
       (S′ , P₂′⟶S′ , S∼′S′) →
         S          ∼⟨ S∼′S′ ⟩■
         S′
-          [ μ ]⟵   ←⟨ choice-right P₂′⟶S′ ⟩■
+          [ μ ]⟵   ←⟨ sum-right P₂′⟶S′ ⟩■
         P₁′ ⊕ P₂′
 
   ·-cong :
@@ -360,13 +360,13 @@ mutual
          ∃ λ Q → ! a ∙ ∣ ! b ∙ [ μ ]⟶ Q × [ i ] P ∼′ Q
     lr {a} {b} {P} tr = case 6-1-3-2 tr of λ where
 
-      (inj₁ (.∅ , choice-left action , P∼![a⊕b]∣∅)) →
+      (inj₁ (.∅ , sum-left action , P∼![a⊕b]∣∅)) →
         P                    ∼⟨ P∼![a⊕b]∣∅ ⟩ ∼′:
         ! (a ∙ ⊕ b ∙) ∣ ∅    ∼⟨ left-lemma ⟩■
         (! a ∙ ∣ ∅) ∣ ! b ∙  [ name a ]⟵⟨ par-left (replication (par-right action)) ⟩
         ! a ∙       ∣ ! b ∙
 
-      (inj₁ (.∅ , choice-right action , P∼![a⊕b]∣∅)) →
+      (inj₁ (.∅ , sum-right action , P∼![a⊕b]∣∅)) →
         P                    ∼⟨ P∼![a⊕b]∣∅ ⟩ ∼′:
         ! (a ∙ ⊕ b ∙) ∣ ∅    ∼⟨ right-lemma ⟩■
         ! a ∙ ∣ (! b ∙ ∣ ∅)  [ name b ]⟵⟨ par-right (replication (par-right action)) ⟩
@@ -390,7 +390,7 @@ mutual
       case 6-1-3-2 tr of λ where
 
         (inj₁ (.∅ , action , P′∼!a∣∅)) →
-          ! (a ∙ ⊕ b ∙)        [ name a ]⟶⟨ replication (par-right (choice-left action)) ⟩ʳˡ
+          ! (a ∙ ⊕ b ∙)        [ name a ]⟶⟨ replication (par-right (sum-left action)) ⟩ʳˡ
           ! (a ∙ ⊕ b ∙) ∣ ∅    ∼⟨ left-lemma ⟩ ∼′:
           (! a ∙ ∣ ∅) ∣ ! b ∙  ∼⟨ symmetric P′∼!a∣∅ ∣-cong reflexive ⟩■
           P′ ∣ ! b ∙
@@ -402,7 +402,7 @@ mutual
       case 6-1-3-2 tr of λ where
 
         (inj₁ (.∅ , action , Q′∼!b∣∅)) →
-          ! (a ∙ ⊕ b ∙)        [ name b ]⟶⟨ replication (par-right (choice-right action)) ⟩ʳˡ
+          ! (a ∙ ⊕ b ∙)        [ name b ]⟶⟨ replication (par-right (sum-right action)) ⟩ʳˡ
           ! (a ∙ ⊕ b ∙) ∣ ∅    ∼⟨ right-lemma ⟩ ∼′:
           ! a ∙ ∣ (! b ∙ ∣ ∅)  ∼⟨ reflexive ∣-cong symmetric Q′∼!b∣∅ ⟩■
           ! a ∙ ∣ Q′
@@ -415,8 +415,8 @@ mutual
 
         (inj₁ (.∅ , action , P′∼!a∣∅) ,
          inj₁ (.∅ , action , Q′∼!co-a∣∅)) →
-          ! (a ∙ ⊕ co a ∙)              [ τ ]⟶⟨ replication (par-τ (replication (par-right (choice-left action)))
-                                                                   (choice-right action)) ⟩ʳˡ
+          ! (a ∙ ⊕ co a ∙)              [ τ ]⟶⟨ replication (par-τ (replication (par-right (sum-left action)))
+                                                                   (sum-right action)) ⟩ʳˡ
           (! (a ∙ ⊕ co a ∙) ∣ ∅) ∣ ∅    ∼⟨ τ-lemma ⟩ ∼′:
           (! a ∙ ∣ ∅) ∣ (! co a ∙ ∣ ∅)  ∼⟨ symmetric (P′∼!a∣∅ ∣-cong Q′∼!co-a∣∅) ⟩■
           P′ ∣ Q′
@@ -685,8 +685,8 @@ module _ (ext : Proc-extensionality) where
                                                                                    weaken C₁ ∣ hole fzero [ b ][ Ps∼Qs ]-cong₁)) (lr C₂ Ps∼Qs tr)
     lr (C₁ ∣ C₂)  Ps∼Qs (par-τ tr₁ tr₂)     = Σ-zip _∣_ (Σ-zip par-τ (λ b₁ b₂ → hole fzero ∣ hole (fsuc fzero) [ b₁ ][ b₂ ]-cong₂))
                                                 (lr C₁ Ps∼Qs tr₁) (lr C₂ Ps∼Qs tr₂)
-    lr (C₁ ⊕ C₂)  Ps∼Qs (choice-left tr)    = Σ-map id (Σ-map choice-left id) (lr C₁ Ps∼Qs tr)
-    lr (C₁ ⊕ C₂)  Ps∼Qs (choice-right tr)   = Σ-map id (Σ-map choice-right id) (lr C₂ Ps∼Qs tr)
+    lr (C₁ ⊕ C₂)  Ps∼Qs (sum-left tr)       = Σ-map id (Σ-map sum-left id) (lr C₁ Ps∼Qs tr)
+    lr (C₁ ⊕ C₂)  Ps∼Qs (sum-right tr)      = Σ-map id (Σ-map sum-right id) (lr C₂ Ps∼Qs tr)
     lr (μ · C)    Ps∼Qs action              = _ , action , force C [ Ps∼Qs ]-cong₂′
     lr (⟨ν a ⟩ C) Ps∼Qs (restriction a∉ tr) = Σ-map ⟨ν a ⟩ (Σ-map (restriction a∉) (λ b → ⟨ν a ⟩ (hole fzero) [ b ][ Ps∼Qs ]-cong₁))
                                                 (lr C Ps∼Qs tr)
@@ -752,13 +752,13 @@ mutual
          ∃ λ S → ! name a ∙ P ∣ ! name b ∙ Q [ μ ]⟶ S × [ i ] R ∼′ S
     lr {a} {b} {P} {Q} {R} tr = case 6-1-3-2 tr of λ where
 
-      (inj₁ (.P , choice-left action , R∼![aP⊕bQ]∣P)) →
+      (inj₁ (.P , sum-left action , R∼![aP⊕bQ]∣P)) →
         R                                  ∼⟨ R∼![aP⊕bQ]∣P ⟩ ∼′:
         ! (name a ∙ P ⊕ name b ∙ Q) ∣ P    ∼⟨ left-lemma ⟩■
         (! name a ∙ P ∣ P) ∣ ! name b ∙ Q  [ name a ]⟵⟨ par-left (replication (par-right action)) ⟩
         ! name a ∙ P       ∣ ! name b ∙ Q
 
-      (inj₁ (.Q , choice-right action , R∼![aP⊕bQ]∣Q)) →
+      (inj₁ (.Q , sum-right action , R∼![aP⊕bQ]∣Q)) →
         R                                  ∼⟨ R∼![aP⊕bQ]∣Q ⟩ ∼′:
         ! (name a ∙ P ⊕ name b ∙ Q) ∣ Q    ∼⟨ right-lemma ⟩■
         ! name a ∙ P ∣ (! name b ∙ Q ∣ Q)  [ name b ]⟵⟨ par-right (replication (par-right action)) ⟩
@@ -792,7 +792,7 @@ mutual
     rl {a} {b} {P} {Q} (par-left {P′ = S} tr) =
       case 6-1-3-2 tr of λ where
         (inj₁ (.P , action , S∼!aP∣P)) →
-          ! (name a ∙ P ⊕ name b ∙ Q)        [ name a ]⟶⟨ replication (par-right (choice-left action)) ⟩ʳˡ
+          ! (name a ∙ P ⊕ name b ∙ Q)        [ name a ]⟶⟨ replication (par-right (sum-left action)) ⟩ʳˡ
           ! (name a ∙ P ⊕ name b ∙ Q) ∣ P    ∼⟨ left-lemma ⟩ ∼′:
           (! name a ∙ P ∣ P) ∣ ! name b ∙ Q  ∼⟨ symmetric S∼!aP∣P ∣-cong reflexive ⟩■
           S ∣ ! name b ∙ Q
@@ -803,7 +803,7 @@ mutual
     rl {a} {b} {P} {Q} (par-right {Q′ = S} tr) =
       case 6-1-3-2 tr of λ where
         (inj₁ (.Q , action , S∼!bQ∣Q)) →
-          ! (name a ∙ P ⊕ name b ∙ Q)        [ name b ]⟶⟨ replication (par-right (choice-right action)) ⟩ʳˡ
+          ! (name a ∙ P ⊕ name b ∙ Q)        [ name b ]⟶⟨ replication (par-right (sum-right action)) ⟩ʳˡ
           ! (name a ∙ P ⊕ name b ∙ Q) ∣ Q    ∼⟨ right-lemma ⟩ ∼′:
           ! name a ∙ P ∣ (! name b ∙ Q ∣ Q)  ∼⟨ reflexive ∣-cong symmetric S∼!bQ∣Q ⟩■
           ! name a ∙ P ∣ S
@@ -815,8 +815,8 @@ mutual
       case 6-1-3-2 tr₁ ,′ 6-1-3-2 tr₂ of λ where
         (inj₁ (.P , action , S∼!aP∣P) ,
          inj₁ (.Q , action , S′∼!co-aQ∣Q)) →
-          ! (name a ∙ P ⊕ name (co a) ∙ Q)              [ τ ]⟶⟨ replication (par-τ (replication (par-right (choice-left action)))
-                                                                                   (choice-right action)) ⟩ʳˡ
+          ! (name a ∙ P ⊕ name (co a) ∙ Q)              [ τ ]⟶⟨ replication (par-τ (replication (par-right (sum-left action)))
+                                                                                   (sum-right action)) ⟩ʳˡ
           (! (name a ∙ P ⊕ name (co a) ∙ Q) ∣ P) ∣ Q    ∼⟨ τ-lemma ⟩ ∼′:
           (! name a ∙ P ∣ P) ∣ (! name (co a) ∙ Q ∣ Q)  ∼⟨ symmetric (S∼!aP∣P ∣-cong S′∼!co-aQ∣Q) ⟩■
           S ∣ S′
@@ -876,18 +876,18 @@ mutual
 ⊕-idempotent {P} =
   ⟨ lr
   , (λ {R} P⟶R →
-       P ⊕ P  ⟶⟨ choice-left P⟶R ⟩ʳˡ
+       P ⊕ P  ⟶⟨ sum-left P⟶R ⟩ʳˡ
        R      ∼⟨ ∼′: reflexive ⟩■
        R)
   ⟩
   where
   lr : ∀ {Q μ} → P ⊕ P [ μ ]⟶ Q → ∃ λ R → P [ μ ]⟶ R × Q ∼′ R
-  lr {Q} (choice-left P⟶Q) =
+  lr {Q} (sum-left P⟶Q) =
     Q  ∼⟨ ∼′: reflexive ⟩■
     Q  ⟵⟨ P⟶Q ⟩
     P
 
-  lr {Q} (choice-right P⟶Q) =
+  lr {Q} (sum-right P⟶Q) =
     Q  ∼⟨ ∼′: reflexive ⟩■
     Q  ⟵⟨ P⟶Q ⟩
     P
@@ -903,12 +903,12 @@ force ⊕-idempotent′ = ⊕-idempotent
   lr : ∀ {P Q R μ} →
        P ⊕ Q [ μ ]⟶ R → ∃ λ R′ → Q ⊕ P [ μ ]⟶ R′ × R ∼′ R′
   lr {P} {Q} {R} = λ where
-    (choice-left  P⟶R) →
-      R      ■ ⟵⟨ choice-right P⟶R ⟩
+    (sum-left  P⟶R) →
+      R      ■ ⟵⟨ sum-right P⟶R ⟩
       Q ⊕ P
 
-    (choice-right Q⟶R) →
-      R      ■ ⟵⟨ choice-left Q⟶R ⟩
+    (sum-right Q⟶R) →
+      R      ■ ⟵⟨ sum-left Q⟶R ⟩
       Q ⊕ P
 
 ------------------------------------------------------------------------
@@ -1092,20 +1092,20 @@ mutual
         return (const $ ∃ λ _ → _ × [ i ] _ ∼′ _)
         of λ where
 
-        (inj₁ (P′ , choice-left P⟶P′ , R∼![P⊕Q]∣P′)) →
+        (inj₁ (P′ , sum-left P⟶P′ , R∼![P⊕Q]∣P′)) →
           R                 ∼⟨ R∼![P⊕Q]∣P′ ⟩ ∼′:
           ! (P ⊕ Q) ∣ P′    ∼⟨ left-lemma ⟩■
           (! P ∣ P′) ∣ ! Q  ⟵⟨ par-left (replication (par-right P⟶P′)) ⟩
           ! P        ∣ ! Q
 
-        (inj₁ (Q′ , choice-right Q⟶Q′ , R∼![P⊕Q]∣Q′)) →
+        (inj₁ (Q′ , sum-right Q⟶Q′ , R∼![P⊕Q]∣Q′)) →
           R                 ∼⟨ R∼![P⊕Q]∣Q′ ⟩ ∼′:
           ! (P ⊕ Q) ∣ Q′    ∼⟨ right-lemma ⟩■
           ! P ∣ (! Q ∣ Q′)  ⟵⟨ par-right (replication (par-right Q⟶Q′)) ⟩
           ! P ∣  ! Q
 
         (inj₂ ( refl , P′ , P″ , c
-              , choice-left P⟶P′ , choice-left P⟶P″
+              , sum-left P⟶P′ , sum-left P⟶P″
               , R∼![P⊕Q]∣P′∣P″
               )) →
           R                        ∼⟨ R∼![P⊕Q]∣P′∣P″ ⟩ ∼′:
@@ -1114,7 +1114,7 @@ mutual
           ! P ∣ ! Q
 
         (inj₂ ( refl , P′ , Q′ , c
-              , choice-left P⟶P′ , choice-right Q⟶Q′
+              , sum-left P⟶P′ , sum-right Q⟶Q′
               , R∼![P⊕Q]∣P′∣Q′
               )) →
           R                        ∼⟨ R∼![P⊕Q]∣P′∣Q′ ⟩ ∼′:
@@ -1124,7 +1124,7 @@ mutual
           ! P ∣ ! Q
 
         (inj₂ ( refl , Q′ , P′ , c
-              , choice-right Q⟶Q′ , choice-left P⟶P′
+              , sum-right Q⟶Q′ , sum-left P⟶P′
               , R∼![P⊕Q]∣Q′∣P′
               )) →
           R                        ∼⟨ R∼![P⊕Q]∣Q′∣P′ ⟩
@@ -1136,7 +1136,7 @@ mutual
           ! P ∣ ! Q
 
         (inj₂ ( refl , Q′ , Q″ , c
-              , choice-right Q⟶Q′ , choice-right Q⟶Q″
+              , sum-right Q⟶Q′ , sum-right Q⟶Q″
               , R∼![P⊕Q]∣Q′∣Q″
               )) →
           R                        ∼⟨ R∼![P⊕Q]∣Q′∣Q″ ⟩ ∼′:
@@ -1152,14 +1152,14 @@ mutual
         return (const $ ∃ λ _ → _ × [ i ] _ ∼′ _)
         of λ where
         (inj₁ (P′ , P⟶P′ , S∼!P∣P′)) →
-          ! (P ⊕ Q)         ⟶⟨ replication (par-right (choice-left P⟶P′)) ⟩ʳˡ
+          ! (P ⊕ Q)         ⟶⟨ replication (par-right (sum-left P⟶P′)) ⟩ʳˡ
           ! (P ⊕ Q) ∣ P′    ∼⟨ left-lemma ⟩ ∼′:
           (! P ∣ P′) ∣ ! Q  ∼⟨ symmetric S∼!P∣P′ ∣-cong reflexive ⟩■
           S ∣ ! Q
 
         (inj₂ (refl , P′ , P″ , a , P⟶P′ , P⟶P″ , S∼!P∣P′∣P″)) →
-          ! (P ⊕ Q)                [ τ ]⟶⟨ replication (par-τ (replication (par-right (choice-left P⟶P′)))
-                                                              (choice-left P⟶P″)) ⟩ʳˡ
+          ! (P ⊕ Q)                [ τ ]⟶⟨ replication (par-τ (replication (par-right (sum-left P⟶P′)))
+                                                              (sum-left P⟶P″)) ⟩ʳˡ
           (! (P ⊕ Q) ∣ P′) ∣ P″    ∼⟨ τ-lemma₁ ⟩ ∼′:
           ((! P ∣ P′) ∣ P″) ∣ ! Q  ∼⟨ symmetric S∼!P∣P′∣P″ ∣-cong reflexive ⟩■
           S ∣ ! Q
@@ -1169,14 +1169,14 @@ mutual
         return (const $ ∃ λ _ → _ × [ i ] _ ∼′ _)
         of λ where
         (inj₁ (Q′ , Q⟶Q′ , S∼!Q∣Q′)) →
-          ! (P ⊕ Q)         ⟶⟨ replication (par-right (choice-right Q⟶Q′)) ⟩ʳˡ
+          ! (P ⊕ Q)         ⟶⟨ replication (par-right (sum-right Q⟶Q′)) ⟩ʳˡ
           ! (P ⊕ Q) ∣ Q′    ∼⟨ right-lemma ⟩ ∼′:
           ! P ∣ (! Q ∣ Q′)  ∼⟨ reflexive ∣-cong symmetric S∼!Q∣Q′ ⟩■
           ! P ∣ S
 
         (inj₂ (refl , Q′ , Q″ , a , Q⟶Q′ , Q⟶Q″ , S∼!Q∣Q′∣Q″)) →
-          ! (P ⊕ Q)                [ τ ]⟶⟨ replication (par-τ (replication (par-right (choice-right Q⟶Q′)))
-                                                              (choice-right Q⟶Q″)) ⟩ʳˡ
+          ! (P ⊕ Q)                [ τ ]⟶⟨ replication (par-τ (replication (par-right (sum-right Q⟶Q′)))
+                                                              (sum-right Q⟶Q″)) ⟩ʳˡ
           (! (P ⊕ Q) ∣ Q′) ∣ Q″    ∼⟨ τ-lemma₃ ⟩ ∼′:
           ! P ∣ ((! Q ∣ Q′) ∣ Q″)  ∼⟨ reflexive ∣-cong symmetric S∼!Q∣Q′∣Q″ ⟩■
           ! P ∣ S
@@ -1185,8 +1185,8 @@ mutual
       case 6-1-3-2 !P⟶S ,′ 6-1-3-2 !Q⟶S′ of λ where
         (inj₁ (P′ , P⟶P′ , S∼!P∣P′) ,
          inj₁ (Q′ , Q⟶Q′ , S′∼!Q∣Q′)) →
-          ! (P ⊕ Q)                [ τ ]⟶⟨ replication (par-τ (replication (par-right (choice-left P⟶P′)))
-                                                                                      (choice-right Q⟶Q′)) ⟩ʳˡ
+          ! (P ⊕ Q)                [ τ ]⟶⟨ replication (par-τ (replication (par-right (sum-left P⟶P′)))
+                                                                                      (sum-right Q⟶Q′)) ⟩ʳˡ
           (! (P ⊕ Q) ∣ P′) ∣ Q′    ∼⟨ τ-lemma₂ ⟩ ∼′:
           (! P ∣ P′) ∣ (! Q ∣ Q′)  ∼⟨ symmetric (S∼!P∣P′ ∣-cong S′∼!Q∣Q′) ⟩■
           S ∣ S′
