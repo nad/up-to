@@ -90,15 +90,15 @@ refl ·-cong′ = reflexive
 
 mutual
 
-  -- ν preserves similarity.
+  -- ⟨ν_⟩ preserves similarity.
 
-  ν-cong : ∀ {i a a′ P P′} →
-           a ≡ a′ → [ i ] P ≤ P′ → [ i ] ν a P ≤ ν a′ P′
-  ν-cong refl P≤P′ = ⟨ CL.ν-cong (ν-cong′ refl) P≤P′ ⟩
+  ⟨ν_⟩-cong : ∀ {i a a′ P P′} →
+              a ≡ a′ → [ i ] P ≤ P′ → [ i ] ⟨ν a ⟩ P ≤ ⟨ν a′ ⟩ P′
+  ⟨ν refl ⟩-cong P≤P′ = ⟨ CL.⟨ν⟩-cong ⟨ν refl ⟩-cong′ P≤P′ ⟩
 
-  ν-cong′ : ∀ {i a a′ P P′} →
-            a ≡ a′ → [ i ] P ≤′ P′ → [ i ] ν a P ≤′ ν a′ P′
-  force (ν-cong′ a≡a′ P≤P′) = ν-cong a≡a′ (force P≤P′)
+  ⟨ν_⟩-cong′ : ∀ {i a a′ P P′} →
+               a ≡ a′ → [ i ] P ≤′ P′ → [ i ] ⟨ν a ⟩ P ≤′ ⟨ν a′ ⟩ P′
+  force (⟨ν a≡a′ ⟩-cong′ P≤P′) = ⟨ν a≡a′ ⟩-cong (force P≤P′)
 
 mutual
 
@@ -123,13 +123,13 @@ mutual
     ∀ {i n Ps Qs}
     (C : Context ∞ n) → (∀ x → [ i ] Ps x ≤ Qs x) →
     [ i ] C [ Ps ] ≤ C [ Qs ]
-  hole x  [ Ps≤Qs ]-cong = Ps≤Qs x
-  ∅       [ Ps≤Qs ]-cong = reflexive
-  C₁ ∣ C₂ [ Ps≤Qs ]-cong = (C₁ [ Ps≤Qs ]-cong) ∣-cong (C₂ [ Ps≤Qs ]-cong)
-  C₁ ⊕ C₂ [ Ps≤Qs ]-cong = (C₁ [ Ps≤Qs ]-cong) ⊕-cong (C₂ [ Ps≤Qs ]-cong)
-  μ ·′ C  [ Ps≤Qs ]-cong = refl ·′-cong λ { .force → force C [ Ps≤Qs ]-cong }
-  ν a C   [ Ps≤Qs ]-cong = ν-cong refl (C [ Ps≤Qs ]-cong)
-  ! C     [ Ps≤Qs ]-cong = !-cong (C [ Ps≤Qs ]-cong)
+  hole x   [ Ps≤Qs ]-cong = Ps≤Qs x
+  ∅        [ Ps≤Qs ]-cong = reflexive
+  C₁ ∣ C₂  [ Ps≤Qs ]-cong = (C₁ [ Ps≤Qs ]-cong) ∣-cong (C₂ [ Ps≤Qs ]-cong)
+  C₁ ⊕ C₂  [ Ps≤Qs ]-cong = (C₁ [ Ps≤Qs ]-cong) ⊕-cong (C₂ [ Ps≤Qs ]-cong)
+  μ ·′ C   [ Ps≤Qs ]-cong = refl ·′-cong λ { .force → force C [ Ps≤Qs ]-cong }
+  ⟨ν a ⟩ C [ Ps≤Qs ]-cong = ⟨ν refl ⟩-cong (C [ Ps≤Qs ]-cong)
+  ! C      [ Ps≤Qs ]-cong = !-cong (C [ Ps≤Qs ]-cong)
 
   _[_]-cong′ :
     ∀ {i n Ps Qs}

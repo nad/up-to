@@ -24,7 +24,7 @@ open import Up-to
 
 private
   module CCS {ℓ} where
-    open Labelled-transition-system.CCS (↑ ℓ ⊤) public hiding (ν)
+    open Labelled-transition-system.CCS (↑ ℓ ⊤) public
     open module B = Bisimilarity.Coinductive CCS public
     open module S = Similarity.Strong CCS public using (Similarity)
 open CCS

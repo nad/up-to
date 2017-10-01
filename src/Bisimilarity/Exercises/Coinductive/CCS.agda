@@ -101,18 +101,19 @@ module Cong-lemmas
       [ μ ]⟵  ←⟨ _[_]⟶_.action ⟩■
     μ ·′ P₂
 
-  ν-cong :
-    (∀ {a P P′} → R′ P P′ → R′ (ν a P) (ν a P′)) →
+  ⟨ν⟩-cong :
+    (∀ {a P P′} → R′ P P′ → R′ (⟨ν a ⟩ P) (⟨ν a ⟩ P′)) →
     ∀ {a μ P P′ Q} →
-    R P P′ → ν a P [ μ ]⟶ Q →
-    ∃ λ Q′ → ν a P′ [ μ ]⟶ Q′ × R′ Q Q′
-  ν-cong ν-cong′ {a} {μ} {P′ = P′} P∼P′ (restriction {P′ = Q} a∉μ P⟶Q) =
+    R P P′ → ⟨ν a ⟩ P [ μ ]⟶ Q →
+    ∃ λ Q′ → ⟨ν a ⟩ P′ [ μ ]⟶ Q′ × R′ Q Q′
+  ⟨ν⟩-cong ⟨ν⟩-cong′ {a} {μ} {P′ = P′} P∼P′
+           (restriction {P′ = Q} a∉μ P⟶Q) =
     case left-to-right P∼P′ P⟶Q of λ where
       (Q′ , P′⟶Q′ , Q∼′Q′) →
-        ν a Q     ∼⟨ ν-cong′ Q∼′Q′ ⟩■
-        ν a Q′
-          [ μ ]⟵  ←⟨ restriction a∉μ P′⟶Q′ ⟩■
-        ν a P′
+        ⟨ν a ⟩ Q   ∼⟨ ⟨ν⟩-cong′ Q∼′Q′ ⟩■
+        ⟨ν a ⟩ Q′
+          [ μ ]⟵   ←⟨ restriction a∉μ P′⟶Q′ ⟩■
+        ⟨ν a ⟩ P′
 
   !-cong :
     (∀ {μ P P₀} →
@@ -587,20 +588,20 @@ mutual
 
 mutual
 
-  -- ν preserves bisimilarity.
+  -- ⟨ν_⟩ preserves bisimilarity.
 
-  ν-cong : ∀ {i a a′ P P′} →
-           a ≡ a′ → [ i ] P ∼ P′ → [ i ] ν a P ∼ ν a′ P′
-  ν-cong refl = λ P∼P′ →
+  ⟨ν_⟩-cong : ∀ {i a a′ P P′} →
+              a ≡ a′ → [ i ] P ∼ P′ → [ i ] ⟨ν a ⟩ P ∼ ⟨ν a′ ⟩ P′
+  ⟨ν refl ⟩-cong = λ P∼P′ →
     ⟨ lr P∼P′
     , Σ-map id (Σ-map id symmetric) ∘ lr (symmetric P∼P′)
     ⟩
     where
-    lr = CL.ν-cong (ν-cong′ refl)
+    lr = CL.⟨ν⟩-cong ⟨ν refl ⟩-cong′
 
-  ν-cong′ : ∀ {i a a′ P P′} →
-            a ≡ a′ → [ i ] P ∼′ P′ → [ i ] ν a P ∼′ ν a′ P′
-  force (ν-cong′ a≡a′ P∼P′) = ν-cong a≡a′ (force P∼P′)
+  ⟨ν_⟩-cong′ : ∀ {i a a′ P P′} →
+               a ≡ a′ → [ i ] P ∼′ P′ → [ i ] ⟨ν a ⟩ P ∼′ ⟨ν a′ ⟩ P′
+  force (⟨ν a≡a′ ⟩-cong′ P∼P′) = ⟨ν a≡a′ ⟩-cong (force P∼P′)
 
 -- _[_] preserves bisimilarity. (This result is related to Exercise
 -- 6.2.10.)
@@ -613,13 +614,13 @@ mutual
     ∀ {i n Ps Qs}
     (C : Context ∞ n) → (∀ x → [ i ] Ps x ∼ Qs x) →
     [ i ] C [ Ps ] ∼ C [ Qs ]
-  hole x  [ Ps∼Qs ]-cong = Ps∼Qs x
-  ∅       [ Ps∼Qs ]-cong = reflexive
-  C₁ ∣ C₂ [ Ps∼Qs ]-cong = (C₁ [ Ps∼Qs ]-cong) ∣-cong (C₂ [ Ps∼Qs ]-cong)
-  C₁ ⊕ C₂ [ Ps∼Qs ]-cong = (C₁ [ Ps∼Qs ]-cong) ⊕-cong (C₂ [ Ps∼Qs ]-cong)
-  μ ·′ C  [ Ps∼Qs ]-cong = refl ·′-cong λ { .force → force C [ Ps∼Qs ]-cong }
-  ν a C   [ Ps∼Qs ]-cong = ν-cong refl (C [ Ps∼Qs ]-cong)
-  ! C     [ Ps∼Qs ]-cong = !-cong (C [ Ps∼Qs ]-cong)
+  hole x   [ Ps∼Qs ]-cong = Ps∼Qs x
+  ∅        [ Ps∼Qs ]-cong = reflexive
+  C₁ ∣ C₂  [ Ps∼Qs ]-cong = (C₁ [ Ps∼Qs ]-cong) ∣-cong (C₂ [ Ps∼Qs ]-cong)
+  C₁ ⊕ C₂  [ Ps∼Qs ]-cong = (C₁ [ Ps∼Qs ]-cong) ⊕-cong (C₂ [ Ps∼Qs ]-cong)
+  μ ·′ C   [ Ps∼Qs ]-cong = refl ·′-cong λ { .force → force C [ Ps∼Qs ]-cong }
+  ⟨ν a ⟩ C [ Ps∼Qs ]-cong = ⟨ν refl ⟩-cong (C [ Ps∼Qs ]-cong)
+  ! C      [ Ps∼Qs ]-cong = !-cong (C [ Ps∼Qs ]-cong)
 
   _[_]-cong′ :
     ∀ {i n Ps Qs}
@@ -674,21 +675,22 @@ module _ (ext : Proc-extensionality) where
          (∀ x → [ i ] Ps x ∼ Qs x) →
          C [ Ps ] [ μ ]⟶ P′ →
          ∃ λ Q′ → C [ Qs ] [ μ ]⟶ Q′ × [ i ] P′ ∼′ Q′
-    lr (hole x)  Ps∼Qs tr                  = left-to-right (Ps∼Qs x) tr
-    lr ∅         Ps∼Qs ()
-    lr (C₁ ∣ C₂) Ps∼Qs (par-left tr)       = Σ-map (_∣ _) (Σ-map par-left (λ b → subst (λ P → [ i ] _ ∼′ _ ∣ P) (ext $ weaken-[] C₂) $
-                                                                                 subst (λ P → [ i ] _ ∣ P ∼′ _) (ext $ weaken-[] C₂) $
-                                                                                 hole fzero ∣ weaken C₂ [ b ][ Ps∼Qs ]-cong₁)) (lr C₁ Ps∼Qs tr)
-    lr (C₁ ∣ C₂) Ps∼Qs (par-right tr)      = Σ-map (_ ∣_) (Σ-map par-right (λ b → subst (λ P → [ i ] _ ∼′ P ∣ _) (ext $ weaken-[] C₁) $
-                                                                                  subst (λ P → [ i ] P ∣ _ ∼′ _) (ext $ weaken-[] C₁) $
-                                                                                  weaken C₁ ∣ hole fzero [ b ][ Ps∼Qs ]-cong₁)) (lr C₂ Ps∼Qs tr)
-    lr (C₁ ∣ C₂) Ps∼Qs (par-τ tr₁ tr₂)     = Σ-zip _∣_ (Σ-zip par-τ (λ b₁ b₂ → hole fzero ∣ hole (fsuc fzero) [ b₁ ][ b₂ ]-cong₂))
-                                               (lr C₁ Ps∼Qs tr₁) (lr C₂ Ps∼Qs tr₂)
-    lr (C₁ ⊕ C₂) Ps∼Qs (choice-left tr)    = Σ-map id (Σ-map choice-left id) (lr C₁ Ps∼Qs tr)
-    lr (C₁ ⊕ C₂) Ps∼Qs (choice-right tr)   = Σ-map id (Σ-map choice-right id) (lr C₂ Ps∼Qs tr)
-    lr (μ ·′ C)  Ps∼Qs action              = _ , action , force C [ Ps∼Qs ]-cong₂′
-    lr (ν a C)   Ps∼Qs (restriction a∉ tr) = Σ-map (ν a) (Σ-map (restriction a∉) (λ b → ν a (hole fzero) [ b ][ Ps∼Qs ]-cong₁)) (lr C Ps∼Qs tr)
-    lr (! C)     Ps∼Qs (replication tr)    = Σ-map id (Σ-map replication id) (lr (! C ∣ C) Ps∼Qs tr)
+    lr (hole x)   Ps∼Qs tr                  = left-to-right (Ps∼Qs x) tr
+    lr ∅          Ps∼Qs ()
+    lr (C₁ ∣ C₂)  Ps∼Qs (par-left tr)       = Σ-map (_∣ _) (Σ-map par-left (λ b → subst (λ P → [ i ] _ ∼′ _ ∣ P) (ext $ weaken-[] C₂) $
+                                                                                  subst (λ P → [ i ] _ ∣ P ∼′ _) (ext $ weaken-[] C₂) $
+                                                                                  hole fzero ∣ weaken C₂ [ b ][ Ps∼Qs ]-cong₁)) (lr C₁ Ps∼Qs tr)
+    lr (C₁ ∣ C₂)  Ps∼Qs (par-right tr)      = Σ-map (_ ∣_) (Σ-map par-right (λ b → subst (λ P → [ i ] _ ∼′ P ∣ _) (ext $ weaken-[] C₁) $
+                                                                                   subst (λ P → [ i ] P ∣ _ ∼′ _) (ext $ weaken-[] C₁) $
+                                                                                   weaken C₁ ∣ hole fzero [ b ][ Ps∼Qs ]-cong₁)) (lr C₂ Ps∼Qs tr)
+    lr (C₁ ∣ C₂)  Ps∼Qs (par-τ tr₁ tr₂)     = Σ-zip _∣_ (Σ-zip par-τ (λ b₁ b₂ → hole fzero ∣ hole (fsuc fzero) [ b₁ ][ b₂ ]-cong₂))
+                                                (lr C₁ Ps∼Qs tr₁) (lr C₂ Ps∼Qs tr₂)
+    lr (C₁ ⊕ C₂)  Ps∼Qs (choice-left tr)    = Σ-map id (Σ-map choice-left id) (lr C₁ Ps∼Qs tr)
+    lr (C₁ ⊕ C₂)  Ps∼Qs (choice-right tr)   = Σ-map id (Σ-map choice-right id) (lr C₂ Ps∼Qs tr)
+    lr (μ ·′ C)   Ps∼Qs action              = _ , action , force C [ Ps∼Qs ]-cong₂′
+    lr (⟨ν a ⟩ C) Ps∼Qs (restriction a∉ tr) = Σ-map ⟨ν a ⟩ (Σ-map (restriction a∉) (λ b → ⟨ν a ⟩ (hole fzero) [ b ][ Ps∼Qs ]-cong₁))
+                                                (lr C Ps∼Qs tr)
+    lr (! C)      Ps∼Qs (replication tr)    = Σ-map id (Σ-map replication id) (lr (! C ∣ C) Ps∼Qs tr)
 
   _[_]-cong₂′ :
     ∀ {i n Ps Qs}
@@ -707,12 +709,12 @@ module _ (ext : Proc-extensionality) where
 mutual
 
   ≡→∼ : ∀ {i P Q} → Equal i P Q → [ i ] P ∼ Q
-  ≡→∼ ∅            = reflexive
-  ≡→∼ (eq₁ ∣ eq₂)  = ≡→∼ eq₁ ∣-cong ≡→∼ eq₂
-  ≡→∼ (eq₁ ⊕ eq₂)  = ≡→∼ eq₁ ⊕-cong ≡→∼ eq₂
-  ≡→∼ (refl ·′ eq) = refl ·′-cong ≡→∼′ eq
-  ≡→∼ (ν refl eq)  = ν-cong refl (≡→∼ eq)
-  ≡→∼ (! eq)       = !-cong ≡→∼ eq
+  ≡→∼ ∅              = reflexive
+  ≡→∼ (eq₁ ∣ eq₂)    = ≡→∼ eq₁ ∣-cong ≡→∼ eq₂
+  ≡→∼ (eq₁ ⊕ eq₂)    = ≡→∼ eq₁ ⊕-cong ≡→∼ eq₂
+  ≡→∼ (refl ·′ eq)   = refl ·′-cong ≡→∼′ eq
+  ≡→∼ (⟨ν refl ⟩ eq) = ⟨ν refl ⟩-cong (≡→∼ eq)
+  ≡→∼ (! eq)         = !-cong ≡→∼ eq
 
   ≡→∼′ : ∀ {i P Q} → Equal′ i P Q → [ i ] P ∼′ Q
   force (≡→∼′ eq) = ≡→∼ (force eq)
@@ -1294,7 +1296,7 @@ module _ (a b : Name-with-kind) where
 -- Some other examples
 
 Restricted : Name → Proc ∞
-Restricted a = ν a (name (a , true) · ∅)
+Restricted a = ⟨ν a ⟩ (name (a , true) · ∅)
 
 Restricted∼∅ : ∀ {a} → Restricted a ∼ ∅
 Restricted∼∅ =

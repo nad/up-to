@@ -89,19 +89,19 @@ refl ·-cong′ = reflexive
 
 mutual
 
-  -- ν preserves weak bisimilarity.
+  -- ⟨ν_⟩ preserves weak bisimilarity.
 
-  ν-cong : ∀ {i a a′ P P′} →
-           a ≡ a′ → [ i ] P ≈ P′ → [ i ] ν a P ≈ ν a′ P′
-  ν-cong {i} {a} {P = P} {P′} refl P≈P′ =
+  ⟨ν_⟩-cong : ∀ {i a a′ P P′} →
+              a ≡ a′ → [ i ] P ≈ P′ → [ i ] ⟨ν a ⟩ P ≈ ⟨ν a′ ⟩ P′
+  ⟨ν_⟩-cong {i} {a} {P = P} {P′} refl P≈P′ =
     ⟨ Σ-map id (Σ-map id symmetric) ∘
-      CL.ν-cong (ν-cong′ refl) (symmetric P≈P′)
-    , CL.ν-cong (ν-cong′ refl) P≈P′
+      CL.⟨ν⟩-cong ⟨ν refl ⟩-cong′ (symmetric P≈P′)
+    , CL.⟨ν⟩-cong ⟨ν refl ⟩-cong′ P≈P′
     ⟩
 
-  ν-cong′ : ∀ {i a a′ P P′} →
-            a ≡ a′ → [ i ] P ≈′ P′ → [ i ] ν a P ≈′ ν a′ P′
-  force (ν-cong′ a≡a′ P≈P′) = ν-cong a≡a′ (force P≈P′)
+  ⟨ν_⟩-cong′ : ∀ {i a a′ P P′} →
+               a ≡ a′ → [ i ] P ≈′ P′ → [ i ] ⟨ν a ⟩ P ≈′ ⟨ν a′ ⟩ P′
+  force (⟨ν a≡a′ ⟩-cong′ P≈P′) = ⟨ν a≡a′ ⟩-cong (force P≈P′)
 
 mutual
 
@@ -202,7 +202,7 @@ hole     [ Ps≈Qs ]-cong = Ps≈Qs _
 ∅        [ Ps≈Qs ]-cong = reflexive
 D₁ ∣ D₂  [ Ps≈Qs ]-cong = (D₁ [ Ps≈Qs ]-cong) ∣-cong (D₂ [ Ps≈Qs ]-cong)
 action D [ Ps≈Qs ]-cong = refl ·′-cong λ { .force → force D [ Ps≈Qs ]-cong }
-ν D      [ Ps≈Qs ]-cong = ν-cong refl (D [ Ps≈Qs ]-cong)
+⟨ν⟩ D    [ Ps≈Qs ]-cong = ⟨ν refl ⟩-cong (D [ Ps≈Qs ]-cong)
 ! D      [ Ps≈Qs ]-cong = !-cong (D [ Ps≈Qs ]-cong)
 D₁ ⊕ D₂  [ Ps≈Qs ]-cong = ⊕-cong Ps≈Qs D₁ D₂
   where

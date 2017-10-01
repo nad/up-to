@@ -178,8 +178,8 @@ Proc′               = Labelled-transition-system.CCS.Proc′
 transition-relation = Labelled-transition-system.CCS._[_]⟶_
 _∉_                 = Labelled-transition-system.CCS._∉_
 
--- The constructor ⟨ν_⟩ is called ν, and _·_ is called _·′_. An
--- "inductive" variant of _·′_ is called _·_.
+-- The constructor _·_ is called _·′_. An "inductive" variant of _·′_
+-- is called _·_.
 
 inductive-variant-of-·′ = Labelled-transition-system.CCS._·_
 
@@ -205,7 +205,7 @@ module Strong-bisimilarity-congruence where
   ·-cong    = Bisimilarity.Exercises.Coinductive.CCS._·′-cong_
   !-cong    = Bisimilarity.Exercises.Coinductive.CCS.!-cong_
   _⊕-cong_  = Bisimilarity.Exercises.Coinductive.CCS._⊕-cong_
-  ⟨ν_⟩-cong = Bisimilarity.Exercises.Coinductive.CCS.ν-cong
+  ⟨ν_⟩-cong = Bisimilarity.Exercises.Coinductive.CCS.⟨ν_⟩-cong
   ∅-cong    = Bisimilarity.Coinductive.reflexive-∼
 
 -- The example with P and Q.
@@ -392,7 +392,7 @@ module Strong-similarity-congruence where
   ·-cong    = Similarity.Strong.CCS._·′-cong_
   !-cong    = Similarity.Strong.CCS.!-cong_
   _⊕-cong_  = Similarity.Strong.CCS._⊕-cong_
-  ⟨ν_⟩-cong = Similarity.Strong.CCS.ν-cong
+  ⟨ν_⟩-cong = Similarity.Strong.CCS.⟨ν_⟩-cong
   ∅-cong    = Similarity.Strong.reflexive-≤
 
 -- Proofs showing that all the CCS process constructors, except for
@@ -404,7 +404,7 @@ module Expansion-almost-congruence where
   _∣-cong_  = Expansion.CCS._∣-cong_
   ·-cong    = Expansion.CCS._·′-cong_
   !-cong    = Expansion.CCS.!-cong_
-  ⟨ν_⟩-cong = Expansion.CCS.ν-cong
+  ⟨ν_⟩-cong = Expansion.CCS.⟨ν_⟩-cong
   ∅-cong    = Expansion.reflexive-≳
 
 -- Proofs showing that all the CCS process constructors, except for
@@ -416,7 +416,7 @@ module Weak-bisimilarity-almost-congruence where
   _∣-cong_  = Bisimilarity.Weak.CCS._∣-cong_
   ·-cong    = Bisimilarity.Weak.CCS._·′-cong_
   !-cong    = Bisimilarity.Weak.CCS.!-cong_
-  ⟨ν_⟩-cong = Bisimilarity.Weak.CCS.ν-cong
+  ⟨ν_⟩-cong = Bisimilarity.Weak.CCS.⟨ν_⟩-cong
   ∅-cong    = Bisimilarity.Weak.Coinductive.Other.reflexive-≈
 
 ------------------------------------------------------------------------

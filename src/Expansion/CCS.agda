@@ -80,18 +80,19 @@ module Cong-lemmas
     ∃ λ Q₁ → μ ·′ P₁ [ μ′ ]⇒̂ Q₁ × R′ Q₁ Q₂
   ·′-cong P₁≳P₂ action = _ , ⟶→⇒̂ action , P₁≳P₂
 
-  ν-cong :
-    (∀ {a P P′} → R′ P P′ → R′ (ν a P) (ν a P′)) →
+  ⟨ν⟩-cong :
+    (∀ {a P P′} → R′ P P′ → R′ (⟨ν a ⟩ P) (⟨ν a ⟩ P′)) →
     ∀ {a μ P P′ Q′} →
-    R P P′ → ν a P′ [ μ ]⟶ Q′ →
-    ∃ λ Q → ν a P [ μ ]⇒̂ Q × R′ Q Q′
-  ν-cong ν-cong′ {a} {μ} {P} P≳P′ (restriction {P′ = Q′} a∉μ P′⟶Q′) =
+    R P P′ → ⟨ν a ⟩ P′ [ μ ]⟶ Q′ →
+    ∃ λ Q → ⟨ν a ⟩ P [ μ ]⇒̂ Q × R′ Q Q′
+  ⟨ν⟩-cong ⟨ν⟩-cong′ {a} {μ} {P} P≳P′
+           (restriction {P′ = Q′} a∉μ P′⟶Q′) =
     case right-to-left P≳P′ P′⟶Q′ of λ where
       (Q , P⇒̂Q , Q≳′Q′) →
-        ν a P      →⟨ map-⇒̂′ (restriction ∘ ∉τ) (restriction a∉μ) P⇒̂Q ⟩■
+        ⟨ν a ⟩ P   →⟨ map-⇒̂′ (restriction ∘ ∉τ) (restriction a∉μ) P⇒̂Q ⟩■
           ⇒̂[ μ ]′
-        ν a Q      ∼⟨ ν-cong′ Q≳′Q′ ⟩■
-        ν a Q′
+        ⟨ν a ⟩ Q   ∼⟨ ⟨ν⟩-cong′ Q≳′Q′ ⟩■
+        ⟨ν a ⟩ Q′
 
   !-cong-lemma₁ : ∀ {P Q μ} → P [ μ ]⇒ Q → ! P [ μ ]⇒ ! P ∣ Q
   !-cong-lemma₁ {P} {Q} {μ} = λ where
@@ -329,35 +330,35 @@ refl ·-cong′ = reflexive
 
 mutual
 
-  -- ν preserves the expansion relation.
+  -- ⟨ν_⟩ preserves the expansion relation.
 
-  ν-cong : ∀ {i a a′ P P′} →
-           a ≡ a′ → [ i ] P ≳ P′ → [ i ] ν a P ≳ ν a′ P′
-  ν-cong {i} {a} {P = P} {P′} refl P≳P′ =
+  ⟨ν_⟩-cong : ∀ {i a a′ P P′} →
+              a ≡ a′ → [ i ] P ≳ P′ → [ i ] ⟨ν a ⟩ P ≳ ⟨ν a′ ⟩ P′
+  ⟨ν_⟩-cong {i} {a} {P = P} {P′} refl P≳P′ =
     ⟨ lr
-    , CL.ν-cong (ν-cong′ refl) P≳P′
+    , CL.⟨ν⟩-cong ⟨ν refl ⟩-cong′ P≳P′
     ⟩
     where
     lr : ∀ {Q μ} →
-         ν a P [ μ ]⟶ Q →
-         ∃ λ Q′ → ν a P′ [ μ ]⟶̂ Q′ × [ i ] Q ≳′ Q′
+         ⟨ν a ⟩ P [ μ ]⟶ Q →
+         ∃ λ Q′ → ⟨ν a ⟩ P′ [ μ ]⟶̂ Q′ × [ i ] Q ≳′ Q′
     lr {μ = μ} (restriction {P′ = Q} a∉μ P⟶Q)
       with left-to-right P≳P′ P⟶Q
     ... | Q′ , step P′⟶Q′ , Q≳′Q′ =
-      ν a Q     ∼⟨ ν-cong′ refl Q≳′Q′ ⟩■
-      ν a Q′
-        ⟵̂[ μ ]  ←⟨ restriction a∉μ P′⟶Q′ ⟩■
-      ν a P′
+      ⟨ν a ⟩ Q   ∼⟨ ⟨ν refl ⟩-cong′ Q≳′Q′ ⟩■
+      ⟨ν a ⟩ Q′
+        ⟵̂[ μ ]   ←⟨ restriction a∉μ P′⟶Q′ ⟩■
+      ⟨ν a ⟩ P′
 
     ... | _ , done μs , Q≳′P′ =
-      ν a Q     ∼⟨ ν-cong′ refl Q≳′P′ ⟩■
-      ν a P′
-        ⟵̂[ μ ]  ←⟨ ⟶̂: done μs ⟩■
-      ν a P′
+      ⟨ν a ⟩ Q   ∼⟨ ⟨ν refl ⟩-cong′ Q≳′P′ ⟩■
+      ⟨ν a ⟩ P′
+        ⟵̂[ μ ]   ←⟨ ⟶̂: done μs ⟩■
+      ⟨ν a ⟩ P′
 
-  ν-cong′ : ∀ {i a a′ P P′} →
-            a ≡ a′ → [ i ] P ≳′ P′ → [ i ] ν a P ≳′ ν a′ P′
-  force (ν-cong′ a≡a′ P≳P′) = ν-cong a≡a′ (force P≳P′)
+  ⟨ν_⟩-cong′ : ∀ {i a a′ P P′} →
+               a ≡ a′ → [ i ] P ≳′ P′ → [ i ] ⟨ν a ⟩ P ≳′ ⟨ν a′ ⟩ P′
+  force (⟨ν a≡a′ ⟩-cong′ P≳P′) = ⟨ν a≡a′ ⟩-cong (force P≳P′)
 
 mutual
 
@@ -566,7 +567,7 @@ hole     [ Ps≳Qs ]-cong = Ps≳Qs _
 ∅        [ Ps≳Qs ]-cong = reflexive
 D₁ ∣ D₂  [ Ps≳Qs ]-cong = (D₁ [ Ps≳Qs ]-cong) ∣-cong (D₂ [ Ps≳Qs ]-cong)
 action D [ Ps≳Qs ]-cong = refl ·′-cong λ { .force → force D [ Ps≳Qs ]-cong }
-ν D      [ Ps≳Qs ]-cong = ν-cong refl (D [ Ps≳Qs ]-cong)
+⟨ν⟩ D    [ Ps≳Qs ]-cong = ⟨ν refl ⟩-cong (D [ Ps≳Qs ]-cong)
 ! D      [ Ps≳Qs ]-cong = !-cong (D [ Ps≳Qs ]-cong)
 D₁ ⊕ D₂  [ Ps≳Qs ]-cong = ⊕-cong Ps≳Qs D₁ D₂
   where

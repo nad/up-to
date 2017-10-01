@@ -104,12 +104,12 @@ Up-to-context-size-preserving =
   drop-[] (_ , hole i , _ , _ , _ , P∣Q≡Ps[i] , !S≡Qs[i] , PsRQs) =
     subst R (cong₂ _,_ (sym P∣Q≡Ps[i]) (sym !S≡Qs[i])) (PsRQs i)
 
-  drop-[] (_ , ∅      , _ , _ , _ , () , _)
-  drop-[] (_ , _ ∣ _  , _ , _ , _ , _  , () , _)
-  drop-[] (_ , _ ⊕ _  , _ , _ , _ , () , _)
-  drop-[] (_ , _ ·′ _ , _ , _ , _ , () , _)
-  drop-[] (_ , ν _ _  , _ , _ , _ , () , _)
-  drop-[] (_ , ! _    , _ , _ , _ , () , _)
+  drop-[] (_ , ∅        , _ , _ , _ , () , _)
+  drop-[] (_ , _ ∣ _    , _ , _ , _ , _  , () , _)
+  drop-[] (_ , _ ⊕ _    , _ , _ , _ , () , _)
+  drop-[] (_ , _ ·′ _   , _ , _ , _ , () , _)
+  drop-[] (_ , ⟨ν _ ⟩ _ , _ , _ , _ , () , _)
+  drop-[] (_ , ! _      , _ , _ , _ , () , _)
 
   R⊆StepR : R ⊆ ⟦ StepC ⟧ R
   R⊆StepR (inj₁ base) = ⟨ lr , rl ⟩

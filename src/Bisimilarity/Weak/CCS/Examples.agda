@@ -217,30 +217,30 @@ mutual
 
 6-5-8-1 :
   ∀ a {P Q} →
-  ν (proj₁ a) (name a · P ∣ name (co a) · Q) ≳ ν (proj₁ a) (P ∣ Q)
+  ⟨ν proj₁ a ⟩ (name a · P ∣ name (co a) · Q) ≳ ⟨ν proj₁ a ⟩ (P ∣ Q)
 6-5-8-1 a {P} {Q} = E.⟨ lr , rl ⟩
   where
   lr :
     ∀ {μ R} →
-    ν (proj₁ a) (name a · P ∣ name (co a) · Q) [ μ ]⟶ R →
-    ∃ λ R′ → ν (proj₁ a) (P ∣ Q) [ μ ]⟶̂ R′ × R ≳′ R′
+    ⟨ν proj₁ a ⟩ (name a · P ∣ name (co a) · Q) [ μ ]⟶ R →
+    ∃ λ R′ → ⟨ν proj₁ a ⟩ (P ∣ Q) [ μ ]⟶̂ R′ × R ≳′ R′
   lr (restriction a∉μ (par-left action))        = ⊥-elim (a∉μ refl)
   lr (restriction a∉μ (par-right action))       = ⊥-elim (a∉μ refl)
   lr (restriction a∉μ (par-τ′ _ action action)) =
-    ν (proj₁ a) (P ∣ Q)  ■
+    ⟨ν proj₁ a ⟩ (P ∣ Q)  ■
       ⟵̂[ τ ]
-    ν (proj₁ a) (P ∣ Q)  ■
+    ⟨ν proj₁ a ⟩ (P ∣ Q)  ■
 
   rl :
     ∀ {μ R′} →
-    ν (proj₁ a) (P ∣ Q) [ μ ]⟶ R′ →
-    ∃ λ R → ν (proj₁ a) (name a · P ∣ name (co a) · Q) [ μ ]⇒̂ R ×
+    ⟨ν proj₁ a ⟩ (P ∣ Q) [ μ ]⟶ R′ →
+    ∃ λ R → ⟨ν proj₁ a ⟩ (name a · P ∣ name (co a) · Q) [ μ ]⇒̂ R ×
             R ≳′ R′
   rl {μ} (restriction {P′ = R} a∉μ P∣Q⟶R) =
-    ν (proj₁ a) (name a · P ∣ name (co a) · Q)  →⟨ restriction _ (par-τ action action) ⟩
-    ν (proj₁ a) (P ∣ Q)                         →⟨ restriction a∉μ P∣Q⟶R ⟩■
+    ⟨ν proj₁ a ⟩ (name a · P ∣ name (co a) · Q)  →⟨ restriction _ (par-τ action action) ⟩
+    ⟨ν proj₁ a ⟩ (P ∣ Q)                         →⟨ restriction a∉μ P∣Q⟶R ⟩■
       E.⇒̂[ μ ]
-    ν (proj₁ a) R                               ■
+    ⟨ν proj₁ a ⟩ R                               ■
 
 -- One interpretation of the second part of Exercise 6.5.8 is
 -- contradictory, assuming that Name is inhabited.
@@ -248,23 +248,23 @@ mutual
 ¬-6-5-8-2 :
   Name →
   ¬ (∀ {a b P} →
-     ! ν (proj₁ a) (name b · (a ·) ∣ name (co a) · P) ≈
-     ! name b · ν (proj₁ a) P)
+     ! ⟨ν proj₁ a ⟩ (name b · (a ·) ∣ name (co a) · P) ≈
+     ! name b · ⟨ν proj₁ a ⟩ P)
 ¬-6-5-8-2 x =
   (∀ {a b P} →
-   ! ν (proj₁ a) (name b · (a ·) ∣ name (co a) · P) ≈
-   ! name b · ν (proj₁ a) P)                                          ↝⟨ (λ hyp → hyp {a = a} {b = co a}) ⟩
+   ! ⟨ν proj₁ a ⟩ (name b · (a ·) ∣ name (co a) · P) ≈
+   ! name b · ⟨ν proj₁ a ⟩ P)                                          ↝⟨ (λ hyp → hyp {a = a} {b = co a}) ⟩
 
-  (! ν (proj₁ a) (name (co a) · (a ·) ∣ co a ·) ≈
-   ! name (co a) · ν (proj₁ a) ∅)                                     ↝⟨ (λ hyp → Σ-map id proj₁ $ W.right-to-left hyp
-                                                                                                     (replication (par-right action))) ⟩
-  ∃ (! ν (proj₁ a) (name (co a) · (a ·) ∣ co a ·) [ name (co a) ]⇒̂_)  ↝⟨ !P⇒̂ ∘ proj₂ ⟩□
+  (! ⟨ν proj₁ a ⟩ (name (co a) · (a ·) ∣ co a ·) ≈
+   ! name (co a) · ⟨ν proj₁ a ⟩ ∅)                                     ↝⟨ (λ hyp → Σ-map id proj₁ $ W.right-to-left hyp
+                                                                                                      (replication (par-right action))) ⟩
+  ∃ (! ⟨ν proj₁ a ⟩ (name (co a) · (a ·) ∣ co a ·) [ name (co a) ]⇒̂_)  ↝⟨ !P⇒̂ ∘ proj₂ ⟩□
 
-  ⊥                                                                   □
+  ⊥                                                                    □
   where
   a = x , true
 
-  P = ν (proj₁ a) (name (co a) · (a ·) ∣ co a ·)
+  P = ⟨ν proj₁ a ⟩ (name (co a) · (a ·) ∣ co a ·)
 
   P⟶ : ∀ {μ Q} → ¬ P [ μ ]⟶ Q
   P⟶ (restriction x≢x (par-left action))     = ⊥-elim (x≢x refl)
@@ -295,35 +295,35 @@ mutual
 6-5-8-2 :
   ∀ {i a b P} →
   proj₁ a ≢ proj₁ b →
-  [ i ] ! ν (proj₁ a) (name b · (a ·) ∣ name (co a) · P) ≈
-        ! name b · ν (proj₁ a) P
+  [ i ] ! ⟨ν proj₁ a ⟩ (name b · (a ·) ∣ name (co a) · P) ≈
+        ! name b · ⟨ν proj₁ a ⟩ P
 6-5-8-2 {i} {a} {b} {P} a≢b = W.⟨ lr , rl ⟩
   where
   6-5-8-2′ :
-    [ i ] ! ν (proj₁ a) (name b · (a ·) ∣ name (co a) · P) ≈′
-          ! name b · ν (proj₁ a) P
+    [ i ] ! ⟨ν proj₁ a ⟩ (name b · (a ·) ∣ name (co a) · P) ≈′
+          ! name b · ⟨ν proj₁ a ⟩ P
   force 6-5-8-2′ = 6-5-8-2 a≢b
 
   lr :
     ∀ {Q μ} →
-    ! ν (proj₁ a) (name b · (a ·) ∣ name (co a) · P) [ μ ]⟶ Q →
-    ∃ λ Q′ → ! name b · ν (proj₁ a) P [ μ ]⇒̂ Q′ × [ i ] Q ≈′ Q′
+    ! ⟨ν proj₁ a ⟩ (name b · (a ·) ∣ name (co a) · P) [ μ ]⟶ Q →
+    ∃ λ Q′ → ! name b · ⟨ν proj₁ a ⟩ P [ μ ]⇒̂ Q′ × [ i ] Q ≈′ Q′
   lr {Q} tr = case 6-1-3-2 tr of λ where
     (inj₁ (_ , restriction a≢b (par-left action)
              , Q∼!νa[ba∣a̅P]∣νa[a∣a̅P])) →
-      Q                                                   ∼⟨ Q∼!νa[ba∣a̅P]∣νa[a∣a̅P] ⟩
+      Q                                                    ∼⟨ Q∼!νa[ba∣a̅P]∣νa[a∣a̅P] ⟩
 
-      ! ν (proj₁ a) (name b · (a ·) ∣ name (co a) · P) ∣
-      ν (proj₁ a) (a · ∣ name (co a) · P)                 ∼⟨ (_ ■) EL.∣-cong 6-5-8-1 _ ⟩ ≈′:
+      ! ⟨ν proj₁ a ⟩ (name b · (a ·) ∣ name (co a) · P) ∣
+      ⟨ν proj₁ a ⟩ (a · ∣ name (co a) · P)                 ∼⟨ (_ ■) EL.∣-cong 6-5-8-1 _ ⟩ ≈′:
 
-      ! ν (proj₁ a) (name b · (a ·) ∣ name (co a) · P) ∣
-      ν (proj₁ a) (∅ ∣ P)                                 ∼⟨ 6-5-8-2′ WL.∣-cong′ convert {a = ℓ} (ν-cong refl ∣-left-identity) ⟩■
+      ! ⟨ν proj₁ a ⟩ (name b · (a ·) ∣ name (co a) · P) ∣
+      ⟨ν proj₁ a ⟩ (∅ ∣ P)                                 ∼⟨ 6-5-8-2′ WL.∣-cong′ convert {a = ℓ} (⟨ν refl ⟩-cong ∣-left-identity) ⟩■
 
-      ! name b · ν (proj₁ a) P ∣ ν (proj₁ a) P
+      ! name b · ⟨ν proj₁ a ⟩ P ∣ ⟨ν proj₁ a ⟩ P
 
-        W.⇐̂[ name b ]                                     ←⟨ replication (par-right action) ⟩■
+        W.⇐̂[ name b ]                                      ←⟨ replication (par-right action) ⟩■
 
-      ! name b · ν (proj₁ a) P
+      ! name b · ⟨ν proj₁ a ⟩ P
 
     (inj₁ (_ , restriction _ (par-τ′ co-a≡co-b action action) , _)) →
       ⊥-elim (             $⟨ co-a≡co-b ⟩
@@ -368,21 +368,21 @@ mutual
 
   rl :
     ∀ {Q′ μ} →
-    ! name b · ν (proj₁ a) P [ μ ]⟶ Q′ →
-    ∃ λ Q → ! ν (proj₁ a) (name b · (a ·) ∣ name (co a) · P) [ μ ]⇒̂ Q ×
+    ! name b · ⟨ν proj₁ a ⟩ P [ μ ]⟶ Q′ →
+    ∃ λ Q → ! ⟨ν proj₁ a ⟩ (name b · (a ·) ∣ name (co a) · P) [ μ ]⇒̂ Q ×
             [ i ] Q ≈′ Q′
   rl {Q′} tr = case 6-1-3-2 tr of λ where
     (inj₁ (_ , action , Q′∼!bνaP∣νaP)) →
-      ! ν (proj₁ a) (name b · (a ·) ∣ name (co a) · P) →⟨ replication (par-right (restriction a≢b (par-left action))) ⟩■
+      ! ⟨ν proj₁ a ⟩ (name b · (a ·) ∣ name (co a) · P)    →⟨ replication (par-right (restriction a≢b (par-left action))) ⟩■
 
         W.⇒̂[ name b ]
 
-      ! ν (proj₁ a) (name b · (a ·) ∣ name (co a) · P) ∣
-      ν (proj₁ a) (a · ∣ name (co a) · P)                 ∼′⟨ 6-5-8-2′ WL.∣-cong′ convert {a = ℓ} (6-5-8-1 a) ⟩
+      ! ⟨ν proj₁ a ⟩ (name b · (a ·) ∣ name (co a) · P) ∣
+      ⟨ν proj₁ a ⟩ (a · ∣ name (co a) · P)                 ∼′⟨ 6-5-8-2′ WL.∣-cong′ convert {a = ℓ} (6-5-8-1 a) ⟩
 
-      ! name b · ν (proj₁ a) P ∣ ν (proj₁ a) (∅ ∣ P)      ∼⟨ (_ ■) ∣-cong ν-cong refl ∣-left-identity ⟩ ∼:
+      ! name b · ⟨ν proj₁ a ⟩ P ∣ ⟨ν proj₁ a ⟩ (∅ ∣ P)     ∼⟨ (_ ■) ∣-cong ⟨ν refl ⟩-cong ∣-left-identity ⟩ ∼:
 
-      ! name b · ν (proj₁ a) P ∣ ν (proj₁ a) P            ∼⟨ symmetric Q′∼!bνaP∣νaP ⟩■
+      ! name b · ⟨ν proj₁ a ⟩ P ∣ ⟨ν proj₁ a ⟩ P           ∼⟨ symmetric Q′∼!bνaP∣νaP ⟩■
 
       Q′
 
