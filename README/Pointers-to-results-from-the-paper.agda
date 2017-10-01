@@ -178,11 +178,6 @@ Proc′               = Labelled-transition-system.CCS.Proc′
 transition-relation = Labelled-transition-system.CCS._[_]⟶_
 _∉_                 = Labelled-transition-system.CCS._∉_
 
--- The constructor _·_ is called _·′_. An "inductive" variant of _·′_
--- is called _·_.
-
-inductive-variant-of-·′ = Labelled-transition-system.CCS._·_
-
 -- Restricted and the corresponding lemma.
 
 Restricted   = Bisimilarity.Exercises.Coinductive.CCS.Restricted
@@ -202,7 +197,7 @@ Restricted∼∅ = Bisimilarity.Exercises.Coinductive.CCS.Restricted∼∅
 module Strong-bisimilarity-congruence where
 
   _∣-cong_  = Bisimilarity.Exercises.Coinductive.CCS._∣-cong_
-  ·-cong    = Bisimilarity.Exercises.Coinductive.CCS._·′-cong_
+  ·-cong    = Bisimilarity.Exercises.Coinductive.CCS._·-cong_
   !-cong    = Bisimilarity.Exercises.Coinductive.CCS.!-cong_
   _⊕-cong_  = Bisimilarity.Exercises.Coinductive.CCS._⊕-cong_
   ⟨ν_⟩-cong = Bisimilarity.Exercises.Coinductive.CCS.⟨ν_⟩-cong
@@ -389,7 +384,7 @@ module Strong-bisimilarity-congruence₂ = Strong-bisimilarity-congruence
 module Strong-similarity-congruence where
 
   _∣-cong_  = Similarity.Strong.CCS._∣-cong_
-  ·-cong    = Similarity.Strong.CCS._·′-cong_
+  ·-cong    = Similarity.Strong.CCS._·-cong_
   !-cong    = Similarity.Strong.CCS.!-cong_
   _⊕-cong_  = Similarity.Strong.CCS._⊕-cong_
   ⟨ν_⟩-cong = Similarity.Strong.CCS.⟨ν_⟩-cong
@@ -402,7 +397,7 @@ module Strong-similarity-congruence where
 module Expansion-almost-congruence where
 
   _∣-cong_  = Expansion.CCS._∣-cong_
-  ·-cong    = Expansion.CCS._·′-cong_
+  ·-cong    = Expansion.CCS._·-cong_
   !-cong    = Expansion.CCS.!-cong_
   ⟨ν_⟩-cong = Expansion.CCS.⟨ν_⟩-cong
   ∅-cong    = Expansion.reflexive-≳
@@ -414,7 +409,7 @@ module Expansion-almost-congruence where
 module Weak-bisimilarity-almost-congruence where
 
   _∣-cong_  = Bisimilarity.Weak.CCS._∣-cong_
-  ·-cong    = Bisimilarity.Weak.CCS._·′-cong_
+  ·-cong    = Bisimilarity.Weak.CCS._·-cong_
   !-cong    = Bisimilarity.Weak.CCS.!-cong_
   ⟨ν_⟩-cong = Bisimilarity.Weak.CCS.⟨ν_⟩-cong
   ∅-cong    = Bisimilarity.Weak.Coinductive.Other.reflexive-≈

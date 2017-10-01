@@ -52,41 +52,41 @@ _⊕-cong′_ : ∀ {i P P′ Q Q′} →
             [ i ] P ≤′ P′ → [ i ] Q ≤′ Q′ → [ i ] P ⊕ Q ≤′ P′ ⊕ Q′
 force (P≤P′ ⊕-cong′ Q≤Q′) = force P≤P′ ⊕-cong force Q≤Q′
 
--- _·′_ preserves similarity.
-
-infix 12 _·′-cong_ _·′-cong′_
-
-_·′-cong_ :
-  ∀ {i μ μ′ P P′} →
-  μ ≡ μ′ → [ i ] force P ≤′ force P′ → [ i ] μ ·′ P ≤ μ′ ·′ P′
-_·′-cong_ {i} refl P≤P′ = ⟨ CL.·′-cong {i = i} P≤P′ ⟩
-
-_·′-cong′_ :
-  ∀ {i μ μ′ P P′} →
-  μ ≡ μ′ → [ i ] force P ≤′ force P′ → [ i ] μ ·′ P ≤′ μ′ ·′ P′
-force (μ≡μ′ ·′-cong′ P≤P′) = μ≡μ′ ·′-cong P≤P′
-
 -- _·_ preserves similarity.
 
 infix 12 _·-cong_ _·-cong′_
 
-_·-cong_ : ∀ {i μ μ′ P P′} →
-           μ ≡ μ′ → [ i ] P ≤ P′ → [ i ] μ · P ≤ μ′ · P′
-refl ·-cong P≤P′ = refl ·′-cong convert {a = ℓ} P≤P′
+_·-cong_ :
+  ∀ {i μ μ′ P P′} →
+  μ ≡ μ′ → [ i ] force P ≤′ force P′ → [ i ] μ · P ≤ μ′ · P′
+_·-cong_ {i} refl P≤P′ = ⟨ CL.·-cong {i = i} P≤P′ ⟩
 
-_·-cong′_ : ∀ {i μ μ′ P P′} →
-            μ ≡ μ′ → [ i ] P ≤′ P′ → [ i ] μ · P ≤′ μ′ · P′
-force (μ≡μ′ ·-cong′ P≤P′) = μ≡μ′ ·-cong force P≤P′
+_·-cong′_ :
+  ∀ {i μ μ′ P P′} →
+  μ ≡ μ′ → [ i ] force P ≤′ force P′ → [ i ] μ · P ≤′ μ′ · P′
+force (μ≡μ′ ·-cong′ P≤P′) = μ≡μ′ ·-cong P≤P′
 
--- _· turns equal actions into similar processes.
+-- _∙_ preserves similarity.
 
-infix 12 _·-cong _·-cong′
+infix 12 _∙-cong_ _∙-cong′_
 
-_·-cong : ∀ {μ μ′} → μ ≡ μ′ → μ · ≤ μ′ ·
-refl ·-cong = reflexive
+_∙-cong_ : ∀ {i μ μ′ P P′} →
+           μ ≡ μ′ → [ i ] P ≤ P′ → [ i ] μ ∙ P ≤ μ′ ∙ P′
+refl ∙-cong P≤P′ = refl ·-cong convert {a = ℓ} P≤P′
 
-_·-cong′ : ∀ {μ μ′} → μ ≡ μ′ → μ · ≤′ μ′ ·
-refl ·-cong′ = reflexive
+_∙-cong′_ : ∀ {i μ μ′ P P′} →
+            μ ≡ μ′ → [ i ] P ≤′ P′ → [ i ] μ ∙ P ≤′ μ′ ∙ P′
+force (μ≡μ′ ∙-cong′ P≤P′) = μ≡μ′ ∙-cong force P≤P′
+
+-- _∙ turns equal actions into similar processes.
+
+infix 12 _∙-cong _∙-cong′
+
+_∙-cong : ∀ {μ μ′} → μ ≡ μ′ → μ ∙ ≤ μ′ ∙
+refl ∙-cong = reflexive
+
+_∙-cong′ : ∀ {μ μ′} → μ ≡ μ′ → μ ∙ ≤′ μ′ ∙
+refl ∙-cong′ = reflexive
 
 mutual
 
@@ -127,7 +127,7 @@ mutual
   ∅        [ Ps≤Qs ]-cong = reflexive
   C₁ ∣ C₂  [ Ps≤Qs ]-cong = (C₁ [ Ps≤Qs ]-cong) ∣-cong (C₂ [ Ps≤Qs ]-cong)
   C₁ ⊕ C₂  [ Ps≤Qs ]-cong = (C₁ [ Ps≤Qs ]-cong) ⊕-cong (C₂ [ Ps≤Qs ]-cong)
-  μ ·′ C   [ Ps≤Qs ]-cong = refl ·′-cong λ { .force → force C [ Ps≤Qs ]-cong }
+  μ · C    [ Ps≤Qs ]-cong = refl ·-cong λ { .force → force C [ Ps≤Qs ]-cong }
   ⟨ν a ⟩ C [ Ps≤Qs ]-cong = ⟨ν refl ⟩-cong (C [ Ps≤Qs ]-cong)
   ! C      [ Ps≤Qs ]-cong = !-cong (C [ Ps≤Qs ]-cong)
 
@@ -173,10 +173,10 @@ mutual
 
   machine₁ machine₂ machine₁′ machine₂′ : Proc ∞
 
-  machine₁′ = name pay · (coffee · ⊕ tea ·)
+  machine₁′ = name pay ∙ (coffee ∙ ⊕ tea ∙)
   machine₁  = ! machine₁′
 
-  machine₂′ = (name pay · (coffee ·) ⊕ name pay · (tea ·))
+  machine₂′ = (name pay ∙ (coffee ∙) ⊕ name pay ∙ (tea ∙))
                 ⊕
               machine₁′
   machine₂  = ! machine₂′
@@ -185,7 +185,7 @@ mutual
 
   machine₁⟶ :
     ∀ {P μ} → machine₁ [ μ ]⟶ P →
-    μ ≡ name pay × P ∼ machine₁ ∣ (coffee · ⊕ tea ·)
+    μ ≡ name pay × P ∼ machine₁ ∣ (coffee ∙ ⊕ tea ∙)
   machine₁⟶ tr = case BE.6-1-3-2 tr of λ where
     (inj₁ (_ , action , P∼))                 → refl , P∼
     (inj₂ (_ , _ , _ , _ , action , tr , _)) →
@@ -200,10 +200,10 @@ mutual
                  (refl , P∼) →
                      _
                    , (machine₂                      [ name pay ]⟶⟨ replication (par-right (choice-right action)) ⟩
-                      machine₂ ∣ coffee · ⊕ tea ·)
+                      machine₂ ∣ coffee ∙ ⊕ tea ∙)
                    , (P                            ∼⟨ ≤: convert {a = ℓ} P∼ ⟩
-                      machine₁ ∣ coffee · ⊕ tea ·  ∼⟨ machine₁≤′machine₂ ∣-cong′ (_ ■) ⟩■
-                      machine₂ ∣ coffee · ⊕ tea ·))
+                      machine₁ ∣ coffee ∙ ⊕ tea ∙  ∼⟨ machine₁≤′machine₂ ∣-cong′ (_ ■) ⟩■
+                      machine₂ ∣ coffee ∙ ⊕ tea ∙))
           ⟩
     where
     machine₁≤′machine₂ : [ i ] machine₁ ≤′ machine₂
@@ -219,7 +219,7 @@ mutual
 
     lemma =
       machine₁                     [ name pay ]⟶⟨ replication (par-right action) ⟩
-      machine₁ ∣ coffee · ⊕ tea ·
+      machine₁ ∣ coffee ∙ ⊕ tea ∙
 
     helper :
       ∀ {P μ} →
@@ -233,22 +233,22 @@ mutual
         _
       , lemma
       , (P                            ∼⟨ ≤: convert {a = ℓ} P∼ ⟩
-         machine₂ ∣ coffee ·          ∼⟨ machine₂≤′machine₁ ∣-cong′ convert {a = ℓ} ≤-⊕-left ⟩■
-         machine₁ ∣ coffee · ⊕ tea ·)
+         machine₂ ∣ coffee ∙          ∼⟨ machine₂≤′machine₁ ∣-cong′ convert {a = ℓ} ≤-⊕-left ⟩■
+         machine₁ ∣ coffee ∙ ⊕ tea ∙)
 
     helper {P} (inj₁ (_ , choice-left (choice-right action) , P∼)) =
         _
       , lemma
       , (P                            ∼⟨ ≤: convert {a = ℓ} P∼ ⟩
-         machine₂ ∣ tea ·             ∼⟨ machine₂≤′machine₁ ∣-cong′ convert {a = ℓ} ≤-⊕-right ⟩■
-         machine₁ ∣ coffee · ⊕ tea ·)
+         machine₂ ∣ tea ∙             ∼⟨ machine₂≤′machine₁ ∣-cong′ convert {a = ℓ} ≤-⊕-right ⟩■
+         machine₁ ∣ coffee ∙ ⊕ tea ∙)
 
     helper {P} (inj₁ (_ , choice-right action , P∼)) =
         _
       , lemma
       , (P                            ∼⟨ ≤: convert {a = ℓ} P∼ ⟩
-         machine₂ ∣ coffee · ⊕ tea ·  ∼⟨ machine₂≤′machine₁ ∣-cong′ (_ ■) ⟩■
-         machine₁ ∣ coffee · ⊕ tea ·)
+         machine₂ ∣ coffee ∙ ⊕ tea ∙  ∼⟨ machine₂≤′machine₁ ∣-cong′ (_ ■) ⟩■
+         machine₁ ∣ coffee ∙ ⊕ tea ∙)
 
     helper (inj₂ (_ , _ , _ , _ , choice-left (choice-left action)  , choice-left (choice-left tr)  , _)) = ⊥-elim (names-are-not-inverted tr)
     helper (inj₂ (_ , _ , _ , _ , choice-left (choice-left action)  , choice-left (choice-right tr) , _)) = ⊥-elim (names-are-not-inverted tr)
@@ -268,24 +268,24 @@ mutual
                                                                                  (replication
                                                                                     (par-right (choice-left (choice-left action))))) ⟩
 
-    (∃ λ P → machine₁ [ name pay ]⟶ P × P ∼′ machine₂ ∣ coffee ·)  ↝⟨ Σ-map id (Σ-map (proj₂ ∘ machine₁⟶) id) ⟩
+    (∃ λ P → machine₁ [ name pay ]⟶ P × P ∼′ machine₂ ∣ coffee ∙)  ↝⟨ Σ-map id (Σ-map (proj₂ ∘ machine₁⟶) id) ⟩
 
-    (∃ λ P → P ∼ machine₁ ∣ (coffee · ⊕ tea ·) ×
-             P ∼′ machine₂ ∣ coffee ·)                             ↝⟨ (λ { (_ , P∼ , P∼′) → transitive {a = ℓ} (symmetric P∼) (convert {a = ℓ} P∼′) }) ⟩
+    (∃ λ P → P ∼ machine₁ ∣ (coffee ∙ ⊕ tea ∙) ×
+             P ∼′ machine₂ ∣ coffee ∙)                             ↝⟨ (λ { (_ , P∼ , P∼′) → transitive {a = ℓ} (symmetric P∼) (convert {a = ℓ} P∼′) }) ⟩
 
-    machine₁ ∣ (coffee · ⊕ tea ·) ∼ machine₂ ∣ coffee ·            ↝⟨ (λ hyp → Σ-map id proj₁ $
+    machine₁ ∣ (coffee ∙ ⊕ tea ∙) ∼ machine₂ ∣ coffee ∙            ↝⟨ (λ hyp → Σ-map id proj₁ $
                                                                                  B.left-to-right hyp (par-right (choice-right action))) ⟩
 
-    (∃ λ P → machine₂ ∣ coffee · [ name tea ]⟶ P)                  ↝⟨ helper ∘ proj₂ ⟩
+    (∃ λ P → machine₂ ∣ coffee ∙ [ name tea ]⟶ P)                  ↝⟨ helper ∘ proj₂ ⟩
 
     pay ≡ tea ⊎ coffee ≡ tea                                       ↝⟨ [ (λ ()) , (λ ()) ] ⟩□
 
     ⊥                                                              □
     where
     helper : ∀ {P} →
-             machine₂ ∣ coffee · [ name tea ]⟶ P →
+             machine₂ ∣ coffee ∙ [ name tea ]⟶ P →
              pay ≡ tea ⊎ coffee ≡ tea
-    helper (par-right tr) = inj₂ $ cancel-name $ ·′-only tr
+    helper (par-right tr) = inj₂ $ cancel-name $ ·-only tr
     helper (par-left  tr) =
       inj₁ $ cancel-name $
-        !-only (⊕-only (⊕-only ·′-only ·′-only) ·′-only) tr
+        !-only (⊕-only (⊕-only ·-only ·-only) ·-only) tr

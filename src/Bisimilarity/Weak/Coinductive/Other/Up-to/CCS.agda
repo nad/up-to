@@ -75,27 +75,27 @@ Up-to-context-size-preserving =
   a = x , true
 
   data R₀ : Rel₂ ℓ (Proc ∞) where
-    base : R₀ (τ · (a ·) , a ·)
+    base : R₀ (τ ∙ (a ∙) , a ∙)
 
   R : Rel₂ ℓ (Proc ∞)
   R = R₀ ⁼
 
-  !τa[R]!a : Up-to-context R (! τ · (a ·) , ! a ·)
+  !τa[R]!a : Up-to-context R (! τ ∙ (a ∙) , ! a ∙)
   !τa[R]!a =
       1
     , ! hole fzero
     , ! hole
-    , (λ _ → τ · (a ·))
-    , (λ _ → a ·)
+    , (λ _ → τ ∙ (a ∙))
+    , (λ _ → a ∙)
     , refl
     , refl
     , (λ _ → inj₁ base)
 
-  !a[τ]⇒̂→≡ : ∀ {P} → ! a · [ τ ]⇒̂ P → P ≡ ! a ·
+  !a[τ]⇒̂→≡ : ∀ {P} → ! a ∙ [ τ ]⇒̂ P → P ≡ ! a ∙
   !a[τ]⇒̂→≡ (non-silent ¬s _)                 = ⊥-elim $ ¬s _
   !a[τ]⇒̂→≡ (silent _ done)                   = refl
   !a[τ]⇒̂→≡ (silent _ (step {μ = μ} s !a⟶ _)) = ⊥-elim $ name≢τ (
-                                                 name a  ≡⟨ !-only ·′-only !a⟶ ⟩
+                                                 name a  ≡⟨ !-only ·-only !a⟶ ⟩
                                                  μ       ≡⟨ silent≡τ s ⟩∎
                                                  τ       ∎)
 
@@ -107,7 +107,7 @@ Up-to-context-size-preserving =
   drop-[] (_ , ∅        , _ , _ , _ , () , _)
   drop-[] (_ , _ ∣ _    , _ , _ , _ , _  , () , _)
   drop-[] (_ , _ ⊕ _    , _ , _ , _ , () , _)
-  drop-[] (_ , _ ·′ _   , _ , _ , _ , () , _)
+  drop-[] (_ , _ · _    , _ , _ , _ , () , _)
   drop-[] (_ , ⟨ν _ ⟩ _ , _ , _ , _ , () , _)
   drop-[] (_ , ! _      , _ , _ , _ , () , _)
 
@@ -116,21 +116,21 @@ Up-to-context-size-preserving =
     where
     lr :
       ∀ {P μ} →
-      τ · (a ·) [ μ ]⟶ P →
-      ∃ λ Q → a · [ μ ]⇒̂ Q × R (P , Q)
+      τ ∙ (a ∙) [ μ ]⟶ P →
+      ∃ λ Q → a ∙ [ μ ]⇒̂ Q × R (P , Q)
     lr action =
         _
-      , (a ·  ■)
+      , (a ∙  ■)
       , inj₂ refl
 
     rl :
       ∀ {Q μ} →
-      a · [ μ ]⟶ Q →
-      ∃ λ P → τ · (a ·) [ μ ]⇒̂ P × R (P , Q)
+      a ∙ [ μ ]⟶ Q →
+      ∃ λ P → τ ∙ (a ∙) [ μ ]⇒̂ P × R (P , Q)
     rl action =
         _
-      , (τ · (a ·)  →⟨ ⟶: action ⟩
-         a ·        →⟨ ⟶: action ⟩■
+      , (τ ∙ (a ∙)  →⟨ ⟶: action ⟩
+         a ∙        →⟨ ⟶: action ⟩■
          ∅)
       , inj₂ refl
 
@@ -154,10 +154,10 @@ Up-to-context-size-preserving =
 
   contradiction : ⊥
   contradiction =                                                       $⟨ !τa[R]!a ⟩
-    Up-to-context R (! τ · (a ·) , ! a ·)                               ↝⟨ [R]⊆Step[R] ⟩
-    ⟦ StepC ⟧ (Up-to-context R) (! τ · (a ·) , ! a ·)                   ↝⟨ (λ s → StepC.left-to-right s (replication (par-right action))) ⟩
-    (∃ λ P → ! a · [ τ ]⇒̂ P × Up-to-context R (! τ · (a ·) ∣ a · , P))  ↝⟨ (λ { (_ , !a⟶ , hyp) →
+    Up-to-context R (! τ ∙ (a ∙) , ! a ∙)                               ↝⟨ [R]⊆Step[R] ⟩
+    ⟦ StepC ⟧ (Up-to-context R) (! τ ∙ (a ∙) , ! a ∙)                   ↝⟨ (λ s → StepC.left-to-right s (replication (par-right action))) ⟩
+    (∃ λ P → ! a ∙ [ τ ]⇒̂ P × Up-to-context R (! τ ∙ (a ∙) ∣ a ∙ , P))  ↝⟨ (λ { (_ , !a⟶ , hyp) →
                                                                                   subst (Up-to-context R ∘ (_ ,_)) (!a[τ]⇒̂→≡ !a⟶) hyp }) ⟩
-    Up-to-context R (! τ · (a ·) ∣ a · , ! a ·)                         ↝⟨ drop-[] ⟩
-    R (! τ · (a ·) ∣ a · , ! a ·)                                       ↝⟨ [ (λ ()) , (λ ()) ] ⟩□
+    Up-to-context R (! τ ∙ (a ∙) ∣ a ∙ , ! a ∙)                         ↝⟨ drop-[] ⟩
+    R (! τ ∙ (a ∙) ∣ a ∙ , ! a ∙)                                       ↝⟨ [ (λ ()) , (λ ()) ] ⟩□
     ⊥                                                                   □

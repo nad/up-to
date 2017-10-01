@@ -46,46 +46,46 @@ mutual
               [ i ] P ≈′ P′ → [ i ] Q ≈′ Q′ → [ i ] P ∣ Q ≈′ P′ ∣ Q′
   force (P≈P′ ∣-cong′ Q≈Q′) = force P≈P′ ∣-cong force Q≈Q′
 
--- _·′_ preserves weak bisimilarity.
-
-infix 12 _·′-cong_ _·′-cong′_
-
-_·′-cong_ :
-  ∀ {i μ μ′ P P′} →
-  μ ≡ μ′ → [ i ] force P ≈′ force P′ → [ i ] μ ·′ P ≈ μ′ ·′ P′
-refl ·′-cong P≈P′ =
-  ⟨ Σ-map id (Σ-map id symmetric) ∘ rl (symmetric P≈P′)
-  , rl P≈P′
-  ⟩
-  where
-  rl = CL.·′-cong
-
-_·′-cong′_ :
-  ∀ {i μ μ′ P P′} →
-  μ ≡ μ′ → [ i ] force P ≈′ force P′ → [ i ] μ ·′ P ≈′ μ′ ·′ P′
-force (μ≡μ′ ·′-cong′ P≈P′) = μ≡μ′ ·′-cong P≈P′
-
 -- _·_ preserves weak bisimilarity.
 
 infix 12 _·-cong_ _·-cong′_
 
-_·-cong_ : ∀ {i μ μ′ P P′} →
-           μ ≡ μ′ → [ i ] P ≈ P′ → [ i ] μ · P ≈ μ′ · P′
-refl ·-cong P≈P′ = refl ·′-cong convert {a = ℓ} P≈P′
+_·-cong_ :
+  ∀ {i μ μ′ P P′} →
+  μ ≡ μ′ → [ i ] force P ≈′ force P′ → [ i ] μ · P ≈ μ′ · P′
+refl ·-cong P≈P′ =
+  ⟨ Σ-map id (Σ-map id symmetric) ∘ rl (symmetric P≈P′)
+  , rl P≈P′
+  ⟩
+  where
+  rl = CL.·-cong
 
-_·-cong′_ : ∀ {i μ μ′ P P′} →
-            μ ≡ μ′ → [ i ] P ≈′ P′ → [ i ] μ · P ≈′ μ′ · P′
-force (μ≡μ′ ·-cong′ P≈P′) = μ≡μ′ ·-cong force P≈P′
+_·-cong′_ :
+  ∀ {i μ μ′ P P′} →
+  μ ≡ μ′ → [ i ] force P ≈′ force P′ → [ i ] μ · P ≈′ μ′ · P′
+force (μ≡μ′ ·-cong′ P≈P′) = μ≡μ′ ·-cong P≈P′
 
--- _· turns equal actions into weakly bisimilar processes.
+-- _∙_ preserves weak bisimilarity.
 
-infix 12 _·-cong _·-cong′
+infix 12 _∙-cong_ _∙-cong′_
 
-_·-cong : ∀ {μ μ′} → μ ≡ μ′ → μ · ≈ μ′ ·
-refl ·-cong = reflexive
+_∙-cong_ : ∀ {i μ μ′ P P′} →
+           μ ≡ μ′ → [ i ] P ≈ P′ → [ i ] μ ∙ P ≈ μ′ ∙ P′
+refl ∙-cong P≈P′ = refl ·-cong convert {a = ℓ} P≈P′
 
-_·-cong′ : ∀ {μ μ′} → μ ≡ μ′ → μ · ≈′ μ′ ·
-refl ·-cong′ = reflexive
+_∙-cong′_ : ∀ {i μ μ′ P P′} →
+            μ ≡ μ′ → [ i ] P ≈′ P′ → [ i ] μ ∙ P ≈′ μ′ ∙ P′
+force (μ≡μ′ ∙-cong′ P≈P′) = μ≡μ′ ∙-cong force P≈P′
+
+-- _∙ turns equal actions into weakly bisimilar processes.
+
+infix 12 _∙-cong _∙-cong′
+
+_∙-cong : ∀ {μ μ′} → μ ≡ μ′ → μ ∙ ≈ μ′ ∙
+refl ∙-cong = reflexive
+
+_∙-cong′ : ∀ {μ μ′} → μ ≡ μ′ → μ ∙ ≈′ μ′ ∙
+refl ∙-cong′ = reflexive
 
 mutual
 
@@ -138,51 +138,51 @@ mutual
   (∀ {P Q Q′} → Q ≳ Q′ → P ⊕ Q ≈ P ⊕ Q′)  ↝⟨ E.¬⊕-congʳ-≳≈ x ⟩□
   ⊥                                       □
 
--- Some congruence lemmas for combinations of _⊕_ and _·′_.
+-- Some congruence lemmas for combinations of _⊕_ and _·_.
 
-⊕·′-cong :
+⊕·-cong :
   ∀ {i P μ Q Q′} →
-  [ i ] force Q ≈′ force Q′ → [ i ] P ⊕ μ ·′ Q ≈ P ⊕ μ ·′ Q′
-⊕·′-cong Q≈Q′ =
-  ⟨ Σ-map id (Σ-map id symmetric) ∘ CL.⊕·′-cong (symmetric Q≈Q′)
-  , CL.⊕·′-cong Q≈Q′
+  [ i ] force Q ≈′ force Q′ → [ i ] P ⊕ μ · Q ≈ P ⊕ μ · Q′
+⊕·-cong Q≈Q′ =
+  ⟨ Σ-map id (Σ-map id symmetric) ∘ CL.⊕·-cong (symmetric Q≈Q′)
+  , CL.⊕·-cong Q≈Q′
   ⟩
 
-⊕·′-cong′ :
+⊕·-cong′ :
   ∀ {i P μ Q Q′} →
-  [ i ] force Q ≈′ force Q′ → [ i ] P ⊕ μ ·′ Q ≈′ P ⊕ μ ·′ Q′
-force (⊕·′-cong′ Q≈Q′) = ⊕·′-cong Q≈Q′
+  [ i ] force Q ≈′ force Q′ → [ i ] P ⊕ μ · Q ≈′ P ⊕ μ · Q′
+force (⊕·-cong′ Q≈Q′) = ⊕·-cong Q≈Q′
 
-·′⊕-cong : ∀ {i P P′ μ Q} →
-           [ i ] force P ≈′ force P′ → [ i ] μ ·′ P ⊕ Q ≈ μ ·′ P′ ⊕ Q
-·′⊕-cong {P = P} {P′} {μ} {Q} P≈P′ =
-  μ ·′ P ⊕ Q   ∼⟨ SE.⊕-comm ⟩
-  Q ⊕ μ ·′ P   ∼′⟨ ⊕·′-cong P≈P′ ⟩ S.∼:
-  Q ⊕ μ ·′ P′  ∼⟨ SE.⊕-comm ⟩■
-  μ ·′ P′ ⊕ Q
+·⊕-cong : ∀ {i P P′ μ Q} →
+          [ i ] force P ≈′ force P′ → [ i ] μ · P ⊕ Q ≈ μ · P′ ⊕ Q
+·⊕-cong {P = P} {P′} {μ} {Q} P≈P′ =
+  μ · P ⊕ Q   ∼⟨ SE.⊕-comm ⟩
+  Q ⊕ μ · P   ∼′⟨ ⊕·-cong P≈P′ ⟩ S.∼:
+  Q ⊕ μ · P′  ∼⟨ SE.⊕-comm ⟩■
+  μ · P′ ⊕ Q
 
-·′⊕-cong′ :
+·⊕-cong′ :
   ∀ {i P P′ μ Q} →
-  [ i ] force P ≈′ force P′ → [ i ] μ ·′ P ⊕ Q ≈′ μ ·′ P′ ⊕ Q
-force (·′⊕-cong′ P≈P′) = ·′⊕-cong P≈P′
+  [ i ] force P ≈′ force P′ → [ i ] μ · P ⊕ Q ≈′ μ · P′ ⊕ Q
+force (·⊕-cong′ P≈P′) = ·⊕-cong P≈P′
 
-infix 8 _·′⊕·′-cong_ _·′⊕·′-cong′_
+infix 8 _·⊕·-cong_ _·⊕·-cong′_
 
-_·′⊕·′-cong_ :
+_·⊕·-cong_ :
   ∀ {i μ₁ μ₂ P₁ P₁′ P₂ P₂′} →
   [ i ] force P₁ ≈′ force P₁′ → [ i ] force P₂ ≈′ force P₂′ →
-  [ i ] μ₁ ·′ P₁ ⊕ μ₂ ·′ P₂ ≈ μ₁ ·′ P₁′ ⊕ μ₂ ·′ P₂′
-P₁≈P₁′ ·′⊕·′-cong P₂≈P₂′ =
+  [ i ] μ₁ · P₁ ⊕ μ₂ · P₂ ≈ μ₁ · P₁′ ⊕ μ₂ · P₂′
+P₁≈P₁′ ·⊕·-cong P₂≈P₂′ =
   ⟨ Σ-map id (Σ-map id symmetric) ∘
-    CL.·′⊕·′-cong (symmetric P₁≈P₁′) (symmetric P₂≈P₂′)
-  , CL.·′⊕·′-cong P₁≈P₁′ P₂≈P₂′
+    CL.·⊕·-cong (symmetric P₁≈P₁′) (symmetric P₂≈P₂′)
+  , CL.·⊕·-cong P₁≈P₁′ P₂≈P₂′
   ⟩
 
-_·′⊕·′-cong′_ :
+_·⊕·-cong′_ :
   ∀ {i μ₁ μ₂ P₁ P₁′ P₂ P₂′} →
   [ i ] force P₁ ≈′ force P₁′ → [ i ] force P₂ ≈′ force P₂′ →
-  [ i ] μ₁ ·′ P₁ ⊕ μ₂ ·′ P₂ ≈′ μ₁ ·′ P₁′ ⊕ μ₂ ·′ P₂′
-force (P₁≈′P₁′ ·′⊕·′-cong′ P₂≈′P₂′) = P₁≈′P₁′ ·′⊕·′-cong P₂≈′P₂′
+  [ i ] μ₁ · P₁ ⊕ μ₂ · P₂ ≈′ μ₁ · P₁′ ⊕ μ₂ · P₂′
+force (P₁≈′P₁′ ·⊕·-cong′ P₂≈′P₂′) = P₁≈′P₁′ ·⊕·-cong P₂≈′P₂′
 
 -- _[_] preserves weak bisimilarity for non-degenerate contexts. (This
 -- result is similar to Theorem 6.5.25 in "Enhancements of the
@@ -201,7 +201,7 @@ _[_]-cong :
 hole     [ Ps≈Qs ]-cong = Ps≈Qs _
 ∅        [ Ps≈Qs ]-cong = reflexive
 D₁ ∣ D₂  [ Ps≈Qs ]-cong = (D₁ [ Ps≈Qs ]-cong) ∣-cong (D₂ [ Ps≈Qs ]-cong)
-action D [ Ps≈Qs ]-cong = refl ·′-cong λ { .force → force D [ Ps≈Qs ]-cong }
+action D [ Ps≈Qs ]-cong = refl ·-cong λ { .force → force D [ Ps≈Qs ]-cong }
 ⟨ν⟩ D    [ Ps≈Qs ]-cong = ⟨ν refl ⟩-cong (D [ Ps≈Qs ]-cong)
 ! D      [ Ps≈Qs ]-cong = !-cong (D [ Ps≈Qs ]-cong)
 D₁ ⊕ D₂  [ Ps≈Qs ]-cong = ⊕-cong Ps≈Qs D₁ D₂
@@ -225,20 +225,20 @@ D₁ ⊕ D₂  [ Ps≈Qs ]-cong = ⊕-cong Ps≈Qs D₁ D₂
       (context P₁ [ Qs ]) ⊕ (context P₂ [ Qs ])
 
     (process P₁) (action {μ = μ₂} {C = C₂} D₂) →
-      (context P₁ [ Ps ]) ⊕ μ₂ ·′ (C₂ [ Ps ]′)  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁)) SE.⊕-cong (_ ■) ⟩
-      P₁ ⊕ μ₂ ·′ (C₂ [ Ps ]′)                   ∼′⟨ ⊕·′-cong (D₂ [ Ps≈Qs ]-cong′) ⟩ S.∼:
-      P₁ ⊕ μ₂ ·′ (C₂ [ Qs ]′)                   ∼⟨ SE.≡→∼ (context-[] P₁) SE.⊕-cong (_ ■) ⟩■
-      (context P₁ [ Qs ]) ⊕ μ₂ ·′ (C₂ [ Qs ]′)
+      (context P₁ [ Ps ]) ⊕ μ₂ · (C₂ [ Ps ]′)  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁)) SE.⊕-cong (_ ■) ⟩
+      P₁ ⊕ μ₂ · (C₂ [ Ps ]′)                   ∼′⟨ ⊕·-cong (D₂ [ Ps≈Qs ]-cong′) ⟩ S.∼:
+      P₁ ⊕ μ₂ · (C₂ [ Qs ]′)                   ∼⟨ SE.≡→∼ (context-[] P₁) SE.⊕-cong (_ ■) ⟩■
+      (context P₁ [ Qs ]) ⊕ μ₂ · (C₂ [ Qs ]′)
 
     (action {μ = μ₁} {C = C₁} D₁) (process P₂) →
-      μ₁ ·′ (C₁ [ Ps ]′) ⊕ (context P₂ [ Ps ])  ∼⟨ (_ ■) SE.⊕-cong symmetric (SE.≡→∼ (context-[] P₂)) ⟩
-      μ₁ ·′ (C₁ [ Ps ]′) ⊕ P₂                   ∼′⟨ ·′⊕-cong (D₁ [ Ps≈Qs ]-cong′) ⟩ S.∼:
-      μ₁ ·′ (C₁ [ Qs ]′) ⊕ P₂                   ∼⟨ (_ ■) SE.⊕-cong SE.≡→∼ (context-[] P₂) ⟩■
-      μ₁ ·′ (C₁ [ Qs ]′) ⊕ (context P₂ [ Qs ])
+      μ₁ · (C₁ [ Ps ]′) ⊕ (context P₂ [ Ps ])  ∼⟨ (_ ■) SE.⊕-cong symmetric (SE.≡→∼ (context-[] P₂)) ⟩
+      μ₁ · (C₁ [ Ps ]′) ⊕ P₂                   ∼′⟨ ·⊕-cong (D₁ [ Ps≈Qs ]-cong′) ⟩ S.∼:
+      μ₁ · (C₁ [ Qs ]′) ⊕ P₂                   ∼⟨ (_ ■) SE.⊕-cong SE.≡→∼ (context-[] P₂) ⟩■
+      μ₁ · (C₁ [ Qs ]′) ⊕ (context P₂ [ Qs ])
 
     (action {μ = μ₁} {C = C₁} D₁) (action {μ = μ₂} {C = C₂} D₂) →
-      μ₁ ·′ (C₁ [ Ps ]′) ⊕ μ₂ ·′ (C₂ [ Ps ]′)  ∼⟨ (D₁ [ Ps≈Qs ]-cong′) ·′⊕·′-cong (D₂ [ Ps≈Qs ]-cong′) ⟩■
-      μ₁ ·′ (C₁ [ Qs ]′) ⊕ μ₂ ·′ (C₂ [ Qs ]′)
+      μ₁ · (C₁ [ Ps ]′) ⊕ μ₂ · (C₂ [ Ps ]′)  ∼⟨ (D₁ [ Ps≈Qs ]-cong′) ·⊕·-cong (D₂ [ Ps≈Qs ]-cong′) ⟩■
+      μ₁ · (C₁ [ Qs ]′) ⊕ μ₂ · (C₂ [ Qs ]′)
 
 _[_]-cong′ :
   ∀ {i n Ps Qs} {C : Context ∞ n} →
