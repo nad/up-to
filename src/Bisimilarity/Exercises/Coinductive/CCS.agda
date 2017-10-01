@@ -499,7 +499,7 @@ mutual
     a ∙             [ name a ]⟵⟨ action ⟩
     name a ∙ (a ∙)
 
-  lr (par-τ′ a≡co-a action action) = ⊥-elim (id≢co a≡co-a)
+  lr (par-τ action tr) = ⊥-elim (names-are-not-inverted tr)
 
   rl : ∀ {P μ} → name a ∙ (a ∙) [ μ ]⟶ P →
        ∃ λ P′ → a ∙ ∣ a ∙ [ μ ]⟶ P′ × P′ ∼′ P

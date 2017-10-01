@@ -85,8 +85,8 @@ a ∉ name (b , _) = a ≢ b
 data _[_]⟶_ : Proc ∞ → Action → Proc ∞ → Set ℓ where
   par-left     : ∀ {P Q P′ μ} → P [ μ ]⟶ P′ → P ∣ Q [ μ ]⟶ P′ ∣ Q
   par-right    : ∀ {P Q Q′ μ} → Q [ μ ]⟶ Q′ → P ∣ Q [ μ ]⟶ P  ∣ Q′
-  par-τ′       : ∀ {P P′ Q Q′ a b} →
-                 b ≡ co a → P [ name a ]⟶ P′ → Q [ name b ]⟶ Q′ →
+  par-τ        : ∀ {P P′ Q Q′ a} →
+                 P [ name a ]⟶ P′ → Q [ name (co a) ]⟶ Q′ →
                  P ∣ Q [ τ ]⟶ P′ ∣ Q′
   choice-left  : ∀ {P Q P′ μ} → P [ μ ]⟶ P′ → P ⊕ Q [ μ ]⟶ P′
   choice-right : ∀ {P Q Q′ μ} → Q [ μ ]⟶ Q′ → P ⊕ Q [ μ ]⟶ Q′
@@ -94,9 +94,6 @@ data _[_]⟶_ : Proc ∞ → Action → Proc ∞ → Set ℓ where
   restriction  : ∀ {P P′ a μ} →
                  a ∉ μ → P [ μ ]⟶ P′ → ⟨ν a ⟩ P [ μ ]⟶ ⟨ν a ⟩ P′
   replication  : ∀ {P P′ μ} → ! P ∣ P [ μ ]⟶ P′ → ! P [ μ ]⟶ P′
-
-pattern par-τ {P} {P′} {Q} {Q′} {a} tr₁ tr₂ =
-  par-τ′ {P} {P′} {Q} {Q′} {a} refl tr₁ tr₂
 
 -- The CCS LTS.
 
@@ -273,6 +270,13 @@ silent≡τ {name _} ()
 
 ∉τ : ∀ {μ a} → Silent μ → a ∉ μ
 ∉τ s rewrite silent≡τ s = _
+
+-- A variant of par-τ.
+
+par-τ′ : ∀ {P P′ Q Q′ a b} →
+         b ≡ co a → P [ name a ]⟶ P′ → Q [ name b ]⟶ Q′ →
+         P ∣ Q [ τ ]⟶ P′ ∣ Q′
+par-τ′ refl = par-τ
 
 -- The process μ · P can only make μ-transitions.
 

@@ -296,7 +296,7 @@ open Bisimilarity.Exercises.Other.CCS.6-1-3-2 (record
       , inj₂ (a ∙ ∣ ∅  ∼⟨ ∣-right-identity ⟩■
               a ∙)
 
-    lr base (par-τ′ a≡co-a action action) = ⊥-elim (id≢co a≡co-a)
+    lr base (par-τ action tr) = ⊥-elim (names-are-not-inverted tr)
 
     rl : ∀ {P Q Q′ μ} →
          R (P , Q) → Q [ μ ]⟶ Q′ →

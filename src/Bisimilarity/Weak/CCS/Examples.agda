@@ -75,11 +75,12 @@ mutual
       (inj₂ (_ , .∅ , _ , .(co a) , action , a̅[a̅̅]⟶ , _)) →
         ⊥-elim (names-are-not-inverted a̅[a̅̅]⟶)
 
-    lr (par-τ′ {P′ = P} {Q′ = Q} _ tr₁ tr₂) =
+    lr (par-τ {P′ = P} {Q′ = Q} tr₁ tr₂) =
       case 6-1-3-2 tr₁ ,′ 6-1-3-2 tr₂ of λ where
         (inj₁ (.(b ∙) , action , P∼!ab∣b) ,
-         inj₁ (.∅     , action , Q∼!a̅∣∅)) →
-          P ∣ Q                                      ∼⟨ P∼!ab∣b ∣-cong Q∼!a̅∣∅ ⟩
+         inj₁ (R      , tr     , Q∼!a̅∣R)) →
+          P ∣ Q                                      ∼⟨ P∼!ab∣b ∣-cong Q∼!a̅∣R ⟩
+          (! name a ∙ (b ∙) ∣ b ∙) ∣ (! co a ∙ ∣ R)  ∼≡⟨ cong (λ R → _ ∣ (_ ∣ R)) (·-only⟶ tr) ⟩
           (! name a ∙ (b ∙) ∣ b ∙) ∣ (! co a ∙ ∣ ∅)  ∼⟨ swap-in-the-middle ⟩
           (! name a ∙ (b ∙) ∣ ! co a ∙) ∣ (b ∙ ∣ ∅)  ∼′⟨ 6-5-4′ WL.∣-cong′ reflexive ⟩
           ((! a ∙ ∣ ! b ∙) ∣ ! co a ∙) ∣ (b ∙ ∣ ∅)   ∼⟨ swap-in-the-middle ⟩ ∼:
@@ -120,7 +121,7 @@ mutual
         (inj₂ (_ , .∅ , _ , .b , action , b[b̅]⟶ , _)) →
           ⊥-elim (names-are-not-inverted b[b̅]⟶)
 
-    rl-lemma (par-left (par-τ′ {P′ = P} {Q′ = Q} _ tr₁ tr₂)) =
+    rl-lemma (par-left (par-τ {P′ = P} {Q′ = Q} tr₁ tr₂)) =
       case 6-1-3-2 tr₁ ,′ 6-1-3-2 tr₂ of λ where
         (inj₁ (.∅ , action , P∼!a∣∅) ,
          inj₁ (.∅ , action , Q∼!b∣∅)) →
@@ -143,24 +144,26 @@ mutual
         (inj₂ (_ , .∅ , _ , .(co a) , action , a̅[a̅̅]⟶ , _)) →
           ⊥-elim (names-are-not-inverted a̅[a̅̅]⟶)
 
-    rl-lemma (par-τ′ {Q′ = Q} _ (par-left {P′ = P} tr₁) tr₂) =
+    rl-lemma (par-τ {Q′ = Q} (par-left {P′ = P} tr₁) tr₂) =
       case 6-1-3-2 tr₁ ,′ 6-1-3-2 tr₂ of λ where
         (inj₁ (.∅ , action , P∼!a∣∅) ,
-         inj₁ (.∅ , action , Q∼!a̅∣∅)) →
+         inj₁ (R  , tr     , Q∼!a̅∣R)) →
             ((! a ∙ ∣ ! b ∙) ∣ ! co a ∙              ∼⟨ symmetric ((∣-right-identity ∣-cong reflexive) ∣-cong ∣-right-identity) ⟩
-             ((! a ∙ ∣ ∅) ∣ ! b ∙) ∣ (! co a ∙ ∣ ∅)  ∼⟨ symmetric ((P∼!a∣∅ ∣-cong reflexive) ∣-cong Q∼!a̅∣∅) ⟩■
+             ((! a ∙ ∣ ∅) ∣ ! b ∙) ∣ (! co a ∙ ∣ ∅)  ∼≡⟨ cong (λ R → _ ∣ (_ ∣ R)) (sym $ ·-only⟶ tr) ⟩
+             ((! a ∙ ∣ ∅) ∣ ! b ∙) ∣ (! co a ∙ ∣ R)  ∼⟨ symmetric ((P∼!a∣∅ ∣-cong reflexive) ∣-cong Q∼!a̅∣R) ⟩■
              (P ∣ ! b ∙) ∣ Q)
           , inj₂ (inj₂ (inj₂ refl))
 
         (inj₂ (() , _) , _)
         (_ , inj₂ (() , _))
 
-    rl-lemma (par-τ′ {Q′ = Q} _ (par-right {Q′ = P} tr₁) tr₂) =
+    rl-lemma (par-τ {Q′ = Q} (par-right {Q′ = P} tr₁) tr₂) =
       case 6-1-3-2 tr₁ ,′ 6-1-3-2 tr₂ of λ where
         (inj₁ (.∅ , action , P∼!b∣∅) ,
-         inj₁ (.∅ , action , Q∼!a̅∣∅)) →
+         inj₁ (R  , tr     , Q∼!a̅∣R)) →
             ((! a ∙ ∣ ! b ∙) ∣ ! co a ∙              ∼⟨ symmetric ((reflexive ∣-cong ∣-right-identity) ∣-cong ∣-right-identity) ⟩
-             (! a ∙ ∣ (! b ∙ ∣ ∅)) ∣ (! co a ∙ ∣ ∅)  ∼⟨ symmetric ((reflexive ∣-cong P∼!b∣∅) ∣-cong Q∼!a̅∣∅) ⟩■
+             (! a ∙ ∣ (! b ∙ ∣ ∅)) ∣ (! co a ∙ ∣ ∅)  ∼≡⟨ cong (λ R → _ ∣ (_ ∣ R)) (sym $ ·-only⟶ tr) ⟩
+             (! a ∙ ∣ (! b ∙ ∣ ∅)) ∣ (! co a ∙ ∣ R)  ∼⟨ symmetric ((reflexive ∣-cong P∼!b∣∅) ∣-cong Q∼!a̅∣R) ⟩■
              (! a ∙ ∣ P) ∣ Q)
           , inj₂ (inj₂ (inj₂ refl))
 
@@ -224,10 +227,11 @@ mutual
     ∀ {μ R} →
     ⟨ν proj₁ a ⟩ (name a ∙ P ∣ name (co a) ∙ Q) [ μ ]⟶ R →
     ∃ λ R′ → ⟨ν proj₁ a ⟩ (P ∣ Q) [ μ ]⟶̂ R′ × R ≳′ R′
-  lr (restriction a∉μ (par-left action))        = ⊥-elim (a∉μ refl)
-  lr (restriction a∉μ (par-right action))       = ⊥-elim (a∉μ refl)
-  lr (restriction a∉μ (par-τ′ _ action action)) =
-    ⟨ν proj₁ a ⟩ (P ∣ Q)  ■
+  lr (restriction a∉μ (par-left action))          = ⊥-elim (a∉μ refl)
+  lr (restriction a∉μ (par-right action))         = ⊥-elim (a∉μ refl)
+  lr (restriction a∉μ (par-τ {Q′ = R} action tr)) =
+    ⟨ν proj₁ a ⟩ (P ∣ R)  ∼≡⟨ cong (λ R → ⟨ν _ ⟩ (_ ∣ R)) (·-only⟶ tr) ⟩■
+    ⟨ν proj₁ a ⟩ (P ∣ Q)
       ⟵̂[ τ ]
     ⟨ν proj₁ a ⟩ (P ∣ Q)  ■
 
@@ -267,11 +271,9 @@ mutual
   P = ⟨ν proj₁ a ⟩ (name (co a) ∙ (a ∙) ∣ co a ∙)
 
   P⟶ : ∀ {μ Q} → ¬ P [ μ ]⟶ Q
-  P⟶ (restriction x≢x (par-left action))     = ⊥-elim (x≢x refl)
-  P⟶ (restriction x≢x (par-right action))    = ⊥-elim (x≢x refl)
-  P⟶ (restriction _
-         (par-τ′ co-a≡co-co-a action action)) =
-    ⊥-elim (id≢co co-a≡co-co-a)
+  P⟶ (restriction x≢x (par-left action))  = ⊥-elim (x≢x refl)
+  P⟶ (restriction x≢x (par-right action)) = ⊥-elim (x≢x refl)
+  P⟶ (restriction _   (par-τ action tr))  = names-are-not-inverted tr
 
   !P⟶ : ∀ {μ Q} → ¬ ! P [ μ ]⟶ Q
   !P⟶ (replication (par-left tr))  = !P⟶ tr
@@ -325,11 +327,13 @@ mutual
 
       ! name b ∙ ⟨ν proj₁ a ⟩ P
 
-    (inj₁ (_ , restriction _ (par-τ′ co-a≡co-b action action) , _)) →
-      ⊥-elim (             $⟨ co-a≡co-b ⟩
-        co a ≡ co b        ↝⟨ cong proj₁ ⟩
-        proj₁ a ≡ proj₁ b  ↝⟨ a≢b ⟩□
-        ⊥                  □)
+    (inj₁ (_ , restriction _ (par-τ action tr) , _)) →
+      ⊥-elim (                              $⟨ tr ⟩
+        name (co a) · _ [ name (co b) ]⟶ _  ↝⟨ ·-only ⟩
+        name (co a) ≡ name (co b)           ↝⟨ cancel-name ⟩
+        co a ≡ co b                         ↝⟨ cong proj₁ ⟩
+        proj₁ a ≡ proj₁ b                   ↝⟨ a≢b ⟩□
+        ⊥                                   □)
 
     (inj₁ (_ , restriction a≢a (par-right action) , _)) →
       ⊥-elim (a≢a refl)
