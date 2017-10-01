@@ -8,6 +8,7 @@ open import Labelled-transition-system
 
 module Bisimilarity.Weak.Coinductive.Other {ℓ} (lts : LTS ℓ) where
 
+open import Equality.Propositional
 open import Prelude
 
 import Bisimilarity.Coinductive
@@ -16,6 +17,7 @@ import Bisimilarity.Coinductive.General
 open import Equational-reasoning
 import Expansion
 import Expansion.Equational-reasoning-instances
+open import Indexed-container using (Container; ν; ν′)
 open import Relation
 
 open LTS lts
@@ -30,9 +32,8 @@ private
     Bisimilarity.Coinductive.General lts _[_]⇒̂_ _[_]⇒̂_ ⟶→⇒̂ ⟶→⇒̂
 
 open General public
-  using (StepC; ⟨_,_⟩; left-to-right; right-to-left; force;
-         [_]_≡_; [_]_≡′_; []≡↔;
-         Extensionality; extensionality)
+  using (module StepC; ⟨_,_⟩; left-to-right; right-to-left; force;
+         [_]_≡_; [_]_≡′_; []≡↔; Extensionality; extensionality)
   renaming ( reflexive-∼ to reflexive-≈
            ; reflexive-∼′ to reflexive-≈′
            ; ≡⇒∼ to ≡⇒≈
@@ -41,29 +42,59 @@ open General public
            ; module Bisimilarity-of-∼ to Bisimilarity-of-≈
            )
 
--- Some definitions are given in the following way, rather than via
--- open public, to make hyperlinks to these definitions more
--- informative.
+-- StepC is given in the following way, rather than via open public,
+-- to make hyperlinks to it more informative.
+
+StepC : Container (Proc × Proc) (Proc × Proc)
+StepC = General.StepC
+
+-- The following definitions are given explicitly, to make the code
+-- easier to follow for readers of the paper.
 
 Weak-bisimilarity : Size → Rel₂ ℓ Proc
-Weak-bisimilarity = General.Bisimilarity
+Weak-bisimilarity = ν StepC
 
 Weak-bisimilarity′ : Size → Rel₂ ℓ Proc
-Weak-bisimilarity′ = General.Bisimilarity′
+Weak-bisimilarity′ = ν′ StepC
 
-infix 4 _≈_ _≈′_ [_]_≈_ [_]_≈′_
+infix 4 [_]_≈_ [_]_≈′_ _≈_ _≈′_
 
 [_]_≈_ : Size → Proc → Proc → Set ℓ
-[_]_≈_ = General.[_]_∼_
+[ i ] p ≈ q = ν StepC i (p , q)
 
 [_]_≈′_ : Size → Proc → Proc → Set ℓ
-[_]_≈′_ = General.[_]_∼′_
+[ i ] p ≈′ q = ν′ StepC i (p , q)
 
 _≈_ : Proc → Proc → Set ℓ
-_≈_ = General._∼_
+_≈_ = [ ∞ ]_≈_
 
 _≈′_ : Proc → Proc → Set ℓ
-_≈′_ = General._∼′_
+_≈′_ = [ ∞ ]_≈′_
+
+private
+
+  -- However, these definitions are definitionally equivalent to
+  -- corresponding definitions in General.
+
+  indirect-Weak-bisimilarity :
+    Weak-bisimilarity ≡ General.Bisimilarity
+  indirect-Weak-bisimilarity = refl
+
+  indirect-Weak-bisimilarity′ :
+    Weak-bisimilarity′ ≡ General.Bisimilarity′
+  indirect-Weak-bisimilarity′ = refl
+
+  indirect-[]≈ : [_]_≈_ ≡ General.[_]_∼_
+  indirect-[]≈ = refl
+
+  indirect-[]≈′ : [_]_≈′_ ≡ General.[_]_∼′_
+  indirect-[]≈′ = refl
+
+  indirect-≈ : _≈_ ≡ General._∼_
+  indirect-≈ = refl
+
+  indirect-≈′ : _≈′_ ≡ General._∼′_
+  indirect-≈′ = refl
 
 -- Combinators that can perhaps make the code a bit nicer to read.
 

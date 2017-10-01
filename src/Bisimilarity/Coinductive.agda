@@ -8,9 +8,11 @@ open import Labelled-transition-system
 
 module Bisimilarity.Coinductive {ℓ} (lts : LTS ℓ) where
 
+open import Equality.Propositional
 open import Prelude
 
 import Bisimilarity.Coinductive.General
+open import Indexed-container using (Container; ν; ν′)
 open import Relation
 
 open LTS lts
@@ -20,31 +22,62 @@ private
     Bisimilarity.Coinductive.General lts _[_]⟶_ _[_]⟶_ id id
 
 open General public
-  hiding (Bisimilarity; Bisimilarity′; [_]_∼_; [_]_∼′_; _∼_; _∼′_)
+  using (module StepC; ⟨_,_⟩; left-to-right; right-to-left; force;
+         reflexive-∼; reflexive-∼′; ≡⇒∼; ∼:_; ∼′:_;
+         [_]_≡_; [_]_≡′_; []≡↔; module Bisimilarity-of-∼;
+         Extensionality; extensionality)
 
--- Some definitions are given in the following way, rather than via
--- open public, to make hyperlinks to these definitions more
--- informative.
+-- StepC is given in the following way, rather than via open public,
+-- to make hyperlinks to it more informative.
+
+StepC : Container (Proc × Proc) (Proc × Proc)
+StepC = General.StepC
+
+-- The following definitions are given explicitly, to make the code
+-- easier to follow for readers of the paper.
 
 Bisimilarity : Size → Rel₂ ℓ Proc
-Bisimilarity = General.Bisimilarity
+Bisimilarity = ν StepC
 
 Bisimilarity′ : Size → Rel₂ ℓ Proc
-Bisimilarity′ = General.Bisimilarity′
+Bisimilarity′ = ν′ StepC
 
-infix 4 _∼_ _∼′_ [_]_∼_ [_]_∼′_
+infix 4 [_]_∼_ [_]_∼′_ _∼_ _∼′_
 
 [_]_∼_ : Size → Proc → Proc → Set ℓ
-[_]_∼_ = General.[_]_∼_
+[ i ] p ∼ q = ν StepC i (p , q)
 
 [_]_∼′_ : Size → Proc → Proc → Set ℓ
-[_]_∼′_ = General.[_]_∼′_
+[ i ] p ∼′ q = ν′ StepC i (p , q)
 
 _∼_ : Proc → Proc → Set ℓ
-_∼_ = General._∼_
+_∼_ = [ ∞ ]_∼_
 
 _∼′_ : Proc → Proc → Set ℓ
-_∼′_ = General._∼′_
+_∼′_ = [ ∞ ]_∼′_
+
+private
+
+  -- However, these definitions are definitionally equivalent to
+  -- corresponding definitions in General.
+
+  indirect-Bisimilarity : Bisimilarity ≡ General.Bisimilarity
+  indirect-Bisimilarity = refl
+
+  indirect-Bisimilarity′ : Bisimilarity′ ≡ General.Bisimilarity′
+  indirect-Bisimilarity′ = refl
+
+  indirect-[]∼ : [_]_∼_ ≡ General.[_]_∼_
+  indirect-[]∼ = refl
+
+  indirect-[]∼′ : [_]_∼′_ ≡ General.[_]_∼′_
+  indirect-[]∼′ = refl
+
+  indirect-∼ : _∼_ ≡ General._∼_
+  indirect-∼ = refl
+
+  indirect-∼′ : _∼′_ ≡ General._∼′_
+  indirect-∼′ = refl
 
 -- Combinators that can perhaps make the code a bit nicer to read.
 
@@ -96,25 +129,23 @@ mutual
   symmetric-∼′ : ∀ {i p q} → [ i ] p ∼′ q → [ i ] q ∼′ p
   force (symmetric-∼′ p∼q) = symmetric-∼ (force p∼q)
 
-mutual
+-- Strong bisimilarity is transitive.
 
-  -- Strong bisimilarity is transitive.
+transitive-∼ : ∀ {i p q r} → [ i ] p ∼ q → [ i ] q ∼ r → [ i ] p ∼ r
+transitive-∼ {i} = λ p q →
+  StepC.⟨ lr p q
+        , Σ-map id (Σ-map id symmetric-∼′) ∘
+          lr (symmetric-∼ q) (symmetric-∼ p)
+        ⟩
+  where
+  lr : ∀ {p p′ q r μ} →
+       [ i ] p ∼ q → [ i ] q ∼ r → p [ μ ]⟶ p′ →
+       ∃ λ r′ → r [ μ ]⟶ r′ × [ i ] p′ ∼′ r′
+  lr p q tr =
+    let (_ , tr′ , p′) = StepC.left-to-right p tr
+        (_ , tr″ , q′) = StepC.left-to-right q tr′
+    in  (_ , tr″ , λ { .force → transitive-∼ (force p′) (force q′) })
 
-  transitive-∼ : ∀ {i p q r} → [ i ] p ∼ q → [ i ] q ∼ r → [ i ] p ∼ r
-  transitive-∼ {i} = λ p∼q q∼r →
-    StepC.⟨ lr p∼q q∼r
-          , Σ-map id (Σ-map id symmetric-∼′) ∘
-            lr (symmetric-∼ q∼r) (symmetric-∼ p∼q)
-          ⟩
-    where
-    lr : ∀ {p p′ q r μ} →
-         [ i ] p ∼ q → [ i ] q ∼ r → p [ μ ]⟶ p′ →
-         ∃ λ r′ → r [ μ ]⟶ r′ × [ i ] p′ ∼′ r′
-    lr p∼q q∼r p⟶p′ =
-      let q′ , q⟶q′ , p′∼q′ = StepC.left-to-right p∼q p⟶p′
-          r′ , r⟶r′ , q′∼r′ = StepC.left-to-right q∼r q⟶q′
-      in r′ , r⟶r′ , transitive-∼′ p′∼q′ q′∼r′
-
-  transitive-∼′ :
-    ∀ {i p q r} → [ i ] p ∼′ q → [ i ] q ∼′ r → [ i ] p ∼′ r
-  force (transitive-∼′ p∼q q∼r) = transitive-∼ (force p∼q) (force q∼r)
+transitive-∼′ :
+  ∀ {i p q r} → [ i ] p ∼′ q → [ i ] q ∼′ r → [ i ] p ∼′ r
+force (transitive-∼′ p∼q q∼r) = transitive-∼ (force p∼q) (force q∼r)

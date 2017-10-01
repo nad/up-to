@@ -31,13 +31,13 @@ open import Expansion delay-monad
 later-cong : ∀ {i x y} →
              [ i ] force x ≳′ force y → [ i ] later x ≳ later y
 later-cong x≳′y =
-  ⟨ (λ { later⟶ → _ , ⟶→⟶̂ later⟶ , x≳′y })
-  , (λ { later⟶ → _ , ⟶→⇒̂ later⟶ , x≳′y })
+  ⟨ (λ { later → _ , ⟶→⟶̂ later , x≳′y })
+  , (λ { later → _ , ⟶→⇒̂ later , x≳′y })
   ⟩
 
 laterˡ : ∀ {i x y} → [ i ] force x ≳ y → [ i ] later x ≳ y
 laterˡ x≳y =
-  ⟨ (λ { later⟶ → _ , done _ , convert {a = a} x≳y })
+  ⟨ (λ { later → _ , done _ , convert {a = a} x≳y })
   , Σ-map id (Σ-map later⇒̂ id) ∘ right-to-left x≳y
   ⟩
 
@@ -56,17 +56,17 @@ direct→indirect (D.laterˡ p) = laterˡ (direct→indirect p)
 
 ⇒→≳ : ∀ {i x y} → x ⇒ y → D.[ i ] x ≳ y
 ⇒→≳ done               = D.reflexive _
-⇒→≳ (step _ later⟶ tr) = D.laterˡ (⇒→≳ tr)
-⇒→≳ (step () now⟶ tr)
+⇒→≳ (step _  later tr) = D.laterˡ (⇒→≳ tr)
+⇒→≳ (step () now   tr)
 
 -- If x makes a non-silent transition with the label y, then x is an
 -- expansion of now y.
 
 [just]⟶→≳now : ∀ {i x x′ y} → x [ just y ]⟶ x′ → D.[ i ] x ≳ now y
-[just]⟶→≳now now⟶ = D.reflexive _
+[just]⟶→≳now now = D.reflexive _
 
 [just]⇒→≳now : ∀ {i x x′ y} → x [ just y ]⇒ x′ → D.[ i ] x ≳ now y
-[just]⇒→≳now (steps tr now⟶ _) = ⇒→≳ tr
+[just]⇒→≳now (steps tr now _) = ⇒→≳ tr
 
 [just]⇒̂→≳now : ∀ {i x x′ y} → x [ just y ]⇒̂ x′ → D.[ i ] x ≳ now y
 [just]⇒̂→≳now (silent () _)
@@ -81,21 +81,21 @@ direct→indirect (D.laterˡ p) = laterˡ (direct→indirect p)
 
 indirect→direct : ∀ {i} x y → [ i ] x ≳ y → D.[ i ] x ≳ y
 indirect→direct {i} (now x) y =
-  ([ i ] now x ≳ y)                                ↝⟨ (λ p → left-to-right p now⟶) ⟩
+  ([ i ] now x ≳ y)                                ↝⟨ (λ p → left-to-right p now) ⟩
   (∃ λ y′ → y [ just x ]⟶̂ y′ × [ i ] now x ≳′ y′)  ↝⟨ sym ∘ [just]⟶̂→≡now ∘ proj₁ ∘ proj₂ ⟩
   now x ≡ y                                        ↝⟨ (λ { refl → D.reflexive _ }) ⟩□
   D.[ i ] now x ≳ y                                □
 
 indirect→direct {i} x (now y) =
-  [ i ] x ≳ now y                                  ↝⟨ (λ p → right-to-left p now⟶) ⟩
+  [ i ] x ≳ now y                                  ↝⟨ (λ p → right-to-left p now) ⟩
   (∃ λ x′ → x [ just y ]⇒̂ x′ × [ i ] x′ ≳′ now y)  ↝⟨ [just]⇒̂→≳now ∘ proj₁ ∘ proj₂ ⟩□
   D.[ i ] x ≳ now y                                □
 
 indirect→direct (later x) (later y) lx≳ly
-  with left-to-right lx≳ly later⟶
-... | _ , step later⟶ , x≳′y  = D.later λ { .force →
+  with left-to-right lx≳ly later
+... | _ , step later , x≳′y  = D.later λ { .force →
                                   indirect→direct _ _ (force x≳′y) }
-... | _ , done _      , x≳′ly with right-to-left lx≳ly later⟶
+... | _ , done _     , x≳′ly with right-to-left lx≳ly later
 
 ...   | _ , non-silent contradiction _ , _ =
   ⊥-elim (contradiction _)
@@ -106,16 +106,16 @@ indirect→direct (later x) (later y) lx≳ly
       (indirect→direct _ _ (force lx≳′y))
       (indirect→direct _ _ (force x≳′ly)) }
 
-...   | x′ , silent _ (step _ later⟶ x⇒x′) , x′≳′y =
+...   | x′ , silent _ (step _ later x⇒x′) , x′≳′y =
   D.later λ { .force →
     indirect→direct′ x⇒x′ (force x′≳′y) }
   where
   indirect→direct′ : ∀ {i x x′ y} →
                      x ⇒ x′ → [ i ] x′ ≳ y → D.[ i ] x ≳ y
   indirect→direct′ done               p = indirect→direct _ _ p
-  indirect→direct′ (step _ later⟶ tr) p = D.laterˡ
+  indirect→direct′ (step _  later tr) p = D.laterˡ
                                             (indirect→direct′ tr p)
-  indirect→direct′ (step () now⟶ _)
+  indirect→direct′ (step () now   _)
 
 -- The direct definition of the expansion relation is logically
 -- equivalent to the one obtained from the transition relation.

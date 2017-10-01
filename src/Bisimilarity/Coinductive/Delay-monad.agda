@@ -30,8 +30,8 @@ open import Equational-reasoning
 later-cong : ∀ {i x y} →
              [ i ] force x ∼′ force y → [ i ] later x ∼ later y
 later-cong x∼′y =
-  ⟨ (λ { later⟶ → _ , later⟶ , x∼′y })
-  , (λ { later⟶ → _ , later⟶ , x∼′y })
+  ⟨ (λ { later → _ , later , x∼′y })
+  , (λ { later → _ , later , x∼′y })
   ⟩
 
 -- The direct definition of strong bisimilarity is contained in the
@@ -48,20 +48,20 @@ direct→indirect (D.later p) = later-cong λ { .force →
 
 indirect→direct : ∀ {i} x y → [ i ] x ∼ y → D.[ i ] x ∼ y
 indirect→direct (now x) (now y) nx∼ny
-  with left-to-right nx∼ny now⟶
-... | _ , now⟶ , _ = D.now
+  with left-to-right nx∼ny now
+... | _ , now , _ = D.now
 
 indirect→direct (later x) (later y) lx∼ly
-  with left-to-right lx∼ly later⟶
-... | _ , later⟶ , x∼′y  = D.later λ { .force →
-                             indirect→direct _ _ (force x∼′y) }
+  with left-to-right lx∼ly later
+... | _ , later , x∼′y  = D.later λ { .force →
+                            indirect→direct _ _ (force x∼′y) }
 
 indirect→direct (now x) (later y) nx∼ly
-  with left-to-right nx∼ly now⟶
+  with left-to-right nx∼ly now
 ... | _ , () , _
 
 indirect→direct (later x) (now y) lx∼ny
-  with left-to-right lx∼ny later⟶
+  with left-to-right lx∼ny later
 ... | _ , () , _
 
 -- The direct definition of strong bisimilarity is pointwise logically

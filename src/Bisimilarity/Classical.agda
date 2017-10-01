@@ -90,7 +90,14 @@ Bisimilarity = Bisimilarity′ lzero
 infix 4 _∼_
 
 _∼_ : Proc → Proc → Set (lsuc ℓ)
-_∼_ = curry Bisimilarity
+p ∼ q = ∃ λ R → R ⊆ ⟦ StepC ⟧ R × R (p , q)
+
+private
+
+  -- The definition of _∼_ could also have been given more indirectly.
+
+  indirect-∼ : _∼_ ≡ curry Bisimilarity
+  indirect-∼ = refl
 
 -- An unfolding lemma for Bisimilarity′.
 

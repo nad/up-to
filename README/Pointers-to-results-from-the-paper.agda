@@ -83,7 +83,7 @@ unfold = Indexed-container.unfold
 
 -- Labelled transition systems.
 --
--- (The treatment of silent labels differs from that in the paper.)
+-- (The label silent is called is-silent.)
 
 LTS = Labelled-transition-system.LTS
 
@@ -141,6 +141,12 @@ delay-monad-direct⇔indirect =
   Bisimilarity.Coinductive.Delay-monad.direct⇔indirect
 
 -- Symmetry of bisimilarity for an arbitrary LTS.
+--
+-- Note that, due to the use of a container in the definition of
+-- strong bisimilarity, the proof uses a helper function instead of
+-- the copatterns left-to-right and right-to-left. Furthermore the
+-- function map₃ is not used, but rather a combination of other
+-- functions. Similar remarks apply to several definitions below.
 
 symmetric  = Bisimilarity.Coinductive.symmetric-∼
 symmetric′ = Bisimilarity.Coinductive.symmetric-∼′

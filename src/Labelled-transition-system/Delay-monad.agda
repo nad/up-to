@@ -18,8 +18,8 @@ open import Labelled-transition-system
 infix 4 _[_]⟶_
 
 data _[_]⟶_ : Delay A ∞ → Maybe A → Delay A ∞ → Set a where
-  now⟶   : ∀ {x} → now x   [ just x  ]⟶ now x
-  later⟶ : ∀ {x} → later x [ nothing ]⟶ force x
+  now   : ∀ {x} → now   x [ just x  ]⟶ now   x
+  later : ∀ {x} → later x [ nothing ]⟶ force x
 
 delay-monad : LTS a
 delay-monad = record
@@ -41,8 +41,8 @@ now[nothing]⟶ : ∀ {x y} → now x [ nothing ]⟶ y → y ≡ now x
 now[nothing]⟶ ()
 
 now⇒ : ∀ {x y} → now x ⇒ y → y ≡ now x
-now⇒ done             = refl
-now⇒ (step () now⟶ _)
+now⇒ done            = refl
+now⇒ (step () now _)
 
 now[nothing]⇒ : ∀ {x y} → now x [ nothing ]⇒ y → y ≡ now x
 now[nothing]⇒ (steps nx⇒x′ x′⟶x″ x″⇒y)
@@ -59,7 +59,7 @@ now[nothing]⟶̂ (step tr) = now[nothing]⟶ tr
 -- If now x can make a just y-transition, then x is equal to y.
 
 now[just]⟶ : ∀ {x y z} → now x [ just y ]⟶ z → x ≡ y
-now[just]⟶ now⟶ = refl
+now[just]⟶ now = refl
 
 now[just]⇒ : ∀ {x y z} → now x [ just y ]⇒ z → x ≡ y
 now[just]⇒ (steps tr₁ tr₂ _) =
@@ -76,11 +76,11 @@ now[just]⟶̂ (step tr) = now[just]⟶ tr
 -- The computation never can only transition to itself.
 
 never⟶never : ∀ {μ x} → never [ μ ]⟶ x → x ≡ never
-never⟶never later⟶ = refl
+never⟶never later = refl
 
 never⇒never : ∀ {x} → never ⇒ x → x ≡ never
-never⇒never done                   = refl
-never⇒never (step _ later⟶ ne⇒) = never⇒never ne⇒
+never⇒never done               = refl
+never⇒never (step _ later ne⇒) = never⇒never ne⇒
 
 never[]⇒never : ∀ {μ x} → never [ μ ]⇒ x → x ≡ never
 never[]⇒never (steps ne⇒x x⟶y y⇒z)
@@ -97,7 +97,7 @@ never⟶̂never (step ne⟶) = never⟶never ne⟶
 -- If never can make a μ-transition, then μ is silent.
 
 never⟶→silent : ∀ {μ x} → never [ μ ]⟶ x → Silent μ
-never⟶→silent later⟶ = _
+never⟶→silent later = _
 
 never[]⇒→silent : ∀ {μ x} → never [ μ ]⇒ x → Silent μ
 never[]⇒→silent (steps ne⇒x  x⟶  _) with never⇒never ne⇒x
@@ -115,10 +115,10 @@ never⟶̂→silent (step ne⟶) = never⟶→silent ne⟶
 -- then z is equal to now y.
 
 [just]⟶ : ∀ {x y z} → x [ just y ]⟶ z → z ≡ now y
-[just]⟶ now⟶ = refl
+[just]⟶ now = refl
 
 [just]⇒ : ∀ {x y z} → x [ just y ]⇒ z → z ≡ now y
-[just]⇒ (steps _ now⟶ ny⇒z) = now⇒ ny⇒z
+[just]⇒ (steps _ now ny⇒z) = now⇒ ny⇒z
 
 [just]⇒̂ : ∀ {x y z} → x [ just y ]⇒̂ z → z ≡ now y
 [just]⇒̂ (silent () _)
@@ -131,7 +131,7 @@ never⟶̂→silent (step ne⟶) = never⟶→silent ne⟶
 -- In some cases x is also equal to now y.
 
 [just]⟶→≡now : ∀ {x y z} → x [ just y ]⟶ z → x ≡ now y
-[just]⟶→≡now now⟶ = refl
+[just]⟶→≡now now = refl
 
 [just]⟶̂→≡now : ∀ {x y z} → x [ just y ]⟶̂ z → x ≡ now y
 [just]⟶̂→≡now (done ())
@@ -141,13 +141,13 @@ never⟶̂→silent (step ne⟶) = never⟶→silent ne⟶
 -- also make a [ μ ]⇒̂-transition to y.
 
 later⇒̂ : ∀ {μ x y} → force x [ μ ]⇒̂ y → later x [ μ ]⇒̂ y
-later⇒̂ = ⇒⇒̂-transitive (⟶→⇒ _ later⟶)
+later⇒̂ = ⇒⇒̂-transitive (⟶→⇒ _ later)
 
 -- The process x can make a silent transition to drop-later x.
 
 ⇒drop-later : ∀ {x} → x ⇒ drop-later x
 ⇒drop-later {now x}   = done
-⇒drop-later {later x} = step _ later⟶ done
+⇒drop-later {later x} = step _ later done
 
 -- If x can make a transition to y, then drop-later x can in some
 -- cases make a transition of the same kind to drop-later y.
@@ -155,13 +155,13 @@ later⇒̂ = ⇒⇒̂-transitive (⟶→⇒ _ later⟶)
 drop-later-cong⟶ :
   ∀ {x μ y} →
   ¬ Silent μ → x [ μ ]⟶ y → drop-later x [ μ ]⟶ drop-later y
-drop-later-cong⟶ _  now⟶   = now⟶
-drop-later-cong⟶ ¬s later⟶ = ⊥-elim (¬s _)
+drop-later-cong⟶ _  now   = now
+drop-later-cong⟶ ¬s later = ⊥-elim (¬s _)
 
 drop-later-cong⇒ : ∀ {x y} → x ⇒ y → drop-later x ⇒ drop-later y
 drop-later-cong⇒ done                = done
-drop-later-cong⇒ (step () now⟶  _)
-drop-later-cong⇒ (step _ later⟶ x⇒y) =
+drop-later-cong⇒ (step () now   _)
+drop-later-cong⇒ (step _  later x⇒y) =
   ⇒-transitive ⇒drop-later (drop-later-cong⇒ x⇒y)
 
 drop-later-cong[]⇒ :
@@ -195,8 +195,8 @@ drop-later⟶ lx⟶ly = helper lx⟶ly refl refl
            y′ ≡ later y →
            x′ ≡ force x →
            x′ [ μ ]⟶ force y
-  helper {x = x} {x′} {y} later⟶ x≡ly x′≡x =
-    subst (_[ _ ]⟶ _) ly≡x′ later⟶
+  helper {x = x} {x′} {y} later x≡ly x′≡x =
+    subst (_[ _ ]⟶ _) ly≡x′ later
     where
     ly≡x′ =
       later y  ≡⟨ sym x≡ly ⟩
@@ -208,10 +208,10 @@ drop-later⇒ = drop-later-cong⇒
 
 drop-later[]⇒ :
   ∀ {μ x y} → later x [ μ ]⇒ later y → force x [ μ ]⇒ force y
-drop-later[]⇒ (steps lx⇒ly later⟶ y⇒lz) =
+drop-later[]⇒ (steps lx⇒ly later y⇒lz) =
   ⇒[]⇒-transitive (⇒-transitive (drop-later⇒ lx⇒ly) y⇒lz)
-                  (⟶→[]⇒ later⟶)
-drop-later[]⇒ (steps _ now⟶ ny⇒lz) with now⇒ ny⇒lz
+                  (⟶→[]⇒ later)
+drop-later[]⇒ (steps _ now ny⇒lz) with now⇒ ny⇒lz
 ... | ()
 
 drop-later⇒̂ :
@@ -227,10 +227,10 @@ drop-later⟶̂ (step lx⟶ly) = step (drop-later⟶ lx⟶ly)
 -- z makes silent transitions to the other.
 
 ⇒×⇒→… : ∀ {x y z} → x ⇒ y → x ⇒ z → y ⇒ z ⊎ z ⇒ y
-⇒×⇒→… done                x⇒z                 = inj₁ x⇒z
-⇒×⇒→… x⇒y                 done                = inj₂ x⇒y
-⇒×⇒→… (step _ later⟶ x⇒y) (step _ later⟶ x⇒z) = ⇒×⇒→… x⇒y x⇒z
-⇒×⇒→… (step () now⟶ _)
+⇒×⇒→… done               x⇒z                = inj₁ x⇒z
+⇒×⇒→… x⇒y                done               = inj₂ x⇒y
+⇒×⇒→… (step _ later x⇒y) (step _ later x⇒z) = ⇒×⇒→… x⇒y x⇒z
+⇒×⇒→… (step () now _)
 
 -- If x makes silent transitions to y and a non-silent weak
 -- μ-transition (of one kind) to z, then y makes a weak μ-transition
@@ -241,10 +241,10 @@ drop-later⟶̂ (step lx⟶ly) = step (drop-later⟶ lx⟶ly)
   ¬ Silent μ → x ⇒ y → x [ μ ]⇒ z → y [ μ ]⇒ z
 ⇒×⇒[]→… _ x⇒y (steps x⇒x′ x′⟶x″ x″⇒z) with ⇒×⇒→… x⇒y x⇒x′
 ⇒×⇒[]→… _ _   (steps _    x′⟶x″ x″⇒z) | inj₁ y⇒x′ = steps y⇒x′ x′⟶x″ x″⇒z
-⇒×⇒[]→… _ _   (steps _    now⟶  n⇒z)  | inj₂ done = steps done now⟶  n⇒z
+⇒×⇒[]→… _ _   (steps _    now   n⇒z)  | inj₂ done = steps done now   n⇒z
 
-⇒×⇒[]→… _  _  _                  | inj₂ (step () now⟶ _)
-⇒×⇒[]→… ¬s _  (steps _ later⟶ _) | _ = ⊥-elim (¬s _)
+⇒×⇒[]→… _  _  _                 | inj₂ (step () now _)
+⇒×⇒[]→… ¬s _  (steps _ later _) | _ = ⊥-elim (¬s _)
 
 -- If x makes silent transitions to y and a weak μ-transition (of
 -- one kind) to z, then either y makes a weak μ-transition to z, or

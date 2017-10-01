@@ -43,10 +43,10 @@ open Indexed-container public using (force)
 infix 4 _∼_ _∼′_ [_]_∼_ [_]_∼′_
 
 Bisimilarity : Size → Rel₂ ℓ Proc
-Bisimilarity i = ν StepC i
+Bisimilarity = ν StepC
 
 Bisimilarity′ : Size → Rel₂ ℓ Proc
-Bisimilarity′ i = ν′ StepC i
+Bisimilarity′ = ν′ StepC
 
 [_]_∼_ : Size → Proc → Proc → Set ℓ
 [_]_∼_ = curry ∘ Bisimilarity

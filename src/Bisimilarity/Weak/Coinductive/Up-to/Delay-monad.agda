@@ -53,7 +53,7 @@ everything-up-to em ext A-set F {R = R} R-prog {x = x , y} =
     x ≈ y
   lemma {x} {y} hyp = uncurry λ z →
     now z W.≈ x                              ↝⟨ _⇔_.to W′.direct⇔indirect′ ⟩
-    now z ≈ x                                ↝⟨ (λ nz≈x → Σ-map id proj₁ $ left-to-right nz≈x (⟶→⇒̂ now⟶)) ⟩
+    now z ≈ x                                ↝⟨ (λ nz≈x → Σ-map id proj₁ $ left-to-right nz≈x (⟶→⇒̂ now)) ⟩
     ∃ (x [ just z ]⇒̂_)                       ↝⟨ (λ x⇒̂ → x⇒̂ , Σ-map id proj₁ (hyp (proj₂ x⇒̂))) ⟩
     ∃ (x [ just z ]⇒̂_) × ∃ (y [ just z ]⇒̂_)  ↝⟨ (uncurry λ x⇒̂ y⇒̂ → W′.⇒̂-with-equal-labels→≈ id (proj₂ x⇒̂) (proj₂ y⇒̂)) ⟩
     x CWO.≈ y                                ↝⟨ cwo⇒cw ⟩□

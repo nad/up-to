@@ -41,20 +41,20 @@ open import Expansion delay-monad as BE using ([_]_≳_; _≳_)
 later-cong : ∀ {i x y} →
              [ i ] force x ≈′ force y → [ i ] later x ≈ later y
 later-cong x≈′y =
-  ⟨ (λ { later⟶ → _ , ⟶→⇒̂ later⟶ , x≈′y })
-  , (λ { later⟶ → _ , ⟶→⇒̂ later⟶ , x≈′y })
+  ⟨ (λ { later → _ , ⟶→⇒̂ later , x≈′y })
+  , (λ { later → _ , ⟶→⇒̂ later , x≈′y })
   ⟩
 
 laterˡ : ∀ {i x y} → [ i ] force x ≈ y → [ i ] later x ≈ y
 laterˡ x≈y =
-  ⟨ (λ { later⟶ → _ , silent _ done , convert {a = a} x≈y })
+  ⟨ (λ { later → _ , silent _ done , convert {a = a} x≈y })
   , Σ-map id (Σ-map later⇒̂ id) ∘ right-to-left x≈y
   ⟩
 
 laterʳ : ∀ {i x y} → [ i ] x ≈ force y → [ i ] x ≈ later y
 laterʳ x≈y =
   ⟨ Σ-map id (Σ-map later⇒̂ id) ∘ left-to-right x≈y
-  , (λ { later⟶ → _ , silent _ done , convert {a = a} x≈y })
+  , (λ { later → _ , silent _ done , convert {a = a} x≈y })
   ⟩
 
 -- The direct definition of weak bisimilarity is contained in the
@@ -76,33 +76,33 @@ mutual
 
   indirect→direct : ∀ {i} x y → [ i ] x ≈ y → DW.[ i ] x ≈ y
   indirect→direct {i} (now x) y =
-    [ i ] now x ≈ y                                  ↝⟨ (λ p → left-to-right p now⟶) ⟩
+    [ i ] now x ≈ y                                  ↝⟨ (λ p → left-to-right p now) ⟩
     (∃ λ y′ → y [ just x ]⇒̂ y′ × [ i ] now x ≈′ y′)  ↝⟨ DE.≳→≈ ∘ ED.[just]⇒̂→≳now ∘ proj₁ ∘ proj₂ ⟩
     DW.[ i ] y ≈ now x                               ↝⟨ DW.symmetric ⟩□
     DW.[ i ] now x ≈ y                               □
 
   indirect→direct {i} x (now y) =
-    [ i ] x ≈ now y                                  ↝⟨ (λ p → right-to-left p now⟶) ⟩
+    [ i ] x ≈ now y                                  ↝⟨ (λ p → right-to-left p now) ⟩
     (∃ λ x′ → x [ just y ]⇒̂ x′ × [ i ] x′ ≈′ now y)  ↝⟨ DE.≳→≈ ∘ ED.[just]⇒̂→≳now ∘ proj₁ ∘ proj₂ ⟩□
     DW.[ i ] x ≈ now y                               □
 
   indirect→direct (later x) (later y) lx≈ly
-    with left-to-right lx≈ly later⟶
+    with left-to-right lx≈ly later
 
   ... | y′ , non-silent contradiction _ , _ =
     ⊥-elim (contradiction _)
 
-  ... | y′ , silent _ (step _ later⟶ y⇒y′) , x≈′y′ =
+  ... | y′ , silent _ (step _ later y⇒y′) , x≈′y′ =
     DW.later λ { .force →
       indirect→direct′ y⇒y′ (force x≈′y′) }
 
   ... | y′ , silent _ done , x≈′ly
-    with right-to-left lx≈ly later⟶
+    with right-to-left lx≈ly later
 
   ...   | x′ , non-silent contradiction _ , _ =
     ⊥-elim (contradiction _)
 
-  ...   | x′ , silent _ (step _ later⟶ x⇒x′) , x′≈′y =
+  ...   | x′ , silent _ (step _ later x⇒x′) , x′≈′y =
     DW.later λ { .force →
       DW.symmetric $
       indirect→direct′ x⇒x′ $
@@ -121,8 +121,8 @@ mutual
     indirect→direct′ : ∀ {i x y y′} →
                        y ⇒ y′ → [ i ] x ≈ y′ → DW.[ i ] x ≈ y
     indirect→direct′ done               p = indirect→direct _ _ p
-    indirect→direct′ (step _ later⟶ tr) p = DW.laterʳ (indirect→direct′ tr p)
-    indirect→direct′ (step () now⟶ _)
+    indirect→direct′ (step _  later tr) p = DW.laterʳ (indirect→direct′ tr p)
+    indirect→direct′ (step () now   _)
 
 -- The direct definition of weak bisimilarity is logically
 -- equivalent to the "other" one obtained from the transition
@@ -340,8 +340,8 @@ size-preserving-cwo⇒cw⇔uninhabited = record
 ⟶-with-equal-labels→≈ :
   ∀ {x x′ y y′ μ} →
   ¬ Silent μ → x [ μ ]⟶ x′ → y [ μ ]⟶ y′ → x ≈ y
-⟶-with-equal-labels→≈ _  now⟶   now⟶ = reflexive
-⟶-with-equal-labels→≈ ¬s later⟶ _    = ⊥-elim (¬s _)
+⟶-with-equal-labels→≈ _  now   now = reflexive
+⟶-with-equal-labels→≈ ¬s later _   = ⊥-elim (¬s _)
 
 []⇒-with-equal-labels→≈ :
   ∀ {x x′ y y′ μ} →
