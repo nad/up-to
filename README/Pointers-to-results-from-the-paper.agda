@@ -38,15 +38,25 @@ import Up-to
 -- Section 2
 
 -- The Delay monad.
+--
+-- Note that, unlike the definition in the paper, this definition is
+-- universe-polymorphic. Similar remarks apply to many definitions
+-- below as well.
 
 Delay  = Delay-monad.Delay
 Delay′ = Delay-monad.Delay′
-never  = Delay-monad.never
+
+-- The non-terminating computation never.
+
+never = Delay-monad.never
 
 -- Strong bisimilarity for the delay monad.
 
-[_]_∼D_     = Delay-monad.Strong-bisimilarity.[_]_∼_
-[_]_∼′D_    = Delay-monad.Strong-bisimilarity.[_]_∼′_
+[_]_∼D_  = Delay-monad.Strong-bisimilarity.[_]_∼_
+[_]_∼′D_ = Delay-monad.Strong-bisimilarity.[_]_∼′_
+
+-- Strong bisimilarity is transitive.
+
 transitiveˢ = Delay-monad.Strong-bisimilarity.transitive
 
 ------------------------------------------------------------------------
