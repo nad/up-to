@@ -5,7 +5,7 @@
 -- The definition of expansion is based on the one in "Enhancements of
 -- the bisimulation proof method" by Pous and Sangiorgi.
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 open import Labelled-transition-system
 

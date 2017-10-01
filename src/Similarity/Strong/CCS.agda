@@ -2,7 +2,7 @@
 -- Lemmas related to strong similarity for CCS
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 module Similarity.Strong.CCS {ℓ} {Name : Set ℓ} where
 

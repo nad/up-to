@@ -2,7 +2,7 @@
 -- A coinductive definition of (strong) similarity
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 open import Labelled-transition-system
 

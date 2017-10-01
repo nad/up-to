@@ -3,7 +3,7 @@
 -- one of the coinductive ones
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 module Bisimilarity.Weak.Comparison where
 

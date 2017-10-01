@@ -6,7 +6,7 @@
 -- bisimilarity and expansion.
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 module Bisimilarity.Weak.CCS.Examples {ℓ} {Name : Set ℓ} where
 

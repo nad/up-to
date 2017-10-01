@@ -2,7 +2,7 @@
 -- "Equational" reasoning combinator setup
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 open import Prelude
 

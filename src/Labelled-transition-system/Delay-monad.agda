@@ -2,7 +2,7 @@
 -- A labelled transition system for the delay monad
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 module Labelled-transition-system.Delay-monad {a} (A : Set a) where
 

@@ -3,7 +3,7 @@
 -- weak bisimilarity
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 module Bisimilarity.Weak.Coinductive.Up-to.Delay-monad
          {a} {A : Set a} where

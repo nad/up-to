@@ -2,7 +2,7 @@
 -- An up-to technique for CCS
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 module Bisimilarity.Weak.Coinductive.Other.Up-to.CCS
          {ℓ} {Name : Set ℓ} where

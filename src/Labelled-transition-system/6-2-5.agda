@@ -3,7 +3,7 @@
 -- proof method" by Pous and Sangiorgi
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 module Labelled-transition-system.6-2-5 (Name : Set) where
 

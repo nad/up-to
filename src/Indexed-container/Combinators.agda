@@ -2,7 +2,7 @@
 -- Container combinators
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 module Indexed-container.Combinators where
 

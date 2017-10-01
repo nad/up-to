@@ -2,7 +2,7 @@
 -- Some results related to expansion for the delay monad
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 module Expansion.Delay-monad {a} {A : Set a} where
 

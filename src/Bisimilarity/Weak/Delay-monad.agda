@@ -3,7 +3,7 @@
 -- bisimilarity for the delay monad
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 module Bisimilarity.Weak.Delay-monad {a} {A : Set a} where
 

@@ -2,7 +2,7 @@
 -- CCS
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 module Labelled-transition-system.CCS {ℓ} (Name : Set ℓ) where
 

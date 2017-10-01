@@ -5,7 +5,7 @@
 -- Implemented using the classical definition of bisimilarity.
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 module Bisimilarity.Exercises.Classical.CCS {ℓ} {Name : Set ℓ} where
 

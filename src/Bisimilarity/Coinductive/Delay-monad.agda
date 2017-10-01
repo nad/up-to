@@ -2,7 +2,7 @@
 -- Some results related to strong bisimilarity for the delay monad
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 module Bisimilarity.Coinductive.Delay-monad {a} {A : Set a} where
 

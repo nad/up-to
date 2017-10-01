@@ -5,7 +5,7 @@
 -- Implemented without using a fixed form of bisimilarity.
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 module Bisimilarity.Exercises.Other.CCS {ℓ} {Name : Set ℓ} where
 

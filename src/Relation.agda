@@ -2,7 +2,7 @@
 -- Unary and binary relations
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 module Relation where
 

@@ -3,7 +3,7 @@
 -- companion
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 -- The definitions below are parametrised by an indexed container.
 

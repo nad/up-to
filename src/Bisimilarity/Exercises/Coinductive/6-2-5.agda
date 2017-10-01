@@ -6,7 +6,7 @@
 -- Implemented using the coinductive definition of bisimilarity.
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --without-K --safe #-}
 
 module Bisimilarity.Exercises.Coinductive.6-2-5 {Name : Set} where
 
