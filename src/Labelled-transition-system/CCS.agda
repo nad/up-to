@@ -20,16 +20,6 @@ open import Labelled-transition-system
 -- processes (instead of the named process constants presented in
 -- "Coinduction All the Way Up" by Pous)
 
-Name-with-kind : Set ℓ
-Name-with-kind = Name × Bool
-
-co : Name-with-kind → Name-with-kind
-co (a , kind) = a , not kind
-
-data Action : Set ℓ where
-  τ    : Action
-  name : Name-with-kind → Action
-
 infix  12 _∙
 infixr 12 _·_ _∙_
 infix  10 !_
@@ -37,6 +27,25 @@ infix   8 _⊕_
 infix   6 _∣_
 infix   5 _[_] _[_]′
 infix   4 _[_]⟶_ _∉_
+
+-- Names with kinds: (a , true) stands for "a", and (a , false) stands
+-- for "a̅".
+
+Name-with-kind : Set ℓ
+Name-with-kind = Name × Bool
+
+-- Turns names of one kind into names of the other kind.
+
+co : Name-with-kind → Name-with-kind
+co (a , kind) = a , not kind
+
+-- Actions.
+
+data Action : Set ℓ where
+  τ    : Action
+  name : Name-with-kind → Action
+
+-- Processes.
 
 mutual
 
@@ -54,15 +63,24 @@ mutual
 
 open Proc′ public
 
+-- An inductive variant of _·_.
+
 _∙_ : ∀ {i} → Action → Proc i → Proc i
 μ ∙ P = μ · λ { .force → P }
+
+-- An abbreviation.
 
 _∙ : Name-with-kind → Proc ∞
 a ∙ = name a ∙ ∅
 
+-- The predicate a ∉ μ holds if a is not the underlying name of μ (if
+-- any).
+
 _∉_ : Name → Action → Set ℓ
 a ∉ τ            = ↑ ℓ ⊤
 a ∉ name (b , _) = a ≢ b
+
+-- Transition relation.
 
 data _[_]⟶_ : Proc ∞ → Action → Proc ∞ → Set ℓ where
   par-left     : ∀ {P Q P′ μ} → P [ μ ]⟶ P′ → P ∣ Q [ μ ]⟶ P′ ∣ Q
@@ -79,6 +97,8 @@ data _[_]⟶_ : Proc ∞ → Action → Proc ∞ → Set ℓ where
 
 pattern par-τ {P} {P′} {Q} {Q′} {a} tr₁ tr₂ =
   par-τ′ {P} {P′} {Q} {Q′} {a} refl tr₁ tr₂
+
+-- The CCS LTS.
 
 CCS : LTS ℓ
 CCS = record
@@ -126,6 +146,8 @@ mutual
 
   _[_]′ : ∀ {i n} → Context′ i n → (Fin n → Proc ∞) → Proc′ i
   force (C [ Ps ]′) = force C [ Ps ]
+
+-- A context is weakly guarded if every hole is under a prefix (μ ·_).
 
 data Weakly-guarded {n : ℕ} : Context ∞ n → Set ℓ where
   ∅      : Weakly-guarded ∅
@@ -182,7 +204,8 @@ mutual
 
 open Non-degenerate′ public
 
--- "Very strong" bisimilarity for processes.
+-- "Very strong" bisimilarity for processes: Equal ∞ P Q means that P
+-- and Q have the same structure.
 
 mutual
 
