@@ -40,17 +40,17 @@ Up-to-expansion-and-weak-similarity R =
 
 -- The relation transformer is monotone.
 
-Up-to-expansion-and-weak-similarity-monotone :
+up-to-expansion-and-weak-similarity-monotone :
   Monotone Up-to-expansion-and-weak-similarity
-Up-to-expansion-and-weak-similarity-monotone R⊆S =
+up-to-expansion-and-weak-similarity-monotone R⊆S =
   Σ-map id (Σ-map id (Σ-map id (Σ-map R⊆S id)))
 
 -- The relation transformer is size-preserving.
 
-Up-to-expansion-and-weak-similarity-size-preserving :
+up-to-expansion-and-weak-similarity-size-preserving :
   Size-preserving Up-to-expansion-and-weak-similarity
-Up-to-expansion-and-weak-similarity-size-preserving =
-  _⇔_.from (monotone→⇔ Up-to-expansion-and-weak-similarity-monotone)
+up-to-expansion-and-weak-similarity-size-preserving =
+  _⇔_.from (monotone→⇔ up-to-expansion-and-weak-similarity-monotone)
     (λ where
        {x = p , q} (r , p≳r , s , r≼s , s≼q) →
          p  ∼⟨ p≳r ⟩

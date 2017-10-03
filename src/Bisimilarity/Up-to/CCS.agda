@@ -28,54 +28,46 @@ open import Bisimilarity.Up-to CCS
 
 -- Up to context for a very simple kind of context.
 
-Up-to-!-context : Trans₂ ℓ (Proc ∞)
-Up-to-!-context R (P , Q) =
+Up-to-! : Trans₂ ℓ (Proc ∞)
+Up-to-! R (P , Q) =
   ∃ λ P′ → ∃ λ Q′ → P ≡ ! P′ × R (P′ , Q′) × ! Q′ ≡ Q
 
 -- This transformer is size-preserving.
 
-Up-to-!-context-size-preserving : Size-preserving Up-to-!-context
-Up-to-!-context-size-preserving
-  {R = R} {i = i} R⊆∼ (P′ , Q′ , refl , P′RQ′ , refl) =
-
-                     $⟨ P′RQ′ ⟩
-  R (P′ , Q′)        ↝⟨ R⊆∼ ⟩
-  [ i ] P′ ∼ Q′      ↝⟨ !-cong_ ⟩□
-  [ i ] ! P′ ∼ ! Q′  □
+up-to-!-size-preserving : Size-preserving Up-to-!
+up-to-!-size-preserving R⊆∼i (P′ , Q′ , refl , P′RQ′ , refl) =
+  !-cong (R⊆∼i P′RQ′)
 
 -- Up to context for CCS (for polyadic contexts).
 
 Up-to-context : Trans₂ ℓ (Proc ∞)
-Up-to-context R (p , q) =
+Up-to-context R (P , Q) =
   ∃ λ n →
   ∃ λ (C : Context ∞ n) →
-  ∃ λ ps →
-  ∃ λ qs →
-  Equal ∞ p (C [ ps ])
+  ∃ λ Ps →
+  ∃ λ Qs →
+  Equal ∞ P (C [ Ps ])
     ×
-  Equal ∞ q (C [ qs ])
+  Equal ∞ Q (C [ Qs ])
     ×
-  ∀ x → R (ps x , qs x)
+  ∀ x → R (Ps x , Qs x)
 
 -- Up to context is monotone.
 
-Up-to-context-monotone : Monotone Up-to-context
-Up-to-context-monotone R⊆S =
+up-to-context-monotone : Monotone Up-to-context
+up-to-context-monotone R⊆S =
   Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id
     (R⊆S ∘_)
 
 -- Up to context is size-preserving.
 
-Up-to-context-size-preserving : Size-preserving Up-to-context
-Up-to-context-size-preserving =
-  _⇔_.from (monotone→⇔ Up-to-context-monotone)
-  (λ where
-     {x = p , q} (_ , C , ps , qs , eq₁ , eq₂ , ps∼qs) →
-
-       p         ∼⟨ ≡→∼ eq₁ ⟩
-       C [ ps ]  ∼⟨ C [ ps∼qs ]-cong ⟩
-       C [ qs ]  ∼⟨ symmetric (≡→∼ eq₂) ⟩■
-       q)
+up-to-context-size-preserving : Size-preserving Up-to-context
+up-to-context-size-preserving
+  R⊆∼i {P , Q} (_ , C , Ps , Qs , eq₁ , eq₂ , Ps∼Qs) =
+    P         ∼⟨ ≡→∼ eq₁ ⟩
+    C [ Ps ]  ∼⟨ C [ R⊆∼i ∘ Ps∼Qs ]-cong ⟩
+    C [ Qs ]  ∼⟨ symmetric (≡→∼ eq₂) ⟩■
+    Q
 
 -- Note that up to context is not compatible (assuming that Name is
 -- inhabited).
@@ -86,8 +78,8 @@ Up-to-context-size-preserving =
 -- (see Remark 6.4.2 in "Enhancements of the bisimulation proof
 -- method").
 
-¬-Up-to-context-compatible : Name → ¬ Compatible Up-to-context
-¬-Up-to-context-compatible x comp = contradiction
+¬-up-to-context-compatible : Name → ¬ Compatible Up-to-context
+¬-up-to-context-compatible x comp = contradiction
   where
   a = x , true
   b = x , false
@@ -216,7 +208,7 @@ Up-to-context-size-preserving =
 
   [R]⊆Step[S] : Up-to-context R ⊆ ⟦ StepC ⟧ (Up-to-context S)
   [R]⊆Step[S] =
-    Up-to-context R              ⊆⟨ Up-to-context-monotone (λ {x} → R⊆StepS {x}) ⟩
+    Up-to-context R              ⊆⟨ up-to-context-monotone (λ {x} → R⊆StepS {x}) ⟩
     Up-to-context (⟦ StepC ⟧ S)  ⊆⟨ comp _ ⟩∎
     ⟦ StepC ⟧ (Up-to-context S)  ∎
 

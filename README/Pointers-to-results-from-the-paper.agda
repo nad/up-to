@@ -267,22 +267,22 @@ _⊙_ = Relation._⊙_
 
 -- Up to bisimilarity.
 
-Up-to-bisimilarity = Bisimilarity.Up-to.Up-to-bisimilarity
+Up-to-bisimilarity =
+  Bisimilarity.Up-to.Up-to-bisimilarity
 up-to-bisimilarity-size-preserving =
-  Bisimilarity.Up-to.Up-to-bisimilarity-size-preserving
+  Bisimilarity.Up-to.up-to-bisimilarity-size-preserving
 
 -- Up to context.
 
 Up-to-context                 = Bisimilarity.Up-to.CCS.Up-to-context
 up-to-context-size-preserving =
-  Bisimilarity.Up-to.CCS.Up-to-context-size-preserving
+  Bisimilarity.Up-to.CCS.up-to-context-size-preserving
 
 -- Up to the simple context consisting of replication applied to a
 -- single hole.
 
-Up-to-!                 = Bisimilarity.Up-to.CCS.Up-to-!-context
-up-to-!-size-preserving =
-  Bisimilarity.Up-to.CCS.Up-to-!-context-size-preserving
+Up-to-!                 = Bisimilarity.Up-to.CCS.Up-to-!
+up-to-!-size-preserving = Bisimilarity.Up-to.CCS.up-to-!-size-preserving
 
 -- Size-preserving transformers are up-to techniques.
 
@@ -298,8 +298,8 @@ not-closed-under-composition =
 
 ∘-closure = Up-to.∘-closure
 
--- There is a (monotone and extensive) up-to technique that is not
--- size-preserving.
+-- There are at least two up-to techniques that are not
+-- size-preserving (despite being monotone and extensive).
 
 not-size-preserving =
   Bisimilarity.Up-to.Counterexamples.∃monotone×extensive×up-to×¬size-preserving
@@ -313,15 +313,15 @@ Monotone = Relation.Monotone
 
 simplification = Up-to.monotone→⇔
 
--- There is a size-preserving transformer that is not monotone (and
--- not extensive either).
+-- There are at least two size-preserving relation transformers that
+-- are not monotone (or extensive).
 
 not-monotone =
-  Bisimilarity.Up-to.Counterexamples.∃size-preserving×¬[monotone⊎extensive]
+  Bisimilarity.Up-to.Counterexamples.∃-2-size-preserving×¬[monotone⊎extensive]
 
--- There is a transformer that, despite preserving every approximation
--- of the greatest fixpoint of some container, is not an up-to
--- technique for this container.
+-- There is a container C such that there are at least two
+-- transformers that, despite preserving every approximation of the
+-- greatest fixpoint of C, are not up-to techniques with respect to C.
 
 not-up-to =
   Bisimilarity.Up-to.Counterexamples.∃special-case-of-size-preserving×¬up-to

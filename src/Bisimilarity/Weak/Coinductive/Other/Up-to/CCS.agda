@@ -44,16 +44,16 @@ Up-to-context R (p , q) =
 
 -- Up to context is monotone.
 
-Up-to-context-monotone : Monotone Up-to-context
-Up-to-context-monotone R⊆S =
+up-to-context-monotone : Monotone Up-to-context
+up-to-context-monotone R⊆S =
   Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $
   Σ-map id (R⊆S ∘_)
 
 -- Up to context is size-preserving.
 
-Up-to-context-size-preserving : Size-preserving Up-to-context
-Up-to-context-size-preserving =
-  _⇔_.from (monotone→⇔ Up-to-context-monotone)
+up-to-context-size-preserving : Size-preserving Up-to-context
+up-to-context-size-preserving =
+  _⇔_.from (monotone→⇔ up-to-context-monotone)
   (λ where
      (_ , C , D , ps , qs , refl , refl , ps∼qs) →
 
@@ -69,8 +69,8 @@ Up-to-context-size-preserving =
 -- (see Section 6.5.3 in "Enhancements of the bisimulation proof
 -- method").
 
-¬-Up-to-context-compatible : Name → ¬ Compatible Up-to-context
-¬-Up-to-context-compatible x comp = contradiction
+¬-up-to-context-compatible : Name → ¬ Compatible Up-to-context
+¬-up-to-context-compatible x comp = contradiction
   where
   a = x , true
 

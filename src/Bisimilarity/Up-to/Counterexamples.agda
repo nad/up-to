@@ -81,27 +81,89 @@ private
   F-pres : Size-preserving F
   F-pres _ _ = total
 
--- There is a relation transformer F satisfying
--- ∀ {i} → F (ν C i) ⊆ ν C i (for some C) that is not an up-to
--- technique for C.
+-- A slight strengthening of the previous result, with a somewhat more
+-- complicated proof: There are (at least two) size-preserving
+-- relation transformers that are neither monotone nor extensive.
+
+∃-2-size-preserving×¬[monotone⊎extensive] :
+  ∃ λ (lts : LTS lzero) →
+  let open Combination lts in
+  ∃ λ (F : Trans₂ (# 0) Proc) →
+  ∃ λ (G : Trans₂ (# 0) Proc) →
+    Size-preserving F × ¬ (Monotone F ⊎ Extensive F) ×
+    Size-preserving G × ¬ (Monotone G ⊎ Extensive G) ×
+    F ≢ G
+∃-2-size-preserving×¬[monotone⊎extensive] =
+    lts
+  , F ⊤ , F ⊥
+  , F-pres , [ ¬-F-mono , ¬-F-extensive ]
+  , F-pres , [ ¬-F-mono , ¬-F-extensive ]
+  , F⊤≢F⊥
+  where
+  lts : LTS lzero
+  lts = record
+    { Proc      = Bool
+    ; Label     = ⊥
+    ; _[_]⟶_    = λ _ ()
+    ; is-silent = λ ()
+    }
+
+  open Combination lts
+
+  F : Set → Trans₂ (# 0) Bool
+  F A R p@(true  , false) = R p × A
+  F A R p@(false , true)  = R p
+  F A R p                 = ¬ R p
+
+  ¬-F-mono : ∀ {A} → ¬ Monotone (F A)
+  ¬-F-mono {A} =
+    Monotone (F A)                                                   ↝⟨ (λ mono → mono {_}) ⟩
+    ((λ _ → ⊥) ⊆ (λ _ → ↑ _ ⊤) → F A (λ _ → ⊥) ⊆ F A (λ _ → ↑ _ ⊤))  ↝⟨ (λ hyp {p} → hyp _ {p}) ⟩
+    F A (λ _ → ⊥) ⊆ F A (λ _ → ↑ _ ⊤)                                ↝⟨ (λ hyp → hyp {true , true}) ⟩
+    (¬ ⊥ → ¬ ↑ _ ⊤)                                                  ↝⟨ _$ ⊥-elim ⟩
+    ¬ ↑ _ ⊤                                                          ↝⟨ _$ _ ⟩□
+    ⊥                                                                □
+
+  ¬-F-extensive : ∀ {A} → ¬ Extensive (F A)
+  ¬-F-extensive {A} =
+    Extensive (F A)    ↝⟨ (λ hyp → hyp (λ _ → ↑ _ ⊤) {true , true}) ⟩
+    (↑ _ ⊤ → ¬ ↑ _ ⊤)  ↝⟨ (_$ _) ∘ (_$ _) ⟩□
+    ⊥                  □
+
+  F-pres : ∀ {A} → Size-preserving (F A)
+  F-pres R⊆∼i {true  , false} = R⊆∼i ∘ proj₁
+  F-pres R⊆∼i {false , true}  = R⊆∼i
+  F-pres _    {true  , true}  = λ _ → reflexive
+  F-pres _    {false , false} = λ _ → reflexive
+
+  F⊤≢F⊥ : F ⊤ ≢ F ⊥
+  F⊤≢F⊥ =
+    F ⊤ ≡ F ⊥                                                       ↝⟨ subst (λ F → F (λ _ → ⊤) (true , false)) ⟩
+    (F ⊤  (λ _ → ⊤) (true , false) → F ⊥ (λ _ → ⊤) (true , false))  ↔⟨⟩
+    (⊤ × ⊤ → ⊤ × ⊥)                                                 ↝⟨ proj₂ ∘ (_$ _) ⟩□
+    ⊥                                                               □
+
+-- There is a container C such that there are (at least two) relation
+-- transformers satisfying λ F → ∀ {i} → F (ν C i) ⊆ ν C i that are
+-- not up-to techniques with respect to C.
 
 ∃special-case-of-size-preserving×¬up-to :
   ∃ λ (I : Set) →
   ∃ λ (C : Container I I) →
   ∃ λ (F : Trans (# 0) I) →
-      (∀ {i} → F (ν C i) ⊆ ν C i) × ¬ Up-to.Up-to-technique C F
+  ∃ λ (G : Trans (# 0) I) →
+    (∀ {i} → F (ν C i) ⊆ ν C i) × ¬ Up-to.Up-to-technique C F ×
+    (∀ {i} → G (ν C i) ⊆ ν C i) × ¬ Up-to.Up-to-technique C G ×
+    F ≢ G
 ∃special-case-of-size-preserving×¬up-to =
     (Proc × Proc)
   , StepC
-  , G
+  , G ⊤ , G ⊥
   , bisimilarity-pre-fixpoint
-  , (Up-to-technique G                           ↝⟨ (λ up-to → up-to) ⟩
-     (S ⊆ ⟦ StepC ⟧ (G S) → S ⊆ Bisimilarity ∞)  ↝⟨ (λ hyp below → hyp (Step↔StepC _ ∘ below)) ⟩
-     (S ⊆ Step (G S) → S ⊆ Bisimilarity ∞)       ↝⟨ _$ S⊆StepGS ⟩
-     S ⊆ Bisimilarity ∞                          ↝⟨ _$ pq ⟩
-     Bisimilarity ∞ (p , q)                      ↝⟨ p≁q ⟩□
-     ⊥                                           □)
-
+  , ¬-up-to
+  , bisimilarity-pre-fixpoint
+  , ¬-up-to
+  , G⊤≢G⊥
   where
 
   data Proc : Set where
@@ -120,21 +182,21 @@ private
 
   open Combination lts hiding (Proc)
 
-  G : Trans₂ (# 0) Proc
-  G R x = R (r , r) → ¬ R (p , r) → R x
+  G : Set → Trans₂ (# 0) Proc
+  G A R x = R (r , r) → ¬ R (p , r) → R x × A
 
   p≁r : ∀ {i} → ¬ Bisimilarity i (p , r)
   p≁r hyp with left-to-right hyp p
   ... | _ , () , _
 
   bisimilarity-pre-fixpoint :
-    ∀ {i} → G (Bisimilarity i) ⊆ Bisimilarity i
-  bisimilarity-pre-fixpoint hyp = hyp reflexive p≁r
+    ∀ {A i} → G A (Bisimilarity i) ⊆ Bisimilarity i
+  bisimilarity-pre-fixpoint hyp = proj₁ (hyp reflexive p≁r)
 
   data S : Rel₂ (# 0) Proc where
     pq : S (p , q)
 
-  S⊆StepGS : S ⊆ Step (G S)
+  S⊆StepGS : ∀ {A} → S ⊆ Step (G A S)
   Step.left-to-right (S⊆StepGS pq) p = r , q , λ ()
   Step.right-to-left (S⊆StepGS pq) q = p , p , λ ()
 
@@ -142,18 +204,39 @@ private
   p≁q hyp with left-to-right hyp p
   ... | r , q , p∼r = p≁r (force p∼r)
 
--- There is a relation transformer F satisfying
--- ∀ {i} → F (ν C i) ⊆ ν C i (for some C) that is not size-preserving
--- for C.
+  ¬-up-to : ∀ {A} → ¬ Up-to-technique (G A)
+  ¬-up-to {A} =
+    Up-to-technique (G A)                         ↝⟨ (λ up-to → up-to) ⟩
+    (S ⊆ ⟦ StepC ⟧ (G A S) → S ⊆ Bisimilarity ∞)  ↝⟨ (λ hyp below → hyp (Step↔StepC _ ∘ below)) ⟩
+    (S ⊆ Step (G A S) → S ⊆ Bisimilarity ∞)       ↝⟨ _$ S⊆StepGS ⟩
+    S ⊆ Bisimilarity ∞                            ↝⟨ _$ pq ⟩
+    Bisimilarity ∞ (p , q)                        ↝⟨ p≁q ⟩□
+    ⊥                                             □
+
+  G⊤≢G⊥ : G ⊤ ≢ G ⊥
+  G⊤≢G⊥ =
+    G ⊤ ≡ G ⊥                                                    ↝⟨ subst (λ G → G (uncurry _≡_) (q , q)) ⟩
+    (G ⊤ (uncurry _≡_) (q , q) → G ⊥ (uncurry _≡_) (q , q))      ↔⟨⟩
+    ((r ≡ r → p ≢ r → q ≡ q × ⊤) → (r ≡ r → p ≢ r → q ≡ q × ⊥))  ↝⟨ _$ (λ _ _ → refl , _) ⟩
+    (r ≡ r → p ≢ r → q ≡ q × ⊥)                                  ↝⟨ proj₂ ∘ (_$ λ ()) ∘ (_$ refl) ⟩□
+    ⊥                                                            □
+
+-- There is a container C such that there are (at least two) relation
+-- transformers satisfying λ F → ∀ {i} → F (ν C i) ⊆ ν C i that are
+-- not size-preserving with respect to C.
 
 ∃special-case-of-size-preserving×¬size-preserving :
   ∃ λ (I : Set) →
   ∃ λ (C : Container I I) →
   ∃ λ (F : Trans (# 0) I) →
-      (∀ {i} → F (ν C i) ⊆ ν C i) × ¬ Up-to.Size-preserving C F
+  ∃ λ (G : Trans (# 0) I) →
+    (∀ {i} → F (ν C i) ⊆ ν C i) × ¬ Up-to.Size-preserving C F ×
+    (∀ {i} → G (ν C i) ⊆ ν C i) × ¬ Up-to.Size-preserving C G ×
+    F ≢ G
 ∃special-case-of-size-preserving×¬size-preserving =
-  Σ-map id (Σ-map id (Σ-map id (Σ-map id
-              (_∘ Up-to.size-preserving→up-to _))))
+  Σ-map id (Σ-map id (Σ-map id (Σ-map id (Σ-map id
+    (Σ-map (_∘ Up-to.size-preserving→up-to _) (Σ-map id
+       (Σ-map (_∘ Up-to.size-preserving→up-to _) id)))))))
     ∃special-case-of-size-preserving×¬up-to
 
 -- There is a monotone, extensive and size-preserving relation
@@ -163,7 +246,7 @@ private
   ∃ λ (lts : LTS lzero) →
   let open Combination lts in
   ∃ λ (F : Trans₂ (# 0) Proc) →
-      Monotone F × Extensive F × Size-preserving F × ¬ Compatible F
+    Monotone F × Extensive F × Size-preserving F × ¬ Compatible F
 ∃monotone×extensive×size-preserving×¬compatible =
     one-transition
   , F
@@ -362,6 +445,15 @@ module PQR where
     q left ∼′ q right                          ↝⟨ (λ rel → q≁q (force rel)) ⟩
     ⊥                                          □
 
+  -- F is not equal to G.
+
+  F≢G : F ≢ G
+  F≢G =
+    F ≡ G                                                              ↝⟨ subst (λ F → F (λ _ → ⊥) (q left , q right)) ⟩
+    (F (λ _ → ⊥) (q left , q right) → G (λ _ → ⊥) (q left , q right))  ↝⟨ _$ qq ⟩
+    G (λ _ → ⊥) (q left , q right)                                     ↝⟨ (λ { [ () ] }) ⟩□
+    ⊥                                                                  □
+
   module F-lemmas where
 
     -- F is monotone.
@@ -547,9 +639,9 @@ module PQR where
   let open Combination lts in
   ∃ λ (F : Trans₂ (# 0) Proc) →
   ∃ λ (G : Trans₂ (# 0) Proc) →
-      Monotone F × Extensive F × Up-to-technique F ×
-      Monotone G × Extensive G × Up-to-technique G ×
-      ¬ Up-to-technique (F ∘ G)
+    Monotone F × Extensive F × Up-to-technique F ×
+    Monotone G × Extensive G × Up-to-technique G ×
+    ¬ Up-to-technique (F ∘ G)
 ∃[monotone×extensive×up-to]²×¬∘-up-to =
     lts
   , F
@@ -585,20 +677,28 @@ module PQR where
   where
   open PQR
 
--- There is a (monotone and extensive) up-to technique that is not
--- size-preserving.
+-- There are (at least two) monotone and extensive up-to techniques
+-- that are not size-preserving.
 
 ∃monotone×extensive×up-to×¬size-preserving :
   ∃ λ (lts : LTS lzero) →
   let open Combination lts in
   ∃ λ (F : Trans₂ (# 0) Proc) →
-      Monotone F × Extensive F × Up-to-technique F × ¬ Size-preserving F
+  ∃ λ (G : Trans₂ (# 0) Proc) →
+    Monotone F × Extensive F × Up-to-technique F × ¬ Size-preserving F ×
+    Monotone G × Extensive G × Up-to-technique G × ¬ Size-preserving G ×
+    F ≢ G
 ∃monotone×extensive×up-to×¬size-preserving =
     lts
-  , F
+  , F , G
   , F-lemmas.mono
   , F-lemmas.ext
   , F-lemmas.up-to
   , F-lemmas.¬-pres
+  , G-lemmas.mono
+  , G-lemmas.ext
+  , G-lemmas.up-to
+  , G-lemmas.¬-pres
+  , F≢G
   where
   open PQR

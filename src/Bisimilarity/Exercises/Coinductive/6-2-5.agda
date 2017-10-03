@@ -132,8 +132,8 @@ Up-to-context R (P , Q) =
 
 -- Up to context is monotone.
 
-Up-to-context-monotone : Monotone Up-to-context
-Up-to-context-monotone R⊆S =
+up-to-context-monotone : Monotone Up-to-context
+up-to-context-monotone R⊆S =
   Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id $ Σ-map id R⊆S
 
 -- Up to bisimilarity and context.
@@ -144,10 +144,10 @@ Up-to-bisimilarity-and-context =
 
 -- Up to bisimilarity and context is monotone.
 
-Up-to-bisimilarity-and-context-monotone :
+up-to-bisimilarity-and-context-monotone :
   Monotone Up-to-bisimilarity-and-context
-Up-to-bisimilarity-and-context-monotone =
-  Up-to-bisimilarity-monotone ∘ Up-to-context-monotone
+up-to-bisimilarity-and-context-monotone =
+  up-to-bisimilarity-monotone ∘ up-to-context-monotone
 
 -- Up to bisimilarity and context is not sound (assuming that Name is
 -- inhabited).
@@ -203,7 +203,7 @@ op-cong-cannot-preserve-size′ a =
                                                                       C [ (λ _ → R₂) ]  ∼⟨ C[R₂]∼Q ⟩■
                                                                       Q) ⟩
   (∀ {i} → Up-to-bisimilarity-and-context (Bisimilarity i) ⊆
-           Bisimilarity i)                                    ↝⟨ _⇔_.from (monotone→⇔ Up-to-bisimilarity-and-context-monotone) ⟩
+           Bisimilarity i)                                    ↝⟨ _⇔_.from (monotone→⇔ up-to-bisimilarity-and-context-monotone) ⟩
 
   Size-preserving Up-to-bisimilarity-and-context              ↝⟨ size-preserving→up-to ⟩
 

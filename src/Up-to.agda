@@ -125,8 +125,14 @@ compatible→up-to {F} mono comp {R = R} R⊆ =
 -- ν C i, then F R is contained in ν C i.
 
 Size-preserving : Trans ℓ I → Set (lsuc ℓ)
-Size-preserving F =
-  ∀ {R : Rel ℓ I} {i} → R ⊆ ν C i → F R ⊆ ν C i
+Size-preserving F = ∀ {R i} → R ⊆ ν C i → F R ⊆ ν C i
+
+-- If a transformer is size-preserving, then it satisfies the
+-- corresponding property for ν′.
+
+size-preserving′ :
+  ∀ {F} → Size-preserving F → ∀ {R i} → R ⊆ ν′ C i → F R ⊆ ν′ C i
+force (size-preserving′ pres R⊆ν′Ci x) = pres (λ y → force (R⊆ν′Ci y)) x
 
 -- If the relation transformer F is size-preserving, then F is an
 -- up-to technique.
@@ -141,30 +147,23 @@ Size-preserving F =
 -- transformers, see Bisimilarity.Up-to.Counterexamples.¬-∘-closure),
 -- whereas the former property is (see ∘-closure below).
 
-size-preserving→up-to :
-  {F : Trans ℓ I} →
-  Size-preserving F → Up-to-technique F
-size-preserving→up-to {F} pres = size-preserving→up-to′
+size-preserving→up-to : ∀ {F} → Size-preserving F → Up-to-technique F
+size-preserving→up-to {F} pres {R = R} R⊆CFR = helper
   where
+  helper : ∀ {i} → R ⊆ ⟦ C ⟧ (ν′ C i)
+  helper =
+    map C (size-preserving′ pres (λ x → λ { .force → helper x })) ∘
+    R⊆CFR
 
-  -- F is also size-preserving for ν′.
+  -- An alternative implementation of helper which might be a bit
+  -- easier to follow.
 
-  pres′ : ∀ {R : Rel ℓ I} {i} → R ⊆ ν′ C i → F R ⊆ ν′ C i
-  force (pres′ R⊆ν′ FRx) =
-    pres (λ Rx′ → force (R⊆ν′ Rx′)) FRx
-
-  size-preserving→up-to′ :
-    ∀ {i} {R : Rel ℓ I} →
-    R ⊆ ⟦ C ⟧ (F R) → R ⊆ ν C i
-  size-preserving→up-to′ {i} {R} R⊆CFR =
+  helper′ : ∀ {i} → R ⊆ ν C i
+  helper′ {i} =
     R               ⊆⟨ R⊆CFR ⟩
-    ⟦ C ⟧ (F R)     ⊆⟨ map C (pres′ size-preserving→up-to″) ⟩
+    ⟦ C ⟧ (F R)     ⊆⟨ map C (size-preserving′ pres (λ x → λ { .force → helper′ x })) ⟩
     ⟦ C ⟧ (ν′ C i)  ⊆⟨ id ⟩∎
     ν C i           ∎
-    where
-    size-preserving→up-to″ : R ⊆ ν′ C i
-    force (size-preserving→up-to″ Rx) =
-      size-preserving→up-to′ R⊆CFR Rx
 
 -- If F is monotone, then Size-preserving F is logically equivalent to
 -- a special case stating that, for any size i, ν C i should be a
@@ -180,19 +179,12 @@ size-preserving→up-to {F} pres = size-preserving→up-to′
 -- Bisimilarity.Up-to.Counterexamples.∃special-case-of-size-preserving×¬up-to.
 
 monotone→⇔ :
-  {F : Trans ℓ I} →
+  ∀ {F} →
   Monotone F →
-  Size-preserving F
-    ⇔
-  (∀ {i} → F (ν C i) ⊆ ν C i)
-monotone→⇔ {F} F-mono = record
-  { to   = λ pres {i} →
-             F (ν C i)  ⊆⟨ pres id ⟩∎
-             ν C i      ∎
-  ; from = λ drop {R i} R⊆ν →
-             F R        ⊆⟨ F-mono R⊆ν ⟩
-             F (ν C i)  ⊆⟨ drop ⟩∎
-             ν C i      ∎
+  Size-preserving F ⇔ (∀ {i} → F (ν C i) ⊆ ν C i)
+monotone→⇔ mono = record
+  { to   = λ pres       → pres id
+  ; from = λ pres R⊆νCi → pres ∘ mono R⊆νCi
   }
 
 -- A special case of compatibility.
@@ -289,14 +281,22 @@ const-size-preserving R⊆∼ _ = R⊆∼
 -- size-preserving.
 
 ∘-closure :
-  {F G : Trans ℓ I} →
-  Size-preserving F →
-  Size-preserving G →
-  Size-preserving (F ∘ G)
-∘-closure {F} {G} F-pres G-pres {R = R} {i = i} =
- R ⊆ ν C i        ↝⟨ G-pres ⟩
- G R ⊆ ν C i      ↝⟨ F-pres ⟩□
- F (G R) ⊆ ν C i  □
+  ∀ {F G} →
+  Size-preserving F → Size-preserving G → Size-preserving (F ∘ G)
+∘-closure F-pres G-pres = F-pres ∘ G-pres
+
+private
+
+  -- An alternative implementation of ∘-closure which might be a bit
+  -- easier to follow.
+
+  ∘-closure′ :
+    ∀ {F G} →
+    Size-preserving F → Size-preserving G → Size-preserving (F ∘ G)
+  ∘-closure′ {F} {G} F-pres G-pres {R = R} {i = i} =
+   R ⊆ ν C i        ↝⟨ G-pres ⟩
+   G R ⊆ ν C i      ↝⟨ F-pres ⟩□
+   F (G R) ⊆ ν C i  □
 
 -- If F is a family of size-preserving transformers, then ⋃ lzero F is
 -- also size-preserving.

@@ -35,26 +35,19 @@ Up-to-bisimilarity R = Bisimilarity ∞ ⊙ R ⊙ Bisimilarity ∞
 
 -- Up to bisimilarity is monotone.
 
-Up-to-bisimilarity-monotone : Monotone Up-to-bisimilarity
-Up-to-bisimilarity-monotone R⊆S =
+up-to-bisimilarity-monotone : Monotone Up-to-bisimilarity
+up-to-bisimilarity-monotone R⊆S =
   Σ-map id (Σ-map id (Σ-map id (Σ-map R⊆S id)))
 
 -- Up to bisimilarity is size-preserving.
---
--- One can perhaps argue that the last part of this proof is less
--- complicated than Pous and Sangiorgi's proof of Lemma 6.3.13 in
--- "Enhancements of the bisimulation proof method". (Pous and
--- Sangiorgi seem to take for granted that the function is monotone.)
 
-Up-to-bisimilarity-size-preserving : Size-preserving Up-to-bisimilarity
-Up-to-bisimilarity-size-preserving =
-  _⇔_.from (monotone→⇔ Up-to-bisimilarity-monotone)
-    (λ where
-       {x = p , q} (r , p∼r , s , r∼s , s∼q) →
-         p  ∼⟨ p∼r ⟩
-         r  ∼⟨ r∼s ⟩
-         s  ∼⟨ s∼q ⟩■
-         q)
+up-to-bisimilarity-size-preserving : Size-preserving Up-to-bisimilarity
+up-to-bisimilarity-size-preserving
+  R⊆∼i {p₁ , p₄} (p₂ , p₁∼p₂ , p₃ , p₂Rp₃ , p₃∼p₄) =
+    p₁  ∼⟨ p₁∼p₂ ⟩
+    p₂  ∼⟨ R⊆∼i p₂Rp₃ ⟩
+    p₃  ∼⟨ p₃∼p₄ ⟩■
+    p₄
 
 -- Up to union with bisimilarity.
 
@@ -63,16 +56,16 @@ Up-to-∪∼ R = R ∪ Bisimilarity ∞
 
 -- Up to union with bisimilarity is monotone.
 
-Up-to-∪∼-monotone : Monotone Up-to-∪∼
-Up-to-∪∼-monotone R⊆S = ⊎-map R⊆S id
+up-to-∪∼-monotone : Monotone Up-to-∪∼
+up-to-∪∼-monotone R⊆S = ⊎-map R⊆S id
 
 -- Up to union with bisimilarity is size-preserving.
 --
 -- The proof is similar to parts of the proof of Pous and Sangiorgi's
 -- Corollary 6.3.15.
 
-Up-to-∪∼-size-preserving : Size-preserving Up-to-∪∼
-Up-to-∪∼-size-preserving =
+up-to-∪∼-size-preserving : Size-preserving Up-to-∪∼
+up-to-∪∼-size-preserving =
   ∪-closure
     id-size-preserving
     (const-size-preserving (Bisimilarity ∞  ⊆⟨ id ⟩∎
@@ -85,8 +78,8 @@ Up-to-* R = R *
 
 -- Up to transitive closure is monotone.
 
-Up-to-*-monotone : Monotone Up-to-*
-Up-to-*-monotone R⊆S = Σ-map id (λ {n} → ^^-mono R⊆S n)
+up-to-*-monotone : Monotone Up-to-*
+up-to-*-monotone R⊆S = Σ-map id (λ {n} → ^^-mono R⊆S n)
   where
   ^^-mono : ∀ {R S} → R ⊆ S →
             ∀ n → R ^^ n ⊆ S ^^ n
@@ -95,9 +88,9 @@ Up-to-*-monotone R⊆S = Σ-map id (λ {n} → ^^-mono R⊆S n)
 
 -- Up to transitive closure is size-preserving.
 
-Up-to-*-size-preserving : Size-preserving Up-to-*
-Up-to-*-size-preserving =
-  _⇔_.from (monotone→⇔ Up-to-*-monotone) drop-*
+up-to-*-size-preserving : Size-preserving Up-to-*
+up-to-*-size-preserving =
+  _⇔_.from (monotone→⇔ up-to-*-monotone) drop-*
   where
   drop-* : ∀ {i} → Bisimilarity i * ⊆ Bisimilarity i
   drop-* {x = p , .p} (zero  , refl)           = p ■
