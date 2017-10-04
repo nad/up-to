@@ -468,7 +468,8 @@ companion′⊆companion {R} {o} =
 
 -- The other direction holds iff Companion is compatible.
 --
--- However, I don't know if this is provable (constructively).
+-- However, I don't know if this is provable (in predicative,
+-- constructive type theory).
 
 companion-compatible⇔companion⊆companion′ :
   Compatible Companion ⇔ (∀ {R} → Companion R ⊆ Companion′ R)
