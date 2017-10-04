@@ -80,7 +80,7 @@ Sound⇔ F = record
 -- b-compatibility.
 
 Compatible : Trans ℓ I → Set (lsuc ℓ)
-Compatible F = ∀ R → F (⟦ C ⟧ R) ⊆ ⟦ C ⟧ (F R)
+Compatible F = ∀ {R} → F (⟦ C ⟧ R) ⊆ ⟦ C ⟧ (F R)
 
 -- If F is monotone and compatible, and R is contained in ⟦ C ⟧ (F R),
 -- then F ^ω R is a post-fixpoint of ⟦ C ⟧.
@@ -104,7 +104,7 @@ compatible→^ω-post-fixpoint {F} mono comp {R = R} R⊆ = uncurry λ n →
   Fⁿ⊆∘F¹⁺ⁿ (suc n) =
     F ^[ 1 + n ] R              ⊆⟨⟩
     F (F ^[ n ] R)              ⊆⟨ mono (Fⁿ⊆∘F¹⁺ⁿ n) ⟩
-    F (⟦ C ⟧ (F ^[ 1 + n ] R))  ⊆⟨ comp _ ⟩∎
+    F (⟦ C ⟧ (F ^[ 1 + n ] R))  ⊆⟨ comp ⟩∎
     ⟦ C ⟧ (F ^[ 2 + n ] R)      ∎
 
 -- Monotone compatible functions are up-to techniques.
@@ -225,7 +225,7 @@ monotone→compatible→size-preserving :
   Compatible F →
   Size-preserving F
 monotone→compatible→size-preserving mono comp =
-  monotone→compatible′→size-preserving mono (comp _)
+  monotone→compatible′→size-preserving mono comp
 
 -- Extensive, size-preserving transformers satisfy the special case of
 -- compatibility.
@@ -447,8 +447,8 @@ companion′-compatible :
   ∀ R → Companion′ (⟦ C ⟧ R) ⊆ ⟦ C ⟧ (Companion′ R)
 companion′-compatible R {x} (F , mono , comp , FCR) =
                           $⟨ FCR ⟩
-  F (⟦ C ⟧ R) x           ↝⟨ comp R ⟩
-  ⟦ C ⟧ (F R) x           ↝⟨ map C (λ FR → F , (λ {_ _} → mono) , comp , FR) ⟩□
+  F (⟦ C ⟧ R) x           ↝⟨ comp ⟩
+  ⟦ C ⟧ (F R) x           ↝⟨ map C (λ FR → F , (λ {_ _} → mono) , (λ {_ _} → comp) , FR) ⟩□
   ⟦ C ⟧ (Companion′ R) x  □
 
 -- Pous' variant of the companion is monotone.
@@ -474,16 +474,16 @@ companion-compatible⇔companion⊆companion′ :
   Compatible Companion ⇔ (∀ {R} → Companion R ⊆ Companion′ R)
 companion-compatible⇔companion⊆companion′ = record
   { to   = λ comp  f → Companion , companion-monotone , comp , f
-  ; from = λ below R →
+  ; from = λ below {R} →
              Companion (⟦ C ⟧ R)   ⊆⟨ below ⟩
 
              Companion′ (⟦ C ⟧ R)  ⊆⟨ (λ { (F , mono , comp , x) → (_$ x) (
 
-                 F (⟦ C ⟧ R)            ⊆⟨ comp _ ⟩
+                 F (⟦ C ⟧ R)            ⊆⟨ comp ⟩
 
                  ⟦ C ⟧ (F R)            ⊆⟨ map C (
 
-                     F R                     ⊆⟨ (λ y → F , (λ {_ _} → mono) , comp , y) ⟩
+                     F R                     ⊆⟨ (λ y → F , (λ {_ _} → mono) , (λ {_ _} → comp) , y) ⟩
                      Companion′ R            ⊆⟨ companion′⊆companion ⟩∎
                      Companion R             ∎) ⟩∎
 

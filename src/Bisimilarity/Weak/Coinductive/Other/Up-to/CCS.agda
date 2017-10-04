@@ -148,8 +148,8 @@ up-to-context-size-preserving =
 
   [R]⊆Step[R] : Up-to-context R ⊆ ⟦ StepC ⟧ (Up-to-context R)
   [R]⊆Step[R] =
-    Up-to-context R              ⊆⟨ Up-to-context-monotone (λ {x} → R⊆StepR {x}) ⟩
-    Up-to-context (⟦ StepC ⟧ R)  ⊆⟨ comp _ ⟩∎
+    Up-to-context R              ⊆⟨ up-to-context-monotone (λ {x} → R⊆StepR {x}) ⟩
+    Up-to-context (⟦ StepC ⟧ R)  ⊆⟨ comp ⟩∎
     ⟦ StepC ⟧ (Up-to-context R)  ∎
 
   contradiction : ⊥

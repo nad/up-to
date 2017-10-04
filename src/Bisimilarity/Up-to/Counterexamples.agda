@@ -320,7 +320,7 @@ private
 
   ¬comp : ¬ Compatible F
   ¬comp =
-    Compatible F                                                     ↝⟨ (λ comp {x} → comp R {x}) ⟩
+    Compatible F                                                     ↝⟨ (λ comp {x} → comp {x = x}) ⟩
 
     F (⟦ StepC ⟧ R) ⊆ ⟦ StepC ⟧ (F R)                                ↝⟨ (λ le → le {true , true}) ⟩
 

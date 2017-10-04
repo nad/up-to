@@ -43,10 +43,10 @@ Compatible-⊗ :
   ∀ {ℓ} {I : Set ℓ} {C₁ C₂ : Container I I} {F : Trans ℓ I} →
   Monotone F →
   Compatible C₁ F → Compatible C₂ F → Compatible (C₁ ⊗ C₂) F
-Compatible-⊗ {C₁ = C₁} {C₂} {F} mono comp₁ comp₂ R =
+Compatible-⊗ {C₁ = C₁} {C₂} {F} mono comp₁ comp₂ {R = R} =
   F (⟦ C₁ ⊗ C₂ ⟧ R)            ⊆⟨ mono (⟦⊗⟧↔ _ C₁ C₂) ⟩
   F (⟦ C₁ ⟧ R ∩ ⟦ C₂ ⟧ R)      ⊆⟨ (λ x → mono proj₁ x , mono proj₂ x) ⟩
-  F (⟦ C₁ ⟧ R) ∩ F (⟦ C₂ ⟧ R)  ⊆⟨ Σ-map (comp₁ _) (comp₂ _) ⟩
+  F (⟦ C₁ ⟧ R) ∩ F (⟦ C₂ ⟧ R)  ⊆⟨ Σ-map comp₁ comp₂ ⟩
   ⟦ C₁ ⟧ (F R) ∩ ⟦ C₂ ⟧ (F R)  ⊆⟨ _⇔_.from (⟦⊗⟧↔ _ C₁ C₂) ⟩∎
   ⟦ C₁ ⊗ C₂ ⟧ (F R)            ∎
 
@@ -57,9 +57,9 @@ Compatible-reindex₁ :
   ∀ {ℓ} {I : Set ℓ} {C : Container I I} {F : Trans ℓ I} {f : I → I} →
   Monotone F → Symmetric f F →
   Compatible C F → Compatible (reindex₁ f C) F
-Compatible-reindex₁ {C = C} {F} {f} mono hyp comp R =
+Compatible-reindex₁ {C = C} {F} {f} mono hyp comp {R = R} =
   F (⟦ reindex₁ f C ⟧ R)  ⊆⟨ mono (⟦reindex₁⟧↔ _ C) ⟩
-  F (⟦ C ⟧ (R ∘ f))       ⊆⟨ comp _ ⟩
+  F (⟦ C ⟧ (R ∘ f))       ⊆⟨ comp ⟩
   ⟦ C ⟧ (F (R ∘ f))       ⊆⟨ map C (hyp _) ⟩
   ⟦ C ⟧ (F R ∘ f)         ⊆⟨ _⇔_.from (⟦reindex₁⟧↔ _ C) ⟩∎
   ⟦ reindex₁ f C ⟧ (F R)  ∎
@@ -71,10 +71,10 @@ Compatible-reindex₂ :
   ∀ {ℓ} {I : Set ℓ} {C : Container I I} {F : Trans ℓ I} {f : I → I} →
   Symmetric f F →
   Compatible C F → Compatible (reindex₂ f C) F
-Compatible-reindex₂ {C = C} {F} {f} hyp comp R =
+Compatible-reindex₂ {C = C} {F} {f} hyp comp {R = R} =
   F (⟦ reindex₂ f C ⟧ R)  ⊆⟨⟩
   F (⟦ C ⟧ R ∘ f)         ⊆⟨ hyp _ ⟩
-  F (⟦ C ⟧ R) ∘ f         ⊆⟨ comp _ ⟩
+  F (⟦ C ⟧ R) ∘ f         ⊆⟨ comp ⟩
   ⟦ C ⟧ (F R) ∘ f         ⊆⟨ id ⟩∎
   ⟦ reindex₂ f C ⟧ (F R)  ∎
 
