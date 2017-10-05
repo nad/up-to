@@ -340,7 +340,8 @@ Below-the-companion = Up-to.Below-the-companion
 -- Transformers are below the companion if and only if they are
 -- size-preserving.
 
-below-the-companion⇔size-preserving = Up-to.⊆companion⇔size-preserving
+below-the-companion⇔size-preserving =
+  Up-to.below-the-companion⇔size-preserving
 
 -- The companion is size-preserving.
 
@@ -352,7 +353,7 @@ Compatible = Up-to.Compatible
 
 -- The large companion.
 
-Companion₁ = Up-to.Companion′
+Companion₁ = Up-to.Companion₁
 
 -- Monotone and compatible transformers are size-preserving.
 
@@ -360,7 +361,7 @@ compatible⇒size‐preserving = Up-to.monotone→compatible→size-preserving
 
 -- The large companion is below the small one.
 
-large⊆small = Up-to.companion′⊆companion
+large⊆small = Up-to.companion₁⊆companion
 
 -- The small companion is monotone.
 
@@ -370,15 +371,35 @@ companion-monotone = Up-to.companion-monotone
 -- large one.
 
 small-compatible⇔⊆large =
-  Up-to.companion-compatible⇔companion⊆companion′
+  Up-to.companion-compatible⇔companion⊆companion₁
 
--- Various properties of the companion.
+-- The identity function is below the companion.
 
-id-below                    = Up-to.id⊆companion
-⟦⟧-below                    = Up-to.⟦⟧⊆companion
-companion∘companion-below   = Up-to.companion²⊆companion
-ν⊆companion-⊥,companion-⊥⊆ν = Up-to.ν⇔companion-⊥
-companion-up-to             = Up-to.companion-up-to
+id-below = Up-to.id-below
+
+-- The interpretation ⟦ C ⟧ of a container C is below the
+-- corresponding companion.
+
+⟦⟧-below = Up-to.⟦⟧-below
+
+-- The companion composed with itself is below the companion.
+
+companion∘companion-below = Up-to.companion∘companion-below
+
+-- An example: If F is below the companion, then ⟦ C ⟧ ∘ F is below
+-- Companion ∘ Companion, which is below the companion.
+
+below-the-companion-example = Up-to.below-the-companion-example
+
+-- The greatest fixpoint is pointwise logically equivalent to the
+-- companion applied to an empty relation.
+
+ν⊆companion-⊥ = Up-to.ν⇔companion-⊥
+companion-⊥⊆ν = Up-to.ν⇔companion-⊥
+
+-- The companion is an up-to technique.
+
+companion-up-to = Up-to.companion-up-to
 
 ------------------------------------------------------------------------
 -- Section 8
