@@ -28,7 +28,7 @@ private
 
 private
   module General =
-    Bisimilarity.Coinductive.General lts _[_]⟶̂_ _[_]⇒̂_ ⟶→⟶̂ ⟶→⇒̂
+    Bisimilarity.Coinductive.General lts _[_]⟶̂_ _[_]⇒_ ⟶→⟶̂ ⟶→[]⇒
 
 open General public
   using (module StepC; ⟨_,_⟩; left-to-right; right-to-left; force;
@@ -111,27 +111,27 @@ _≲′_ = [ ∞ ]_≲′_
 
 -- Combinators that can perhaps make the code a bit nicer to read.
 
-infix -3 lr-result-⟶̂ rl-result-⇒̂ lr-result-⇒̂ rl-result-⟶̂
+infix -3 lr-result-⟶̂ rl-result-⇒ lr-result-⇒ rl-result-⟶̂
 
 lr-result-⟶̂ : ∀ {i p′ q q′} μ → [ i ] p′ ≳′ q′ → q [ μ ]⟶̂ q′ →
               ∃ λ q′ → q [ μ ]⟶̂ q′ × [ i ] p′ ≳′ q′
 lr-result-⟶̂ _ p′≳′q′ q⟶̂q′ = _ , q⟶̂q′ , p′≳′q′
 
-rl-result-⇒̂ : ∀ {i p p′ q′} μ → p [ μ ]⇒̂ p′ → [ i ] p′ ≳′ q′ →
-              ∃ λ p′ → p [ μ ]⇒̂ p′ × [ i ] p′ ≳′ q′
-rl-result-⇒̂ _ p⇒̂p′ p′≳′q′ = _ , p⇒̂p′ , p′≳′q′
+rl-result-⇒ : ∀ {i p p′ q′} μ → p [ μ ]⇒ p′ → [ i ] p′ ≳′ q′ →
+              ∃ λ p′ → p [ μ ]⇒ p′ × [ i ] p′ ≳′ q′
+rl-result-⇒ _ p⇒p′ p′≳′q′ = _ , p⇒p′ , p′≳′q′
 
-lr-result-⇒̂ : ∀ {i p′ q q′} μ → [ i ] p′ ≲′ q′ → q [ μ ]⇒̂ q′ →
-              ∃ λ q′ → q [ μ ]⇒̂ q′ × [ i ] p′ ≲′ q′
-lr-result-⇒̂ _ p′≲′q′ q⇒̂q′ = _ , q⇒̂q′ , p′≲′q′
+lr-result-⇒ : ∀ {i p′ q q′} μ → [ i ] p′ ≲′ q′ → q [ μ ]⇒ q′ →
+              ∃ λ q′ → q [ μ ]⇒ q′ × [ i ] p′ ≲′ q′
+lr-result-⇒ _ p′≲′q′ q⇒q′ = _ , q⇒q′ , p′≲′q′
 
 rl-result-⟶̂ : ∀ {i p p′ q′} μ → p [ μ ]⟶̂ p′ → [ i ] p′ ≲′ q′ →
               ∃ λ p′ → p [ μ ]⟶̂ p′ × [ i ] p′ ≲′ q′
 rl-result-⟶̂ _ p⟶̂p′ p′≲′q′ = _ , p⟶̂p′ , p′≲′q′
 
 syntax lr-result-⟶̂ μ p′≳′q′ q⟶̂q′ = p′≳′q′ ⟵̂[ μ ] q⟶̂q′
-syntax rl-result-⇒̂ μ p⇒̂p′ p′≳′q′ = p⇒̂p′ ⇒̂[ μ ] p′≳′q′
-syntax lr-result-⇒̂ μ p′≲′q′ q⇒̂q′ = p′≲′q′ ⇐̂[ μ ] q⇒̂q′
+syntax rl-result-⇒ μ p⇒p′ p′≳′q′ = p⇒p′ ⇒[ μ ] p′≳′q′
+syntax lr-result-⇒ μ p′≲′q′ q⇒q′ = p′≲′q′ ⇐[ μ ] q⇒q′
 syntax rl-result-⟶̂ μ p⟶̂p′ p′≲′q′ = p⟶̂p′ ⟶̂[ μ ] p′≲′q′
 
 -- Strongly bisimilar processes are related by the expansion ordering.
@@ -150,10 +150,10 @@ mutual
 
     rl : ∀ {p q q′ μ} →
          [ i ] p ∼ q → q [ μ ]⟶ q′ →
-         ∃ λ p′ → p [ μ ]⇒̂ p′ × [ i ] p′ ≳′ q′
+         ∃ λ p′ → p [ μ ]⇒ p′ × [ i ] p′ ≳′ q′
     rl p∼q q⟶q′ =
       let p′ , p⟶p′ , p′∼′q′ = SB.right-to-left p∼q q⟶q′
-      in p′ , ⟶→⇒̂ p⟶p′ , ∼⇒≳′ p′∼′q′
+      in p′ , ⟶→[]⇒ p⟶p′ , ∼⇒≳′ p′∼′q′
 
   ∼⇒≳′ : ∀ {i p q} → [ i ] p ∼′ q → [ i ] p ≳′ q
   force (∼⇒≳′ p∼′q) = ∼⇒≳ (SB.force p∼′q)
@@ -165,16 +165,25 @@ expansion-is-weak :
   p ≳ q → p [ μ ]⇒̂ p′ →
   ∃ λ q′ → q [ μ ]⇒̂ q′ × p′ ≳ q′
 expansion-is-weak =
-  is-weak StepC.left-to-right (λ p≳′q → force p≳′q) ⟶̂→⇒ ⟶̂→⇒̂
+  is-weak⇒̂ StepC.left-to-right (λ p≳′q → force p≳′q) ⟶̂→⇒ ⟶̂→⇒̂
 
 -- The converse of expansion is a weak simulation (of a certain kind).
 
-converse-of-expansion-is-weak :
+converse-of-expansion-is-weak[]⇒ :
+  ∀ {p p′ q μ} →
+  p ≲ q → p [ μ ]⇒ p′ →
+  ∃ λ q′ → q [ μ ]⇒ q′ × p′ ≲ q′
+converse-of-expansion-is-weak[]⇒ =
+  is-weak[]⇒ StepC.right-to-left (λ p≲′q → force p≲′q) []⇒→⇒ id
+
+-- The converse of expansion is a weak simulation (of another kind).
+
+converse-of-expansion-is-weak⇒̂ :
   ∀ {p p′ q μ} →
   p ≲ q → p [ μ ]⇒̂ p′ →
   ∃ λ q′ → q [ μ ]⇒̂ q′ × p′ ≲ q′
-converse-of-expansion-is-weak =
-  is-weak⇒̂ StepC.right-to-left (λ p≲′q → force p≲′q) ⇒̂→⇒ id
+converse-of-expansion-is-weak⇒̂ =
+  is-weak⇒̂ StepC.right-to-left (λ p≲′q → force p≲′q) []⇒→⇒ ⇒→⇒̂
 
 mutual
 
@@ -201,10 +210,10 @@ mutual
 
     rl : ∀ {p q r r′ μ} →
          p ≳ q → [ i ] q ≳ r → r [ μ ]⟶ r′ →
-         ∃ λ p′ → p [ μ ]⇒̂ p′ × [ i ] p′ ≳′ r′
+         ∃ λ p′ → p [ μ ]⇒ p′ × [ i ] p′ ≳′ r′
     rl p≳q q≳r r⟶r′ =
-      let q′ , q⇒̂q′ , q′≳′r′ = StepC.right-to-left q≳r r⟶r′
-          p′ , p⇒̂p′ , p′≳q′  = converse-of-expansion-is-weak p≳q q⇒̂q′
+      let q′ , q⇒q′ , q′≳′r′ = StepC.right-to-left q≳r r⟶r′
+          p′ , p⇒̂p′ , p′≳q′  = converse-of-expansion-is-weak[]⇒ p≳q q⇒q′
       in p′ , p⇒̂p′ , transitive-≳′ (record { force = p′≳q′ }) q′≳′r′
 
   transitive-≳′ : ∀ {i p q r} → p ≳′ q → [ i ] q ≳′ r → [ i ] p ≳′ r
@@ -219,11 +228,11 @@ mutual
   transitive-≳∼ {i} {p} {r = r} p≳q q∼r = StepC.⟨ lr , rl ⟩
     where
     rl : ∀ {r′ μ} → r [ μ ]⟶ r′ →
-         ∃ λ p′ → p [ μ ]⇒̂ p′ × [ i ] p′ ≳′ r′
+         ∃ λ p′ → p [ μ ]⇒ p′ × [ i ] p′ ≳′ r′
     rl r⟶r′ =
       let q′ , q⟶q′ , q′∼′r′ = SB.right-to-left q∼r r⟶r′
-          p′ , p⇒̂p′ , p′≳′q′ = StepC.right-to-left p≳q q⟶q′
-      in p′ , p⇒̂p′ , transitive-≳∼′ p′≳′q′ q′∼′r′
+          p′ , p⇒p′ , p′≳′q′ = StepC.right-to-left p≳q q⟶q′
+      in p′ , p⇒p′ , transitive-≳∼′ p′≳′q′ q′∼′r′
 
     lr : ∀ {p′ μ} → p [ μ ]⟶ p′ →
          ∃ λ r′ → r [ μ ]⟶̂ r′ × [ i ] p′ ≳′ r′

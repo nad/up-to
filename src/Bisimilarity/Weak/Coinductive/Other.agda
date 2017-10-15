@@ -130,8 +130,8 @@ mutual
          [ i ] p ≳ q → q [ μ ]⟶ q′ →
          ∃ λ p′ → p [ μ ]⇒̂ p′ × [ i ] p′ ≈′ q′
     rl p≳q q⟶q′ =
-      let p′ , p⇒̂p′ , p′≳′q′ = E.right-to-left p≳q q⟶q′
-      in p′ , p⇒̂p′ , ≳⇒≈′ p′≳′q′
+      let p′ , p⇒p′ , p′≳′q′ = E.right-to-left p≳q q⟶q′
+      in p′ , ⇒→⇒̂ p⇒p′ , ≳⇒≈′ p′≳′q′
 
   ≳⇒≈′ : ∀ {i p q} → [ i ] p ≳′ q → [ i ] p ≈′ q
   force (≳⇒≈′ p≳′q) = ≳⇒≈ (SB.force p≳′q)
@@ -223,7 +223,7 @@ mutual
          ∃ λ p′ → p [ μ ]⇒̂ p′ × [ i ] p′ ≈′ r′
     rl r⟶r′ =
       let q′ , q⇒̂q′ , q′≈′r′ = StepC.right-to-left q≈r r⟶r′
-          p′ , p⇒̂p′ , p′≳q′  = E.converse-of-expansion-is-weak p≳q q⇒̂q′
+          p′ , p⇒̂p′ , p′≳q′  = E.converse-of-expansion-is-weak⇒̂ p≳q q⇒̂q′
       in p′ , p⇒̂p′ , transitive-≳≈′ (record { force = p′≳q′ }) q′≈′r′
 
   transitive-≳≈′ : ∀ {i p q r} →

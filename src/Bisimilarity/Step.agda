@@ -39,7 +39,7 @@ private
   -- clause (3) is omitted.
   --
   -- Finally, if _[_]↝₁_ is instantiated with _[_]⟶̂_ and _[_]↝₂_ is
-  -- instantiated with _[_]⇒̂_, then we get the expansion relation's
+  -- instantiated with _[_]⇒_, then we get the expansion relation's
   -- "step" function.
 
   record Step {r} (R : Rel₂ r Proc) (pq : Proc × Proc) :

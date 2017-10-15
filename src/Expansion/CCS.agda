@@ -9,7 +9,7 @@ module Expansion.CCS {ℓ} {Name : Set ℓ} where
 open import Equality.Propositional
 open import Prelude hiding (module W)
 
-open import Function-universe equality-with-J hiding (_∘_)
+open import Function-universe equality-with-J hiding (id; _∘_)
 
 import Bisimilarity.Coinductive.Equational-reasoning-instances
 import Bisimilarity.Exercises.Coinductive.CCS as SE
@@ -37,37 +37,67 @@ module Cong-lemmas
   ⦃ _ : Convertible R′ R′ ⦄
   ⦃ _ : Transitive′ R′ _∼_ ⦄
   ⦃ _ : Transitive _∼_ R′ ⦄
+  {_[_]↝_ : Proc ∞ → Label → Proc ∞ → Set ℓ}
   (right-to-left :
    ∀ {P Q} → R P Q →
-   ∀ {Q′ μ} → Q [ μ ]⟶ Q′ → ∃ λ P′ → P [ μ ]⇒̂ P′ × R′ P′ Q′)
+   ∀ {Q′ μ} → Q [ μ ]⟶ Q′ → ∃ λ P′ → P [ μ ]↝ P′ × R′ P′ Q′)
+  ⦃ _ : ∀ {μ} → Convertible _[ μ ]↝_ _[ μ ]↝_ ⦄
+  ⦃ _ : ∀ {μ} → Convertible _[ μ ]⟶_ _[ μ ]↝_ ⦄
+  (↝→[]⇒ : ∀ {P Q a} → P [ name a ]↝ Q → P [ name a ]⇒ Q)
+  ([]⇒→↝ : ∀ {P Q} → P [ τ ]⇒ Q → P [ τ ]↝ Q)
+  (map-↝ :
+    {F : Proc ∞ → Proc ∞} →
+    (∀ {P P′ μ} → P [ μ ]⟶ P′ → F P [ μ ]⟶ F P′) →
+    ∀ {P P′ μ} → P [ μ ]↝ P′ → F P [ μ ]↝ F P′)
+  (map-↝′ :
+    ∀ {μ} {F : Proc ∞ → Proc ∞} →
+    (∀ {P P′ μ} → Silent μ → P [ μ ]⟶ P′ → F P [ μ ]⟶ F P′) →
+    (∀ {P P′} → P [ μ ]⟶ P′ → F P [ μ ]⟶ F P′) →
+    ∀ {P P′} → P [ μ ]↝ P′ → F P [ μ ]↝ F P′)
+  (zip-↝ :
+    {F : Proc ∞ → Proc ∞ → Proc ∞} →
+    (∀ {P P′ Q μ} → P [ μ ]⟶ P′ → F P Q [ μ ]⟶ F P′ Q) →
+    (∀ {P Q Q′ μ} → Q [ μ ]⟶ Q′ → F P Q [ μ ]⟶ F P Q′) →
+    ∀ {μ₁ μ₂ μ₃} →
+    (Silent μ₁ → Silent μ₂ → Silent μ₃) →
+    (∀ {P P′ Q} → P [ μ₁ ]⟶ P′ → Silent μ₂ → F P Q [ μ₃ ]⟶ F P′ Q) →
+    (∀ {P Q Q′} → Silent μ₁ → Q [ μ₂ ]⟶ Q′ → F P Q [ μ₃ ]⟶ F P Q′) →
+    (∀ {P P′ Q Q′} →
+     P [ μ₁ ]⟶ P′ → Q [ μ₂ ]⟶ Q′ → F P Q [ μ₃ ]⟶ F P′ Q′) →
+    ∀ {P P′ Q Q′} →
+    P [ μ₁ ]↝ P′ → Q [ μ₂ ]↝ Q′ → F P Q [ μ₃ ]↝ F P′ Q′)
+  (!-lemma :
+    (∀ {P Q μ} → P [ μ ]⇒ Q → ! P [ μ ]⇒ ! P ∣ Q) →
+    ∀ {P Q μ} → P [ μ ]↝ Q →
+    ∃ λ P′ → ((! P) [ μ ]↝ P′) × P′ ∼ ! P ∣ Q)
   where
 
   private
 
-    infix -3 rl-result-⇒̂′
+    infix -3 rl-result-↝
 
-    rl-result-⇒̂′ : ∀ {P P′ Q′} μ → P [ μ ]⇒̂ P′ → R′ P′ Q′ →
-                   ∃ λ P′ → P [ μ ]⇒̂ P′ × R′ P′ Q′
-    rl-result-⇒̂′ _ P⇒̂P′ P′≳′Q′ = _ , P⇒̂P′ , P′≳′Q′
+    rl-result-↝ : ∀ {P P′ Q′} μ → P [ μ ]↝ P′ → R′ P′ Q′ →
+                  ∃ λ P′ → (P [ μ ]↝ P′) × R′ P′ Q′
+    rl-result-↝ _ P↝P′ P′≳′Q′ = _ , P↝P′ , P′≳′Q′
 
-    syntax rl-result-⇒̂′ μ P⇒̂P′ P′≳′Q′ = P⇒̂P′ ⇒̂[ μ ]′ P′≳′Q′
+    syntax rl-result-↝ μ P↝P′ P′≳′Q′ = P↝P′ ↝[ μ ] P′≳′Q′
 
   ∣-cong :
     (∀ {P P′ Q Q′} → R′ P P′ → R′ Q Q′ → R′ (P ∣ Q) (P′ ∣ Q′)) →
     ∀ {P₁ P₂ Q₁ Q₂ R₂ μ} →
     R P₁ P₂ → R Q₁ Q₂ → P₂ ∣ Q₂ [ μ ]⟶ R₂ →
-    ∃ λ R₁ → P₁ ∣ Q₁ [ μ ]⇒̂ R₁ × R′ R₁ R₂
+    ∃ λ R₁ → ((P₁ ∣ Q₁) [ μ ]↝ R₁) × R′ R₁ R₂
   ∣-cong _∣-cong′_ P₁≳P₂ Q₁≳Q₂ = λ where
     (par-left  tr)  → Σ-map (_∣ _)
-                        (Σ-map (map-⇒̂ par-left)
+                        (Σ-map (map-↝ par-left)
                                (_∣-cong′ convert Q₁≳Q₂))
                         (right-to-left P₁≳P₂ tr)
     (par-right tr)  → Σ-map (_ ∣_)
-                        (Σ-map (map-⇒̂ par-right)
+                        (Σ-map (map-↝ par-right)
                                (convert P₁≳P₂ ∣-cong′_))
                         (right-to-left Q₁≳Q₂ tr)
     (par-τ tr₁ tr₂) → Σ-zip _∣_
-                        (Σ-zip (zip-⇒̂ par-left par-right
+                        (Σ-zip (zip-↝ par-left par-right
                                       (λ ()) (λ _ ()) (λ ())
                                       par-τ)
                                _∣-cong′_)
@@ -77,20 +107,20 @@ module Cong-lemmas
   ·-cong :
     ∀ {P₁ P₂ Q₂ μ μ′} →
     R′ (force P₁) (force P₂) → μ · P₂ [ μ′ ]⟶ Q₂ →
-    ∃ λ Q₁ → μ · P₁ [ μ′ ]⇒̂ Q₁ × R′ Q₁ Q₂
-  ·-cong P₁≳P₂ action = _ , ⟶→⇒̂ action , P₁≳P₂
+    ∃ λ Q₁ → ((μ · P₁) [ μ′ ]↝ Q₁) × R′ Q₁ Q₂
+  ·-cong P₁≳P₂ action = _ , convert _[_]⟶_.action , P₁≳P₂
 
   ⟨ν⟩-cong :
     (∀ {a P P′} → R′ P P′ → R′ (⟨ν a ⟩ P) (⟨ν a ⟩ P′)) →
     ∀ {a μ P P′ Q′} →
     R P P′ → ⟨ν a ⟩ P′ [ μ ]⟶ Q′ →
-    ∃ λ Q → ⟨ν a ⟩ P [ μ ]⇒̂ Q × R′ Q Q′
+    ∃ λ Q → (⟨ν a ⟩ P [ μ ]↝ Q) × R′ Q Q′
   ⟨ν⟩-cong ⟨ν⟩-cong′ {a} {μ} {P} P≳P′
            (restriction {P′ = Q′} a∉μ P′⟶Q′) =
     case right-to-left P≳P′ P′⟶Q′ of λ where
-      (Q , P⇒̂Q , Q≳′Q′) →
-        ⟨ν a ⟩ P   →⟨ map-⇒̂′ (restriction ∘ ∉τ) (restriction a∉μ) P⇒̂Q ⟩■
-          ⇒̂[ μ ]′
+      (Q , P↝Q , Q≳′Q′) →
+        ⟨ν a ⟩ P   →⟨ map-↝′ (restriction ∘ ∉τ) (restriction a∉μ) P↝Q ⟩■
+          ↝[ μ ]
         ⟨ν a ⟩ Q   ∼⟨ ⟨ν⟩-cong′ Q≳′Q′ ⟩■
         ⟨ν a ⟩ Q′
 
@@ -168,65 +198,48 @@ module Cong-lemmas
     (∀ {P P′} → R′ P P′ → R′ (! P) (! P′)) →
     ∀ {P P′ Q′ μ} →
     R P P′ → ! P′ [ μ ]⟶ Q′ →
-    ∃ λ Q → ! P [ μ ]⇒̂ Q × R′ Q Q′
+    ∃ λ Q → ((! P) [ μ ]↝ Q) × R′ Q Q′
   !-cong _∣-cong′_ !-cong′_ {P} {P′} {Q′} {μ} P≳P′ !P′⟶Q′ =
     case SE.6-1-3-2 !P′⟶Q′ of λ where
 
       (inj₁ (P″ , P′⟶P″ , Q′∼!P′∣P″)) →
-        case right-to-left P≳P′ P′⟶P″ of λ where
-          (_ , silent μs done , P≳′P″) →
-            ! P        →⟨ silent μs done ⟩■
-              ⇒̂[ μ ]′
-            ! P        ∼⟨ symmetric SE.6-1-2 ⟩
-            ! P ∣ P    ∼′⟨ (!-cong′ (convert P≳P′)) ∣-cong′ P≳′P″ ⟩ S.∼:
-            ! P′ ∣ P″  ∼⟨ symmetric Q′∼!P′∣P″ ⟩■
-            Q′
-
-          (Q , silent μs (step {q = R} {μ = μ′} μ′s P⟶R R⇒Q) , Q≳′P″) →
-            ! P        →⟨ ⟶→⇒ μ′s (replication (par-right P⟶R)) ⟩
-            ! P ∣ R    →⟨ silent μs (map-⇒ par-right R⇒Q) ⟩■
-              ⇒̂[ μ ]′
-            ! P ∣ Q    ∼′⟨ (!-cong′ (convert P≳P′)) ∣-cong′ Q≳′P″ ⟩ S.∼:
-            ! P′ ∣ P″  ∼⟨ symmetric Q′∼!P′∣P″ ⟩■
-            Q′
-
-          (Q , non-silent ¬μs P⇒Q , Q≳′P″) →
-            ! P        →⟨ non-silent ¬μs (!-cong-lemma₁ P⇒Q) ⟩■
-              ⇒̂[ μ ]′
-            ! P ∣ Q    ∼′⟨ (!-cong′ (convert P≳P′)) ∣-cong′ Q≳′P″ ⟩ S.∼:
-            ! P′ ∣ P″  ∼⟨ symmetric Q′∼!P′∣P″ ⟩■
-            Q′
+        let Q , P↝Q  , Q≳′P″  = right-to-left P≳P′ P′⟶P″
+            R , !P↝R , R∼!P∣Q = !-lemma !-cong-lemma₁ P↝Q
+        in
+          ! P        →⟨ !P↝R ⟩■
+            ↝[ μ ]
+          R          ∼⟨ R∼!P∣Q ⟩
+          ! P ∣ Q    ∼′⟨ (!-cong′ (convert P≳P′)) ∣-cong′ Q≳′P″ ⟩ S.∼:
+          ! P′ ∣ P″  ∼⟨ symmetric Q′∼!P′∣P″ ⟩■
+          Q′
 
       (inj₂ (refl , P″ , P‴ , a , P′⟶P″ , P′⟶P‴ , Q′∼!P′∣P″∣P‴)) →
-        case right-to-left P≳P′ P′⟶P″ ,′
-             right-to-left P≳P′ P′⟶P‴ of λ where
-          ((_ , silent () _ , _) , _)
-          (_ , (_ , silent () _ , _))
+        let Q₁ , P↝Q₁ , Q₁≳′P″ = right-to-left P≳P′ P′⟶P″
+            Q₂ , P↝Q₂ , Q₂≳′P‴ = right-to-left P≳P′ P′⟶P‴
 
-          ((Q₁ , non-silent _ P⇒Q₁ , Q₁≳′P″) ,
-           (Q₂ , non-silent _ P⇒Q₂ , Q₂≳′P‴)) →
-            case !-cong-lemma₂ P⇒Q₁ P⇒Q₂ of λ where
-              (R , !P⇒R , R∼[!P∣Q₁]∣Q₂) →
-                ! P               →⟨ !P⇒R ⟩■
-                  ⇒̂[ τ ]′
-                R                 ∼⟨ R∼[!P∣Q₁]∣Q₂ ⟩
-                (! P ∣ Q₁) ∣ Q₂   ∼′⟨ ((!-cong′ (convert P≳P′)) ∣-cong′ Q₁≳′P″) ∣-cong′ Q₂≳′P‴ ⟩ S.∼:
-                (! P′ ∣ P″) ∣ P‴  ∼⟨ symmetric Q′∼!P′∣P″∣P‴ ⟩■
-                Q′
+            R , !P⇒R , R∼[!P∣Q₁]∣Q₂ =
+              !-cong-lemma₂ (↝→[]⇒ P↝Q₁) (↝→[]⇒ P↝Q₂)
+        in
+          ! P               →⟨ []⇒→↝ !P⇒R ⟩■
+            ↝[ τ ]
+          R                 ∼⟨ R∼[!P∣Q₁]∣Q₂ ⟩
+          (! P ∣ Q₁) ∣ Q₂   ∼′⟨ ((!-cong′ (convert P≳P′)) ∣-cong′ Q₁≳′P″) ∣-cong′ Q₂≳′P‴ ⟩ S.∼:
+          (! P′ ∣ P″) ∣ P‴  ∼⟨ symmetric Q′∼!P′∣P″∣P‴ ⟩■
+          Q′
 
   ⊕·-cong :
     ∀ {P Q Q′ S′ μ μ′} →
     R′ (force Q) (force Q′) → P ⊕ μ · Q′ [ μ′ ]⟶ S′ →
-    ∃ λ S → P ⊕ μ · Q [ μ′ ]⇒̂ S × R′ S S′
+    ∃ λ S → ((P ⊕ μ · Q) [ μ′ ]↝ S) × R′ S S′
   ⊕·-cong {P} {Q} {Q′} {S′} {μ} {μ′} Q≳Q′ = λ where
     (sum-left P⟶S′) →
-      P ⊕ μ · Q   →⟨ sum-left P⟶S′ ⟩■
-        ⇒̂[ μ′ ]′
-      S′          ■
+      P ⊕ μ · Q  →⟨ sum-left P⟶S′ ⟩■
+        ↝[ μ′ ]
+      S′         ■
 
     (sum-right action) →
       P ⊕ μ · Q  →⟨ sum-right action ⟩■
-        ⇒̂[ μ ]′
+        ↝[ μ ]
       force Q    ∼⟨ Q≳Q′ ⟩■
       force Q′
 
@@ -234,22 +247,26 @@ module Cong-lemmas
     ∀ {μ₁ μ₂ P₁ P₁′ P₂ P₂′ S′ μ} →
     R′ (force P₁) (force P₁′) → R′ (force P₂) (force P₂′) →
     μ₁ · P₁′ ⊕ μ₂ · P₂′ [ μ ]⟶ S′ →
-    ∃ λ S → μ₁ · P₁ ⊕ μ₂ · P₂ [ μ ]⇒̂ S × R′ S S′
+    ∃ λ S → ((μ₁ · P₁ ⊕ μ₂ · P₂) [ μ ]↝ S) × R′ S S′
   ·⊕·-cong {μ₁} {μ₂} {P₁} {P₁′} {P₂} {P₂′} P₁≳P₁′ P₂≳P₂′ = λ where
     (sum-left action) →
       μ₁ · P₁ ⊕ μ₂ · P₂  →⟨ sum-left action ⟩■
-        ⇒̂[ μ₁ ]′
+        ↝[ μ₁ ]
       force P₁           ∼⟨ P₁≳P₁′ ⟩■
       force P₁′
 
     (sum-right action) →
       μ₁ · P₁ ⊕ μ₂ · P₂  →⟨ sum-right action ⟩■
-        ⇒̂[ μ₂ ]′
+        ↝[ μ₂ ]
       force P₂           ∼⟨ P₂≳P₂′ ⟩■
       force P₂′
 
 private
-  module CL {i} = Cong-lemmas [ i ]_≳′_ right-to-left
+  module CL {i} =
+    Cong-lemmas
+      [ i ]_≳′_ right-to-left id id
+      map-[]⇒ map-[]⇒′ (λ f g _ _ _ → zip-[]⇒ f g)
+      (λ hyp P⇒Q → _ , hyp P⇒Q , reflexive)
 
 mutual
 
@@ -438,7 +455,7 @@ mutual
         action →
           τ ∙ (a ∙)      →⟨ ⟶: action ⟩
           a ∙            →⟨ ⟶: action ⟩■
-            ⇒̂[ name a ]
+            ⇒[ name a ]
           ∅              ■)
     ⟩
 

@@ -22,9 +22,34 @@ open import Labelled-transition-system.CCS Name
 import Bisimilarity.Coinductive CCS as S
 open import Bisimilarity.Weak.Coinductive.Other CCS
 open import Expansion CCS using (_≳_)
+import Labelled-transition-system.Equational-reasoning-instances CCS
+
+-- An instantiation of a module with helper lemmas.
 
 private
-  module CL {i} = E.Cong-lemmas [ i ]_≈′_ right-to-left
+  module CL {i} =
+    E.Cong-lemmas
+      [ i ]_≈′_ right-to-left (⇒̂→[]⇒ (λ ())) ⇒→⇒̂
+      map-⇒̂ map-⇒̂′ zip-⇒̂
+      (λ hyp {P Q} → λ where
+
+        (silent s done) →
+            _
+          , (! P      →⟨ silent s done ⟩■)
+          , (! P      ∼⟨ symmetric SE.6-1-2 ⟩
+             ! P ∣ P  ∼≡⟨ refl ⟩■
+             ! P ∣ Q)
+
+        (silent s (step {q = R} s′ P⟶R R⇒Q)) →
+            _
+          , (! P      →⟨ ⟶→⇒ s′ (replication (par-right P⟶R)) ⟩
+             ! P ∣ R  →⟨ silent s (map-⇒ par-right R⇒Q) ⟩■)
+          , (! P ∣ Q  ■)
+
+        (non-silent ¬s P⇒Q) →
+            _
+          , (! P  →⟨ non-silent ¬s (hyp P⇒Q) ⟩■)
+          , (! P ∣ Q  ■))
 
 mutual
 

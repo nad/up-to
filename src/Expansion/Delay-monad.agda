@@ -31,14 +31,14 @@ open import Expansion delay-monad
 later-cong : ∀ {i x y} →
              [ i ] force x ≳′ force y → [ i ] later x ≳ later y
 later-cong x≳′y =
-  ⟨ (λ { later → _ , ⟶→⟶̂ later , x≳′y })
-  , (λ { later → _ , ⟶→⇒̂ later , x≳′y })
+  ⟨ (λ { later → _ , ⟶→⟶̂   later , x≳′y })
+  , (λ { later → _ , ⟶→[]⇒ later , x≳′y })
   ⟩
 
 laterˡ : ∀ {i x y} → [ i ] force x ≳ y → [ i ] later x ≳ y
 laterˡ x≳y =
   ⟨ (λ { later → _ , done _ , convert {a = a} x≳y })
-  , Σ-map id (Σ-map later⇒̂ id) ∘ right-to-left x≳y
+  , Σ-map id (Σ-map later[]⇒ id) ∘ right-to-left x≳y
   ⟩
 
 -- The direct definition of expansion is contained in the one
@@ -88,27 +88,17 @@ indirect→direct {i} (now x) y =
 
 indirect→direct {i} x (now y) =
   [ i ] x ≳ now y                                  ↝⟨ (λ p → right-to-left p now) ⟩
-  (∃ λ x′ → x [ just y ]⇒̂ x′ × [ i ] x′ ≳′ now y)  ↝⟨ [just]⇒̂→≳now ∘ proj₁ ∘ proj₂ ⟩□
+  (∃ λ x′ → x [ just y ]⇒ x′ × [ i ] x′ ≳′ now y)  ↝⟨ [just]⇒→≳now ∘ proj₁ ∘ proj₂ ⟩□
   D.[ i ] x ≳ now y                                □
 
-indirect→direct (later x) (later y) lx≳ly
-  with left-to-right lx≳ly later
-... | _ , step later , x≳′y  = D.later λ { .force →
-                                  indirect→direct _ _ (force x≳′y) }
-... | _ , done _     , x≳′ly with right-to-left lx≳ly later
-
-...   | _ , non-silent contradiction _ , _ =
-  ⊥-elim (contradiction _)
-
-...   | _ , silent _ done , lx≳′y =
-  D.later λ { .force →
-    D.laterˡʳ⁻¹
-      (indirect→direct _ _ (force lx≳′y))
-      (indirect→direct _ _ (force x≳′ly)) }
-
-...   | x′ , silent _ (step _ later x⇒x′) , x′≳′y =
-  D.later λ { .force →
-    indirect→direct′ x⇒x′ (force x′≳′y) }
+indirect→direct (later x) (later y) lx≳ly =
+  case left-to-right lx≳ly later of λ where
+    (_ , step later , x≳′y) → D.later λ { .force {j} →
+                                indirect→direct _ _
+                                  (force x≳′y {j = j}) }
+    (_ , done _     , x≳′ly) →
+      let x′ , lx⇒x′ , x′≳′y = right-to-left lx≳ly later
+      in lemma x≳′ly ([]⇒→⇒ _ lx⇒x′) x′≳′y
   where
   indirect→direct′ : ∀ {i x x′ y} →
                      x ⇒ x′ → [ i ] x′ ≳ y → D.[ i ] x ≳ y
@@ -116,6 +106,20 @@ indirect→direct (later x) (later y) lx≳ly
   indirect→direct′ (step _  later tr) p = D.laterˡ
                                             (indirect→direct′ tr p)
   indirect→direct′ (step () now   _)
+
+  lemma :
+    ∀ {i x x′} →
+    [ i ] force x ≳′ later y →
+    later x ⇒ x′ → [ i ] x′ ≳′ force y →
+    D.[ i ] later x ≳ later y
+  lemma x≳′ly done lx≳′y =
+    D.later λ { .force →
+      D.laterˡʳ⁻¹
+        (indirect→direct _ _ (force lx≳′y))
+        (indirect→direct _ _ (force x≳′ly)) }
+  lemma x≳′ly (step _ later x⇒x′) x′≳′y =
+    D.later λ { .force →
+      indirect→direct′ x⇒x′ (force x′≳′y) }
 
 -- The direct definition of the expansion relation is logically
 -- equivalent to the one obtained from the transition relation.

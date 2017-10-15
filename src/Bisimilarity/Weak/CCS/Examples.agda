@@ -238,12 +238,12 @@ mutual
   rl :
     ∀ {μ R′} →
     ⟨ν proj₁ a ⟩ (P ∣ Q) [ μ ]⟶ R′ →
-    ∃ λ R → ⟨ν proj₁ a ⟩ (name a ∙ P ∣ name (co a) ∙ Q) [ μ ]⇒̂ R ×
+    ∃ λ R → ⟨ν proj₁ a ⟩ (name a ∙ P ∣ name (co a) ∙ Q) [ μ ]⇒ R ×
             R ≳′ R′
   rl {μ} (restriction {P′ = R} a∉μ P∣Q⟶R) =
     ⟨ν proj₁ a ⟩ (name a ∙ P ∣ name (co a) ∙ Q)  →⟨ restriction _ (par-τ action action) ⟩
     ⟨ν proj₁ a ⟩ (P ∣ Q)                         →⟨ restriction a∉μ P∣Q⟶R ⟩■
-      E.⇒̂[ μ ]
+      E.⇒[ μ ]
     ⟨ν proj₁ a ⟩ R                               ■
 
 -- One interpretation of the second part of Exercise 6.5.8 is
