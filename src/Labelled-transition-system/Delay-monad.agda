@@ -137,8 +137,12 @@ never⟶̂→silent (step ne⟶) = never⟶→silent ne⟶
 [just]⟶̂→≡now (done ())
 [just]⟶̂→≡now (step x⟶z) = [just]⟶→≡now x⟶z
 
--- If force x can make a [ μ ]⇒̂-transition to y, then later x can
--- also make a [ μ ]⇒̂-transition to y.
+-- If force x can make a weak μ-transition (_[_]⇒_ or _[_]⇒̂_) to y,
+-- then later x can also make a weak μ-transition (of the same kind)
+-- to y.
+
+later[]⇒ : ∀ {μ x y} → force x [ μ ]⇒ y → later x [ μ ]⇒ y
+later[]⇒ = ⇒[]⇒-transitive (⟶→⇒ _ later)
 
 later⇒̂ : ∀ {μ x y} → force x [ μ ]⇒̂ y → later x [ μ ]⇒̂ y
 later⇒̂ = ⇒⇒̂-transitive (⟶→⇒ _ later)
