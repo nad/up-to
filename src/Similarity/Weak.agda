@@ -65,7 +65,7 @@ weak-is-weak :
   ∀ {p p′ q μ} →
   p ≼ q → p [ μ ]⇒̂ p′ →
   ∃ λ q′ → q [ μ ]⇒̂ q′ × p′ ≼ q′
-weak-is-weak = is-weak challenge (λ p≼′q → force p≼′q) ⇒̂→⇒ id
+weak-is-weak = is-weak⇒̂ challenge (λ p≼′q → force p≼′q) ⇒̂→⇒ id
 
 mutual
 

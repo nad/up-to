@@ -174,7 +174,7 @@ converse-of-expansion-is-weak :
   p ≲ q → p [ μ ]⇒̂ p′ →
   ∃ λ q′ → q [ μ ]⇒̂ q′ × p′ ≲ q′
 converse-of-expansion-is-weak =
-  is-weak StepC.right-to-left (λ p≲′q → force p≲′q) ⇒̂→⇒ id
+  is-weak⇒̂ StepC.right-to-left (λ p≲′q → force p≲′q) ⇒̂→⇒ id
 
 mutual
 

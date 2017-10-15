@@ -113,8 +113,8 @@ strong-is-weak :
   p ∼ q → p [ μ ]⇒̂ p′ →
   ∃ λ q′ → q [ μ ]⇒̂ q′ × p′ ∼ q′
 strong-is-weak =
-  is-weak StepC.left-to-right (λ p∼′q → force p∼′q)
-          (λ s tr → step s tr done) ⟶→⇒̂
+  is-weak⇒̂ StepC.left-to-right (λ p∼′q → force p∼′q)
+           (λ s tr → step s tr done) ⟶→⇒̂
 
 mutual
 

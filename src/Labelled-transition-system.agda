@@ -186,43 +186,52 @@ record LTS ℓ : Set (lsuc ℓ) where
   ⟶̂→⇒ : ∀ {p q μ} → Silent μ → p [ μ ]⟶̂ q → p ⇒ q
   ⟶̂→⇒ s = ⇒̂→⇒ s ∘ ⟶̂→⇒̂
 
-  -- A lemma that can be used to show that some relation is a weak
-  -- simulation (of a certain kind).
+  -- Lemmas that can be used to show that relations are weak
+  -- simulations of various kinds.
 
-  is-weak :
-    ∀ {ℓ} {_%_ _%′_ : Proc → Proc → Set ℓ}
-      {_[_]%_ : Proc → Label → Proc → Set ℓ} →
-    (∀ {p q} → p % q → ∀ {p′ μ} →
-     p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]% q′ × p′ %′ q′) →
-    (∀ {p q} → p %′ q → p % q) →
-    (∀ {p p′ μ} → Silent μ → p [ μ ]% p′ → p ⇒ p′) →
-    (∀ {p p′ μ} → p [ μ ]% p′ → p [ μ ]⇒̂ p′) →
-    ∀ {p p′ q μ} →
-    p % q → p [ μ ]⇒̂ p′ →
-    ∃ λ q′ → q [ μ ]⇒̂ q′ × (p′ % q′)
-  is-weak {_%_ = _%_} left-to-right %′⇒% %⇒⇒ %⇒⇒̂ = lr⇒̂
+  module _
+    {ℓ}
+    {_%_ _%′_ : Proc → Proc → Set ℓ}
+    {_[_]%_ : Proc → Label → Proc → Set ℓ}
+    (left-to-right :
+       ∀ {p q} → p % q → ∀ {p′ μ} →
+       p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]% q′ × p′ %′ q′)
+    (%′⇒% : ∀ {p q} → p %′ q → p % q)
+    (%⇒⇒ : ∀ {p p′ μ} → Silent μ → p [ μ ]% p′ → p ⇒ p′)
     where
-    lr⇒ : ∀ {q q′ r} →
-          q % r → q ⇒ q′ →
-          ∃ λ r′ → r ⇒ r′ × (q′ % r′)
-    lr⇒ q%r done                = _ , done , q%r
-    lr⇒ q%r (step s q⟶q′ q′⇒q″) =
-      let r′ , r%r′  , q′%′r′ = left-to-right q%r q⟶q′
-          r″ , r′⇒r″ , q″%r″  = lr⇒ (%′⇒% q′%′r′) q′⇒q″
-      in r″ , ⇒-transitive (%⇒⇒ s r%r′) r′⇒r″ , q″%r″
 
-    lr⇒̂ : ∀ {p p′ q μ} →
-          p % q → p [ μ ]⇒̂ p′ →
-          ∃ λ q′ → q [ μ ]⇒̂ q′ × (p′ % q′)
-    lr⇒̂ q%r (silent s q⇒q′) =
-      let r′ , r⇒r′ , q′%r′ = lr⇒ q%r q⇒q′
-      in r′ , silent s r⇒r′ , q′%r′
-    lr⇒̂ q%r (non-silent ¬s (steps q⇒q′ q′⟶q″ q″⇒q‴)) =
-      let r′ , r⇒r′  , r′%q′  = lr⇒ q%r q⇒q′
-          r″ , r′%r″ , r″%′q″ = left-to-right r′%q′ q′⟶q″
-          r‴ , r″⇒r‴ , r‴%q‴  = lr⇒ (%′⇒% r″%′q″) q″⇒q‴
-      in r‴ , ⇒⇒̂-transitive r⇒r′ (⇒̂⇒-transitive (%⇒⇒̂ r′%r″) r″⇒r‴)
-            , r‴%q‴
+    is-weak⇒ :
+      ∀ {p p′ q} →
+      p % q → p ⇒ p′ →
+      ∃ λ q′ → q ⇒ q′ × (p′ % q′)
+    is-weak⇒ p%q done                = _ , done , p%q
+    is-weak⇒ p%q (step s p⟶p′ p′⇒p″) =
+      let q′ , q%q′  , p′%′q′ = left-to-right p%q p⟶p′
+          q″ , q′⇒q″ , p″%q″  = is-weak⇒ (%′⇒% p′%′q′) p′⇒p″
+      in q″ , ⇒-transitive (%⇒⇒ s q%q′) q′⇒q″ , p″%q″
+
+    is-weak[]⇒ :
+      ∀ {p p′ q μ} →
+      (∀ {p p′} → p [ μ ]% p′ → p [ μ ]⇒ p′) →
+      p % q → p [ μ ]⇒ p′ →
+      ∃ λ q′ → q [ μ ]⇒ q′ × (p′ % q′)
+    is-weak[]⇒ %⇒[]⇒ p%q (steps p⇒p′ p′⟶p″ p″⇒p‴) =
+      let q′ , q⇒q′  , p′%q′  = is-weak⇒ p%q p⇒p′
+          q″ , q′%q″ , p″%′q″ = left-to-right p′%q′ p′⟶p″
+          q‴ , q″⇒q‴ , p‴%q‴  = is-weak⇒ (%′⇒% p″%′q″) p″⇒p‴
+      in q‴
+       , ⇒[]⇒-transitive q⇒q′ ([]⇒⇒-transitive (%⇒[]⇒ q′%q″) q″⇒q‴)
+       , p‴%q‴
+
+    is-weak⇒̂ :
+      ∀ {p p′ q μ} →
+      (∀ {p p′} → p [ μ ]% p′ → p [ μ ]⇒̂ p′) →
+      p % q → p [ μ ]⇒̂ p′ →
+      ∃ λ q′ → q [ μ ]⇒̂ q′ × (p′ % q′)
+    is-weak⇒̂ _ q%r (silent s q⇒q′) =
+      Σ-map id (Σ-map (silent s) id) (is-weak⇒ q%r q⇒q′)
+    is-weak⇒̂ %⇒⇒̂ q%r (non-silent ¬s q⇒q′) =
+      Σ-map id (Σ-map ⇒→⇒̂ id) (is-weak[]⇒ (⇒̂→[]⇒ ¬s ∘ %⇒⇒̂) q%r q⇒q′)
 
   -- If no action is silent, then _[_]⇒_ is pointwise isomorphic to
   -- _[_]⟶_.
