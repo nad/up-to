@@ -373,6 +373,13 @@ companion-monotone = Up-to.companion-monotone
 small-compatible⇔⊆large =
   Up-to.companion-compatible⇔companion⊆companion₁
 
+-- The small companion is compatible if certain assumptions (including
+-- a strong version of excluded middle) are satisfied. However, at the
+-- time of writing I don't know if these assumptions are consistent
+-- with the variant of Agda that is used in this development.
+
+companion-compatible = Up-to.companion-compatible
+
 -- The identity function is below the companion.
 
 id-below = Up-to.id-below

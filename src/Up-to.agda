@@ -14,6 +14,7 @@ module Up-to {ℓ} {I : Set ℓ} (C : Container I I) where
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
+import Size
 
 open import Bijection equality-with-J using (_↔_)
 open import Function-universe equality-with-J as F hiding (id; _∘_)
@@ -650,3 +651,104 @@ companion-compatible⇔companion⊆companion₁ = record
         ⟦ C ⟧ (Companion R)        ∎) }) ⟩∎
 
     ⟦ C ⟧ (Companion R)      ∎
+
+-- Assumptions used by companion-compatible below.
+
+record Companion-compatible-assumptions : Set (lsuc ℓ) where
+  field
+    excluded-middle : (P : Set ℓ) → Dec P
+
+  _<_ : Size → Size → Set
+  i < j = Σ (Size< j) λ { k → i ≡ k }
+
+  _≤_ : Size → Size → Set
+  i ≤ j = ∃ λ (k : Size< ssuc j) → i ≡ k
+
+  field
+    total : ∀ i j → i < j ⊎ j ≤ i
+
+    is-successor :
+      {R : Rel ℓ I} →
+      let P = λ i → R ⊆ ν C i in
+      ∀ i →
+      ((j : Size< i) → P j) →
+      ¬ P i →
+      ∃ λ i′ → i ≡ ssuc i′
+
+  -- A corollary of (one of) the assumptions above.
+
+  ¬∀→∃¬ : {A : Set} {P : A → Set ℓ} →
+          ¬ (∀ x → P x) → ∃ λ x → ¬ P x
+  ¬∀→∃¬ {P = P} ¬∀ = case excluded-middle (∃ λ x → ¬ P x) of λ where
+    (inj₁ ∃¬P)  → ∃¬P
+    (inj₂ ¬∃¬P) → ⊥-elim (¬∀ λ x → case excluded-middle (P x) of λ where
+      (inj₁ Px)  → Px
+      (inj₂ ¬Px) → ⊥-elim (¬∃¬P (x , ¬Px)))
+
+-- Given certain assumptions one can prove that the companion is
+-- compatible. However, I don't know if these assumptions are
+-- consistent with the variant of Agda that is used in this
+-- development.
+--
+-- This proof is based on that of Theorem 2.14 in Parrow and Weber's
+-- "The Largest Respectful Function".
+
+companion-compatible :
+  Companion-compatible-assumptions → Compatible Companion
+companion-compatible assumptions {R} {x} Comp-CR =
+  case lemma₁ R of λ where
+    (inj₁ R⊆νC) →
+                             $⟨ (λ {i} → Comp-CR {i}) ⟩
+      Companion (⟦ C ⟧ R) x  ↝⟨ _$ map C (λ Rx → λ { .force → R⊆νC Rx }) ⟩
+      ν C ∞ x                ↝⟨ map C (λ ν′C∞x {_} _ → force ν′C∞x) ⟩
+      ⟦ C ⟧ (Companion R) x  □
+
+    (inj₂ (i , R⊈νC[1+i] , ≤i→R⊆νC)) →
+                               $⟨ (λ {_} →
+        ⟦ C ⟧ R                   ⊆⟨ map C (≤i→R⊆νC i) ⟩
+        ⟦ C ⟧ (ν C i)             ⊆⟨ map C (λ x → λ { .force → x }) ⟩∎
+        ν C (ssuc i)              ∎) ⟩
+
+      ⟦ C ⟧ R ⊆ ν C (ssuc i)   ↝⟨ Comp-CR ⟩
+      ν C (ssuc i) x           ↔⟨⟩
+      ⟦ C ⟧ (ν′ C (ssuc i)) x  ↝⟨ map C (λ x → force x) ⟩
+      ⟦ C ⟧ (ν C i) x          ↝⟨ map C (λ νCiy {_} R⊆νCj → lemma₂ R⊈νC[1+i] (λ {_} → R⊆νCj {_}) νCiy) ⟩□
+      ⟦ C ⟧ (Companion R) x    □
+
+  where
+  open Companion-compatible-assumptions assumptions
+
+  lemma₁ :
+    ∀ R → (∀ {i} → R ⊆ ν C i)
+            ⊎
+          ∃ λ i → ¬ R ⊆ ν C (ssuc i) ×
+                  ((j : Size< ssuc i) → R ⊆ ν C j)
+  lemma₁ R =
+    case excluded-middle _ of λ where
+      (inj₁ hyp) → inj₁ hyp
+      (inj₂ ¬∀)  → inj₂ (
+                                                                         $⟨ ¬∀ ⟩
+        ¬ (∀ {i} → R ⊆ ν C i)                                            ↝⟨ (λ hyp → ¬∀→∃¬ {P = λ _ → _ ⊆ _} (λ ∀iR⊆νCi → hyp λ {i} → ∀iR⊆νCi i)) ⟩
+        (∃ λ i → ¬ R ⊆ ν C i)                                            ↝⟨ uncurry $
+                                                                              Size.elim (λ i → ¬ R ⊆ ν C i → _)
+                                                                              (λ i ind-hyp R⊈νCi → case excluded-middle _ of λ where
+                                                                                   (inj₁ ∀<R⊆νC)  → i , R⊈νCi , ∀<R⊆νC
+                                                                                   (inj₂ ¬∀<R⊆νC) → let j , R⊈νCj = ¬∀→∃¬ ¬∀<R⊆νC
+                                                                                                    in ind-hyp (Size.boxed j) R⊈νCj) ⟩
+        (∃ λ i → ¬ R ⊆ ν C i × ((j : Size< i) → R ⊆ ν C j))              ↝⟨ (λ { (i , R⊈νCi , <→R⊆νC) →
+                                                                                 let i′ , eq = is-successor i <→R⊆νC R⊈νCi
+                                                                                 in i′ , subst (λ i → ¬ R ⊆ ν C i)               eq R⊈νCi
+                                                                                       , subst (λ i → (j : Size< i) → R ⊆ ν C j) eq <→R⊆νC
+                                                                                    }) ⟩□
+        (∃ λ i → ¬ R ⊆ ν C (ssuc i) × ((j : Size< ssuc i) → R ⊆ ν C j))  □)
+
+  lemma₂ : ∀ {i j R} →
+           ¬ R ⊆ ν C (ssuc i) → R ⊆ ν C j →
+           ν C i ⊆ ν C j
+  lemma₂ {i} {j} R⊈νC[1+i] R⊆νCj {x} νCix =
+    case total i j of λ where
+      (inj₁ (i , refl)) → ⊥-elim (R⊈νC[1+i] R⊆νCj)
+      (inj₂ (j , refl)) → cast j νCix
+    where
+    cast : ∀ {i} (j : Size< ssuc i) → ν C i ⊆ ν C j
+    cast _ x = x
