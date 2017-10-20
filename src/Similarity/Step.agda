@@ -82,7 +82,7 @@ StepC =
     ◁
   (λ { {o = p , q} (_ , lr) (p′ , q′) →
        ∃ λ μ → ∃ λ (p⟶p′ : p [ μ ]⟶ p′) → proj₁ (lr p⟶p′) ≡ q′
-       })
+     })
 
 -- The definition of Step in terms of a container is pointwise
 -- logically equivalent to the direct definition, and in the presence
