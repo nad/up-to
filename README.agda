@@ -83,7 +83,7 @@ import Labelled-transition-system.6-2-5
 -- Similarity
 
 -- The one-sided Step function, used to define similarity and the
--- two-sided step function.
+-- two-sided Step function.
 
 import Similarity.Step
 

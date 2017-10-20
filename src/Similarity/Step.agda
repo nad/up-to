@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------
 -- The one-sided Step function, used to define similarity and the
--- two-sided step function
+-- two-sided Step function
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K --safe #-}
