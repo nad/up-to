@@ -144,9 +144,9 @@ mutual
     lr : ∀ {p p′ q μ} →
          [ i ] p ∼ q → p [ μ ]⟶ p′ →
          ∃ λ q′ → q [ μ ]⟶̂ q′ × [ i ] p′ ≳′ q′
-    lr p∼q q⟶q′ =
-      let p′ , p⟶p′ , p′∼′q′ = SB.left-to-right p∼q q⟶q′
-      in p′ , step p⟶p′ , ∼⇒≳′ p′∼′q′
+    lr p∼q p⟶p′ =
+      let q′ , q⟶q′ , p′∼′q′ = SB.left-to-right p∼q p⟶p′
+      in q′ , step q⟶q′ , ∼⇒≳′ p′∼′q′
 
     rl : ∀ {p q q′ μ} →
          [ i ] p ∼ q → q [ μ ]⟶ q′ →
