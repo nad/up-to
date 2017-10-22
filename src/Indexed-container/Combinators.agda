@@ -92,10 +92,10 @@ const X = X ◁ λ _ _ → ⊥
 
 -- An unfolding lemma for ⟦ const ⟧.
 
-⟦const⟧↔ : ∀ {k ℓ y} {I : Set ℓ} {X} {Y : Rel y I} {i} →
+⟦const⟧↔ : ∀ {k ℓ y} {I : Set ℓ} X {Y : Rel y I} {i} →
            Extensionality? k ℓ (ℓ ⊔ y) →
            ⟦ const X ⟧ Y i ↝[ k ] X i
-⟦const⟧↔ {k} {ℓ} {I = I} {X} {Y} {i} ext =
+⟦const⟧↔ {k} {ℓ} {I = I} X {Y} {i} ext =
   X i × (∀ {i} → ⊥ → Y i)  ↔⟨ ∃-cong (λ _ → Bijection.implicit-Π↔Π) ⟩
   X i × (∀ i → ⊥ → Y i)    ↝⟨ ∃-cong (λ _ → ∀-cong ext λ _ → Π⊥↔⊤ (lower-extensionality? k lzero ℓ ext)) ⟩
   X i × (I → ⊤)            ↔⟨ drop-⊤-right (λ _ → →-right-zero) ⟩
