@@ -93,8 +93,6 @@ unfold = Indexed-container.unfold
 -- Section 4
 
 -- Labelled transition systems.
---
--- (The label silent is called is-silent.)
 
 LTS = Labelled-transition-system.LTS
 
@@ -174,7 +172,7 @@ transitive = Bisimilarity.Coinductive.transitive-∼
 Name-with-kind      = Labelled-transition-system.CCS.Name-with-kind
 co                  = Labelled-transition-system.CCS.co
 Action              = Labelled-transition-system.CCS.Action
-silent              = Labelled-transition-system.CCS.is-silent
+is-silent           = Labelled-transition-system.CCS.is-silent
 Proc                = Labelled-transition-system.CCS.Proc
 Proc′               = Labelled-transition-system.CCS.Proc′
 transition-relation = Labelled-transition-system.CCS._[_]⟶_
