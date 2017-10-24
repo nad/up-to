@@ -456,6 +456,20 @@ context-[] (μ · P)    = refl · λ { .force → context-[] (force P) }
 context-[] (⟨ν a ⟩ P) = ⟨ν refl ⟩ (context-[] P)
 context-[] (! P)      = ! (context-[] P)
 
+-- The contexts constructed by the context function are always
+-- non-degenerate.
+
+context-non-degenerate :
+  ∀ {i n} (P : Proc ∞) → Non-degenerate i (context {n = n} P)
+context-non-degenerate ∅          = ∅
+context-non-degenerate (P₁ ∣ P₂)  = context-non-degenerate P₁ ∣
+                                    context-non-degenerate P₂
+context-non-degenerate (P₁ ⊕ P₂)  = process P₁ ⊕ process P₂
+context-non-degenerate (μ · P)    = action λ { .force →
+                                      context-non-degenerate (force P) }
+context-non-degenerate (⟨ν a ⟩ P) = ⟨ν⟩ (context-non-degenerate P)
+context-non-degenerate (! P)      = ! context-non-degenerate P
+
 mutual
 
   -- A relation expressing that a certain process matches a certain
