@@ -66,7 +66,7 @@ mutual
          p ∼ q → p [ μ ]⇒̂ p′ →
          ∃ λ q′ → q [ μ ]⇒̂ q′ × [ i ] p′ ≈′ q′
     lr p∼q p⇒̂p′ =
-      Σ-map id (Σ-map id ∼⇒≈′) (SB.strong-is-weak p∼q p⇒̂p′)
+      Σ-map id (Σ-map id ∼⇒≈′) (SB.strong-is-weak⇒̂ p∼q p⇒̂p′)
 
   ∼⇒≈′ : ∀ {i p q} → p ∼ q → [ i ] p ≈′ q
   force (∼⇒≈′ p∼q) = ∼⇒≈ p∼q

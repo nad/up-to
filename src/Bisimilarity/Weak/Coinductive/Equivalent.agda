@@ -59,7 +59,7 @@ mutual
          p CWO.≈ q → p [ μ ]⇒̂ p′ →
          ∃ λ q′ → q [ μ ]⇒̂ q′ × CW.[ i ] p′ ≈′ q′
     lr p≈q p⇒̂p′ =
-      Σ-map id (Σ-map id cwo⇒cw′) (CWO.weak-is-weak p≈q p⇒̂p′)
+      Σ-map id (Σ-map id cwo⇒cw′) (CWO.weak-is-weak⇒̂ p≈q p⇒̂p′)
 
   cwo⇒cw′ : ∀ {i p q} → p CWO.≈ q → CW.[ i ] p ≈′ q
   CW.force (cwo⇒cw′ p≈q) = cwo⇒cw p≈q

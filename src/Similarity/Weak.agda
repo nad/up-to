@@ -61,11 +61,11 @@ mutual
 
 -- Weak similarity is a weak simulation (of a certain kind).
 
-weak-is-weak :
+weak-is-weak⇒̂ :
   ∀ {p p′ q μ} →
   p ≼ q → p [ μ ]⇒̂ p′ →
   ∃ λ q′ → q [ μ ]⇒̂ q′ × p′ ≼ q′
-weak-is-weak = is-weak⇒̂ challenge (λ p≼′q → force p≼′q) ⇒̂→⇒ id
+weak-is-weak⇒̂ = is-weak⇒̂ challenge (λ p≼′q → force p≼′q) ⇒̂→⇒ id
 
 mutual
 
@@ -79,7 +79,7 @@ mutual
   transitive-≼ p≼q q≼r =
     ⟨ (λ p⟶p′ →
          let q′ , q⇒̂q′ , p′≼q′ = challenge p≼q p⟶p′
-             r′ , r⇒̂r′ , q′≼r′ = weak-is-weak q≼r q⇒̂q′
+             r′ , r⇒̂r′ , q′≼r′ = weak-is-weak⇒̂ q≼r q⇒̂q′
          in r′ , r⇒̂r′ , transitive-≼′ p′≼q′ q′≼r′)
     ⟩
 

@@ -108,11 +108,11 @@ syntax lr-result-with-action    p′∼q′ μ q q⟶q′ = p′∼q′ [ μ ]�
 
 -- Strong bisimilarity is a weak simulation (of a certain kind).
 
-strong-is-weak :
+strong-is-weak⇒̂ :
   ∀ {p p′ q μ} →
   p ∼ q → p [ μ ]⇒̂ p′ →
   ∃ λ q′ → q [ μ ]⇒̂ q′ × p′ ∼ q′
-strong-is-weak =
+strong-is-weak⇒̂ =
   is-weak⇒̂ StepC.left-to-right (λ p∼′q → force p∼′q)
            (λ s tr → step s tr done) ⟶→⇒̂
 

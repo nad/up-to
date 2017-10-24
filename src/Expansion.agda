@@ -160,11 +160,11 @@ mutual
 
 -- Expansion is a weak simulation (of a certain kind).
 
-expansion-is-weak :
+expansion-is-weak⇒̂ :
   ∀ {p p′ q μ} →
   p ≳ q → p [ μ ]⇒̂ p′ →
   ∃ λ q′ → q [ μ ]⇒̂ q′ × p′ ≳ q′
-expansion-is-weak =
+expansion-is-weak⇒̂ =
   is-weak⇒̂ StepC.left-to-right (λ p≳′q → force p≳′q) ⟶̂→⇒ ⟶̂→⇒̂
 
 -- The converse of expansion is a weak simulation (of a certain kind).

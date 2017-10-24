@@ -144,13 +144,22 @@ mutual
 ∼⇒≈′ : ∀ {i p q} → [ i ] p ∼′ q → [ i ] p ≈′ q
 ∼⇒≈′ = ≳⇒≈′ ∘ convert {a = ℓ}
 
--- Weak bisimilarity is a weak simulation (of a certain kind).
+-- Weak bisimilarity is a weak simulation (of one kind).
 
-weak-is-weak :
+weak-is-weak⇒ :
+  ∀ {p p′ q} →
+  p ≈ q → p ⇒ p′ →
+  ∃ λ q′ → q ⇒ q′ × p′ ≈ q′
+weak-is-weak⇒ = is-weak⇒ StepC.left-to-right (λ p≈′q → force p≈′q) ⇒̂→⇒
+
+-- Weak bisimilarity is a weak simulation (of another kind).
+
+weak-is-weak⇒̂ :
   ∀ {p p′ q μ} →
   p ≈ q → p [ μ ]⇒̂ p′ →
   ∃ λ q′ → q [ μ ]⇒̂ q′ × p′ ≈ q′
-weak-is-weak = is-weak⇒̂ StepC.left-to-right (λ p≈′q → force p≈′q) ⇒̂→⇒ id
+weak-is-weak⇒̂ =
+  is-weak⇒̂ StepC.left-to-right (λ p≈′q → force p≈′q) ⇒̂→⇒ id
 
 mutual
 
@@ -187,7 +196,7 @@ mutual
          ∃ λ r′ → r [ μ ]⇒̂ r′ × [ i ] p′ ≈′ r′
     lr p≈q q≈r p⟶p′ =
       let q′ , q⇒̂q′ , p′≈′q′ = StepC.left-to-right p≈q p⟶p′
-          r′ , r⇒̂r′ , q′≈r′  = weak-is-weak q≈r q⇒̂q′
+          r′ , r⇒̂r′ , q′≈r′  = weak-is-weak⇒̂ q≈r q⇒̂q′
       in r′ , r⇒̂r′ , transitive-≈′ p′≈′q′ q′≈r′
 
   transitive-≈′ : ∀ {i p q r} → p ≈′ q → q ≈ r → [ i ] p ≈′ r
