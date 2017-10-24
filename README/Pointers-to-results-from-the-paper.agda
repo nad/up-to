@@ -355,7 +355,7 @@ Companion₁ = Up-to.Companion₁
 
 -- Monotone and compatible transformers are size-preserving.
 
-compatible⇒size‐preserving = Up-to.monotone→compatible→size-preserving
+compatible⇒size-preserving = Up-to.monotone→compatible→size-preserving
 
 -- The large companion is below the small one.
 
