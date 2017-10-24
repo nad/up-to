@@ -236,7 +236,7 @@ Proc-extensionality : Set ℓ
 Proc-extensionality = ∀ {P Q} → Equal ∞ P Q → P ≡ Q
 
 ------------------------------------------------------------------------
--- A bunch of simple lemmas
+-- Some lemmas
 
 -- The co function is involutive.
 
@@ -364,31 +364,6 @@ names-are-not-inverted {a} {P} {Q} =
                             , inj₂ (refl , refl)
 ·⊕·-co (sum-right action)
        (sum-right tr)     = ⊥-elim (names-are-not-inverted tr)
-
--- Lemma 6.2.15 from "Enhancements of the bisimulation proof method".
--- That text claims that the lemma is proved by induction on the
--- structure of the context. Perhaps that is possible, but the proof
--- below uses induction on the structure of the transition relation,
--- and in the replication case's recursive call the context is not
--- structurally smaller.
-
-6-2-15 :
-  ∀ {n Ps μ P}
-  (C : Context ∞ n) → Weakly-guarded C →
-  C [ Ps ] [ μ ]⟶ P →
-  ∃ λ (C′ : Context ∞ n) →
-    P ≡ C′ [ Ps ] × ∀ Qs → C [ Qs ] [ μ ]⟶ C′ [ Qs ]
-6-2-15 ∅          ∅         ()
-6-2-15 (C₁ ∣ C₂)  (w₁ ∣ w₂) (par-left  tr)       = Σ-map (_∣ C₂) (Σ-map (cong (_∣ _)) (par-left  ∘_)) (6-2-15 C₁ w₁ tr)
-6-2-15 (C₁ ∣ C₂)  (w₁ ∣ w₂) (par-right tr)       = Σ-map (C₁ ∣_) (Σ-map (cong (_ ∣_)) (par-right ∘_)) (6-2-15 C₂ w₂ tr)
-6-2-15 (C₁ ∣ C₂)  (w₁ ∣ w₂) (par-τ tr₁ tr₂)      = Σ-zip _∣_ (Σ-zip (cong₂ _)
-                                                                    (λ trs₁ trs₂ Qs → par-τ (trs₁ Qs) (trs₂ Qs)))
-                                                     (6-2-15 C₁ w₁ tr₁) (6-2-15 C₂ w₂ tr₂)
-6-2-15 (C₁ ⊕ C₂)  (w₁ ⊕ w₂) (sum-left  tr)       = Σ-map id (Σ-map id (sum-left  ∘_)) (6-2-15 C₁ w₁ tr)
-6-2-15 (C₁ ⊕ C₂)  (w₁ ⊕ w₂) (sum-right tr)       = Σ-map id (Σ-map id (sum-right ∘_)) (6-2-15 C₂ w₂ tr)
-6-2-15 (μ · C)    action    action               = force C , refl , λ _ → action
-6-2-15 (⟨ν a ⟩ C) (⟨ν⟩ w)   (restriction a∉μ tr) = Σ-map ⟨ν a ⟩ (Σ-map (cong _) (restriction a∉μ ∘_)) (6-2-15 C w tr)
-6-2-15 (! C)      (! w)     (replication tr)     = Σ-map id (Σ-map id (replication ∘_)) (6-2-15 (! C ∣ C) (! w ∣ w) tr)
 
 -- Very strong bisimilarity is reflexive.
 
@@ -525,3 +500,72 @@ Matches-cong (refl · p)    (action q) = action λ { .force →
                                                        (force q) }
 Matches-cong (⟨ν refl ⟩ p) (⟨ν⟩ q)    = ⟨ν⟩ (Matches-cong p q)
 Matches-cong (! p)         (! q)      = ! Matches-cong p q
+
+-- Lemma 6.2.15 from "Enhancements of the bisimulation proof method".
+-- That text claims that the lemma is proved by induction on the
+-- structure of the context. Perhaps that is possible, but the proof
+-- below uses induction on the structure of the transition relation,
+-- and in the replication case's recursive call the context is not
+-- structurally smaller.
+
+6-2-15 :
+  ∀ {n Ps μ P}
+  (C : Context ∞ n) → Weakly-guarded C →
+  C [ Ps ] [ μ ]⟶ P →
+  ∃ λ (C′ : Context ∞ n) →
+    P ≡ C′ [ Ps ] × ∀ Qs → C [ Qs ] [ μ ]⟶ C′ [ Qs ]
+6-2-15 ∅          ∅         ()
+6-2-15 (C₁ ∣ C₂)  (w₁ ∣ w₂) (par-left  tr)       = Σ-map (_∣ C₂) (Σ-map (cong (_∣ _)) (par-left  ∘_)) (6-2-15 C₁ w₁ tr)
+6-2-15 (C₁ ∣ C₂)  (w₁ ∣ w₂) (par-right tr)       = Σ-map (C₁ ∣_) (Σ-map (cong (_ ∣_)) (par-right ∘_)) (6-2-15 C₂ w₂ tr)
+6-2-15 (C₁ ∣ C₂)  (w₁ ∣ w₂) (par-τ tr₁ tr₂)      = Σ-zip _∣_ (Σ-zip (cong₂ _)
+                                                                    (λ trs₁ trs₂ Qs → par-τ (trs₁ Qs) (trs₂ Qs)))
+                                                     (6-2-15 C₁ w₁ tr₁) (6-2-15 C₂ w₂ tr₂)
+6-2-15 (C₁ ⊕ C₂)  (w₁ ⊕ w₂) (sum-left  tr)       = Σ-map id (Σ-map id (sum-left  ∘_)) (6-2-15 C₁ w₁ tr)
+6-2-15 (C₁ ⊕ C₂)  (w₁ ⊕ w₂) (sum-right tr)       = Σ-map id (Σ-map id (sum-right ∘_)) (6-2-15 C₂ w₂ tr)
+6-2-15 (μ · C)    action    action               = force C , refl , λ _ → action
+6-2-15 (⟨ν a ⟩ C) (⟨ν⟩ w)   (restriction a∉μ tr) = Σ-map ⟨ν a ⟩ (Σ-map (cong _) (restriction a∉μ ∘_)) (6-2-15 C w tr)
+6-2-15 (! C)      (! w)     (replication tr)     = Σ-map id (Σ-map id (replication ∘_)) (6-2-15 (! C ∣ C) (! w ∣ w) tr)
+
+-- A variant of the previous lemma.
+
+6-2-15-nd :
+  Proc-extensionality →
+  ∀ {n Ps μ P}
+  (C : Context ∞ n) → Weakly-guarded C → Non-degenerate ∞ C →
+  C [ Ps ] [ μ ]⟶ P →
+  ∃ λ (C′ : Context ∞ n) →
+    Non-degenerate ∞ C′ ×
+    P ≡ C′ [ Ps ] × ∀ Qs → C [ Qs ] [ μ ]⟶ C′ [ Qs ]
+6-2-15-nd ext ∅          ∅         ∅ ()
+6-2-15-nd ext (C₁ ∣ C₂)  (w₁ ∣ w₂) (n₁ ∣ n₂)         (par-left  tr)       = Σ-map (_∣ C₂) (Σ-map (_∣ n₂) (Σ-map (cong (_∣ _)) (par-left  ∘_)))
+                                                                              (6-2-15-nd ext C₁ w₁ n₁ tr)
+6-2-15-nd ext (C₁ ∣ C₂)  (w₁ ∣ w₂) (n₁ ∣ n₂)         (par-right tr)       = Σ-map (C₁ ∣_) (Σ-map (n₁ ∣_) (Σ-map (cong (_ ∣_)) (par-right ∘_)))
+                                                                              (6-2-15-nd ext C₂ w₂ n₂ tr)
+6-2-15-nd ext (C₁ ∣ C₂)  (w₁ ∣ w₂) (n₁ ∣ n₂)         (par-τ tr₁ tr₂)      = Σ-zip _∣_ (Σ-zip _∣_ (Σ-zip (cong₂ _) (λ trs₁ trs₂ Qs →
+                                                                                                                       par-τ (trs₁ Qs) (trs₂ Qs))))
+                                                                              (6-2-15-nd ext C₁ w₁ n₁ tr₁) (6-2-15-nd ext C₂ w₂ n₂ tr₂)
+6-2-15-nd ext (μ · C)    action    (action n)        action               = force C , force n , refl , λ _ → action
+6-2-15-nd ext (⟨ν a ⟩ C) (⟨ν⟩ w)   (⟨ν⟩ n)           (restriction a∉μ tr) = Σ-map ⟨ν a ⟩ (Σ-map ⟨ν⟩ (Σ-map (cong _) (restriction a∉μ ∘_)))
+                                                                              (6-2-15-nd ext C w n tr)
+6-2-15-nd ext (! C)      (! w)     (! n)             (replication tr)     = Σ-map id (Σ-map id (Σ-map id (replication ∘_)))
+                                                                              (6-2-15-nd ext (! C ∣ C) (! w ∣ w) (! n ∣ n) tr)
+6-2-15-nd ext (C₁ ⊕ C₂)  (w₁ ⊕ w₂) (action n₁  ⊕ n₂) (sum-left  tr)       = Σ-map id (Σ-map id (Σ-map id (sum-left ∘_)))
+                                                                              (6-2-15-nd ext (_ · _) action (action n₁) tr)
+6-2-15-nd ext {Ps = Ps} {P = P}
+              (C₁ ⊕ C₂)  (w₁ ⊕ w₂) (process P₁ ⊕ n₂) (sum-left  tr)       = context P , context-non-degenerate P , ext (context-[] P) , λ Qs →
+                                                                              subst (_ [ _ ]⟶_) (ext $ context-[] P) $
+                                                                              subst (λ P → P ⊕ _ [ _ ]⟶ _)
+                                                                                    (context P₁ [ Ps ]  ≡⟨ sym $ ext $ context-[] P₁ ⟩
+                                                                                     P₁                 ≡⟨ ext $ context-[] P₁ ⟩∎
+                                                                                     context P₁ [ Qs ]  ∎) $
+                                                                              sum-left tr
+6-2-15-nd ext (C₁ ⊕ C₂)  (w₁ ⊕ w₂) (n₁ ⊕ action n₂)  (sum-right tr)       = Σ-map id (Σ-map id (Σ-map id (sum-right ∘_)))
+                                                                              (6-2-15-nd ext (_ · _) action (action n₂) tr)
+6-2-15-nd ext {Ps = Ps} {P = P}
+              (C₁ ⊕ C₂)  (w₁ ⊕ w₂) (n₁ ⊕ process P₂) (sum-right tr)       = context P , context-non-degenerate P , ext (context-[] P) , λ Qs →
+                                                                              subst (_ [ _ ]⟶_) (ext $ context-[] P) $
+                                                                              subst (λ P → _ ⊕ P [ _ ]⟶ _)
+                                                                                    (context P₂ [ Ps ]  ≡⟨ sym $ ext $ context-[] P₂ ⟩
+                                                                                     P₂                 ≡⟨ ext $ context-[] P₂ ⟩∎
+                                                                                     context P₂ [ Qs ]  ∎) $
+                                                                              sum-right tr
