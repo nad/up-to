@@ -169,14 +169,14 @@ transitive = Bisimilarity.Coinductive.transitive-∼
 
 -- CCS.
 
-Name-with-kind      = Labelled-transition-system.CCS.Name-with-kind
-co                  = Labelled-transition-system.CCS.co
-Action              = Labelled-transition-system.CCS.Action
-is-silent           = Labelled-transition-system.CCS.is-silent
-Proc                = Labelled-transition-system.CCS.Proc
-Proc′               = Labelled-transition-system.CCS.Proc′
-transition-relation = Labelled-transition-system.CCS._[_]⟶_
-_∉_                 = Labelled-transition-system.CCS._∉_
+Name-with-kind = Labelled-transition-system.CCS.Name-with-kind
+co             = Labelled-transition-system.CCS.co
+Action         = Labelled-transition-system.CCS.Action
+is-silent      = Labelled-transition-system.CCS.is-silent
+Proc           = Labelled-transition-system.CCS.Proc
+Proc′          = Labelled-transition-system.CCS.Proc′
+_[_]→_         = Labelled-transition-system.CCS._[_]⟶_
+_∉_            = Labelled-transition-system.CCS._∉_
 
 -- Restricted and the corresponding lemma.
 
@@ -284,7 +284,7 @@ up-to-!-size-preserving = Bisimilarity.Up-to.CCS.up-to-!-size-preserving
 
 -- Size-preserving transformers are up-to techniques.
 
-size-preserving⇒up-to = Up-to.size-preserving→up-to
+size-preserving→up-to = Up-to.size-preserving→up-to
 
 -- There are monotone (and extensive) up-to techniques G and H such
 -- that G ∘ H is not an up-to-technique.
@@ -355,7 +355,7 @@ Companion₁ = Up-to.Companion₁
 
 -- Monotone and compatible transformers are size-preserving.
 
-compatible⇒size-preserving = Up-to.monotone→compatible→size-preserving
+compatible→size-preserving = Up-to.monotone→compatible→size-preserving
 
 -- The large companion is below the small one.
 
