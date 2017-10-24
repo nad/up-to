@@ -17,11 +17,12 @@ import
   Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
 open import Equational-reasoning
 import Expansion.CCS as E
+import Expansion.Equational-reasoning-instances
 open import Labelled-transition-system.CCS Name
 
 import Bisimilarity.Coinductive CCS as S
 open import Bisimilarity.Weak.Coinductive.Other CCS
-open import Expansion CCS using (_≳_)
+open import Expansion CCS using (_≳_; ≳:_)
 import Labelled-transition-system.Equational-reasoning-instances CCS
 
 -- An instantiation of a module with helper lemmas.
@@ -270,3 +271,57 @@ _[_]-cong′ :
   Non-degenerate ∞ C → (∀ x → [ i ] Ps x ≈′ Qs x) →
   [ i ] C [ Ps ] ≈′ C [ Qs ]
 force (C [ Ps≈Qs ]-cong′) = C [ (λ x → force (Ps≈Qs x)) ]-cong
+
+-- A generalisation to systems of inequations of the following
+-- property: If two processes satisfy the same equation X ≳ C [ X ],
+-- for a weakly guarded, non-degenerate context C, then the two
+-- processes are weakly bisimilar (assuming extensionality).
+--
+-- This result is a variant of
+-- Bisimilarity.Exercises.Coinductive.CCS.6-2-16. Proposition 4.4.4 in
+-- Milner's "Operational and Algebraic Semantics of Concurrent
+-- Processes" is perhaps more useful in practice, as well as some of
+-- the results in Sangiorgi's "Equations, Contractions, and Unique
+-- Solutions".
+
+module _ (ext : Proc-extensionality) where
+
+  mutual
+
+    unique-solutions :
+      ∀ {i n} {Ps Qs : Fin n → Proc ∞} {C : Fin n → Context ∞ n} →
+      (∀ x → Weakly-guarded (C x)) →
+      (∀ x → Non-degenerate ∞ (C x)) →
+      (∀ x → Ps x ≳ C x [ Ps ]) →
+      (∀ x → Qs x ≳ C x [ Qs ]) →
+      ∀ x → [ i ] Ps x ≈ Qs x
+    unique-solutions {i} {Ps = Ps} {Qs} {C} w nd ≳C[Ps] ≳C[Qs] x =
+      Ps x        ∼⟨ ≳C[Ps] x ⟩
+      C x [ Ps ]  ∼′⟨ ≈: ⟨ lr ≳C[Ps] ≳C[Qs] , Σ-map id (Σ-map id symmetric) ∘ lr ≳C[Qs] ≳C[Ps] ⟩ ⟩ ≳:
+      C x [ Qs ]  ∽⟨ ≳C[Qs] x ⟩■
+      Qs x
+      where
+      lr :
+        ∀ {Ps Qs μ P} →
+        (∀ x → Ps x ≳ C x [ Ps ]) →
+        (∀ x → Qs x ≳ C x [ Qs ]) →
+        C x [ Ps ] [ μ ]⟶ P →
+        ∃ λ Q → C x [ Qs ] [ μ ]⇒̂ Q × [ i ] P ≈′ Q
+      lr {Ps} {Qs} {μ} ≳C[Ps] ≳C[Qs] ⟶P =
+        case 6-2-15-nd ext (C x) (w x) (nd x) ⟶P of λ where
+          (C′ , nd′ , refl , trs) →
+              _
+            , (C x [ Qs ]  →⟨ trs Qs ⟩■
+               C′ [ Qs ])
+            , (C′ [ Ps ]  ∼⟨ nd′ [ unique-solutions′ w nd ≳C[Ps] ≳C[Qs] ]-cong′ ⟩■
+               C′ [ Qs ])
+
+    unique-solutions′ :
+      ∀ {i n} {Ps Qs : Fin n → Proc ∞} {C : Fin n → Context ∞ n} →
+      (∀ x → Weakly-guarded (C x)) →
+      (∀ x → Non-degenerate ∞ (C x)) →
+      (∀ x → Ps x ≳ C x [ Ps ]) →
+      (∀ x → Qs x ≳ C x [ Qs ]) →
+      ∀ x → [ i ] Ps x ≈′ Qs x
+    force (unique-solutions′ w nd ≳C[Ps] ≳C[Qs] x) =
+      unique-solutions w nd ≳C[Ps] ≳C[Qs] x
