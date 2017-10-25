@@ -32,7 +32,7 @@ instance
   convert≼≼ : ∀ {i} → Convertible [ i ]_≼_ [ i ]_≼_
   convert≼≼ = is-convertible id
 
-  convert≼′≼ : ∀ {i} → Convertible [ ssuc i ]_≼′_ [ i ]_≼_
+  convert≼′≼ : ∀ {i} → Convertible _≼′_ [ i ]_≼_
   convert≼′≼ = is-convertible λ p≼′q → force p≼′q
 
   convert≼≼′ : ∀ {i} → Convertible [ i ]_≼_ [ i ]_≼′_
@@ -47,7 +47,7 @@ instance
   convert≤≼ : ∀ {i} → Convertible [ i ]_≤_ [ i ]_≼_
   convert≤≼ = is-convertible ≤⇒≼
 
-  convert≤′≼ : ∀ {i} → Convertible [ ssuc i ]_≤′_ [ i ]_≼_
+  convert≤′≼ : ∀ {i} → Convertible _≤′_ [ i ]_≼_
   convert≤′≼ = is-convertible (convert ∘ ≤⇒≼′)
 
   convert≤≼′ : ∀ {i} → Convertible [ i ]_≤_ [ i ]_≼′_
@@ -62,7 +62,7 @@ instance
   convert≈≼ : ∀ {i} → Convertible [ i ]_≈_ [ i ]_≼_
   convert≈≼ = is-convertible ≈⇒≼
 
-  convert≈′≼ : ∀ {i} → Convertible [ ssuc i ]_≈′_ [ i ]_≼_
+  convert≈′≼ : ∀ {i} → Convertible _≈′_ [ i ]_≼_
   convert≈′≼ = is-convertible (convert ∘ ≈⇒≼′)
 
   convert≈≼′ : ∀ {i} → Convertible [ i ]_≈_ [ i ]_≼′_
@@ -77,7 +77,7 @@ instance
   convert∼≼ : ∀ {i} → Convertible [ i ]_∼_ [ i ]_≼_
   convert∼≼ = is-convertible (≈⇒≼ ∘ convert {a = ℓ})
 
-  convert∼′≼ : ∀ {i} → Convertible [ ssuc i ]_∼′_ [ i ]_≼_
+  convert∼′≼ : ∀ {i} → Convertible _∼′_ [ i ]_≼_
   convert∼′≼ = is-convertible (convert ∘ ≈⇒≼′ ∘ convert {a = ℓ})
 
   convert∼≼′ : ∀ {i} → Convertible [ i ]_∼_ [ i ]_≼′_
@@ -92,7 +92,7 @@ instance
   trans≼≼ : ∀ {i} → Transitive′ [ i ]_≼_ _≼_
   trans≼≼ = is-transitive transitive-≼
 
-  trans≼′≼ : ∀ {i} → Transitive′ [ ssuc i ]_≼′_ _≼_
+  trans≼′≼ : Transitive′ _≼′_ _≼_
   trans≼′≼ = is-transitive transitive-≼′
 
   trans≼′≼′ : ∀ {i} → Transitive′ [ i ]_≼′_ _≼′_
@@ -104,7 +104,7 @@ instance
   trans≳≼ : ∀ {i} → Transitive [ i ]_≳_ [ i ]_≼_
   trans≳≼ = is-transitive transitive-≳≼
 
-  trans≳′≼ : ∀ {i} → Transitive [ ssuc i ]_≳′_ [ i ]_≼_
+  trans≳′≼ : ∀ {i} → Transitive _≳′_ [ i ]_≼_
   trans≳′≼ = is-transitive (transitive-≳≼ ∘ convert {a = ℓ})
 
   trans≳′≼′ : ∀ {i} → Transitive [ i ]_≳′_ [ i ]_≼′_

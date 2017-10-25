@@ -31,7 +31,7 @@ instance
   trans∼∼ : Transitive [ i ]_∼_ [ i ]_∼_
   trans∼∼ = is-transitive transitive-∼
 
-  trans∼′∼ : Transitive [ ssuc i ]_∼′_ [ i ]_∼_
+  trans∼′∼ : Transitive _∼′_ [ i ]_∼_
   trans∼′∼ = is-transitive λ p∼′q → transitive (force p∼′q)
 
   trans∼′∼′ : Transitive [ i ]_∼′_ [ i ]_∼′_
@@ -46,7 +46,7 @@ instance
   convert∼∼ : Convertible [ i ]_∼_ [ i ]_∼_
   convert∼∼ = is-convertible id
 
-  convert∼′∼ : Convertible [ ssuc i ]_∼′_ [ i ]_∼_
+  convert∼′∼ : Convertible _∼′_ [ i ]_∼_
   convert∼′∼ = is-convertible λ p∼′q → force p∼′q
 
   convert∼∼′ : Convertible [ i ]_∼_ [ i ]_∼′_
