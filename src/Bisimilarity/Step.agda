@@ -19,7 +19,9 @@ open import Logical-equivalence using (_⇔_)
 open import Prelude
 
 open import Bijection equality-with-J using (_↔_)
-open import Function-universe equality-with-J hiding (_∘_)
+import Equivalence equality-with-J as Eq
+open import Function-universe equality-with-J as F hiding (_∘_)
+open import H-level.Closure equality-with-J
 
 import Similarity.Step lts as One-sided
 open import Indexed-container hiding (⟨_⟩)
@@ -63,6 +65,55 @@ open Temporarily-private using (Step)
 StepC : Container (Proc × Proc) (Proc × Proc)
 StepC = One-sided.StepC _[_]↝₁_ ⟷ One-sided.StepC _[_]↝₂_
 
+-- The strong bisimilarity container presented in the paper,
+-- generalised to use _[_]↝₁_ and _[_]↝₂_.
+
+StepC′ : Container (Proc × Proc) (Proc × Proc)
+StepC′ =
+  (λ { (p , q) → (∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝₁ q′) ×
+                 (∀ {q′ μ} → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]↝₂ p′)
+     })
+    ◁
+  (λ { {(p , q)} (lr , rl) (p′ , q′) →
+       (∃ λ μ → ∃ λ (p⟶p′ : p [ μ ]⟶ p′) → proj₁ (lr p⟶p′) ≡ q′) ⊎
+       (∃ λ μ → ∃ λ (q⟶q′ : q [ μ ]⟶ q′) → proj₁ (rl q⟶q′) ≡ p′)
+     })
+
+-- The interpretations of the two containers above are pointwise
+-- logically equivalent, and in the presence of extensionality they
+-- are pointwise isomorphic.
+
+StepC↔StepC′ :
+  ∀ {k r} {R : Rel₂ r Proc} {pq} →
+  Extensionality? k ℓ (ℓ ⊔ r) →
+  ⟦ StepC ⟧ R pq ↝[ k ] ⟦ StepC′ ⟧ R pq
+StepC↔StepC′ {pq = p , q} =
+  inverse-ext? λ {k} ext →
+  Σ-cong (inverse $
+          drop-⊤-left-Σ (One-sided.Magic↔⊤ _)
+            ×-cong
+          drop-⊤-left-Σ (One-sided.Magic↔⊤ _)) λ { (lr , rl) →
+  implicit-∀-cong ext λ { {p′ , q′} →
+  Π-cong (lower-extensionality? k lzero ℓ ext)
+    (F.id ⊎-cong (
+
+       (∃ λ μ → ∃ λ (q⟶q′ : q [ μ ]⟶ q′) →
+            proj₁ (rl q⟶q′) ≡ p′)                            ↝⟨ inverse $ drop-⊤-left-Σ (_⇔_.to contractible⇔↔⊤ (singleton-contractible _)) ⟩
+
+       (∃ λ (q′p′≡ : ∃ λ q′p′ → q′p′ ≡ (q′ , p′)) →
+        ∃ λ μ → ∃ λ (q⟶q′ : q [ μ ]⟶ proj₁ (proj₁ q′p′≡)) →
+          proj₁ (rl q⟶q′) ≡ proj₂ (proj₁ q′p′≡))             ↝⟨ inverse Σ-assoc ⟩
+
+       (∃ λ q′p′ → q′p′ ≡ (q′ , p′) ×
+        ∃ λ μ → ∃ λ (q⟶q′ : q [ μ ]⟶ proj₁ q′p′) →
+          proj₁ (rl q⟶q′) ≡ proj₂ q′p′)                      ↔⟨ (∃-cong λ _ → (inverse $ Eq.≃-≡ (Eq.↔⇒≃ ×-comm)) ×-cong F.id) ⟩□
+
+       (∃ λ q′p′ → swap q′p′ ≡ (p′ , q′) ×
+        ∃ λ μ → ∃ λ (q⟶q′ : q [ μ ]⟶ proj₁ q′p′) →
+          proj₁ (rl q⟶q′) ≡ proj₂ q′p′)                      □))
+
+    (λ _ → F.id) }}
+
 -- The definition of Step in terms of a container is pointwise
 -- logically equivalent to the direct definition, and in the presence
 -- of extensionality it is pointwise isomorphic to the direct
@@ -100,6 +151,18 @@ Step↔StepC {R = R} {pq} ext =
       }
     ; left-inverse-of = λ _ → refl
     }
+
+-- A variant of the previous lemma, stated for StepC′ instead of
+-- StepC.
+
+Step↔StepC′ :
+  ∀ {k r} {R : Rel₂ r Proc} {pq} →
+  Extensionality? k ℓ (ℓ ⊔ r) →
+  Step R pq ↝[ k ] ⟦ StepC′ ⟧ R pq
+Step↔StepC′ {R = R} {pq} ext =
+  Step R pq        ↝⟨ Step↔StepC   ext ⟩
+  ⟦ StepC  ⟧ R pq  ↝⟨ StepC↔StepC′ ext ⟩□
+  ⟦ StepC′ ⟧ R pq  □
 
 module StepC {r} {R : Rel₂ r Proc} {p q} where
 
