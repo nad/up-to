@@ -39,6 +39,11 @@ import Indexed-container
 
 import Indexed-container.Combinators
 
+-- The delay monad defined as the greatest fixpoint of an indexed
+-- container.
+
+import Indexed-container.Delay-monad
+
 ------------------------------------------------------------------------
 -- Up-to techniques
 
