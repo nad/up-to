@@ -69,6 +69,23 @@ map-∘ _ _ = refl
   (∃ λ (s : S o) → P s ⊆ A)  ↝⟨ (∃-cong λ _ → ⊆-congʳ ext A↝B) ⟩□
   (∃ λ (s : S o) → P s ⊆ B)  □
 
+-- The shapes of a container are in pointwise bijective correspondence
+-- with the interpretation of the container applied to the constant
+-- function yielding the unit type.
+--
+-- (This lemma was suggested to me by an anonymous reviewer of another
+-- paper.)
+
+Shape↔⟦⟧⊤ : ∀ {ℓ} {I O : Set ℓ} (C : Container I O) {o} →
+            Container.Shape C o ↔ ⟦ C ⟧ (λ _ → ⊤) o
+Shape↔⟦⟧⊤ C {o} =
+  Shape C o                                         ↝⟨ inverse $ drop-⊤-right (λ _ → →-right-zero) ⟩
+  (∃ λ (s : Shape C o) → ∃ (Position C s) → ⊤)      ↝⟨ ∃-cong (λ _ → currying) ⟩
+  (∃ λ (s : Shape C o) → ∀ i → Position C s i → ⊤)  ↝⟨ ∃-cong (λ _ → inverse Bijection.implicit-Π↔Π) ⟩□
+  (∃ λ (s : Shape C o) → Position C s ⊆ (λ _ → ⊤))  □
+  where
+  open Container
+
 ------------------------------------------------------------------------
 -- Least fixpoints
 
