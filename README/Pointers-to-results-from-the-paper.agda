@@ -27,6 +27,7 @@ import Expansion
 import Expansion.CCS
 import Expansion.Delay-monad
 import Indexed-container
+import Indexed-container.Delay-monad
 import Labelled-transition-system
 import Labelled-transition-system.CCS
 import Labelled-transition-system.Delay-monad
@@ -61,7 +62,7 @@ never = Delay-monad.never
 transitiveˢ = Delay-monad.Strong-bisimilarity.transitive
 
 ------------------------------------------------------------------------
--- Section 3 and Appendix A
+-- Section 3
 
 -- Indexed containers.
 --
@@ -89,6 +90,32 @@ unfold = Indexed-container.unfold
 
 ⊆-not-antisymmetric = Relation.⊆-not-antisymmetric
 
+-- The shapes of a container are in pointwise bijective correspondence
+-- with the interpretation of the container applied to the constant
+-- function yielding the unit type.
+
+Shape↔⟦⟧⊤ = Indexed-container.Shape↔⟦⟧⊤
+
+-- A container corresponding to the Delay monad.
+
+DelayC = Indexed-container.Delay-monad.DelayC
+
+-- A (size-preserving) logical equivalence between the direct
+-- definition of the delay monad and the indirect definition using ν
+-- and the container DelayC.
+
+Delay⇔νDelayC = Indexed-container.Delay-monad.Delay⇔νDelayC
+
+-- Bisimilarity for ν.
+
+ν-bisimilar = Indexed-container.ν-bisimilar
+
+-- The two components of Delay⇔νDelayC {i = ∞} are inverses up to
+-- (strong) bisimilarity.
+
+Delay⇔νDelayC-inverses =
+  Indexed-container.Delay-monad.Delay⇔νDelayC-inverses
+
 ------------------------------------------------------------------------
 -- Section 4
 
@@ -101,17 +128,29 @@ LTS = Labelled-transition-system.LTS
 -- The type is parametrised so that it can also be used to define weak
 -- bisimilarity and expansion.
 
-B-record = Bisimilarity.Step.Step
+B = Bisimilarity.Step.Step
 
--- The container B.
+-- The container B^C, roughly as given in the paper.
 
-B-container = Bisimilarity.Step.StepC
+B^C = Bisimilarity.Step.StepC′
 
--- The definition of Step in terms of a container is pointwise
--- logically equivalent to the direct definition, and in the presence
--- of extensionality the definitions are pointwise isomorphic.
+-- The code mainly uses another definition of B^C, built up from
+-- smaller building blocks, and employing a trick to make it easier
+-- for Agda to infer implicit arguments.
 
-container-isomorphic-to-record = Bisimilarity.Step.Step↔StepC
+B^C-code = Bisimilarity.Step.StepC
+
+-- The two definitions of B^C have interpretations that are pointwise
+-- logically equivalent, and in the presence of extensionality they
+-- are pointwise isomorphic.
+
+B^C-code↔B^C = Bisimilarity.Step.StepC↔StepC′
+
+-- The interpretation of B^C is pointwise logically equivalent to B,
+-- and in the presence of extensionality they are pointwise
+-- isomorphic.
+
+B↔B^C = Bisimilarity.Step.Step↔StepC′
 
 -- The traditional definition of bisimilarity.
 
