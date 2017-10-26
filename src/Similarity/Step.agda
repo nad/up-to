@@ -53,10 +53,10 @@ private
 
 open Temporarily-private using (Step)
 
--- Used to aid type inference. Note that this type is parametrised
--- (see the module telescope above). The inclusion of a value of this
--- type in the definition of StepC below makes it easier for Agda to
--- infer the LTS parameter from the types ν StepC i (p , q) and
+-- Used to aid unification. Note that this type is parametrised (see
+-- the module telescope above). The inclusion of a value of this type
+-- in the definition of StepC below makes it easier for Agda to infer
+-- the LTS parameter from the types ν StepC i (p , q) and
 -- ν′ StepC i (p , q).
 
 record Magic : Set where
