@@ -672,20 +672,21 @@ record Companion-compatible-assumptions : Set (lsuc ℓ) where
   _≤_ : Size → Size → Set
   i ≤ j = i < j ⊎ i ≡ j
 
-  -- Successor sizes: Sizes i for which there is a size k < i such
-  -- that every size j < i satisfies j ≤ k.
+  -- Successor sizes: Sizes i for which there is a size j < i such
+  -- that every size k < i satisfies k ≤ j.
 
   Successor : Size → Set
-  Successor i = Σ (Size< i) λ { k → (j : Size< i) → j ≤ k }
+  Successor i = Σ (Size< i) λ { j → (k : Size< i) → k ≤ j }
 
   field
-    -- Trichotomy.
+    -- If i is not smaller than or equal to j, then j is smaller
+    -- than i.
 
-    trichotomy : ∀ i j → i < j ⊎ i ≡ j ⊎ j < i
+    ≰→> : ∀ {i j} → ¬ i ≤ j → j < i
 
     -- If a predicate from a certain class of predicates is satisfied
-    -- for all sizes smaller than i, but not for i itself, then i must
-    -- be a successor size.
+    -- for all sizes smaller than i, but not for i itself, then i is a
+    -- successor size.
 
     is-successor :
       {R : Rel ℓ I} →
@@ -695,7 +696,13 @@ record Companion-compatible-assumptions : Set (lsuc ℓ) where
       ¬ P i →
       Successor i
 
-  -- A corollary of (one of) the assumptions above.
+  -- A variant of excluded-middle.
+
+  excluded-middle₀ : (P : Set) → Dec P
+  excluded-middle₀ P =
+    ⊎-map lower (_∘ lift) $ excluded-middle (↑ ℓ P)
+
+  -- "Not for all" implies "exists not".
 
   ¬∀→∃¬ : {A : Set} {P : A → Set ℓ} →
           ¬ (∀ x → P x) → ∃ λ x → ¬ P x
@@ -705,56 +712,79 @@ record Companion-compatible-assumptions : Set (lsuc ℓ) where
       (inj₁ Px)  → Px
       (inj₂ ¬Px) → ⊥-elim (¬∃¬P (x , ¬Px)))
 
+  -- Given the assumptions above every pair of sizes must be related
+  -- by either _<_, _≡_, or flip _<_. However, note that all three
+  -- relations hold for ∞ and ∞, so we do not get a law of trichotomy.
+
+  compare : ∀ i j → i < j ⊎ i ≡ j ⊎ j < i
+  compare i j = case excluded-middle₀ (i < j) of λ where
+    (inj₁ i<j) → inj₁ i<j
+    (inj₂ i≮j) → case excluded-middle₀ (i ≡ j) of λ where
+      (inj₁ i≡j) → inj₂ (inj₁ i≡j)
+      (inj₂ i≢j) → inj₂ (inj₂ (≰→> [ i≮j , i≢j ]))
+
 -- Given certain assumptions one can prove that the companion is
 -- compatible. However, I don't know if these assumptions are
 -- consistent with the variant of Agda that is used in this
--- development.
+-- development. I discussed the assumptions with Andreas Abel and
+-- Andrea Vezzosi. Some potential problems came up in the
+-- discussion:
+--
+-- * The fact that ∞ : Size< ∞ could perhaps lead to some kind of
+--   problem.
+--
+-- * The assumptions make it possible to define functions that give
+--   completely different results for different sizes (assuming that
+--   there is more than one size).
+--
 --
 -- This proof is based on that of Theorem 2.14 in Parrow and Weber's
 -- "The Largest Respectful Function".
 
 companion-compatible :
   Companion-compatible-assumptions → Compatible Companion
-companion-compatible assumptions {R} {x} Comp-CR =
-  case lemma R of λ where
+companion-compatible assumptions {R} = case lemma R of λ where
+
     (inj₁ R⊆νC) →
-                             $⟨ (λ {i} → Comp-CR {i}) ⟩
-      Companion (⟦ C ⟧ R) x  ↝⟨ _$ map C (λ Rx → λ { .force → R⊆νC Rx }) ⟩
-      ν C ∞ x                ↝⟨ map C (λ ν′C∞x {_} _ → force ν′C∞x) ⟩
-      ⟦ C ⟧ (Companion R) x  □
+      Companion (⟦ C ⟧ R)  ⊆⟨ _$ map C (λ Rx → λ { .force → R⊆νC Rx }) ⟩
+      ν C ∞                ⊆⟨ map C (λ ν′C∞x {_} _ → force ν′C∞x) ⟩∎
+      ⟦ C ⟧ (Companion R)  ∎
 
-    (inj₂ (i , (k , <i→≤k) , <i→R⊆νC , R⊈νC[i])) →
-                             $⟨ (λ {_} →
-          ⟦ C ⟧ R                ⊆⟨ map C (<i→R⊆νC k) ⟩
-          ⟦ C ⟧ (ν C k)          ⊆⟨ map C (λ x → λ { .force {j} → cast₁ j k (<i→≤k j) x }) ⟩∎
-          ν C i                  ∎) ⟩
+    (inj₂ (1+i , (i , <1+i→≤i) , <1+i→R⊆νC , R⊈νC[1+i])) →
 
-      ⟦ C ⟧ R ⊆ ν C i        ↝⟨ Comp-CR ⟩
-      ν C i x                ↔⟨⟩
-      ⟦ C ⟧ (ν′ C i) x       ↝⟨ map C (λ x → force x) ⟩
-      ⟦ C ⟧ (ν C k) x        ↝⟨ map C (λ νCky {l} R⊆νCl → cast₂ <i→≤k R⊈νC[i] (λ {_} → R⊆νCl {_}) νCky) ⟩□
-      ⟦ C ⟧ (Companion R) x  □
+      let CR⊆νC[1+i] =
+            ⟦ C ⟧ R        ⊆⟨ map C (<1+i→R⊆νC i) ⟩
+            ⟦ C ⟧ (ν C i)  ⊆⟨ map C (λ x → λ { .force {j} → cast (<1+i→≤i j) x }) ⟩∎
+            ν C 1+i        ∎
+
+          νCi⊆CompanionR =
+            ν C i                                                ⊆⟨ (λ hyp → λ { j≤i → cast j≤i hyp }) ⟩
+            (λ x → ∀ {j} → j ≤ i → ν C j x)                      ⊆⟨ (λ hyp → λ { (j , refl) → hyp (<1+i→≤i j) }) ⟩
+            (λ x → ∀ {j} → j < 1+i → ν C j x)                    ⊆⟨ (λ hyp → λ { j<1+i _ → hyp j<1+i }) ⟩
+            (λ x → ∀ {j} → j < 1+i → R ⊆ ν C j → ν C j x)        ⊆⟨ (λ hyp → λ { 1+i≰j → hyp (≰→> 1+i≰j) }) ⟩
+            (λ x → ∀ {j} → ¬ 1+i ≤ j → R ⊆ ν C j → ν C j x)      ⊆⟨ (λ hyp → λ { {j} → [ (λ 1+i≤j R⊆νCj →
+                                                                                            ⊥-elim $ R⊈νC[1+i] (
+                R                                                                             ⊆⟨ (λ {x} → R⊆νCj {x}) ⟩
+                ν C j                                                                         ⊆⟨ cast 1+i≤j ⟩∎
+                ν C 1+i                                                                       ∎))
+                                                                                       , hyp
+                                                                                       ] }) ⟩
+            (λ x → ∀ {j} → Dec (1+i ≤ j) → R ⊆ ν C j → ν C j x)  ⊆⟨ (λ hyp → λ { {_} → hyp (excluded-middle₀ _) }) ⟩
+            (λ x → ∀ {j} → R ⊆ ν C j → ν C j x)                  ⊆⟨ id ⟩∎
+            Companion R                                          ∎
+      in
+      Companion (⟦ C ⟧ R)  ⊆⟨ _$ CR⊆νC[1+i] ⟩
+      ν C 1+i              ⊆⟨⟩
+      ⟦ C ⟧ (ν′ C 1+i)     ⊆⟨ map C (λ x → force x) ⟩
+      ⟦ C ⟧ (ν C i)        ⊆⟨ map C νCi⊆CompanionR ⟩∎
+      ⟦ C ⟧ (Companion R)  ∎
 
   where
   open Companion-compatible-assumptions assumptions
 
-  cast₁ : ∀ {i} (j k : Size< i) → j ≤ k →
-          ν C k ⊆ ν C j
-  cast₁ j k (inj₁ (j′ , j≡j′)) x = subst (λ i → ν C i _) (sym j≡j′) x
-  cast₁ j k (inj₂ j≡k)         x = subst (λ i → ν C i _) (sym j≡k)  x
-
-  cast₂ : ∀ {i j} {k : Size< i} {R} →
-          ((j : Size< i) → j ≤ k) →
-          ¬ R ⊆ ν C i → R ⊆ ν C j →
-          ν C k ⊆ ν C j
-  cast₂ {i} {j} {k} <i→≤k R⊈νCi R⊆νCj {x} νCkx =
-    case trichotomy j k of λ where
-      (inj₁ (j , refl))         → cast₁ j k (inj₁ (j , refl)) νCkx
-      (inj₂ (inj₁ refl))        → νCkx
-      (inj₂ (inj₂ (k′ , k≡k′))) → case trichotomy i j of λ where
-        (inj₁ (i′ , refl))       → ⊥-elim (R⊈νCi R⊆νCj)
-        (inj₂ (inj₁ refl))       → ⊥-elim (R⊈νCi R⊆νCj)
-        (inj₂ (inj₂ (j , refl))) → cast₁ j k (<i→≤k j) νCkx
+  cast : ∀ {j k} → j ≤ k → ν C k ⊆ ν C j
+  cast (inj₁ (_ , refl)) x = x
+  cast (inj₂ refl)       x = x
 
   lemma :
     ∀ R → (∀ {i} → R ⊆ ν C i)
@@ -772,7 +802,7 @@ companion-compatible assumptions {R} {x} Comp-CR =
                                                                    (λ i ind-hyp R⊈νCi → case excluded-middle _ of λ where
                                                                         (inj₁ ∀<R⊆νC)  → i , ∀<R⊆νC , R⊈νCi
                                                                         (inj₂ ¬∀<R⊆νC) → let j , R⊈νCj = ¬∀→∃¬ ¬∀<R⊆νC
-                                                                                         in ind-hyp (Size.boxed j) R⊈νCj) ⟩
+                                                                                         in ind-hyp (Size.box j) R⊈νCj) ⟩
 
          (∃ λ i → ((j : Size< i) → R ⊆ ν C j) × ¬ R ⊆ ν C i)  ↝⟨ (λ { (i , hyp) → (i , uncurry (is-successor i) hyp , hyp) }) ⟩□
 
