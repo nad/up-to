@@ -15,10 +15,7 @@ open import Function-universe equality-with-J hiding (id; _∘_)
 open import Labelled-transition-system
 
 ------------------------------------------------------------------------
--- CCS, roughly as defined in "Enhancements of the bisimulation proof
--- method" by Pous and Sangiorgi, with support for corecursive
--- processes (instead of the named process constants presented in
--- "Coinduction All the Way Up" by Pous)
+-- Fixity declarations
 
 infix  12 _∙
 infixr 12 _·_ _∙_
@@ -27,6 +24,12 @@ infix   8 _⊕_
 infix   6 _∣_
 infix   5 _[_] _[_]′
 infix   4 _[_]⟶_ _∉_
+
+------------------------------------------------------------------------
+-- CCS, roughly as defined in "Enhancements of the bisimulation proof
+-- method" by Pous and Sangiorgi, with support for corecursive
+-- processes (instead of the named process constants presented in
+-- "Coinduction All the Way Up" by Pous)
 
 -- Names with kinds: (a , true) stands for "a", and (a , false) stands
 -- for "a̅".
@@ -112,6 +115,11 @@ CCS = record
   }
 
 open LTS CCS public hiding (Proc; _[_]⟶_; is-silent)
+
+------------------------------------------------------------------------
+-- Contexts and some related definitions, roughly following
+-- "Enhancements of the bisimulation proof method" by Pous and
+-- Sangiorgi
 
 mutual
 
@@ -204,6 +212,9 @@ mutual
       force : {j : Size< i} → Non-degenerate j C
 
 open Non-degenerate′ public
+
+------------------------------------------------------------------------
+-- Very strong bisimilarity
 
 -- "Very strong" bisimilarity for processes: Equal ∞ P Q means that P
 -- and Q have the same structure.
