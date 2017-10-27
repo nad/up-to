@@ -217,6 +217,10 @@ Proc′          = Labelled-transition-system.CCS.Proc′
 _[_]→_         = Labelled-transition-system.CCS._[_]⟶_
 _∉_            = Labelled-transition-system.CCS._∉_
 
+-- The transition relation takes finite processes to finite processes.
+
+finite→finite = Labelled-transition-system.CCS.finite→finite
+
 -- Restricted and the corresponding lemma.
 
 Restricted   = Bisimilarity.Exercises.Coinductive.CCS.Restricted

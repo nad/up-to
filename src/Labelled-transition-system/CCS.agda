@@ -501,6 +501,30 @@ Matches-cong (refl · p)    (action q) = action λ { .force →
 Matches-cong (⟨ν refl ⟩ p) (⟨ν⟩ q)    = ⟨ν⟩ (Matches-cong p q)
 Matches-cong (! p)         (! q)      = ! Matches-cong p q
 
+-- A predicate that identifies a process as being finite. Note that
+-- this is an inductive definition.
+
+data Finite : Proc ∞ → Set ℓ where
+  ∅      : Finite ∅
+  _∣_    : ∀ {P Q} → Finite P → Finite Q → Finite (P ∣ Q)
+  _⊕_    : ∀ {P Q} → Finite P → Finite Q → Finite (P ⊕ Q)
+  action : ∀ {μ P} → Finite (force P) → Finite (μ · P)
+  ⟨ν_⟩   : ∀ {a P} → Finite P → Finite (⟨ν a ⟩ P)
+  !_     : ∀ {P} → Finite P → Finite (! P)
+
+-- The transition relation takes finite processes to finite processes.
+
+finite→finite : ∀ {P μ Q} → P [ μ ]⟶ Q → Finite P → Finite Q
+finite→finite (par-left tr)       (f₁ ∣ f₂)  = finite→finite tr f₁ ∣ f₂
+finite→finite (par-right tr)      (f₁ ∣ f₂)  = f₁ ∣ finite→finite tr f₂
+finite→finite (par-τ tr₁ tr₂)     (f₁ ∣ f₂)  = finite→finite tr₁ f₁ ∣
+                                               finite→finite tr₂ f₂
+finite→finite (sum-left tr)       (f₁ ⊕ f₂)  = finite→finite tr f₁
+finite→finite (sum-right tr)      (f₁ ⊕ f₂)  = finite→finite tr f₂
+finite→finite action              (action f) = f
+finite→finite (restriction a∉ tr) ⟨ν f ⟩     = ⟨ν finite→finite tr f ⟩
+finite→finite (replication tr)    (! f)      = finite→finite tr (! f ∣ f)
+
 -- Lemma 6.2.15 from "Enhancements of the bisimulation proof method".
 -- That text claims that the lemma is proved by induction on the
 -- structure of the context. Perhaps that is possible, but the proof
