@@ -697,7 +697,7 @@ module _ (ext : Proc-extensionality) where
 
  mutual
 
-  infix 5 _[_]-cong₂ _[_]-cong₂′ _[_]-cong₂″
+  infix 5 _[_]-cong₂ _[_]-cong₂′
 
   _[_]-cong₂ :
     ∀ {i n Ps Qs}
@@ -748,22 +748,16 @@ module _ (ext : Proc-extensionality) where
                                                 (lr C₁ Ps∼Qs tr₁) (lr C₂ Ps∼Qs tr₂)
     lr (C₁ ⊕ C₂)  Ps∼Qs (sum-left tr)       = Σ-map id (Σ-map sum-left id) (lr C₁ Ps∼Qs tr)
     lr (C₁ ⊕ C₂)  Ps∼Qs (sum-right tr)      = Σ-map id (Σ-map sum-right id) (lr C₂ Ps∼Qs tr)
-    lr (μ · C)    Ps∼Qs action              = _ , action , force C [ Ps∼Qs ]-cong₂′
+    lr (μ · C)    Ps∼Qs action              = _ , action , λ { .force → force C [ Ps∼Qs ]-cong₂ }
     lr (⟨ν a ⟩ C) Ps∼Qs (restriction a∉ tr) = Σ-map ⟨ν a ⟩ (Σ-map (restriction a∉) (λ b → ⟨ν a ⟩ (hole fzero) [ b ][ Ps∼Qs ]-cong₁))
                                                 (lr C Ps∼Qs tr)
     lr (! C)      Ps∼Qs (replication tr)    = Σ-map id (Σ-map replication id) (lr (! C ∣ C) Ps∼Qs tr)
 
   _[_]-cong₂′ :
     ∀ {i n Ps Qs}
-    (C : Context ∞ n) → (∀ x → [ i ] Ps x ∼ Qs x) →
-    [ i ] C [ Ps ] ∼′ C [ Qs ]
-  force (C [ Ps∼Qs ]-cong₂′) = C [ Ps∼Qs ]-cong₂
-
-  _[_]-cong₂″ :
-    ∀ {i n Ps Qs}
     (C : Context ∞ n) → (∀ x → [ i ] Ps x ∼′ Qs x) →
     [ i ] C [ Ps ] ∼′ C [ Qs ]
-  force (C [ Ps∼′Qs ]-cong₂″) = C [ (λ x → force (Ps∼′Qs x)) ]-cong₂
+  force (C [ Ps∼′Qs ]-cong₂′) = C [ (λ x → force (Ps∼′Qs x)) ]-cong₂
 
 -- Very strong bisimilarity is contained in bisimilarity.
 
