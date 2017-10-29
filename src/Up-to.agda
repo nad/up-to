@@ -41,8 +41,8 @@ open import Relation
 Sound : Container I I → Set ℓ
 Sound F = ν (C ⊚ F) ∞ ⊆ ν C ∞
 
--- A relation transformer F is an up-to technique if every relation R
--- that is contained in ⟦ C ⟧ (F R) is contained in ν C ∞.
+-- A relation transformer F is a (sound) up-to technique if every
+-- relation R that is contained in ⟦ C ⟧ (F R) is contained in ν C ∞.
 
 Up-to-technique : Trans ℓ I → Set (lsuc ℓ)
 Up-to-technique F = ∀ {R} → R ⊆ ⟦ C ⟧ (F R) → R ⊆ ν C ∞
@@ -515,8 +515,8 @@ other-half-of-symmetry {f} f-involution R R∘f⊆R =
   R ∘ f ∘ f  ⊆⟨ R∘f⊆R ⟩∎
   R ∘ f      ∎
 
--- The results in the following module correspond to parts of
--- Proposition 7.1 in "Coinduction All the Way Up".
+-- The results in the following module are based on Proposition 7.1 in
+-- "Coinduction All the Way Up".
 
 module _
   (D : Container I I)
