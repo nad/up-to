@@ -656,6 +656,24 @@ module PQR where
   where
   open PQR
 
+-- It is not the case that every monotone and extensive up-to
+-- technique is size-preserving.
+
+¬monotone×extensive×up-to→size-preserving :
+  ∃ λ (lts : LTS lzero) →
+  let open Combination lts in
+  ¬ (∀ {F} → Monotone F → Extensive F → Up-to-technique F →
+             Size-preserving F)
+¬monotone×extensive×up-to→size-preserving =
+    lts
+  , λ up-to→pres →
+      ¬-F∘G-up-to $
+      size-preserving→up-to $
+      ∘-closure (up-to→pres F-lemmas.mono F-lemmas.ext F-lemmas.up-to)
+                (up-to→pres G-lemmas.mono G-lemmas.ext G-lemmas.up-to)
+  where
+  open PQR
+
 -- Up-to-technique is not closed under composition, not even for
 -- monotone and extensive relation transformers.
 
