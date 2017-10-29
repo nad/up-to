@@ -137,6 +137,7 @@ import Bisimilarity.Coinductive.Delay-monad
 import Bisimilarity.Exercises.Other.CCS
 import Bisimilarity.Exercises.Classical.CCS
 import Bisimilarity.Exercises.Coinductive.CCS
+import Bisimilarity.Exercises.Coinductive.CCS.Natural-numbers
 import Bisimilarity.Exercises.Coinductive.6-2-5
 
 -- Up-to techniques for strong bisimilarity.

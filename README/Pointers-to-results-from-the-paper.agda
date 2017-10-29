@@ -12,12 +12,14 @@ import Bisimilarity.Coinductive.Delay-monad
 import Bisimilarity.Coinductive.Equational-reasoning-instances
 import Bisimilarity.Comparison
 import Bisimilarity.Exercises.Coinductive.CCS
+import Bisimilarity.Exercises.Coinductive.CCS.Natural-numbers
 import Bisimilarity.Step
 import Bisimilarity.Up-to
 import Bisimilarity.Up-to.CCS
 import Bisimilarity.Up-to.Counterexamples
 import Bisimilarity.Weak.CCS
 import Bisimilarity.Weak.Coinductive.Other
+import Bisimilarity.Weak.Coinductive.Other.Up-to
 import Bisimilarity.Weak.Delay-monad
 import Delay-monad
 import Delay-monad.Expansion
@@ -169,13 +171,26 @@ classical-and-ν-equivalent =
 
 [_]_∼′_ = Bisimilarity.Coinductive.[_]_∼′_
 
--- Weak transitions.
+-- Derived transition relations.
 
+_⇒_    = Labelled-transition-system.LTS._⇒_
+_[_]⇒_ = Labelled-transition-system.LTS._[_]⇒_
 _[_]⇒̂_ = Labelled-transition-system.LTS._[_]⇒̂_
+_[_]→̂_ = Labelled-transition-system.LTS._[_]⟶̂_
 
 -- Weak bisimilarity.
 
 [_]_≈_ = Bisimilarity.Weak.Coinductive.Other.[_]_≈_
+
+-- Expansion.
+
+[_]_≳_ = Expansion.[_]_≳_
+
+-- A general definition that can be instantiated with different
+-- transition relations to yield strong or weak bisimilarity or the
+-- expansion relation.
+
+import Bisimilarity.Coinductive.General
 
 -- The labelled transition system for the delay monad.
 
@@ -228,7 +243,7 @@ Restricted∼∅ = Bisimilarity.Exercises.Coinductive.CCS.Restricted∼∅
 
 -- ∅ is a left identity for parallel composition.
 
-∅∣ = Bisimilarity.Exercises.Coinductive.CCS.∣-left-identity
+∣-left-identity = Bisimilarity.Exercises.Coinductive.CCS.∣-left-identity
 
 -- Proofs showing that all the CCS process constructors preserve
 -- strong bisimilarity. (For ∅ the proof is simply reflexivity of
@@ -267,11 +282,18 @@ import Equational-reasoning
 symmetric′-instance =
   Bisimilarity.Coinductive.Equational-reasoning-instances.symmetric∼′
 
+-- Lemmas corresponding to ·-cong for expansion and weak bisimilarity.
+
+module ·-cong where
+
+  expansion         = Expansion.CCS._·-cong_
+  weak-bisimilarity = Bisimilarity.Weak.CCS._·-cong_
+
 -- The example with P and Q.
 
-P   = Bisimilarity.Exercises.Coinductive.CCS.Another-example.P
-Q   = Bisimilarity.Exercises.Coinductive.CCS.Another-example.Q
-P∼Q = Bisimilarity.Exercises.Coinductive.CCS.Another-example.P∼Q
+P   = Bisimilarity.Exercises.Coinductive.CCS.Natural-numbers.P
+Q   = Bisimilarity.Exercises.Coinductive.CCS.Natural-numbers.Q
+P∼Q = Bisimilarity.Exercises.Coinductive.CCS.Natural-numbers.P∼Q
 
 -- The combinators _■ and _∼⟨_⟩_ presented in the paper correspond to
 -- two instances.
@@ -292,7 +314,7 @@ unique-solutions-for-weakly-guarded-contexts =
 
 -- Up-to techniques.
 
-Up-to = Up-to.Up-to-technique
+Up-to-technique = Up-to.Up-to-technique
 
 -- Relation transformers.
 
@@ -338,6 +360,12 @@ not-closed-under-composition =
 -- Size-preserving is closed under composition.
 
 ∘-closure = Up-to.∘-closure
+
+-- It is not the case that every (monotone and extensive) up-to
+-- technique is size-preserving.
+
+¬up-to→size-preserving =
+  Bisimilarity.Up-to.Counterexamples.¬monotone×extensive×up-to→size-preserving
 
 -- There are at least two up-to techniques that are not
 -- size-preserving (despite being monotone and extensive).
@@ -402,7 +430,7 @@ compatible→size-preserving = Up-to.monotone→compatible→size-preserving
 
 -- The large companion is below the small one.
 
-large⊆small = Up-to.companion₁⊆companion
+companion₁⊆companion = Up-to.companion₁⊆companion
 
 -- The small companion is monotone.
 
@@ -411,7 +439,7 @@ companion-monotone = Up-to.companion-monotone
 -- The small companion is compatible if and only if it is below the
 -- large one.
 
-small-compatible⇔⊆large =
+companion-compatible⇔companion⊆companion₁ =
   Up-to.companion-compatible⇔companion⊆companion₁
 
 -- The small companion is compatible if certain assumptions (including
@@ -562,13 +590,38 @@ transitiveʷ       = Delay-monad.Weak-bisimilarity.transitive
 ------------------------------------------------------------------------
 -- Section 9.2
 
--- The Drop-later predicate.
+-- If transitivity of weak bisimilarity for the delay monad is
+-- size-preserving in both arguments, then weak bisimilarity is
+-- trivial.
 
-Drop-later = Delay-monad.Weak-bisimilarity.Laterˡ⁻¹-∼≈
+size-preserving→trivial =
+  Delay-monad.Weak-bisimilarity.size-preserving-transitivity→trivial
+
+-- Weak bisimilarity for the delay monad is reflexive.
+
+_∎ʷ = Delay-monad.Weak-bisimilarity.reflexive
 
 -- The computation now x is not weakly bisimilar to never.
 
 now≉never = Delay-monad.Weak-bisimilarity.now≉never
+
+-- If transitivity of weak bisimilarity for the delay monad is
+-- size-preserving in both arguments, then the carrier type is
+-- uninhabited.
+
+not-size-preservingʷ =
+  Delay-monad.Weak-bisimilarity.size-preserving-transitivity→uninhabited
+
+-- If transitivity of weak bisimilarity is size-preserving in the
+-- first argument, then weak bisimulations up to weak bisimilarity are
+-- contained in weak bisimilarity.
+
+size-preserving→weak-bisimulations-up-to-weak-bisimilarity-works =
+  Bisimilarity.Weak.Coinductive.Other.Up-to.size-preserving-transitivity→up-to-weak-bisimilarity-up-to
+
+-- The Drop-later predicate.
+
+Drop-later = Delay-monad.Weak-bisimilarity.Laterˡ⁻¹-∼≈
 
 -- Drop-later A implies that A is not inhabited, and vice versa.
 --
@@ -639,41 +692,39 @@ basic-counterexample′ =
 size-preservingʷ =
   Delay-monad.Weak-bisimilarity.size-preserving-transitivity⇔uninhabited
 
--- Size-preserving transitivity-like proofs involving strong
+-- Size-preserving transitivity-like proofs involving strong and weak
 -- bisimilarity.
 
 transitiveˢʷ = Delay-monad.Weak-bisimilarity.transitive-∼≈
 transitiveʷˢ = Delay-monad.Weak-bisimilarity.transitive-≈∼
 
--- The expansion relation.
+-- A direct definition of expansion for the delay monad.
 
 [_]_≳D_ = Delay-monad.Expansion.[_]_≳_
 
--- Size-preserving transitivity-like proofs involving the expansion
--- relation.
+-- The direct definition of expansion for the delay monad is pointwise
+-- logically equivalent, in a size-preserving way, to the one obtained
+-- from the LTS for the delay monad.
 
+direct⇔indirect-expansion = Expansion.Delay-monad.direct⇔indirect
+
+-- Size-preserving transitivity-like proofs involving the direct
+-- definitions of weak bisimilarity and expansion for the delay monad.
+
+transitiveᵉˢ = Delay-monad.Expansion.transitive-≳∼
 transitiveᵉ  = Delay-monad.Expansion.transitive
 transitiveᵉʷ = Delay-monad.Expansion.transitive-≳≈
 transitiveʷᵉ = Delay-monad.Expansion.transitive-≈≲
 
--- The expansion relation, defined for any LTS.
+-- Size-preserving transitivity-like proofs involving weak
+-- bisimilarity and expansion defined for an arbitrary LTS.
 
-[_]_≳_ = Expansion.[_]_≳_
-
--- The explicit definition of expansion for the delay monad is
--- pointwise logically equivalent, in a size-preserving way, to the
--- one obtained from the LTS for the delay monad.
-
-direct⇔indirect-expansion = Expansion.Delay-monad.direct⇔indirect
-
--- Size-preserving transitivity-like proofs involving the expansion
--- relation for an arbitrary LTS.
-
+transitiveᵉˢ-lts = Expansion.transitive-≳∼
 transitiveᵉ-lts  = Expansion.transitive-≳
 transitiveᵉʷ-lts = Bisimilarity.Weak.Coinductive.Other.transitive-≳≈
 transitiveʷᵉ-lts = Bisimilarity.Weak.Coinductive.Other.transitive-≈≲
 
--- Negative results related to the expansion relation.
+-- Negative results related to expansion.
 
 not-size-preservingˢᵉ =
   Delay-monad.Expansion.size-preserving-transitivity-∼≳ˡ⇔uninhabited
