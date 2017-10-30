@@ -158,7 +158,23 @@ mutual
   ∼⇒≳′ : ∀ {i p q} → [ i ] p ∼′ q → [ i ] p ≳′ q
   force (∼⇒≳′ p∼′q) = ∼⇒≳ (SB.force p∼′q)
 
--- Expansion is a weak simulation (of a certain kind).
+-- Expansion is a weak simulation (of three different kinds).
+
+expansion-is-weak⇒ :
+  ∀ {p p′ q} →
+  p ≳ q → p ⇒ p′ →
+  ∃ λ q′ → q ⇒ q′ × p′ ≳ q′
+expansion-is-weak⇒ =
+  is-weak⇒ StepC.left-to-right (λ p≳′q → force p≳′q) ⟶̂→⇒
+
+expansion-is-weak[]⇒ :
+  ∀ {p p′ q μ} →
+  ¬ Silent μ →
+  p ≳ q → p [ μ ]⇒ p′ →
+  ∃ λ q′ → q [ μ ]⇒ q′ × p′ ≳ q′
+expansion-is-weak[]⇒ ¬s =
+  is-weak[]⇒ StepC.left-to-right (λ p≳′q → force p≳′q)
+             ⟶̂→⇒ (⇒̂→[]⇒ ¬s ∘ ⟶̂→⇒̂)
 
 expansion-is-weak⇒̂ :
   ∀ {p p′ q μ} →
@@ -167,7 +183,15 @@ expansion-is-weak⇒̂ :
 expansion-is-weak⇒̂ =
   is-weak⇒̂ StepC.left-to-right (λ p≳′q → force p≳′q) ⟶̂→⇒ ⟶̂→⇒̂
 
--- The converse of expansion is a weak simulation (of a certain kind).
+-- The converse of expansion is a weak simulation (of three different
+-- kinds).
+
+converse-of-expansion-is-weak :
+  ∀ {p p′ q} →
+  p ≲ q → p ⇒ p′ →
+  ∃ λ q′ → q ⇒ q′ × p′ ≲ q′
+converse-of-expansion-is-weak =
+  is-weak⇒ StepC.right-to-left (λ p≲′q → force p≲′q) []⇒→⇒
 
 converse-of-expansion-is-weak[]⇒ :
   ∀ {p p′ q μ} →
@@ -175,8 +199,6 @@ converse-of-expansion-is-weak[]⇒ :
   ∃ λ q′ → q [ μ ]⇒ q′ × p′ ≲ q′
 converse-of-expansion-is-weak[]⇒ =
   is-weak[]⇒ StepC.right-to-left (λ p≲′q → force p≲′q) []⇒→⇒ id
-
--- The converse of expansion is a weak simulation (of another kind).
 
 converse-of-expansion-is-weak⇒̂ :
   ∀ {p p′ q μ} →
