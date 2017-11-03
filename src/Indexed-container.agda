@@ -101,26 +101,30 @@ mutual
           (C : Container X X) (i : Size) (x : X) : Set ℓ where
     ⟨_⟩ : {j : Size< i} → μ C j x → μ′ C i x
 
--- An inverse of ⟨_⟩ (for fully defined values).
+-- The least fixpoint μ C ∞ is pointwise logically equivalent to
+-- μ′ C ∞.
 
-⟨_⟩⁻¹ :
-  ∀ {ℓ} {X : Set ℓ} {C : Container X X} →
-  μ′ C ∞ ⊆ μ C ∞
-⟨ ⟨ x ⟩ ⟩⁻¹ = x
+μ⇔μ′ :
+  ∀ {ℓ} {X : Set ℓ} {C : Container X X} {x : X} →
+  μ C ∞ x ⇔ μ′ C ∞ x
+μ⇔μ′ = record
+  { to   = ⟨_⟩
+  ; from = λ { ⟨ x ⟩ → x }
+  }
 
 -- The least fixpoint is a post-fixpoint.
 
 μ-out :
   ∀ {ℓ} {X : Set ℓ} {C : Container X X} →
   μ C ∞ ⊆ ⟦ C ⟧ (μ C ∞)
-μ-out {C = C} = map C ⟨_⟩⁻¹
+μ-out {C = C} = map C (_⇔_.from μ⇔μ′)
 
 -- The least fixpoint is a pre-fixpoint.
 
 μ-in :
   ∀ {ℓ} {X : Set ℓ} {C : Container X X} →
   ⟦ C ⟧ (μ C ∞) ⊆ μ C ∞
-μ-in {C = C} = map C ⟨_⟩
+μ-in {C = C} = map C (_⇔_.to μ⇔μ′)
 
 -- The least fixpoint is smaller than or equal to every
 -- pre-fixpoint.
@@ -149,6 +153,17 @@ mutual
       force : {j : Size< i} → ν C j x
 
 open ν′ public
+
+-- The greatest fixpoint ν C ∞ is pointwise logically equivalent to
+-- ν′ C ∞.
+
+ν⇔ν′ :
+  ∀ {ℓ} {X : Set ℓ} {C : Container X X} {x : X} →
+  ν C ∞ x ⇔ ν′ C ∞ x
+ν⇔ν′ = record
+  { to   = λ { x .force → x }
+  ; from = λ x → force x
+  }
 
 -- The greatest fixpoint ν C ∞ is a post-fixpoint.
 
