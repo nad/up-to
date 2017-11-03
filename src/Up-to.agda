@@ -498,6 +498,12 @@ companion-ν⊆ν {i} =
   (∀ {j} → ν C i ⊆ ν C j → ν C j _)  ↝⟨ (λ hyp → hyp id) ⟩□
   ν C i _                            □
 
+-- Every "partial" fixpoint ν′ C i is a pre-fixpoint of the companion.
+
+companion-ν′⊆ν′ : ∀ {i} → Companion (ν′ C i) ⊆ ν′ C i
+force (companion-ν′⊆ν′ hyp) =
+  companion-ν⊆ν (companion-monotone (λ x → force x) hyp)
+
 -- The companion applied to the greatest fixpoint ν C ∞ is pointwise
 -- logically equivalent to the greatest fixpoint.
 --
