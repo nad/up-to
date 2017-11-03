@@ -111,9 +111,9 @@ compatible→^ω-post-fixpoint {F} mono comp {R = R} R⊆ = uncurry λ n →
 --
 -- This is basically Pous and Sangiorgi's Theorem 6.3.9.
 
-compatible→up-to :
+monotone→compatible→up-to :
   ∀ {F} → Monotone F → Compatible F → Up-to-technique F
-compatible→up-to {F} mono comp {R = R} R⊆ =
+monotone→compatible→up-to {F} mono comp {R = R} R⊆ =
   R       ⊆⟨ 0 ,_ ⟩
   F ^ω R  ⊆⟨ unfold C (compatible→^ω-post-fixpoint mono comp R⊆) ⟩∎
   ν C ∞   ∎

@@ -37,6 +37,7 @@ import Relation
 import Similarity.Strong
 import Similarity.Strong.CCS
 import Up-to
+import Up-to.Closure
 
 ------------------------------------------------------------------------
 -- Section 2
@@ -295,6 +296,11 @@ P   = Bisimilarity.Exercises.Coinductive.CCS.Natural-numbers.P
 Q   = Bisimilarity.Exercises.Coinductive.CCS.Natural-numbers.Q
 P∼Q = Bisimilarity.Exercises.Coinductive.CCS.Natural-numbers.P∼Q
 
+-- The processes in the family P are irregular.
+
+P-irregular =
+  Bisimilarity.Exercises.Coinductive.CCS.Natural-numbers.P-irregular
+
 -- The combinators _■ and _∼⟨_⟩_ presented in the paper correspond to
 -- two instances.
 
@@ -347,9 +353,36 @@ up-to-context-size-preserving =
 Up-to-!                 = Bisimilarity.Up-to.CCS.Up-to-!
 up-to-!-size-preserving = Bisimilarity.Up-to.CCS.up-to-!-size-preserving
 
+-- If a transformer is size-preserving, then it satisfies a
+-- corresponding property for ν′ (and vice versa).
+
+size-preserving′ = Up-to.size-preserving⇔size-preserving′
+
 -- Size-preserving transformers are up-to techniques.
 
 size-preserving→up-to = Up-to.size-preserving→up-to
+
+-- Monotonicity.
+
+Monotone = Relation.Monotone
+
+-- The definition of Size-preserving can be simplified for monotone
+-- transformers.
+
+simplification = Up-to.monotone→⇔
+
+-- There are at least two size-preserving relation transformers that
+-- are not monotone (or extensive).
+
+not-monotone =
+  Bisimilarity.Up-to.Counterexamples.∃-2-size-preserving×¬[monotone⊎extensive]
+
+-- There is a container C such that there are at least two
+-- transformers that, despite preserving every approximation of the
+-- greatest fixpoint of C, are not up-to techniques with respect to C.
+
+not-up-to =
+  Bisimilarity.Up-to.Counterexamples.∃special-case-of-size-preserving×¬up-to
 
 -- There are monotone (and extensive) up-to techniques G and H such
 -- that G ∘ H is not an up-to-technique.
@@ -373,27 +406,23 @@ not-closed-under-composition =
 not-size-preserving =
   Bisimilarity.Up-to.Counterexamples.∃monotone×extensive×up-to×¬size-preserving
 
--- Monotonicity.
+-- Monotone and compatible transformers are up-to techniques.
 
-Monotone = Relation.Monotone
+monotone→compatible→up-to = Up-to.monotone→compatible→up-to
 
--- The definition of Size-preserving can be simplified for monotone
--- transformers.
+-- If F is monotone and symmetric, and compatible for strong
+-- similarity for some LTS, then F is compatible for strong
+-- bisimilarity for this LTS.
 
-simplification = Up-to.monotone→⇔
+compatible-for-similarity→compatible-for-bisimilarity =
+  Up-to.Closure.compatible-for-similarity→compatible-for-bisimilarity
 
--- There are at least two size-preserving relation transformers that
--- are not monotone (or extensive).
+-- It is not in general the case that if F is monotone and symmetric,
+-- and size-preserving for strong similarity for some LTS, then F is
+-- size-preserving for strong bisimilarity for this LTS.
 
-not-monotone =
-  Bisimilarity.Up-to.Counterexamples.∃-2-size-preserving×¬[monotone⊎extensive]
-
--- There is a container C such that there are at least two
--- transformers that, despite preserving every approximation of the
--- greatest fixpoint of C, are not up-to techniques with respect to C.
-
-not-up-to =
-  Bisimilarity.Up-to.Counterexamples.∃special-case-of-size-preserving×¬up-to
+¬-compatible-for-similarity→compatible-for-bisimilarity =
+  Up-to.Closure.¬-Size-preserving-⟷/⊗
 
 ------------------------------------------------------------------------
 -- Section 7
@@ -732,3 +761,17 @@ not-size-preservingᵉʷ =
   Delay-monad.Expansion.size-preserving-transitivity-≳≈ˡ⇔uninhabited
 not-size-preservingʷᵉ =
   Delay-monad.Expansion.size-preserving-transitivity-≈≳ˡ⇔uninhabited
+
+-- Up to expansion.
+
+Up-to-expansion =
+  Bisimilarity.Weak.Coinductive.Other.Up-to.Up-to-expansion
+up-to-expansion-size-preserving =
+  Bisimilarity.Weak.Coinductive.Other.Up-to.up-to-expansion-size-preserving
+
+-- Relations that satisfy the diagrams of the variant of up to
+-- expansion where two occurrences of the expansion relation have been
+-- replaced by weak bisimilarity are contained in weak bisimilarity.
+
+variant-of-up-to-expansion =
+  Bisimilarity.Weak.Coinductive.Other.Up-to.6-5-2-4

@@ -156,11 +156,11 @@ mutual
 -- F ^ω_. This result corresponds to Pous and Sangiorgi's
 -- Theorem 6.3.26.
 
-compatible→up-to-via :
+monotone→compatible→up-to-via :
   ∀ {ℓ} {I : Set ℓ} {C : Container I I} {F} →
   Monotone F →
   Compatible C F → Up-to-technique-via C F (F ^ω_)
-compatible→up-to-via {C = C} {F} mono comp =
+monotone→compatible→up-to-via {C = C} {F} mono comp =
     (λ R →
        R       ⊆⟨ 0 ,_ ⟩∎
        F ^ω R  ∎)

@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------
--- Code related to the paper "Up-to Techniques Using Sized Types"
+-- Code related to the paper "Up-to Techniques using Sized Types"
 --
 -- Nils Anders Danielsson
 ------------------------------------------------------------------------
