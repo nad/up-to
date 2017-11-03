@@ -864,12 +864,12 @@ mutual
   ∀ (C₁ C₂ : Container (I × I) (I × I)) {X : Rel₂ x I} {i} →
   ⟦ C₁ ⟷ C₂ ⟧ X i
     ↝[ k ]
-  ⟦ C₁ ⟧ X i × ⟦ C₂ ⟧ (X ⊚ swap) (swap i)
+  ⟦ C₁ ⟧ X i × (⟦ C₂ ⟧ (X ⁻¹) ⁻¹) i
 ⟦⟷⟧↔ ext C₁ C₂ {X} {i} =
-  ⟦ C₁ ⟷ C₂ ⟧ X i                          ↔⟨⟩
-  ⟦ C₁ ⊗ reindex swap C₂ ⟧ X i             ↝⟨ ⟦⊗⟧↔ ext C₁ (reindex swap C₂) ⟩
-  ⟦ C₁ ⟧ X i × ⟦ reindex swap C₂ ⟧ X i     ↝⟨ ∃-cong (λ _ → ⟦reindex⟧↔ ext C₂) ⟩□
-  ⟦ C₁ ⟧ X i × ⟦ C₂ ⟧ (X ⊚ swap) (swap i)  □
+  ⟦ C₁ ⟷ C₂ ⟧ X i                       ↔⟨⟩
+  ⟦ C₁ ⊗ reindex swap C₂ ⟧ X i          ↝⟨ ⟦⊗⟧↔ ext C₁ (reindex swap C₂) ⟩
+  ⟦ C₁ ⟧ X i × ⟦ reindex swap C₂ ⟧ X i  ↝⟨ ∃-cong (λ _ → ⟦reindex⟧↔ ext C₂) ⟩□
+  ⟦ C₁ ⟧ X i × (⟦ C₂ ⟧ (X ⁻¹) ⁻¹) i     □
 
 -- An unfolding lemma for ⟦ C₁ ⟷ C₂ ⟧₂.
 
@@ -920,10 +920,10 @@ mutual
   ∀ {ℓ r} {I : Set ℓ} {C : Container (I × I) (I × I)} {R : Rel₂ r I} →
   R ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ R → R ⊆ ⟦ ⟷[ C ] ⟧ R
 ⊆reindex₂-swap-⊗→⊆⟷ {C = C} {R} R⊆ =
-  R                                  ⊆⟨ (λ x → lemma₁ x , lemma₂ x) ⟩
-  ⟦ C ⟧ R ∩ R ⊚ swap                 ⊆⟨ Σ-map P.id lemma₃ ⟩
-  ⟦ C ⟧ R ∩ ⟦ C ⟧ (R ⊚ swap) ⊚ swap  ⊆⟨ _⇔_.from (⟦⟷⟧↔ _ C C) ⟩∎
-  ⟦ ⟷[ C ] ⟧ R                       ∎
+  R                          ⊆⟨ (λ x → lemma₁ x , lemma₂ x) ⟩
+  ⟦ C ⟧ R ∩ R ⁻¹             ⊆⟨ Σ-map P.id lemma₃ ⟩
+  ⟦ C ⟧ R ∩ ⟦ C ⟧ (R ⁻¹) ⁻¹  ⊆⟨ _⇔_.from (⟦⟷⟧↔ _ C C) ⟩∎
+  ⟦ ⟷[ C ] ⟧ R               ∎
   where
   lemma₀ =
     R                                 ⊆⟨ R⊆ ⟩
@@ -939,13 +939,13 @@ mutual
     R                                 ⊆⟨ lemma₀ ⟩
     ⟦ reindex₂ swap id ⟧ R ∩ ⟦ C ⟧ R  ⊆⟨ proj₁ ⟩
     ⟦ reindex₂ swap id ⟧ R            ⊆⟨ P.id ⟩
-    ⟦ id ⟧ R ⊚ swap                   ⊆⟨ _⇔_.to (⟦id⟧↔ _) ⟩∎
-    R ⊚ swap                          ∎
+    ⟦ id ⟧ R ⁻¹                       ⊆⟨ _⇔_.to (⟦id⟧↔ _) ⟩∎
+    R ⁻¹                              ∎
 
   lemma₃ =
-    R                 ⊆⟨ lemma₁ ⟩
-    ⟦ C ⟧ R           ⊆⟨ map C lemma₂ ⟩∎
-    ⟦ C ⟧ (R ⊚ swap)  ∎
+    R             ⊆⟨ lemma₁ ⟩
+    ⟦ C ⟧ R       ⊆⟨ map C lemma₂ ⟩∎
+    ⟦ C ⟧ (R ⁻¹)  ∎
 
 -- The symmetric closure of a post-fixpoint of ⟷[ C ] is a
 -- post-fixpoint of reindex₂ swap id ⊗ C.
@@ -953,31 +953,26 @@ mutual
 ⊆⟷→∪-swap⊆reindex₂-swap-⊗ :
   ∀ {ℓ r} {I : Set ℓ} {C : Container (I × I) (I × I)} {R : Rel₂ r I} →
   R ⊆ ⟦ ⟷[ C ] ⟧ R →
-  R ∪ R ⊚ swap ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ (R ∪ R ⊚ swap)
+  R ∪ R ⁻¹ ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ (R ∪ R ⁻¹)
 ⊆⟷→∪-swap⊆reindex₂-swap-⊗ {C = C} {R} R⊆ =
-  R ∪ R ⊚ swap                                                ⊆⟨ (λ x → lemma₁ x , lemma₂ x) ⟩
-  ⟦ reindex₂ swap id ⟧ (R ∪ R ⊚ swap) ∩ ⟦ C ⟧ (R ∪ R ⊚ swap)  ⊆⟨ _⇔_.from (⟦⊗⟧↔ _ (reindex₂ swap id) C) ⟩∎
-  ⟦ reindex₂ swap id ⊗ C ⟧ (R ∪ R ⊚ swap)                     ∎
+  R ∪ R ⁻¹                                            ⊆⟨ (λ x → lemma₁ x , lemma₂ x) ⟩
+  ⟦ reindex₂ swap id ⟧ (R ∪ R ⁻¹) ∩ ⟦ C ⟧ (R ∪ R ⁻¹)  ⊆⟨ _⇔_.from (⟦⊗⟧↔ _ (reindex₂ swap id) C) ⟩∎
+  ⟦ reindex₂ swap id ⊗ C ⟧ (R ∪ R ⁻¹)                 ∎
   where
   lemma₁ =
-    R ∪ R ⊚ swap                         ⊆⟨ [ inj₂ , inj₁ ] ⟩
-    R ⊚ swap ∪ R                         ⊆⟨ P.id ⟩
-    R ⊚ swap ∪ R ⊚ swap ⊚ swap           ⊆⟨ P.id ⟩
-    (R ∪ R ⊚ swap) ⊚ swap                ⊆⟨ _⇔_.from (⟦id⟧↔ _) ⟩
-    ⟦ id ⟧ (R ∪ R ⊚ swap) ⊚ swap         ⊆⟨ P.id ⟩∎
-    ⟦ reindex₂ swap id ⟧ (R ∪ R ⊚ swap)  ∎
+    R ∪ R ⁻¹                         ⊆⟨ [ inj₂ , inj₁ ] ⟩
+    R ⁻¹ ∪ R                         ⊆⟨ P.id ⟩
+    R ⁻¹ ∪ R ⁻¹ ⁻¹                   ⊆⟨ P.id ⟩
+    (R ∪ R ⁻¹) ⁻¹                    ⊆⟨ _⇔_.from (⟦id⟧↔ _) ⟩
+    ⟦ id ⟧ (R ∪ R ⁻¹) ⁻¹             ⊆⟨ P.id ⟩∎
+    ⟦ reindex₂ swap id ⟧ (R ∪ R ⁻¹)  ∎
 
   lemma₂ =
-    R ∪ R ⊚ swap                         ⊆⟨ ⊎-map R⊆ R⊆ ⟩
-
-    ⟦ ⟷[ C ] ⟧ R ∪ ⟦ ⟷[ C ] ⟧ R ⊚ swap   ⊆⟨ ⊎-map (_⇔_.to (⟦⟷⟧↔ _ C C)) (_⇔_.to (⟦⟷⟧↔ _ C C)) ⟩
-
-    ⟦ C ⟧ R ∩ ⟦ C ⟧ (R ⊚ swap) ⊚ swap ∪
-    ⟦ C ⟧ R ⊚ swap ∩ ⟦ C ⟧ (R ⊚ swap)    ⊆⟨ ⊎-map proj₁ proj₂ ⟩
-
-    ⟦ C ⟧ R ∪ ⟦ C ⟧ (R ⊚ swap)           ⊆⟨ [ map C inj₁ , map C inj₂ ] ⟩∎
-
-    ⟦ C ⟧ (R ∪ R ⊚ swap)                 ∎
+    R ∪ R ⁻¹                                               ⊆⟨ ⊎-map R⊆ R⊆ ⟩
+    ⟦ ⟷[ C ] ⟧ R ∪ ⟦ ⟷[ C ] ⟧ R ⁻¹                         ⊆⟨ ⊎-map (_⇔_.to (⟦⟷⟧↔ _ C C)) (_⇔_.to (⟦⟷⟧↔ _ C C)) ⟩
+    ⟦ C ⟧ R ∩ ⟦ C ⟧ (R ⁻¹) ⁻¹ ∪ ⟦ C ⟧ R ⁻¹ ∩ ⟦ C ⟧ (R ⁻¹)  ⊆⟨ ⊎-map proj₁ proj₂ ⟩
+    ⟦ C ⟧ R ∪ ⟦ C ⟧ (R ⁻¹)                                 ⊆⟨ [ map C inj₁ , map C inj₂ ] ⟩∎
+    ⟦ C ⟧ (R ∪ R ⁻¹)                                       ∎
 
 -- The greatest fixpoint of ⟷[ C ] is pointwise logically equivalent
 -- to the greatest fixpoint of reindex₂ swap id ⊗ C.
@@ -990,11 +985,11 @@ mutual
   ν ⟷[ C ] ∞ p ⇔ ν (reindex₂ swap id ⊗ C) ∞ p
 ν-⟷⇔ {C = C} = record
   { to =
-      let R = ν ⟷[ C ] ∞ in                                   $⟨ (λ {_} → ν-out _) ⟩
-      R ⊆ ⟦ ⟷[ C ] ⟧ R                                        ↝⟨ ⊆⟷→∪-swap⊆reindex₂-swap-⊗ ⟩
-      R ∪ R ⊚ swap ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ (R ∪ R ⊚ swap)  ↝⟨ unfold _ ⟩
-      R ∪ R ⊚ swap ⊆ ν (reindex₂ swap id ⊗ C) ∞               ↝⟨ (λ hyp {_} x → hyp (inj₁ x)) ⟩□
-      R ⊆ ν (reindex₂ swap id ⊗ C) ∞                          □
+      let R = ν ⟷[ C ] ∞ in                           $⟨ (λ {_} → ν-out _) ⟩
+      R ⊆ ⟦ ⟷[ C ] ⟧ R                                ↝⟨ ⊆⟷→∪-swap⊆reindex₂-swap-⊗ ⟩
+      R ∪ R ⁻¹ ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ (R ∪ R ⁻¹)  ↝⟨ unfold _ ⟩
+      R ∪ R ⁻¹ ⊆ ν (reindex₂ swap id ⊗ C) ∞           ↝⟨ (λ hyp {_} x → hyp (inj₁ x)) ⟩□
+      R ⊆ ν (reindex₂ swap id ⊗ C) ∞                  □
 
   ; from =
       let R = ν (reindex₂ swap id ⊗ C) ∞ in  $⟨ (λ {_} → ν-out _) ⟩

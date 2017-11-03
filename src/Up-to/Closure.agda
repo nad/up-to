@@ -207,10 +207,10 @@ Size-preserving-reindex {C = C} {F} {f}
 
   symm : Symmetric swap F
   symm R =
-    F (R ∘ swap)                                              ⊆⟨⟩
-    R ∘ swap ∪ (_≡ (m₁ , m₂))        ∪ (_≡ (m₂ , m₁))         ⊆⟨ ⊎-map id P.[ inj₂ ∘ lemma , inj₁ ∘ lemma ] ⟩
-    R ∘ swap ∪ (_≡ (m₁ , m₂)) ∘ swap ∪ (_≡ (m₂ , m₁)) ∘ swap  ⊆⟨ id ⟩∎
-    F R ∘ swap                                                ∎
+    F (R ⁻¹)                                      ⊆⟨⟩
+    R ⁻¹ ∪ (_≡ (m₁ , m₂))    ∪ (_≡ (m₂ , m₁))     ⊆⟨ ⊎-map id P.[ inj₂ ∘ lemma , inj₁ ∘ lemma ] ⟩
+    R ⁻¹ ∪ (_≡ (m₁ , m₂)) ⁻¹ ∪ (_≡ (m₂ , m₁)) ⁻¹  ⊆⟨ id ⟩∎
+    F R ⁻¹                                        ∎
     where
     lemma : {p₁ p₂ : Proc ∞ × Proc ∞} → p₁ ≡ swap p₂ → swap p₁ ≡ p₂
     lemma refl = refl

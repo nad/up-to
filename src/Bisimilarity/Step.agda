@@ -124,17 +124,17 @@ Step↔StepC :
   Extensionality? k ℓ (ℓ ⊔ r) →
   Step R pq ↝[ k ] ⟦ StepC ⟧ R pq
 Step↔StepC {R = R} {pq} ext =
-  Step R pq                                         ↔⟨ lemma ⟩
+  Step R pq                                     ↔⟨ lemma ⟩
 
   One-sided.Step _[_]↝₁_ R pq
     ×
-  One-sided.Step _[_]↝₂_ (R ∘ swap) (swap pq)       ↝⟨ One-sided.Step↔StepC _ ext ×-cong One-sided.Step↔StepC _ ext ⟩
+  One-sided.Step _[_]↝₂_ (R ⁻¹) (swap pq)       ↝⟨ One-sided.Step↔StepC _ ext ×-cong One-sided.Step↔StepC _ ext ⟩
 
   ⟦ One-sided.StepC _[_]↝₁_ ⟧ R pq
     ×
-  ⟦ One-sided.StepC _[_]↝₂_ ⟧ (R ∘ swap) (swap pq)  ↝⟨ inverse-ext? (λ ext → ⟦⟷⟧↔ ext (One-sided.StepC _[_]↝₁_) (One-sided.StepC _[_]↝₂_)) ext ⟩□
+  ⟦ One-sided.StepC _[_]↝₂_ ⟧ (R ⁻¹) (swap pq)  ↝⟨ inverse-ext? (λ ext → ⟦⟷⟧↔ ext (One-sided.StepC _[_]↝₁_) (One-sided.StepC _[_]↝₂_)) ext ⟩□
 
-  ⟦ StepC ⟧ R pq                                    □
+  ⟦ StepC ⟧ R pq                                □
   where
   lemma : _ ↔ _
   lemma = record
