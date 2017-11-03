@@ -390,6 +390,17 @@ companion-size-preserving =
 companion-monotone : Monotone Companion
 companion-monotone R⊆S f S⊆νCi = f (S⊆νCi ∘ R⊆S)
 
+-- A preservation lemma.
+
+companion-cong :
+  ∀ {k R S} →
+  Extensionality? ⌊ k ⌋-sym ℓ ℓ →
+  (∀ {x} → R x ↝[ ⌊ k ⌋-sym ] S x) →
+  (∀ {x} → Companion R x ↝[ ⌊ k ⌋-sym ] Companion S x)
+companion-cong {k} {R} {S} ext R↝S {x} =
+  (∀ {i} → R ⊆ ν C i → ν C i x)  ↝⟨ implicit-∀-cong (lower-extensionality? ⌊ k ⌋-sym _ lzero ext) (→-cong ext (⊆-cong ext R↝S F.id) F.id) ⟩□
+  (∀ {i} → S ⊆ ν C i → ν C i x)  □
+
 -- The companion is an up-to technique.
 
 companion-up-to : Up-to-technique Companion
