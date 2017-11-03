@@ -909,6 +909,17 @@ mutual
             , (t₂ , λ p → g (inj₂ (_ , refl , p)))
             )                                                 □
 
+-- The greatest fixpoint ν (C₁ ⟷ C₂) i is contained in the
+-- intersection ν C₁ i ∩ ν C₂ i ⁻¹.
+
+ν-↔⊆ : ∀ {ℓ} {I : Set ℓ} {C₁ C₂ : Container (I × I) (I × I)} {i} →
+       ν (C₁ ⟷ C₂) i ⊆ ν C₁ i ∩ ν C₂ i ⁻¹
+ν-↔⊆ {C₁ = C₁} {C₂} {i} =
+  ν (C₁ ⟷ C₂) i                   ⊆⟨⟩
+  ν (C₁ ⊗ reindex swap C₂) i      ⊆⟨ ν-⊗⊆ ⟩
+  ν C₁ i ∩ ν (reindex swap C₂) i  ⊆⟨ Σ-map P.id (_⇔_.to (ν-reindex⇔ refl)) ⟩∎
+  ν C₁ i ∩ ν C₂ i ⁻¹              ∎
+
 -- The following three lemmas correspond to the second part of
 -- Exercise 6.3.24 in Pous and Sangiorgi's "Enhancements of the
 -- bisimulation proof method".
