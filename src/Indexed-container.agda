@@ -115,7 +115,7 @@ mutual
   μ C ∞ ⊆ ⟦ C ⟧ (μ C ∞)
 μ-out {C = C} = map C ⟨_⟩⁻¹
 
--- The greatest fixpoint is a pre-fixpoint.
+-- The least fixpoint is a pre-fixpoint.
 
 μ-in :
   ∀ {ℓ} {X : Set ℓ} {C : Container X X} →
