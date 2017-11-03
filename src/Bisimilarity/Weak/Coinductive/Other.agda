@@ -11,6 +11,8 @@ module Bisimilarity.Weak.Coinductive.Other {ℓ} (lts : LTS ℓ) where
 open import Equality.Propositional
 open import Prelude
 
+import Function-universe equality-with-J as F
+
 import Bisimilarity.Coinductive
 import Bisimilarity.Coinductive.Equational-reasoning-instances
 import Bisimilarity.Coinductive.General
@@ -19,6 +21,7 @@ import Expansion
 import Expansion.Equational-reasoning-instances
 open import Indexed-container using (Container; ν; ν′)
 open import Relation
+open import Up-to
 
 open LTS lts
 private
@@ -173,6 +176,15 @@ mutual
 
   symmetric-≈′ : ∀ {i p q} → [ i ] p ≈′ q → [ i ] q ≈′ p
   force (symmetric-≈′ p≈q) = symmetric-≈ (force p≈q)
+
+private
+
+  -- An alternative proof of symmetry.
+
+  alternative-proof-of-symmetry : ∀ {i p q} → [ i ] p ≈ q → [ i ] q ≈ p
+  alternative-proof-of-symmetry {i} =
+    uncurry [ i ]_≈_ ⁻¹  ⊆⟨ ν-symmetric _ _ swap refl F.id ⟩∎
+    uncurry [ i ]_≈_     ∎
 
 mutual
 
