@@ -303,11 +303,11 @@ _■ =
 _∼⟨_⟩_ =
   Bisimilarity.Coinductive.Equational-reasoning-instances.trans∼∼
 
--- Equations of the form [ ∞ ] P ∼ (C [ P ]) have unique solutions for
--- contexts C where every hole is under a prefix.
+-- Equations of the form [ ∞ ] P ∼ (C [ P ]) have unique solutions up
+-- to bisimilarity for contexts C where every hole is under a prefix.
 
-unique-solutions-for-weakly-guarded-contexts =
-  Bisimilarity.Exercises.Coinductive.CCS.unique-solutions
+existence  = Bisimilarity.Exercises.Coinductive.CCS.solutions-exist
+uniqueness = Bisimilarity.Exercises.Coinductive.CCS.unique-solutions
 
 ------------------------------------------------------------------------
 -- Section 6

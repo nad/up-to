@@ -929,6 +929,58 @@ mutual
     ∀ x → [ i ] Ps x ∼′ Qs x
   force (unique-solutions′ w ∼C[Ps] ∼C[Qs] x) = unique-solutions w ∼C[Ps] ∼C[Qs] x
 
+-- For every family of weakly guarded contexts there is a family of
+-- processes that satisfies the corresponding equations.
+
+solutions-exist :
+  ∀ {n} {C : Fin n → Context ∞ n} →
+  (∀ x → Weakly-guarded (C x)) →
+  ∃ λ Ps → ∀ x → Ps x ∼ C x [ Ps ]
+solutions-exist {n} {C} w = Ps , Ps∼
+  where
+
+  mutual
+
+    Ps : ∀ {i} → Fin n → Proc i
+    Ps x = P₁ (w x)
+
+    P₁ : ∀ {i} {C : Context ∞ n} → Weakly-guarded C → Proc i
+    P₁ ∅                        = ∅
+    P₁ (w₁ ∣ w₂)                = P₁ w₁ ∣ P₁ w₂
+    P₁ (w₁ ⊕ w₂)                = P₁ w₁ ⊕ P₁ w₂
+    P₁ (action {μ = μ} {C = C}) = μ · λ { .force → P₂ (force C) }
+    P₁ (⟨ν⟩ {a = a} w)          = ⟨ν a ⟩ (P₁ w)
+    P₁ (! w)                    = ! P₁ w
+
+    P₂ : ∀ {i} → Context ∞ n → Proc i
+    P₂ (hole x)   = Ps x
+    P₂ ∅          = ∅
+    P₂ (C₁ ∣ C₂)  = P₂ C₁ ∣ P₂ C₂
+    P₂ (C₁ ⊕ C₂)  = P₂ C₁ ⊕ P₂ C₂
+    P₂ (μ · C)    = μ · λ { .force → P₂ (force C) }
+    P₂ (⟨ν a ⟩ C) = ⟨ν a ⟩ (P₂ C)
+    P₂ (! C)      = ! P₂ C
+
+  P₂∼ : ∀ {i} (C : Context ∞ n) → [ i ] P₂ C ∼ C [ Ps ]
+  P₂∼ (hole x)   = reflexive
+  P₂∼ ∅          = reflexive
+  P₂∼ (C₁ ∣ C₂)  = P₂∼ C₁ ∣-cong P₂∼ C₂
+  P₂∼ (C₁ ⊕ C₂)  = P₂∼ C₁ ⊕-cong P₂∼ C₂
+  P₂∼ (μ · C)    = refl ·-cong λ { .force → P₂∼ (force C) }
+  P₂∼ (⟨ν a ⟩ C) = ⟨ν refl ⟩-cong (P₂∼ C)
+  P₂∼ (! C)      = !-cong P₂∼ C
+
+  P₁∼ : {C : Context ∞ n} (w : Weakly-guarded C) → P₁ w ∼ C [ Ps ]
+  P₁∼ ∅                = reflexive
+  P₁∼ (w₁ ∣ w₂)        = P₁∼ w₁ ∣-cong P₁∼ w₂
+  P₁∼ (w₁ ⊕ w₂)        = P₁∼ w₁ ⊕-cong P₁∼ w₂
+  P₁∼ (action {C = C}) = refl ·-cong λ { .force → P₂∼ (force C) }
+  P₁∼ (⟨ν⟩ {a = a} w)  = ⟨ν refl ⟩-cong (P₁∼ w)
+  P₁∼ (! w)            = !-cong P₁∼ w
+
+  Ps∼ : ∀ x → Ps x ∼ C x [ Ps ]
+  Ps∼ x = P₁∼ (w x)
+
 ------------------------------------------------------------------------
 -- Some lemmas related to _⊕_
 
