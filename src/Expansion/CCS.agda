@@ -108,7 +108,7 @@ module Cong-lemmas
     ∀ {P₁ P₂ Q₂ μ μ′} →
     R′ (force P₁) (force P₂) → μ · P₂ [ μ′ ]⟶ Q₂ →
     ∃ λ Q₁ → ((μ · P₁) [ μ′ ]↝ Q₁) × R′ Q₁ Q₂
-  ·-cong P₁≳P₂ action = _ , convert _[_]⟶_.action , P₁≳P₂
+  ·-cong P₁≳P₂ action = _ , convert (⟶: action) , P₁≳P₂
 
   ⟨ν⟩-cong :
     (∀ {a P P′} → R′ P P′ → R′ (⟨ν a ⟩ P) (⟨ν a ⟩ P′)) →
@@ -233,12 +233,12 @@ module Cong-lemmas
     ∃ λ S → ((P ⊕ μ · Q) [ μ′ ]↝ S) × R′ S S′
   ⊕·-cong {P} {Q} {Q′} {S′} {μ} {μ′} Q≳Q′ = λ where
     (sum-left P⟶S′) →
-      P ⊕ μ · Q  →⟨ sum-left P⟶S′ ⟩■
+      P ⊕ μ · Q  →⟨ ⟶: sum-left P⟶S′ ⟩■
         ↝[ μ′ ]
       S′         ■
 
     (sum-right action) →
-      P ⊕ μ · Q  →⟨ sum-right action ⟩■
+      P ⊕ μ · Q  →⟨ ⟶: sum-right action ⟩■
         ↝[ μ ]
       force Q    ∼⟨ Q≳Q′ ⟩■
       force Q′
@@ -250,13 +250,13 @@ module Cong-lemmas
     ∃ λ S → ((μ₁ · P₁ ⊕ μ₂ · P₂) [ μ ]↝ S) × R′ S S′
   ·⊕·-cong {μ₁} {μ₂} {P₁} {P₁′} {P₂} {P₂′} P₁≳P₁′ P₂≳P₂′ = λ where
     (sum-left action) →
-      μ₁ · P₁ ⊕ μ₂ · P₂  →⟨ sum-left action ⟩■
+      μ₁ · P₁ ⊕ μ₂ · P₂  →⟨ ⟶: sum-left action ⟩■
         ↝[ μ₁ ]
       force P₁           ∼⟨ P₁≳P₁′ ⟩■
       force P₁′
 
     (sum-right action) →
-      μ₁ · P₁ ⊕ μ₂ · P₂  →⟨ sum-right action ⟩■
+      μ₁ · P₁ ⊕ μ₂ · P₂  →⟨ ⟶: sum-right action ⟩■
         ↝[ μ₂ ]
       force P₂           ∼⟨ P₂≳P₂′ ⟩■
       force P₂′
@@ -364,7 +364,7 @@ mutual
     ... | Q′ , step P′⟶Q′ , Q≳′Q′ =
       ⟨ν a ⟩ Q   ∼⟨ ⟨ν refl ⟩-cong′ Q≳′Q′ ⟩■
       ⟨ν a ⟩ Q′
-        ⟵̂[ μ ]   ←⟨ restriction a∉μ P′⟶Q′ ⟩■
+        ⟵̂[ μ ]   ←⟨ ⟶: restriction a∉μ P′⟶Q′ ⟩■
       ⟨ν a ⟩ P′
 
     ... | _ , done μs , Q≳′P′ =
@@ -409,7 +409,7 @@ mutual
           Q          ∼⟨ Q∼!P∣P″ ⟩
           ! P  ∣ P″  ∼⟨ !-cong′ (convert {a = ℓ} P≳P′) ∣-cong′ P″≳′Q′ ⟩■
           ! P′ ∣ Q′
-            ⟵̂[ μ ]   ←⟨ replication (par-right P′⟶Q′) ⟩■
+            ⟵̂[ μ ]   ←⟨ ⟶: replication (par-right P′⟶Q′) ⟩■
           ! P′
 
       (inj₂ (refl , P″ , P‴ , a , P⟶P″ , P⟶P‴ , Q≳!P∣P″∣P‴)) →
@@ -420,7 +420,7 @@ mutual
             Q                 ∼⟨ Q≳!P∣P″∣P‴ ⟩
             (! P ∣ P″) ∣ P‴   ∼⟨ (!-cong′ (convert {a = ℓ} P≳P′) ∣-cong′ P″≳′Q′) ∣-cong′ P‴≳′Q″ ⟩■
             (! P′ ∣ Q′) ∣ Q″
-              ⟵̂[ μ ]          ←⟨ replication (par-τ (replication (par-right P′⟶Q′)) P′⟶Q″) ⟩■
+              ⟵̂[ μ ]          ←⟨ ⟶: replication (par-τ (replication (par-right P′⟶Q′)) P′⟶Q″) ⟩■
             ! P′
 
           ((_ , done () , _) , _)
@@ -515,13 +515,13 @@ mutual
   lr {R} {μ′} = λ where
     (sum-left P⟶R) →
       R           ■
-        ⟵̂[ μ′ ]   ←⟨ sum-left P⟶R ⟩■
+        ⟵̂[ μ′ ]   ←⟨ ⟶: sum-left P⟶R ⟩■
       P ⊕ μ · Q′
 
     (sum-right action) →
       force Q     ∼⟨ Q≳Q′ ⟩■
       force Q′
-        ⟵̂[ μ ]    ←⟨ sum-right action ⟩■
+        ⟵̂[ μ ]    ←⟨ ⟶: sum-right action ⟩■
       P ⊕ μ · Q′
 
 ⊕·-cong′ : ∀ {i P μ Q Q′} →
@@ -555,13 +555,13 @@ _·⊕·-cong_ {i} {μ₁} {μ₂} {P₁} {P₁′} {P₂} {P₂′} P₁≳P₁
     (sum-left action) →
       force P₁             ∼⟨ P₁≳P₁′ ⟩■
       force P₁′
-        ⟵̂[ μ₁ ]            ←⟨ sum-left action ⟩■
+        ⟵̂[ μ₁ ]            ←⟨ ⟶: sum-left action ⟩■
       μ₁ · P₁′ ⊕ μ₂ · P₂′
 
     (sum-right action) →
       force P₂             ∼⟨ P₂≳P₂′ ⟩■
       force P₂′
-        ⟵̂[ μ₂ ]            ←⟨ sum-right action ⟩■
+        ⟵̂[ μ₂ ]            ←⟨ ⟶: sum-right action ⟩■
       μ₁ · P₁′ ⊕ μ₂ · P₂′
 
 _·⊕·-cong′_ :

@@ -536,6 +536,27 @@ finite→finite action              (action f) = f
 finite→finite (restriction a∉ tr) ⟨ν f ⟩     = ⟨ν finite→finite tr f ⟩
 finite→finite (replication tr)    (! f)      = finite→finite tr (! f ∣ f)
 
+-- Subprocess P Q means that P is a syntactic subprocess of Q.
+
+data Subprocess (P : Proc ∞) : Proc ∞ → Set ℓ where
+  refl        : ∀ {Q} → Equal ∞ P Q → Subprocess P Q
+  par-left    : ∀ {Q₁ Q₂} → Subprocess P Q₁ → Subprocess P (Q₁ ∣ Q₂)
+  par-right   : ∀ {Q₁ Q₂} → Subprocess P Q₂ → Subprocess P (Q₁ ∣ Q₂)
+  sum-left    : ∀ {Q₁ Q₂} → Subprocess P Q₁ → Subprocess P (Q₁ ⊕ Q₂)
+  sum-right   : ∀ {Q₁ Q₂} → Subprocess P Q₂ → Subprocess P (Q₁ ⊕ Q₂)
+  action      : ∀ {μ Q} → Subprocess P (force Q) → Subprocess P (μ · Q)
+  restriction : ∀ {a Q} → Subprocess P Q → Subprocess P (⟨ν a ⟩ Q)
+  replication : ∀ {Q} → Subprocess P Q → Subprocess P (! Q)
+
+-- A process is regular if it has a finite number of distinct
+-- subprocesses.
+
+Regular : Proc ∞ → Set ℓ
+Regular P =
+  ∃ λ n → ∃ λ (Qs : Fin n → Proc ∞) →
+    ∀ {Q} → Subprocess Q P →
+      ∃ λ (i : Fin n) → Equal ∞ Q (Qs i)
+
 -- Lemma 6.2.15 from "Enhancements of the bisimulation proof method".
 -- That text claims that the lemma is proved by induction on the
 -- structure of the context. Perhaps that is possible, but the proof

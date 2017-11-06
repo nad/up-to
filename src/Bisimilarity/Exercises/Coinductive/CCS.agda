@@ -81,14 +81,14 @@ module Cong-lemmas
       (S′ , P₁′⟶S′ , S∼′S′) →
         S          ∼⟨ S∼′S′ ⟩■
         S′
-          [ μ ]⟵   ←⟨ sum-left P₁′⟶S′ ⟩■
+          [ μ ]⟵   ←⟨ ⟶: sum-left P₁′⟶S′ ⟩■
         P₁′ ⊕ P₂′
 
     (sum-right P₂⟶S) → case left-to-right P₂∼P₂′ P₂⟶S of λ where
       (S′ , P₂′⟶S′ , S∼′S′) →
         S          ∼⟨ S∼′S′ ⟩■
         S′
-          [ μ ]⟵   ←⟨ sum-right P₂′⟶S′ ⟩■
+          [ μ ]⟵   ←⟨ ⟶: sum-right P₂′⟶S′ ⟩■
         P₁′ ⊕ P₂′
 
   ·-cong :
@@ -98,7 +98,7 @@ module Cong-lemmas
   ·-cong {P₁} {P₂} {μ = μ} P₁∼P₂ action =
     force P₁  ∼⟨ P₁∼P₂ ⟩■
     force P₂
-      [ μ ]⟵  ←⟨ _[_]⟶_.action ⟩■
+      [ μ ]⟵  ←⟨ ⟶: action ⟩■
     μ · P₂
 
   ⟨ν⟩-cong :
@@ -112,7 +112,7 @@ module Cong-lemmas
       (Q′ , P′⟶Q′ , Q∼′Q′) →
         ⟨ν a ⟩ Q   ∼⟨ ⟨ν⟩-cong′ Q∼′Q′ ⟩■
         ⟨ν a ⟩ Q′
-          [ μ ]⟵   ←⟨ restriction a∉μ P′⟶Q′ ⟩■
+          [ μ ]⟵   ←⟨ ⟶: restriction a∉μ P′⟶Q′ ⟩■
         ⟨ν a ⟩ P′
 
   !-cong :
@@ -137,7 +137,7 @@ module Cong-lemmas
         Q          ∼⟨ R′: convert Q∼!P∣P″ ⟩
         ! P  ∣ P″  ∼⟨ (!-cong′ convert P∼P′) ∣-cong′ P″∼′Q′ ⟩■
         ! P′ ∣ Q′
-          [ μ ]⟵   ←⟨ replication (par-right P′⟶Q′) ⟩■
+          [ μ ]⟵   ←⟨ ⟶: replication (par-right P′⟶Q′) ⟩■
         ! P′
 
       (inj₂ (refl , P″ , P‴ , a , P⟶P″ , P⟶P‴ , Q∼!P∣P″∣P‴)) →
@@ -147,7 +147,7 @@ module Cong-lemmas
         Q                 ∼⟨ R′: convert Q∼!P∣P″∣P‴ ⟩
         (! P ∣ P″) ∣ P‴   ∼⟨ ((!-cong′ convert P∼P′) ∣-cong′ P″∼′Q′) ∣-cong′ P‴∼′Q″ ⟩■
         (! P′ ∣ Q′) ∣ Q″
-          [ τ ]⟵          ←⟨ replication (par-τ (replication (par-right P′⟶Q′)) P′⟶Q″) ⟩■
+          [ τ ]⟵          ←⟨ ⟶: replication (par-τ (replication (par-right P′⟶Q′)) P′⟶Q″) ⟩■
         ! P′
 
 private

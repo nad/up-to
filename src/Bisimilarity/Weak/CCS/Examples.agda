@@ -56,7 +56,7 @@ mutual
         ((! a ∙ ∣ ! b ∙) ∣ ! co a ∙) ∣ b ∙   ∼⟨ swap-rightmost ⟩ ∼:
         ((! a ∙ ∣ ! b ∙) ∣ b ∙) ∣ ! co a ∙   ∼⟨ lemma ∣-cong reflexive ⟩■
         ((! a ∙ ∣ ∅) ∣ ! b ∙) ∣ ! co a ∙
-          W.⇐̂[ name a ]                      ←⟨ par-left (par-left (replication (par-right action))) ⟩■
+          W.⇐̂[ name a ]                      ←⟨ ⟶: par-left (par-left (replication (par-right action))) ⟩■
         (! a ∙ ∣ ! b ∙) ∣ ! co a ∙
 
       (inj₂ (_ , .(b ∙) , _ , .a , action , ab[a̅]⟶ , _)) →
@@ -69,7 +69,7 @@ mutual
         (! name a ∙ (b ∙) ∣ ! co a ∙) ∣ ∅  ∼′⟨ 6-5-4′ WL.∣-cong′ reflexive ⟩ ∼:
         ((! a ∙ ∣ ! b ∙) ∣ ! co a ∙) ∣ ∅   ∼⟨ symmetric ∣-assoc ⟩■
         (! a ∙ ∣ ! b ∙) ∣ (! co a ∙ ∣ ∅)
-          W.⇐̂[ name (co a) ]               ←⟨ par-right (replication (par-right action)) ⟩■
+          W.⇐̂[ name (co a) ]               ←⟨ ⟶: par-right (replication (par-right action)) ⟩■
         (! a ∙ ∣ ! b ∙) ∣ ! co a ∙
 
       (inj₂ (_ , .∅ , _ , .(co a) , action , a̅[a̅̅]⟶ , _)) →
@@ -176,7 +176,7 @@ mutual
       ∃ λ P → ! name a ∙ (b ∙) ∣ ! co a ∙ [ μ ]⇒̂ P × [ i ] P ≈′ Q
     rl {Q} tr = case rl-lemma tr of λ where
       (!a∣!b∣!a̅∼Q , inj₁ refl) →
-        ! name a ∙ (b ∙) ∣ ! co a ∙          →⟨ par-left (replication (par-right action)) ⟩■
+        ! name a ∙ (b ∙) ∣ ! co a ∙          →⟨ ⟶: par-left (replication (par-right action)) ⟩■
           W.⇒̂[ name a ]
         (! name a ∙ (b ∙) ∣ b ∙) ∣ ! co a ∙  ∼⟨ swap-rightmost ⟩
         (! name a ∙ (b ∙) ∣ ! co a ∙) ∣ b ∙  ∼′⟨ 6-5-4′ WL.∣-cong′ reflexive ⟩
@@ -189,7 +189,7 @@ mutual
       (!a∣!b∣!a̅∼Q , inj₂ (inj₁ refl)) →
         ! name a ∙ (b ∙) ∣ ! co a ∙                  →⟨ par-τ (replication (par-right action))
                                                               (replication (par-right action)) ⟩
-        (! name a ∙ (b ∙) ∣ (b ∙)) ∣ (! co a ∙ ∣ ∅)  →⟨ par-left (par-right action) ⟩■
+        (! name a ∙ (b ∙) ∣ (b ∙)) ∣ (! co a ∙ ∣ ∅)  →⟨ ⟶: par-left (par-right action) ⟩■
           W.⇒̂[ name b ]
         (! name a ∙ (b ∙) ∣ ∅) ∣ (! co a ∙ ∣ ∅)      ∼⟨ ∣-right-identity ∣-cong ∣-right-identity ⟩
         (! name a ∙ (b ∙)) ∣ ! co a ∙                ∼′⟨ 6-5-4′ ⟩ ∼:
@@ -197,7 +197,7 @@ mutual
         Q
 
       (!a∣!b∣!a̅∼Q , inj₂ (inj₂ (inj₁ refl))) →
-        ! name a ∙ (b ∙) ∣ ! co a ∙        →⟨ par-right (replication (par-right action)) ⟩■
+        ! name a ∙ (b ∙) ∣ ! co a ∙        →⟨ ⟶: par-right (replication (par-right action)) ⟩■
           W.⇒̂[ name (co a) ]
         ! name a ∙ (b ∙) ∣ (! co a ∙ ∣ ∅)  ∼⟨ reflexive ∣-cong ∣-right-identity ⟩
         ! name a ∙ (b ∙) ∣ ! co a ∙        ∼′⟨ 6-5-4′ ⟩ ∼:
@@ -241,8 +241,8 @@ mutual
     ∃ λ R → ⟨ν proj₁ a ⟩ (name a ∙ P ∣ name (co a) ∙ Q) [ μ ]⇒ R ×
             R ≳′ R′
   rl {μ} (restriction {P′ = R} a∉μ P∣Q⟶R) =
-    ⟨ν proj₁ a ⟩ (name a ∙ P ∣ name (co a) ∙ Q)  →⟨ restriction _ (par-τ action action) ⟩
-    ⟨ν proj₁ a ⟩ (P ∣ Q)                         →⟨ restriction a∉μ P∣Q⟶R ⟩■
+    ⟨ν proj₁ a ⟩ (name a ∙ P ∣ name (co a) ∙ Q)  →⟨ ⟶: restriction _ (par-τ action action) ⟩
+    ⟨ν proj₁ a ⟩ (P ∣ Q)                         →⟨ ⟶: restriction a∉μ P∣Q⟶R ⟩■
       E.⇒[ μ ]
     ⟨ν proj₁ a ⟩ R                               ■
 
@@ -323,7 +323,7 @@ mutual
 
       ! name b ∙ ⟨ν proj₁ a ⟩ P ∣ ⟨ν proj₁ a ⟩ P
 
-        W.⇐̂[ name b ]                                      ←⟨ replication (par-right action) ⟩■
+        W.⇐̂[ name b ]                                      ←⟨ ⟶: replication (par-right action) ⟩■
 
       ! name b ∙ ⟨ν proj₁ a ⟩ P
 
@@ -377,7 +377,7 @@ mutual
             [ i ] Q ≈′ Q′
   rl {Q′} tr = case 6-1-3-2 tr of λ where
     (inj₁ (_ , action , Q′∼!bνaP∣νaP)) →
-      ! ⟨ν proj₁ a ⟩ (name b ∙ (a ∙) ∣ name (co a) ∙ P)    →⟨ replication (par-right (restriction a≢b (par-left action))) ⟩■
+      ! ⟨ν proj₁ a ⟩ (name b ∙ (a ∙) ∣ name (co a) ∙ P)    →⟨ ⟶: replication (par-right (restriction a≢b (par-left action))) ⟩■
 
         W.⇒̂[ name b ]
 
