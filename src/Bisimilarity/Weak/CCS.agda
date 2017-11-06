@@ -278,11 +278,11 @@ force (C [ Ps≈Qs ]-cong′) = C [ (λ x → force (Ps≈Qs x)) ]-cong
 -- processes are weakly bisimilar (assuming extensionality).
 --
 -- This result is a variant of
--- Bisimilarity.Exercises.Coinductive.CCS.6-2-16. Proposition 4.4.4 in
--- Milner's "Operational and Algebraic Semantics of Concurrent
--- Processes" is perhaps more useful in practice, as well as some of
--- the results in Sangiorgi's "Equations, Contractions, and Unique
--- Solutions".
+-- Bisimilarity.Exercises.Coinductive.CCS.unique-solutions.
+-- Proposition 4.4.4 in Milner's "Operational and Algebraic Semantics
+-- of Concurrent Processes" is perhaps more useful in practice, as
+-- well as some of the results in Sangiorgi's "Equations,
+-- Contractions, and Unique Solutions".
 
 module _ (ext : Proc-extensionality) where
 

@@ -307,7 +307,7 @@ _∼⟨_⟩_ =
 -- contexts C where every hole is under a prefix.
 
 unique-solutions-for-weakly-guarded-contexts =
-  Bisimilarity.Exercises.Coinductive.CCS.6-2-16
+  Bisimilarity.Exercises.Coinductive.CCS.unique-solutions
 
 ------------------------------------------------------------------------
 -- Section 6

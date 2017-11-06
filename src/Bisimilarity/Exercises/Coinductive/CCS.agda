@@ -885,17 +885,24 @@ mutual
   force 6-2-14′ = 6-2-14
 
 ------------------------------------------------------------------------
--- Theorem 6.2.16
+-- Unique solutions
+
+-- If the set of equations corresponding (in a certain sense) to a
+-- family of weakly guarded contexts has two families of solutions,
+-- then those solutions are pairwise bisimilar.
+--
+-- This result is very similar to a proposition in Milner's
+-- "Communication and Concurrency".
 
 mutual
 
-  6-2-16 :
+  unique-solutions :
     ∀ {i n} {Ps Qs : Fin n → Proc ∞} {C : Fin n → Context ∞ n} →
     (∀ x → Weakly-guarded (C x)) →
     (∀ x → [ i ] Ps x ∼ C x [ Ps ]) →
     (∀ x → [ i ] Qs x ∼ C x [ Qs ]) →
     ∀ x → [ i ] Ps x ∼ Qs x
-  6-2-16 {i} {Ps = Ps} {Qs} {C} w ∼C[Ps] ∼C[Qs] x =
+  unique-solutions {i} {Ps = Ps} {Qs} {C} w ∼C[Ps] ∼C[Qs] x =
     Ps x        ∼⟨ ∼C[Ps] x ⟩
     C x [ Ps ]  ∼⟨ ∼: ⟨ lr ∼C[Ps] ∼C[Qs] , Σ-map id (Σ-map id symmetric) ∘ lr ∼C[Qs] ∼C[Ps] ⟩ ⟩
     C x [ Qs ]  ∼⟨ symmetric (∼C[Qs] x) ⟩■
@@ -910,17 +917,17 @@ mutual
     lr {Ps} {Qs} {μ} ∼C[Ps] ∼C[Qs] ⟶P =
       case 6-2-15 (C x) (w x) ⟶P of λ where
         (C′ , refl , trs) →
-          C′ [ Ps ]   ∼⟨ C′ [ 6-2-16′ w ∼C[Ps] ∼C[Qs] ]-cong′ ⟩■
+          C′ [ Ps ]   ∼⟨ C′ [ unique-solutions′ w ∼C[Ps] ∼C[Qs] ]-cong′ ⟩■
           C′ [ Qs ]   [ μ ]⟵⟨ trs Qs ⟩
           C x [ Qs ]
 
-  6-2-16′ :
+  unique-solutions′ :
     ∀ {i n} {Ps Qs : Fin n → Proc ∞} {C : Fin n → Context ∞ n} →
     (∀ x → Weakly-guarded (C x)) →
     (∀ x → [ i ] Ps x ∼ C x [ Ps ]) →
     (∀ x → [ i ] Qs x ∼ C x [ Qs ]) →
     ∀ x → [ i ] Ps x ∼′ Qs x
-  force (6-2-16′ w ∼C[Ps] ∼C[Qs] x) = 6-2-16 w ∼C[Ps] ∼C[Qs] x
+  force (unique-solutions′ w ∼C[Ps] ∼C[Qs] x) = unique-solutions w ∼C[Ps] ∼C[Qs] x
 
 ------------------------------------------------------------------------
 -- Some lemmas related to _⊕_
