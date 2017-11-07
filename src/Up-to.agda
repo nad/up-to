@@ -749,11 +749,12 @@ record Companion-compatible-assumptions : Set (lsuc ℓ) where
       (inj₂ i≢j) → inj₂ (inj₂ (≰→> [ i≮j , i≢j ]))
 
 -- Given certain assumptions one can prove that the companion is
--- compatible. However, I don't know if these assumptions are
--- consistent with the variant of Agda that is used in this
--- development. I discussed the assumptions with Andreas Abel and
--- Andrea Vezzosi. Some potential problems came up in the
--- discussion:
+-- compatible. (The proof is based on that of Theorem 2.14 in Parrow
+-- and Weber's "The Largest Respectful Function".) However, I don't
+-- know if these assumptions are consistent with the variant of Agda
+-- that is used in this development. I discussed the assumptions with
+-- Andreas Abel and Andrea Vezzosi. Some potential problems came up in
+-- the discussion:
 --
 -- * The fact that ∞ : Size< ∞ could perhaps lead to some kind of
 --   problem.
@@ -761,10 +762,6 @@ record Companion-compatible-assumptions : Set (lsuc ℓ) where
 -- * The assumptions make it possible to define functions that give
 --   completely different results for different sizes (assuming that
 --   there is more than one size).
---
---
--- This proof is based on that of Theorem 2.14 in Parrow and Weber's
--- "The Largest Respectful Function".
 
 companion-compatible :
   Companion-compatible-assumptions → Compatible Companion
