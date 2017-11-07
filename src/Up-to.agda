@@ -14,7 +14,6 @@ module Up-to {ℓ} {I : Set ℓ} (C : Container I I) where
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
-import Size
 
 open import Bijection equality-with-J using (_↔_)
 open import Function-universe equality-with-J as F hiding (id; _∘_)
@@ -713,6 +712,15 @@ record Companion-compatible-assumptions : Set (lsuc ℓ) where
       ¬ P i →
       Successor i
 
+    -- Size elimination. A very similar elimination principle can at
+    -- the time of writing be implemented in Agda, but Andreas Abel
+    -- has suggested that this implementation should not be allowed.
+
+    size-elim :
+      (P : Size → Set ℓ) →
+      (∀ i → ((j : Size< i) → P j) → P i) →
+      ∀ i → P i
+
   -- A variant of excluded-middle.
 
   excluded-middle₀ : (P : Set) → Dec P
@@ -815,11 +823,11 @@ companion-compatible assumptions {R} = case lemma R of λ where
         (¬ (∀ {i} → R ⊆ ν C i)                                ↝⟨ (λ hyp → ¬∀→∃¬ {P = λ _ → _ ⊆ _} (λ ∀iR⊆νCi → hyp λ {i} → ∀iR⊆νCi i)) ⟩
 
          (∃ λ i → ¬ R ⊆ ν C i)                                ↝⟨ uncurry $
-                                                                   Size.elim (λ i → ¬ R ⊆ ν C i → _)
+                                                                   size-elim (λ i → ¬ R ⊆ ν C i → _)
                                                                    (λ i ind-hyp R⊈νCi → case excluded-middle _ of λ where
                                                                         (inj₁ ∀<R⊆νC)  → i , ∀<R⊆νC , R⊈νCi
                                                                         (inj₂ ¬∀<R⊆νC) → let j , R⊈νCj = ¬∀→∃¬ ¬∀<R⊆νC
-                                                                                         in ind-hyp (Size.box j) R⊈νCj) ⟩
+                                                                                         in ind-hyp j R⊈νCj) ⟩
 
          (∃ λ i → ((j : Size< i) → R ⊆ ν C j) × ¬ R ⊆ ν C i)  ↝⟨ (λ { (i , hyp) → (i , uncurry (is-successor i) hyp , hyp) }) ⟩□
 
