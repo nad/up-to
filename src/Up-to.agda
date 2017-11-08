@@ -128,11 +128,16 @@ Size-preserving : Trans ℓ I → Set (lsuc ℓ)
 Size-preserving F = ∀ {R i} → R ⊆ ν C i → F R ⊆ ν C i
 
 -- If a transformer is size-preserving, then it satisfies the
--- corresponding property for ν′.
+-- corresponding property for ν′, and vice versa.
+--
+-- Note that this proof uses the size successor function.
 
-size-preserving′ :
-  ∀ {F} → Size-preserving F → ∀ {R i} → R ⊆ ν′ C i → F R ⊆ ν′ C i
-force (size-preserving′ pres R⊆ν′Ci x) = pres (λ y → force (R⊆ν′Ci y)) x
+size-preserving⇔size-preserving′ :
+  ∀ {F} → Size-preserving F ⇔ (∀ {R i} → R ⊆ ν′ C i → F R ⊆ ν′ C i)
+force (_⇔_.to size-preserving⇔size-preserving′ pres R⊆ν′Ci x) =
+  pres (λ y → force (R⊆ν′Ci y)) x
+_⇔_.from size-preserving⇔size-preserving′ pres′ {i = i} R⊆ν′Ci x =
+  force (pres′ {i = ssuc i} (λ x → λ { .force → R⊆ν′Ci x }) x)
 
 -- If the relation transformer F is size-preserving, then F is an
 -- up-to technique.
@@ -152,7 +157,8 @@ size-preserving→up-to {F} pres {R = R} R⊆CFR = helper
   where
   helper : ∀ {i} → R ⊆ ⟦ C ⟧ (ν′ C i)
   helper =
-    map C (size-preserving′ pres (λ x → λ { .force → helper x })) ∘
+    map C (_⇔_.to size-preserving⇔size-preserving′
+             pres (λ x → λ { .force → helper x })) ∘
     R⊆CFR
 
   -- An alternative implementation of helper which might be a bit
@@ -161,7 +167,8 @@ size-preserving→up-to {F} pres {R = R} R⊆CFR = helper
   helper′ : ∀ {i} → R ⊆ ν C i
   helper′ {i} =
     R               ⊆⟨ R⊆CFR ⟩
-    ⟦ C ⟧ (F R)     ⊆⟨ map C (size-preserving′ pres (λ x → λ { .force → helper′ x })) ⟩
+    ⟦ C ⟧ (F R)     ⊆⟨ map C (_⇔_.to size-preserving⇔size-preserving′
+                                pres (λ x → λ { .force → helper′ x })) ⟩
     ⟦ C ⟧ (ν′ C i)  ⊆⟨ id ⟩∎
     ν C i           ∎
 
