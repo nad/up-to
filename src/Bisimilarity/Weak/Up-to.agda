@@ -1,20 +1,19 @@
 ------------------------------------------------------------------------
--- Up-to techniques for the "other" definition of weak bisimilarity
+-- Up-to techniques for the standard coinductive definition of weak
+-- bisimilarity
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K --safe #-}
 
 open import Labelled-transition-system
 
-module Bisimilarity.Weak.Coinductive.Other.Up-to
-         {ℓ} (lts : LTS ℓ) where
+module Bisimilarity.Weak.Up-to {ℓ} (lts : LTS ℓ) where
 
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 
-open import Bisimilarity.Weak.Coinductive.Other lts
-import
-  Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
+open import Bisimilarity.Weak lts
+import Bisimilarity.Weak.Equational-reasoning-instances
 open import Equational-reasoning
 open import Expansion lts as E using (Expansion; _≲_; ≳:_)
 import Expansion.Equational-reasoning-instances

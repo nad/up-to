@@ -6,14 +6,14 @@
 
 open import Labelled-transition-system
 
-module Bisimilarity.Weak.Coinductive.Equational-reasoning-instances
+module Bisimilarity.Weak.Alternative.Equational-reasoning-instances
          {ℓ} {lts : LTS ℓ} where
 
 open import Prelude
 
 open import Bisimilarity.Coinductive lts
 import Bisimilarity.Coinductive.Equational-reasoning-instances
-open import Bisimilarity.Weak.Coinductive lts
+open import Bisimilarity.Weak.Alternative lts
 open import Equational-reasoning
 
 instance

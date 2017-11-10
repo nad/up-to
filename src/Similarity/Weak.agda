@@ -11,8 +11,7 @@ module Similarity.Weak {ℓ} (lts : LTS ℓ) where
 open import Equality.Propositional
 open import Prelude
 
-open import Bisimilarity.Weak.Coinductive.Other lts as WB
-  using ([_]_≈_; [_]_≈′_)
+open import Bisimilarity.Weak lts as WB using ([_]_≈_; [_]_≈′_)
 open import Expansion lts as E using ([_]_≳_; [_]_≳′_)
 open import Indexed-container hiding (⟨_⟩)
 open import Relation

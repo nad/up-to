@@ -165,30 +165,31 @@ import Expansion.Delay-monad
 ------------------------------------------------------------------------
 -- Weak bisimilarity
 
--- A classical definition of weak bisimilarity.
-
-import Bisimilarity.Weak.Classical
-
 -- A coinductive definition of weak bisimilarity.
 
-import Bisimilarity.Weak.Coinductive
-import Bisimilarity.Weak.Coinductive.Equational-reasoning-instances
+import Bisimilarity.Weak
+import Bisimilarity.Weak.Equational-reasoning-instances
 
--- Another coinductive definition of weak bisimilarity.
+-- An alternative (non-standard) coinductive definition of weak
+-- bisimilarity.
 
-import Bisimilarity.Weak.Coinductive.Other
-import
-  Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
+import Bisimilarity.Weak.Alternative
+import Bisimilarity.Weak.Alternative.Equational-reasoning-instances
 
--- A comparison of the classical definition of weak bisimilarity and
--- one of the coinductive ones.
+-- An alternative (non-standard) classical definition of weak
+-- bisimilarity.
 
-import Bisimilarity.Weak.Comparison
+import Bisimilarity.Weak.Alternative.Classical
+
+-- A comparison of the two alternative definitions of weak
+-- bisimilarity.
+
+import Bisimilarity.Weak.Alternative.Comparison
 
 -- The two coinductive definitions of weak bisimilarity are pointwise
 -- logically equivalent.
 
-import Bisimilarity.Weak.Coinductive.Equivalent
+import Bisimilarity.Weak.Equivalent
 
 -- Lemmas related to weak bisimilarity and CCS.
 
@@ -204,15 +205,16 @@ import Bisimilarity.Weak.CCS.Examples
 
 import Bisimilarity.Weak.Delay-monad
 
--- Up-to techniques for the "other" definition of weak bisimilarity.
+-- Up-to techniques for the standard coinductive definition of weak
+-- bisimilarity.
 
-import Bisimilarity.Weak.Coinductive.Other.Up-to
-import Bisimilarity.Weak.Coinductive.Other.Up-to.CCS
+import Bisimilarity.Weak.Up-to
+import Bisimilarity.Weak.Up-to.CCS
 
--- Up-to techniques for the delay monad and the "first" definition of
--- weak bisimilarity.
+-- Up-to techniques for the delay monad and the alternative
+-- coinductive definition of weak bisimilarity.
 
-import Bisimilarity.Weak.Coinductive.Up-to.Delay-monad
+import Bisimilarity.Weak.Alternative.Up-to.Delay-monad
 
 ------------------------------------------------------------------------
 -- Similarity, continued

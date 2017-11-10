@@ -1,12 +1,12 @@
 ------------------------------------------------------------------------
--- Another coinductive definition of weak bisimilarity
+-- A coinductive definition of weak bisimilarity
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K --safe #-}
 
 open import Labelled-transition-system
 
-module Bisimilarity.Weak.Coinductive.Other {ℓ} (lts : LTS ℓ) where
+module Bisimilarity.Weak {ℓ} (lts : LTS ℓ) where
 
 open import Equality.Propositional
 open import Prelude

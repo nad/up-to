@@ -17,10 +17,10 @@ import Bisimilarity.Step
 import Bisimilarity.Up-to
 import Bisimilarity.Up-to.CCS
 import Bisimilarity.Up-to.Counterexamples
+import Bisimilarity.Weak
 import Bisimilarity.Weak.CCS
-import Bisimilarity.Weak.Coinductive.Other
-import Bisimilarity.Weak.Coinductive.Other.Up-to
 import Bisimilarity.Weak.Delay-monad
+import Bisimilarity.Weak.Up-to
 import Delay-monad
 import Delay-monad.Expansion
 import Delay-monad.Strong-bisimilarity
@@ -181,7 +181,7 @@ _[_]→̂_ = Labelled-transition-system.LTS._[_]⟶̂_
 
 -- Weak bisimilarity.
 
-[_]_≈_ = Bisimilarity.Weak.Coinductive.Other.[_]_≈_
+[_]_≈_ = Bisimilarity.Weak.[_]_≈_
 
 -- Expansion.
 
@@ -571,7 +571,7 @@ module Weak-bisimilarity-almost-congruence where
   ·-cong    = Bisimilarity.Weak.CCS._·-cong_
   !-cong    = Bisimilarity.Weak.CCS.!-cong_
   ⟨ν_⟩-cong = Bisimilarity.Weak.CCS.⟨ν_⟩-cong
-  ∅-cong    = Bisimilarity.Weak.Coinductive.Other.reflexive-≈
+  ∅-cong    = Bisimilarity.Weak.reflexive-≈
 
 ------------------------------------------------------------------------
 -- Section 9
@@ -602,7 +602,7 @@ direct⇔Capretta = Delay-monad.Weak-bisimilarity.≈⇔≈₃
 
 -- Weak bisimilarity is transitive for every LTS.
 
-transitiveʷ-lts = Bisimilarity.Weak.Coinductive.Other.transitive-≈
+transitiveʷ-lts = Bisimilarity.Weak.transitive-≈
 
 -- The later constructors can be removed.
 
@@ -646,7 +646,7 @@ not-size-preservingʷ =
 -- contained in weak bisimilarity.
 
 size-preserving→weak-bisimulations-up-to-weak-bisimilarity-works =
-  Bisimilarity.Weak.Coinductive.Other.Up-to.size-preserving-transitivity→up-to-weak-bisimilarity-up-to
+  Bisimilarity.Weak.Up-to.size-preserving-transitivity→up-to-weak-bisimilarity-up-to
 
 -- The Drop-later predicate.
 
@@ -750,8 +750,8 @@ transitiveʷᵉ = Delay-monad.Expansion.transitive-≈≲
 
 transitiveᵉˢ-lts = Expansion.transitive-≳∼
 transitiveᵉ-lts  = Expansion.transitive-≳
-transitiveᵉʷ-lts = Bisimilarity.Weak.Coinductive.Other.transitive-≳≈
-transitiveʷᵉ-lts = Bisimilarity.Weak.Coinductive.Other.transitive-≈≲
+transitiveᵉʷ-lts = Bisimilarity.Weak.transitive-≳≈
+transitiveʷᵉ-lts = Bisimilarity.Weak.transitive-≈≲
 
 -- Negative results related to expansion.
 
@@ -765,13 +765,12 @@ not-size-preservingʷᵉ =
 -- Up to expansion.
 
 Up-to-expansion =
-  Bisimilarity.Weak.Coinductive.Other.Up-to.Up-to-expansion
+  Bisimilarity.Weak.Up-to.Up-to-expansion
 up-to-expansion-size-preserving =
-  Bisimilarity.Weak.Coinductive.Other.Up-to.up-to-expansion-size-preserving
+  Bisimilarity.Weak.Up-to.up-to-expansion-size-preserving
 
 -- Relations that satisfy the diagrams of the variant of up to
 -- expansion where two occurrences of the expansion relation have been
 -- replaced by weak bisimilarity are contained in weak bisimilarity.
 
-variant-of-up-to-expansion =
-  Bisimilarity.Weak.Coinductive.Other.Up-to.6-5-2-4
+variant-of-up-to-expansion = Bisimilarity.Weak.Up-to.6-5-2-4

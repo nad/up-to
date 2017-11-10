@@ -18,15 +18,14 @@ open import Function-universe equality-with-J hiding (id; _∘_)
 import Bisimilarity.Coinductive.Equational-reasoning-instances
 open import Bisimilarity.Exercises.Coinductive.CCS
 import Bisimilarity.Weak.CCS as WL
-import
-  Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
+import Bisimilarity.Weak.Equational-reasoning-instances
 open import Equational-reasoning
 import Expansion.CCS as EL
 import Expansion.Equational-reasoning-instances
 open import Labelled-transition-system.CCS Name
 
 open import Bisimilarity.Coinductive CCS as S using (_∼_; _∼′_; ∼:_)
-open import Bisimilarity.Weak.Coinductive.Other CCS as W
+open import Bisimilarity.Weak CCS as W
 open import Expansion CCS as E
 import Labelled-transition-system.Equational-reasoning-instances CCS
 

@@ -17,19 +17,17 @@ open import Prelude
 open import Function-universe equality-with-J hiding (id; _∘_)
 
 import Bisimilarity.Coinductive.Delay-monad as SD
-import
-  Bisimilarity.Weak.Coinductive.Equational-reasoning-instances
-open import Bisimilarity.Weak.Coinductive.Equivalent
-import
-  Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
+import Bisimilarity.Weak.Alternative.Equational-reasoning-instances
+import Bisimilarity.Weak.Equational-reasoning-instances
+open import Bisimilarity.Weak.Equivalent
 open import Equational-reasoning
 import Expansion.Delay-monad as ED
 open import Labelled-transition-system.Delay-monad A
 
 open import Bisimilarity.Coinductive delay-monad using ([_]_∼_)
-open import Bisimilarity.Weak.Coinductive delay-monad as BW
+open import Bisimilarity.Weak delay-monad
+open import Bisimilarity.Weak.Alternative delay-monad as AW
   using (force)
-open import Bisimilarity.Weak.Coinductive.Other delay-monad
 open import Expansion delay-monad as BE using ([_]_≳_; _≳_)
 
 ------------------------------------------------------------------------
@@ -57,9 +55,8 @@ laterʳ x≈y =
   , (λ { later → _ , silent _ done , convert {a = a} x≈y })
   ⟩
 
--- The direct definition of weak bisimilarity is contained in the
--- "other" form of weak bisimilarity obtained from the transition
--- relation.
+-- The direct definition of weak bisimilarity is contained in the form
+-- of weak bisimilarity obtained from the transition relation.
 
 direct→indirect : ∀ {i x y} →
                   DW.[ i ] x ≈ y → [ i ] x ≈ y
@@ -71,8 +68,8 @@ direct→indirect (DW.laterʳ p) = laterʳ (direct→indirect p)
 
 mutual
 
-  -- The "other" definition of weak bisimilarity obtained from the
-  -- transition relation is contained in the direct one.
+  -- The definition of weak bisimilarity obtained from the transition
+  -- relation is contained in the direct one.
 
   indirect→direct : ∀ {i} x y → [ i ] x ≈ y → DW.[ i ] x ≈ y
   indirect→direct {i} (now x) y =
@@ -124,9 +121,8 @@ mutual
     indirect→direct′ (step _  later tr) p = DW.laterʳ (indirect→direct′ tr p)
     indirect→direct′ (step () now   _)
 
--- The direct definition of weak bisimilarity is logically
--- equivalent to the "other" one obtained from the transition
--- relation.
+-- The direct definition of weak bisimilarity is logically equivalent
+-- to the one obtained from the transition relation.
 --
 -- TODO: Are the two definitions isomorphic?
 
@@ -137,58 +133,59 @@ direct⇔indirect = record
   }
 
 -- The direct definition of weak bisimilarity is logically equivalent
--- to the "first" one obtained from the transition relation. Note that
--- this proof is not size-preserving.
+-- to the alternative, coinductive form of weak bisimilarity obtained
+-- from the transition relation. Note that this proof is not
+-- size-preserving.
 
-direct⇔indirect′ : ∀ {x y} → x DW.≈ y ⇔ x BW.≈ y
-direct⇔indirect′ {x} {y} =
+direct⇔alternative : ∀ {x y} → x DW.≈ y ⇔ x AW.≈ y
+direct⇔alternative {x} {y} =
   x DW.≈ y  ↝⟨ direct⇔indirect ⟩
-  x ≈ y     ↝⟨ inverse cw⇔cwo ⟩□
-  x BW.≈ y  □
+  x ≈ y     ↝⟨ inverse alternative⇔ ⟩□
+  x AW.≈ y  □
 
 ------------------------------------------------------------------------
--- A non-existence result for the "first" indirect definition of weak
--- bisimilarity
+-- A non-existence result for the alternative, coinductive indirect
+-- definition of weak bisimilarity
 
 private
 
-  -- If A is uninhabited, then BW._≈_ is trivial.
+  -- If A is uninhabited, then AW._≈_ is trivial.
 
-  uninhabited→trivial : ¬ A → ∀ x y → x BW.≈ y
+  uninhabited→trivial : ¬ A → ∀ x y → x AW.≈ y
   uninhabited→trivial =
     ¬ A                 ↝⟨ DW.uninhabited→trivial ⟩
-    (∀ x y → x DW.≈ y)  ↝⟨ ∀-cong _ (λ _ → ∀-cong _ λ _ → _⇔_.to direct⇔indirect′) ⟩
-    (∀ x y → x BW.≈ y)  □
+    (∀ x y → x DW.≈ y)  ↝⟨ ∀-cong _ (λ _ → ∀-cong _ λ _ → _⇔_.to direct⇔alternative) ⟩
+    (∀ x y → x AW.≈ y)  □
 
 -- One can define a size-preserving "later-cong" function iff A is
 -- uninhabited.
 
 Later-cong =
   ∀ {i x y} →
-  BW.[ i ] force x ≈′ force y → BW.[ i ] later x ≈ later y
+  AW.[ i ] force x ≈′ force y → AW.[ i ] later x ≈ later y
 
 size-preserving-later-cong⇔uninhabited : Later-cong ⇔ ¬ A
 size-preserving-later-cong⇔uninhabited = record
   { to   = Later-cong                ↝⟨ (λ later-cong → now≈never (λ {i} → later-cong {i})) ⟩
-           (∀ x → now x BW.≈ never)  ↝⟨ ∀-cong _ (λ _ → _⇔_.from direct⇔indirect′) ⟩
+           (∀ x → now x AW.≈ never)  ↝⟨ ∀-cong _ (λ _ → _⇔_.from direct⇔alternative) ⟩
            (∀ x → now x DW.≈ never)  ↝⟨ (λ hyp → DW.now≉never ∘ hyp) ⟩□
            ¬ A                       □
   ; from = ¬ A                 ↝⟨ uninhabited→trivial ⟩
-           (∀ x y → x BW.≈ y)  ↝⟨ (λ trivial {_ _ _} _ → trivial _ _) ⟩□
+           (∀ x y → x AW.≈ y)  ↝⟨ (λ trivial {_ _ _} _ → trivial _ _) ⟩□
            Later-cong          □
   }
   where
 
   module _ (later-cong : Later-cong) where
 
-    now≈never : ∀ {i} x → BW.[ i ] now x ≈ never
+    now≈never : ∀ {i} x → AW.[ i ] now x ≈ never
     now≈never x =
-      now x                         ∼⟨ cwo⇒cw (laterʳ reflexive) ⟩
+      now x                         ∼⟨ ⇒alternative (laterʳ reflexive) ⟩
       later (λ { .force → now x })  ∼⟨ later-cong (λ { .force → now≈never x }) ⟩■
       never
 
 ------------------------------------------------------------------------
--- Some non-existence results for the "other" indirect definition of
+-- Some non-existence results for the standard indirect definition of
 -- weak bisimilarity
 
 -- There is a transitivity proof that takes weak bisimilarity and
@@ -314,21 +311,22 @@ size-preserving-transitivity-≈≳ˡ⇔uninhabited =
 -- A non-existence result for both indirect definitions of weak
 -- bisimilarity
 
--- The function cwo⇒cw translating from the "other" indirect
--- definition of weak bisimilarity to the first indirect one can be
--- made size-preserving iff A is uninhabited.
+-- The function ⇒alternative translating from the standard indirect
+-- definition of weak bisimilarity to the alternative, coinductive one
+-- can be made size-preserving iff A is uninhabited.
 
-size-preserving-cwo⇒cw⇔uninhabited :
-  (∀ {i p q} → [ i ] p ≈ q → BW.[ i ] p ≈ q) ⇔ ¬ A
-size-preserving-cwo⇒cw⇔uninhabited = record
+size-preserving-⇒alternative⇔uninhabited :
+  (∀ {i p q} → [ i ] p ≈ q → AW.[ i ] p ≈ q) ⇔ ¬ A
+size-preserving-⇒alternative⇔uninhabited = record
   { to =
-      (∀ {i p q} → [ i ] p ≈ q → BW.[ i ] p ≈ q)  ↝⟨ (λ cwo⇒cw x≈y y≈z → cw⇒cwo (transitive {a = a} (cwo⇒cw x≈y) (cwo⇒cw y≈z))) ⟩
+      (∀ {i p q} → [ i ] p ≈ q → AW.[ i ] p ≈ q)  ↝⟨ (λ ⇒alternative x≈y y≈z →
+                                                        alternative⇒ (transitive {a = a} (⇒alternative x≈y) (⇒alternative y≈z))) ⟩
       Transitivityʳ                               ↝⟨ _⇔_.to size-preserving-transitivityʳ⇔uninhabited ⟩□
       ¬ A                                         □
   ; from =
       ¬ A                                         ↝⟨ uninhabited→trivial ⟩
-      (∀ x y → x BW.≈ y)                          ↝⟨ (λ trivial {_ _ _} _ → trivial _ _) ⟩□
-      (∀ {i p q} → [ i ] p ≈ q → BW.[ i ] p ≈ q)  □
+      (∀ x y → x AW.≈ y)                          ↝⟨ (λ trivial {_ _ _} _ → trivial _ _) ⟩□
+      (∀ {i p q} → [ i ] p ≈ q → AW.[ i ] p ≈ q)  □
   }
 
 ------------------------------------------------------------------------

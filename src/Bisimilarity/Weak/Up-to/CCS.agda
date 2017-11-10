@@ -4,8 +4,7 @@
 
 {-# OPTIONS --without-K --safe #-}
 
-module Bisimilarity.Weak.Coinductive.Other.Up-to.CCS
-         {ℓ} {Name : Set ℓ} where
+module Bisimilarity.Weak.Up-to.CCS {ℓ} {Name : Set ℓ} where
 
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
@@ -14,15 +13,14 @@ open import Prelude
 open import Function-universe equality-with-J hiding (id; _∘_)
 
 open import Bisimilarity.Weak.CCS
-import
-  Bisimilarity.Weak.Coinductive.Other.Equational-reasoning-instances
+import Bisimilarity.Weak.Equational-reasoning-instances
 open import Equational-reasoning
 open import Indexed-container hiding (⟨_⟩)
 open import Labelled-transition-system.CCS Name
 open import Relation
 
-open import Bisimilarity.Weak.Coinductive.Other CCS
-open import Bisimilarity.Weak.Coinductive.Other.Up-to CCS
+open import Bisimilarity.Weak CCS
+open import Bisimilarity.Weak.Up-to CCS
 import Labelled-transition-system.Equational-reasoning-instances CCS
 
 -- Up to (non-degenerate) context for CCS (for polyadic, coinductive

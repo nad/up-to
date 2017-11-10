@@ -1,11 +1,11 @@
 ------------------------------------------------------------------------
--- A comparison of the classical definition of weak bisimilarity and
--- one of the coinductive ones
+-- A comparison of the two alternative definitions of weak
+-- bisimilarity
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K --safe #-}
 
-module Bisimilarity.Weak.Comparison where
+module Bisimilarity.Weak.Alternative.Comparison where
 
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
@@ -18,8 +18,8 @@ open import Univalence-axiom equality-with-J
 import Bisimilarity.Classical
 import Bisimilarity.Coinductive
 import Bisimilarity.Comparison as Comp
-import Bisimilarity.Weak.Classical
-import Bisimilarity.Weak.Coinductive
+import Bisimilarity.Weak.Alternative
+import Bisimilarity.Weak.Alternative.Classical
 open import Labelled-transition-system
 
 module _ {ℓ} {lts : LTS ℓ} where
@@ -27,8 +27,8 @@ module _ {ℓ} {lts : LTS ℓ} where
   open LTS lts
 
   private
-    module Cl = Bisimilarity.Weak.Classical   lts
-    module Co = Bisimilarity.Weak.Coinductive lts
+    module Co = Bisimilarity.Weak.Alternative           lts
+    module Cl = Bisimilarity.Weak.Alternative.Classical lts
 
   -- Classically weakly bisimilar processes are coinductively weakly
   -- bisimilar.
@@ -80,8 +80,8 @@ module _ {ℓ} {lts : LTS ℓ} where
 
 coinductive↠classical :
   ∀ {p q} →
-  Bisimilarity.Weak.Coinductive._≈_ empty p q ↠
-  Bisimilarity.Weak.Classical._≈_   empty p q
+  Bisimilarity.Weak.Alternative._≈_           empty p q ↠
+  Bisimilarity.Weak.Alternative.Classical._≈_ empty p q
 coinductive↠classical {p = ()}
 
 -- There is an LTS for which coinductive weak bisimilarity is
@@ -91,7 +91,7 @@ coinductive↠classical {p = ()}
 coinductive-weak-bisimilarity-is-sometimes-propositional :
   Extensionality lzero (lsuc lzero) →
   Univalence lzero →
-  let module Co = Bisimilarity.Weak.Coinductive one-loop in
+  let module Co = Bisimilarity.Weak.Alternative one-loop in
   Co.Extensionality → Is-proposition (tt Co.≈ tt)
 coinductive-weak-bisimilarity-is-sometimes-propositional ext univ =
   subst (λ lts → let module Co = Bisimilarity.Coinductive lts in
@@ -108,7 +108,7 @@ coinductive-weak-bisimilarity-is-sometimes-propositional ext univ =
 classical-weak-bisimilarity-is-not-propositional :
   Extensionality lzero (lsuc lzero) →
   Univalence lzero →
-  let module Cl = Bisimilarity.Weak.Classical one-loop in
+  let module Cl = Bisimilarity.Weak.Alternative.Classical one-loop in
   ∀ {ℓ} → ¬ Is-proposition (Cl.Weak-bisimilarity′ ℓ (tt , tt))
 classical-weak-bisimilarity-is-not-propositional ext univ {ℓ} =
   subst (λ lts → let module Cl = Bisimilarity.Classical lts in
@@ -124,11 +124,12 @@ classical-weak-bisimilarity-is-not-propositional ext univ {ℓ} =
 ¬coinductive↠classical :
   Extensionality lzero (lsuc lzero) →
   Univalence lzero →
-  Bisimilarity.Weak.Coinductive.Extensionality one-loop →
+  Bisimilarity.Weak.Alternative.Extensionality one-loop →
   ∀ {ℓ} →
-  ¬ (∀ {p q} → Bisimilarity.Weak.Coinductive._≈_ one-loop p q ↠
-               Bisimilarity.Weak.Classical.Weak-bisimilarity′
-                 one-loop ℓ (p , q))
+  ¬ (∀ {p q} →
+     Bisimilarity.Weak.Alternative._≈_ one-loop p q ↠
+     Bisimilarity.Weak.Alternative.Classical.Weak-bisimilarity′
+       one-loop ℓ (p , q))
 ¬coinductive↠classical ext univ ext′ {ℓ} =
   subst (λ lts → Bisimilarity.Coinductive.Extensionality lts →
                  ¬ (∀ {p q} → Bisimilarity.Coinductive._∼_ lts p q ↠
@@ -145,7 +146,7 @@ classical-weak-bisimilarity-is-not-propositional ext univ {ℓ} =
 coinductive-weak-bisimilarity-is-not-propositional :
   Extensionality lzero (lsuc lzero) →
   Univalence lzero →
-  let open Bisimilarity.Weak.Coinductive two-bisimilar-processes in
+  let open Bisimilarity.Weak.Alternative two-bisimilar-processes in
   ¬ (∀ {p q} → Is-proposition (p ≈ q))
 coinductive-weak-bisimilarity-is-not-propositional ext univ =
   subst (λ lts → let open Bisimilarity.Coinductive lts in
@@ -162,7 +163,7 @@ weak-bisimilarity↠equality :
   Extensionality a (lsuc a) →
   Univalence a →
   {A : Set a} →
-  let open Bisimilarity.Weak.Coinductive (bisimilarity⇔equality A) in
+  let open Bisimilarity.Weak.Alternative (bisimilarity⇔equality A) in
   {p q : A} → p ≈ q ↠ p ≡ q
 weak-bisimilarity↠equality ext univ {A} =
   subst (λ lts → let open Bisimilarity.Coinductive lts in
