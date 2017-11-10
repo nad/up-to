@@ -8,28 +8,83 @@ open import Labelled-transition-system
 
 module Similarity.Weak {ℓ} (lts : LTS ℓ) where
 
+open import Equality.Propositional
 open import Prelude
 
 open import Bisimilarity.Weak.Coinductive.Other lts as WB
   using ([_]_≈_; [_]_≈′_)
 open import Expansion lts as E using ([_]_≳_; [_]_≳′_)
+open import Indexed-container hiding (⟨_⟩)
+open import Relation
+import Similarity.General
 open import Similarity.Strong lts as S using ([_]_≤_; [_]_≤′_)
 
 open LTS lts
 
-open import Similarity.General lts _[_]⇒̂_ ⟶→⇒̂ public
-  renaming ( Similarity to Weak-similarity
-           ; Similarity′ to Weak-similarity′
-           ; [_]_≤_ to [_]_≼_
-           ; [_]_≤′_ to [_]_≼′_
-           ; _≤_ to _≼_
-           ; _≤′_ to _≼′_
-           ; reflexive-≤ to reflexive-≼
+private
+  module General = Similarity.General lts _[_]⇒̂_ ⟶→⇒̂
+
+open General public
+  using (module StepC; ⟨_⟩; challenge; force;
+         [_]_≡_; [_]_≡′_; []≡↔; Extensionality; extensionality)
+  renaming ( reflexive-≤ to reflexive-≼
            ; reflexive-≤′ to reflexive-≼′
            ; ≡⇒≤ to ≡⇒≼
            ; ≤:_ to ≼:_
            ; ≤′:_ to ≼′:_
            )
+
+-- StepC is given in the following way, rather than via open public,
+-- to make hyperlinks to it more informative.
+
+StepC : Container (Proc × Proc) (Proc × Proc)
+StepC = General.StepC
+
+-- The following definitions are given explicitly, in order to make
+-- the code easier to follow.
+
+Weak-similarity : Size → Rel₂ ℓ Proc
+Weak-similarity = ν StepC
+
+Weak-similarity′ : Size → Rel₂ ℓ Proc
+Weak-similarity′ = ν′ StepC
+
+infix 4 [_]_≼_ [_]_≼′_ _≼_ _≼′_
+
+[_]_≼_ : Size → Proc → Proc → Set ℓ
+[ i ] p ≼ q = ν StepC i (p , q)
+
+[_]_≼′_ : Size → Proc → Proc → Set ℓ
+[ i ] p ≼′ q = ν′ StepC i (p , q)
+
+_≼_ : Proc → Proc → Set ℓ
+_≼_ = [ ∞ ]_≼_
+
+_≼′_ : Proc → Proc → Set ℓ
+_≼′_ = [ ∞ ]_≼′_
+
+private
+
+  -- However, these definitions are definitionally equivalent to
+  -- corresponding definitions in General.
+
+  indirect-Weak-similarity : Weak-similarity ≡ General.Similarity
+  indirect-Weak-similarity = refl
+
+  indirect-Weak-similarity′ : Weak-similarity′ ≡ General.Similarity′
+  indirect-Weak-similarity′ = refl
+
+  indirect-[]≼ : [_]_≼_ ≡ General.[_]_≤_
+  indirect-[]≼ = refl
+
+  indirect-[]≼′ : [_]_≼′_ ≡ General.[_]_≤′_
+  indirect-[]≼′ = refl
+
+  indirect-≼ : _≼_ ≡ General._≤_
+  indirect-≼ = refl
+
+  indirect-≼′ : _≼′_ ≡ General._≤′_
+  indirect-≼′ = refl
 
 mutual
 

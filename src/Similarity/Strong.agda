@@ -8,14 +8,76 @@ open import Labelled-transition-system
 
 module Similarity.Strong {ℓ} (lts : LTS ℓ) where
 
+open import Equality.Propositional
 open import Prelude
 
 open import Bisimilarity.Coinductive lts as SB
   using ([_]_∼_; [_]_∼′_)
+open import Indexed-container hiding (⟨_⟩)
+open import Relation
+import Similarity.General
 
 open LTS lts
 
-open import Similarity.General lts _[_]⟶_ id public
+private
+  module General = Similarity.General lts _[_]⟶_ id
+
+open General public
+  using (module StepC; ⟨_⟩; challenge; force;
+         reflexive-≤; reflexive-≤′; ≡⇒≤; ≤:_; ≤′:_;
+         [_]_≡_; [_]_≡′_; []≡↔; Extensionality; extensionality)
+
+-- StepC is given in the following way, rather than via open public,
+-- to make hyperlinks to it more informative.
+
+StepC : Container (Proc × Proc) (Proc × Proc)
+StepC = General.StepC
+
+-- The following definitions are given explicitly, in order to make
+-- the code easier to follow.
+
+Similarity : Size → Rel₂ ℓ Proc
+Similarity = ν StepC
+
+Similarity′ : Size → Rel₂ ℓ Proc
+Similarity′ = ν′ StepC
+
+infix 4 [_]_≤_ [_]_≤′_ _≤_ _≤′_
+
+[_]_≤_ : Size → Proc → Proc → Set ℓ
+[ i ] p ≤ q = ν StepC i (p , q)
+
+[_]_≤′_ : Size → Proc → Proc → Set ℓ
+[ i ] p ≤′ q = ν′ StepC i (p , q)
+
+_≤_ : Proc → Proc → Set ℓ
+_≤_ = [ ∞ ]_≤_
+
+_≤′_ : Proc → Proc → Set ℓ
+_≤′_ = [ ∞ ]_≤′_
+
+private
+
+  -- However, these definitions are definitionally equivalent to
+  -- corresponding definitions in General.
+
+  indirect-Similarity : Similarity ≡ General.Similarity
+  indirect-Similarity = refl
+
+  indirect-Similarity′ : Similarity′ ≡ General.Similarity′
+  indirect-Similarity′ = refl
+
+  indirect-[]≤ : [_]_≤_ ≡ General.[_]_≤_
+  indirect-[]≤ = refl
+
+  indirect-[]≤′ : [_]_≤′_ ≡ General.[_]_≤′_
+  indirect-[]≤′ = refl
+
+  indirect-≤ : _≤_ ≡ General._≤_
+  indirect-≤ = refl
+
+  indirect-≤′ : _≤′_ ≡ General._≤′_
+  indirect-≤′ = refl
 
 mutual
 
