@@ -16,6 +16,7 @@ open import Function-universe equality-with-J hiding (id; _∘_)
 import Bisimilarity.Coinductive
 open import Indexed-container hiding (Bisimilarity)
 open import Indexed-container.Combinators hiding (id; _∘_)
+open import Labelled-transition-system
 import Labelled-transition-system.CCS
 open import Relation
 import Similarity.Strong
@@ -23,11 +24,10 @@ import Similarity.Strong.CCS as SC
 open import Up-to
 
 private
-  module CCS {ℓ} where
-    open Labelled-transition-system.CCS (↑ ℓ ⊤) public
+  module CCS {ℓ} (Name : Set ℓ) where
+    open Labelled-transition-system.CCS Name public
     open module B = Bisimilarity.Coinductive CCS public
     open module S = Similarity.Strong CCS public using (Similarity)
-open CCS
 
 ------------------------------------------------------------------------
 -- Closure properties for Compatible
@@ -105,6 +105,18 @@ Compatible-⟷ {C₁ = C₁} {C₂} {F} mono sym = curry (
   Compatible (C₁ ⊗ reindex swap C₂) F               ↔⟨⟩
   Compatible (C₁ ⟷ C₂) F                            □)
 
+-- An instance of the result above: If F is monotone and symmetric,
+-- and compatible for strong similarity for some LTS, then F is
+-- compatible for strong bisimilarity for this LTS.
+
+compatible-for-similarity→compatible-for-bisimilarity :
+  ∀ {ℓ} {lts : LTS ℓ} {F} →
+  Monotone F → Symmetric swap F →
+  Compatible (Similarity.Strong.StepC lts) F →
+  Compatible (Bisimilarity.Coinductive.StepC lts) F
+compatible-for-similarity→compatible-for-bisimilarity mono sym comp =
+  Compatible-⟷ mono sym comp comp
+
 ------------------------------------------------------------------------
 -- Closure properties for Size-preserving
 
@@ -134,109 +146,142 @@ Size-preserving-reindex {C = C} {F} {f}
   ν C i ∘ f                  ⊆⟨ _⇔_.from (ν-reindex⇔ inv) ⟩∎
   ν (reindex f C) i          ∎
 
--- Three negative results:
+-- Some negative results:
 --
--- * The function flip Size-preserving F is not closed under _⟷_, not
---   even if F is monotone and symmetric.
+-- * For inhabited name types it is not in general the case that a
+--   monotone and symmetric function F that is size-preserving for
+--   similarity for CCS is also size-preserving for bisimilarity for
+--   CCS.
 --
--- * In fact, it is not in general the case that a monotone and
---   symmetric function F that is size-preserving for similarity for
---   CCS is also size-preserving for bisimilarity for CCS.
+-- * It is not in general the case that if F is monotone and
+--   symmetric, and size-preserving for strong similarity for some
+--   LTS, then F is size-preserving for strong bisimilarity for this
+--   LTS.
 --
--- * Furthermore flip Size-preserving F is not closed under _⊗_, not
---   even if F is monotone.
+-- * The function flip Size-preserving F is not closed under _⟷_ for
+--   all F, not even those that are monotone and symmetric.
+--
+-- * Furthermore flip Size-preserving F is not closed under _⊗_ for
+--   all F, not even those that are monotone.
 
 ¬-Size-preserving-⟷/⊗ :
   ∀ {ℓ} →
+  ({Name : Set ℓ} →
+   let open CCS Name in
+   Name →
+   ¬ ({F : Trans₂ ℓ (Proc ∞)} →
+      Monotone F → Symmetric swap F →
+      Size-preserving S.StepC F →
+      Size-preserving B.StepC F))
+    ×
+  ¬ (∀ {lts : LTS ℓ} {F} →
+     Monotone F → Symmetric swap F →
+     Size-preserving (Similarity.Strong.StepC lts) F →
+     Size-preserving (Bisimilarity.Coinductive.StepC lts) F)
+    ×
   ¬ ({I : Set ℓ} {C₁ C₂ : Container (I × I) (I × I)}
      {F : Trans₂ ℓ I} →
      Monotone F → Symmetric swap F →
      Size-preserving C₁ F → Size-preserving C₂ F →
      Size-preserving (C₁ ⟷ C₂) F)
     ×
-  ¬ ({F : Trans₂ ℓ (Proc ∞)} →
-     Monotone F → Symmetric swap F →
-     Size-preserving S.StepC F →
-     Size-preserving B.StepC F)
-    ×
   ¬ ({I : Set ℓ} {C₁ C₂ : Container I I} {F : Trans ℓ I} →
      Monotone F →
      Size-preserving C₁ F → Size-preserving C₂ F →
      Size-preserving (C₁ ⊗ C₂) F)
 ¬-Size-preserving-⟷/⊗ {ℓ} =
-
-    (({I : Set ℓ} {C₁ C₂ : Container (I × I) (I × I)}
-      {F : Trans₂ ℓ I} →
-      Monotone F → Symmetric swap F →
-      Size-preserving C₁ F → Size-preserving C₂ F →
-      Size-preserving (C₁ ⟷ C₂) F)                   ↝⟨ (λ closed mono symm pres → closed mono symm pres pres) ⟩
-
-     ({F : Trans₂ ℓ (Proc ∞)} →
-      Monotone F → Symmetric swap F →
-      Size-preserving S.StepC F →
-      Size-preserving B.StepC F)                     ↝⟨ contradiction₂ ⟩□
-
-     ⊥                                               □)
-
-  , contradiction₂
-
-  , (({I : Set ℓ} {C₁ C₂ : Container I I}
-      {F : Trans ℓ I} →
-      Monotone F →
-      Size-preserving C₁ F → Size-preserving C₂ F →
-      Size-preserving (C₁ ⊗ C₂) F)                   ↝⟨ (λ closed → closed mono pres) ⟩
-
-     (Size-preserving (reindex swap S.StepC) F →
-      Size-preserving B.StepC F)                     ↝⟨ _$ Size-preserving-reindex refl symm pres ⟩
-
-     Size-preserving B.StepC F                       ↝⟨ contradiction ⟩□
-
-     ⊥                                               □)
-
+    Lemmas.contradiction₂
+  , Lemmas.contradiction₃ (lift tt)
+  , Lemmas.contradiction₄ (lift tt)
+  , Lemmas.contradiction₅ (lift tt)
   where
-  ≤≥≁ = SC.≤≥≁ (lift tt)
+  module Lemmas {Name : Set ℓ} (a : Name) where
+    open CCS Name public
 
-  m₁ = proj₁ ≤≥≁
-  m₂ = proj₁ (proj₂ ≤≥≁)
+    ≤≥≁ = SC.≤≥≁ a
 
-  F : Trans₂ ℓ (Proc ∞)
-  F R = R ∪ (_≡ (m₁ , m₂)) ∪ (_≡ (m₂ , m₁))
+    m₁ = proj₁ ≤≥≁
+    m₂ = proj₁ (proj₂ ≤≥≁)
 
-  mono : Monotone F
-  mono R⊆S = ⊎-map R⊆S id
+    F : Trans₂ ℓ (Proc ∞)
+    F R = R ∪ (_≡ (m₁ , m₂)) ∪ (_≡ (m₂ , m₁))
 
-  symm : Symmetric swap F
-  symm R =
-    F (R ⁻¹)                                      ⊆⟨⟩
-    R ⁻¹ ∪ (_≡ (m₁ , m₂))    ∪ (_≡ (m₂ , m₁))     ⊆⟨ ⊎-map id P.[ inj₂ ∘ lemma , inj₁ ∘ lemma ] ⟩
-    R ⁻¹ ∪ (_≡ (m₁ , m₂)) ⁻¹ ∪ (_≡ (m₂ , m₁)) ⁻¹  ⊆⟨ id ⟩∎
-    F R ⁻¹                                        ∎
-    where
-    lemma : {p₁ p₂ : Proc ∞ × Proc ∞} → p₁ ≡ swap p₂ → swap p₁ ≡ p₂
-    lemma refl = refl
+    mono : Monotone F
+    mono R⊆S = ⊎-map R⊆S id
 
-  pres : Size-preserving S.StepC F
-  pres {R = R} {i = i} R⊆ =
-    F R                                  ⊆⟨⟩
-    R ∪ (_≡ (m₁ , m₂)) ∪ (_≡ (m₂ , m₁))  ⊆⟨ [ R⊆ , helper ] ⟩∎
-    Similarity i                         ∎
-    where
-    helper : ∀ {p} → p ≡ (m₁ , m₂) ⊎ p ≡ (m₂ , m₁) → Similarity i p
-    helper (inj₁ refl) = proj₁ (proj₂ (proj₂ ≤≥≁))
-    helper (inj₂ refl) = proj₁ (proj₂ (proj₂ (proj₂ ≤≥≁)))
+    symm : Symmetric swap F
+    symm R =
+      F (R ⁻¹)                                      ⊆⟨⟩
+      R ⁻¹ ∪ (_≡ (m₁ , m₂))    ∪ (_≡ (m₂ , m₁))     ⊆⟨ ⊎-map id P.[ inj₂ ∘ lemma , inj₁ ∘ lemma ] ⟩
+      R ⁻¹ ∪ (_≡ (m₁ , m₂)) ⁻¹ ∪ (_≡ (m₂ , m₁)) ⁻¹  ⊆⟨ id ⟩∎
+      F R ⁻¹                                        ∎
+      where
+      lemma : {p₁ p₂ : Proc ∞ × Proc ∞} → p₁ ≡ swap p₂ → swap p₁ ≡ p₂
+      lemma refl = refl
 
-  contradiction =
-    Size-preserving B.StepC F            ↝⟨ (λ hyp → _⇔_.to (monotone→⇔ _ mono) hyp) ⟩
-    F (Bisimilarity ∞) ⊆ Bisimilarity ∞  ↝⟨ _$ inj₂ (inj₁ refl) ⟩
-    m₁ ∼ m₂                              ↝⟨ proj₂ (proj₂ (proj₂ (proj₂ ≤≥≁))) ⟩□
-    ⊥                                    □
+    pres : Size-preserving S.StepC F
+    pres {R = R} {i = i} R⊆ =
+      F R                                  ⊆⟨⟩
+      R ∪ (_≡ (m₁ , m₂)) ∪ (_≡ (m₂ , m₁))  ⊆⟨ [ R⊆ , helper ] ⟩∎
+      Similarity i                         ∎
+      where
+      helper : ∀ {p} → p ≡ (m₁ , m₂) ⊎ p ≡ (m₂ , m₁) → Similarity i p
+      helper (inj₁ refl) = proj₁ (proj₂ (proj₂ ≤≥≁))
+      helper (inj₂ refl) = proj₁ (proj₂ (proj₂ (proj₂ ≤≥≁)))
 
-  contradiction₂ =
-    ({F : Trans₂ ℓ (Proc ∞)} →
-     Monotone F → Symmetric swap F →
-     Size-preserving S.StepC F →
-     Size-preserving B.StepC F)       ↝⟨ (λ closed → closed mono symm pres) ⟩
+    contradiction =
+      Size-preserving B.StepC F            ↝⟨ (λ hyp → _⇔_.to (monotone→⇔ _ mono) hyp) ⟩
+      F (Bisimilarity ∞) ⊆ Bisimilarity ∞  ↝⟨ _$ inj₂ (inj₁ refl) ⟩
+      m₁ ∼ m₂                              ↝⟨ proj₂ (proj₂ (proj₂ (proj₂ ≤≥≁))) ⟩□
+      ⊥                                    □
 
-    Size-preserving B.StepC F         ↝⟨ contradiction ⟩□
+    contradiction₂ =
+      ({F : Trans₂ ℓ (Proc ∞)} →
+       Monotone F → Symmetric swap F →
+       Size-preserving S.StepC F →
+       Size-preserving B.StepC F)       ↝⟨ (λ closed → closed mono symm pres) ⟩
 
-    ⊥                                 □
+      Size-preserving B.StepC F         ↝⟨ contradiction ⟩□
+
+      ⊥                                 □
+
+    contradiction₃ =
+      (∀ {lts : LTS ℓ} {F} →
+       Monotone F → Symmetric swap F →
+       Size-preserving (Similarity.Strong.StepC lts) F →
+       Size-preserving (Bisimilarity.Coinductive.StepC lts) F)  ↝⟨ (λ closed mono sym pres → closed mono sym pres) ⟩
+
+      ({F : Trans₂ ℓ (Proc ∞)} →
+       Monotone F → Symmetric swap F →
+       Size-preserving S.StepC F →
+       Size-preserving B.StepC F)                               ↝⟨ contradiction₂ ⟩□
+
+      ⊥                                                         □
+
+    contradiction₄ =
+      ({I : Set ℓ} {C₁ C₂ : Container (I × I) (I × I)}
+       {F : Trans₂ ℓ I} →
+       Monotone F → Symmetric swap F →
+       Size-preserving C₁ F → Size-preserving C₂ F →
+       Size-preserving (C₁ ⟷ C₂) F)                             ↝⟨ (λ closed mono symm pres → closed mono symm pres pres) ⟩
+
+      (∀ {lts : LTS ℓ} {F} →
+       Monotone F → Symmetric swap F →
+       Size-preserving (Similarity.Strong.StepC lts) F →
+       Size-preserving (Bisimilarity.Coinductive.StepC lts) F)  ↝⟨ contradiction₃ ⟩□
+
+      ⊥                                                         □
+
+    contradiction₅ =
+      ({I : Set ℓ} {C₁ C₂ : Container I I}
+       {F : Trans ℓ I} →
+       Monotone F →
+       Size-preserving C₁ F → Size-preserving C₂ F →
+       Size-preserving (C₁ ⊗ C₂) F)                   ↝⟨ (λ closed → closed mono pres) ⟩
+
+      (Size-preserving (reindex swap S.StepC) F →
+       Size-preserving B.StepC F)                     ↝⟨ _$ Size-preserving-reindex refl symm pres ⟩
+
+      Size-preserving B.StepC F                       ↝⟨ contradiction ⟩□
+
+      ⊥                                               □
