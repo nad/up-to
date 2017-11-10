@@ -690,10 +690,10 @@ record Companion-compatible-assumptions : Set (lsuc ℓ) where
   infix 4 _<_ _≤_
 
   _<_ : Size → Size → Set
-  i < j = Σ (Size< j) λ { k → i ≡ k }
+  _<_ = λ i j → Σ (Size< j) λ { k → i ≡ k }
 
   _≤_ : Size → Size → Set
-  i ≤ j = i < j ⊎ i ≡ j
+  _≤_ = λ i j → i < j ⊎ i ≡ j
 
   -- Successor sizes: Sizes i for which there is a size j < i such
   -- that every size k < i satisfies k ≤ j.
