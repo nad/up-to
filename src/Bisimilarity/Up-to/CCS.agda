@@ -13,16 +13,14 @@ open import Prelude
 open import Bijection equality-with-J using (_↔_)
 open import Function-universe equality-with-J hiding (id; _∘_)
 
+open import Bisimilarity.CCS
 import Bisimilarity.Equational-reasoning-instances
-open import Bisimilarity.Exercises.Coinductive.CCS
-  using (_[_]-cong; 6-1-3-2; ≡→∼)
 open import Equational-reasoning
 open import Indexed-container
 open import Labelled-transition-system.CCS Name
 open import Relation
 
 open import Bisimilarity CCS
-open import Bisimilarity.Exercises.Coinductive.CCS
 open import Bisimilarity.Step CCS _[_]⟶_ using (Step; Step↔StepC)
 open import Bisimilarity.Up-to CCS
 

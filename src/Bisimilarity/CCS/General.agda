@@ -1,13 +1,11 @@
 ------------------------------------------------------------------------
--- Some exercises related to CCS from "Enhancements of the
--- bisimulation proof method" by Pous and Sangiorgi
---
--- Implemented without using a fixed form of bisimilarity.
+-- Some results related to CCS, implemented without using a fixed form
+-- of bisimilarity
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K --safe #-}
 
-module Bisimilarity.Exercises.Other.CCS {ℓ} {Name : Set ℓ} where
+module Bisimilarity.CCS.General {ℓ} {Name : Set ℓ} where
 
 open import Equality.Propositional
 open import List equality-with-J
@@ -17,7 +15,8 @@ open import Labelled-transition-system
 open import Labelled-transition-system.CCS Name
 
 ------------------------------------------------------------------------
--- Exercise 6.1.3 (1)
+-- Exercise 6.1.3 (1) from "Enhancements of the bisimulation proof
+-- method" by Pous and Sangiorgi
 
 6-1-3-1-proc : Proc ∞ → Proc ∞ → ℕ → Proc ∞
 6-1-3-1-proc P P′ zero    = ! P ∣ P′
@@ -93,7 +92,8 @@ cons x (xs , y) = x ∷ xs , y
      6-1-3-1-proc′ P Ps′      ∎)
 
 ------------------------------------------------------------------------
--- Exercise 6.1.3 (2)
+-- Exercise 6.1.3 (2) from "Enhancements of the bisimulation proof
+-- method" by Pous and Sangiorgi
 
 -- Assumptions used to state and solve the exercise.
 

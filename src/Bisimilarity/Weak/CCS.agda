@@ -11,8 +11,8 @@ open import Prelude
 
 open import Function-universe equality-with-J hiding (id; _∘_)
 
+import Bisimilarity.CCS as SE
 import Bisimilarity.Equational-reasoning-instances
-import Bisimilarity.Exercises.Coinductive.CCS as SE
 import Bisimilarity.Weak.Equational-reasoning-instances
 open import Equational-reasoning
 import Expansion.CCS as E
@@ -319,8 +319,7 @@ force (C [ Ps≈Qs ]-cong′) = C [ (λ x → force (Ps≈Qs x)) ]-cong
 -- for a weakly guarded, non-degenerate context C, then the two
 -- processes are weakly bisimilar (assuming extensionality).
 --
--- This result is a variant of
--- Bisimilarity.Exercises.Coinductive.CCS.unique-solutions.
+-- This result is a variant of Bisimilarity.CCS.unique-solutions.
 -- Proposition 4.4.4 in Milner's "Operational and Algebraic Semantics
 -- of Concurrent Processes" is perhaps more useful in practice, as
 -- well as some of the results in Sangiorgi's "Equations,

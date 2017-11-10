@@ -1,14 +1,12 @@
 ------------------------------------------------------------------------
--- Some exercises and results from "Enhancements of the bisimulation
--- proof method" by Pous and Sangiorgi, as well as other results,
--- related to an LTS from Section 6.2.5 in the aforementioned chapter
---
--- Implemented using the coinductive definition of bisimilarity.
+-- Some results related to an LTS from Section 6.2.5 of "Enhancements
+-- of the bisimulation proof method" by Pous and Sangiorgi,
+-- implemented using the coinductive definition of bisimilarity
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K --safe #-}
 
-module Bisimilarity.Exercises.Coinductive.6-2-5 {Name : Set} where
+module Bisimilarity.6-2-5 {Name : Set} where
 
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)

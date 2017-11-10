@@ -7,12 +7,13 @@
 module README.Pointers-to-results-from-the-paper where
 
 import Bisimilarity
+import Bisimilarity.CCS
 import Bisimilarity.Classical
 import Bisimilarity.Comparison
 import Bisimilarity.Delay-monad
 import Bisimilarity.Equational-reasoning-instances
-import Bisimilarity.Exercises.Coinductive.CCS
-import Bisimilarity.Exercises.Coinductive.CCS.Natural-numbers
+import Bisimilarity.CCS.Examples
+import Bisimilarity.CCS.Examples.Natural-numbers
 import Bisimilarity.Step
 import Bisimilarity.Up-to
 import Bisimilarity.Up-to.CCS
@@ -238,12 +239,12 @@ finite→finite = Labelled-transition-system.CCS.finite→finite
 
 -- Restricted and the corresponding lemma.
 
-Restricted   = Bisimilarity.Exercises.Coinductive.CCS.Restricted
-Restricted∼∅ = Bisimilarity.Exercises.Coinductive.CCS.Restricted∼∅
+Restricted   = Bisimilarity.CCS.Examples.Restricted
+Restricted∼∅ = Bisimilarity.CCS.Examples.Restricted∼∅
 
 -- ∅ is a left identity for parallel composition.
 
-∣-left-identity = Bisimilarity.Exercises.Coinductive.CCS.∣-left-identity
+∣-left-identity = Bisimilarity.CCS.∣-left-identity
 
 -- Proofs showing that all the CCS process constructors preserve
 -- strong bisimilarity. (For ∅ the proof is simply reflexivity of
@@ -255,11 +256,11 @@ Restricted∼∅ = Bisimilarity.Exercises.Coinductive.CCS.Restricted∼∅
 
 module Strong-bisimilarity-congruence where
 
-  _∣-cong_  = Bisimilarity.Exercises.Coinductive.CCS._∣-cong_
-  ·-cong    = Bisimilarity.Exercises.Coinductive.CCS._·-cong_
-  !-cong    = Bisimilarity.Exercises.Coinductive.CCS.!-cong_
-  _⊕-cong_  = Bisimilarity.Exercises.Coinductive.CCS._⊕-cong_
-  ⟨ν_⟩-cong = Bisimilarity.Exercises.Coinductive.CCS.⟨ν_⟩-cong
+  _∣-cong_  = Bisimilarity.CCS._∣-cong_
+  ·-cong    = Bisimilarity.CCS._·-cong_
+  !-cong    = Bisimilarity.CCS.!-cong_
+  _⊕-cong_  = Bisimilarity.CCS._⊕-cong_
+  ⟨ν_⟩-cong = Bisimilarity.CCS.⟨ν_⟩-cong
   ∅-cong    = Bisimilarity.reflexive-∼
 
 -- Some proofs have been repeated in order to provide code which is
@@ -267,9 +268,9 @@ module Strong-bisimilarity-congruence where
 
 module As-in-the-paper where
 
-  _∣-cong_ = Bisimilarity.Exercises.Coinductive.CCS._∣-congP_
-  ·-cong   = Bisimilarity.Exercises.Coinductive.CCS.·-congP
-  !-cong   = Bisimilarity.Exercises.Coinductive.CCS.!-congP
+  _∣-cong_ = Bisimilarity.CCS._∣-congP_
+  ·-cong   = Bisimilarity.CCS.·-congP
+  !-cong   = Bisimilarity.CCS.!-congP
 
 -- The code uses overloaded equational reasoning combinators.
 
@@ -291,14 +292,13 @@ module ·-cong where
 
 -- The example with P and Q.
 
-P   = Bisimilarity.Exercises.Coinductive.CCS.Natural-numbers.P
-Q   = Bisimilarity.Exercises.Coinductive.CCS.Natural-numbers.Q
-P∼Q = Bisimilarity.Exercises.Coinductive.CCS.Natural-numbers.P∼Q
+P   = Bisimilarity.CCS.Examples.Natural-numbers.P
+Q   = Bisimilarity.CCS.Examples.Natural-numbers.Q
+P∼Q = Bisimilarity.CCS.Examples.Natural-numbers.P∼Q
 
 -- The processes in the family P are irregular.
 
-P-irregular =
-  Bisimilarity.Exercises.Coinductive.CCS.Natural-numbers.P-irregular
+P-irregular = Bisimilarity.CCS.Examples.Natural-numbers.P-irregular
 
 -- The combinators _■ and _∼⟨_⟩_ presented in the paper correspond to
 -- two instances.
@@ -309,8 +309,8 @@ _∼⟨_⟩_ = Bisimilarity.Equational-reasoning-instances.trans∼∼
 -- Equations of the form [ ∞ ] P ∼ (C [ P ]) have unique solutions up
 -- to bisimilarity for contexts C where every hole is under a prefix.
 
-existence  = Bisimilarity.Exercises.Coinductive.CCS.solutions-exist
-uniqueness = Bisimilarity.Exercises.Coinductive.CCS.unique-solutions
+existence  = Bisimilarity.CCS.solutions-exist
+uniqueness = Bisimilarity.CCS.unique-solutions
 
 ------------------------------------------------------------------------
 -- Section 6
@@ -508,7 +508,7 @@ companion-up-to = Up-to.companion-up-to
 
 -- Pous and Sangiorgi's lemma 6.1.3, part (2).
 
-6-1-3-2 = Bisimilarity.Exercises.Coinductive.CCS.6-1-3-2
+6-1-3-2 = Bisimilarity.CCS.6-1-3-2
 
 -- Instances corresponding to some equational reasoning combinators
 -- mentioned in the paper.
@@ -519,12 +519,12 @@ _■′      = Bisimilarity.Equational-reasoning-instances.reflexive∼′
 
 -- The primed variant of _∣-cong_.
 
-_∣-cong′_ = Bisimilarity.Exercises.Coinductive.CCS._∣-cong′_
+_∣-cong′_ = Bisimilarity.CCS._∣-cong′_
 
 -- Replication preserves strong bisimilarity (already mentioned
 -- above).
 
-!-cong₂ = Bisimilarity.Exercises.Coinductive.CCS.!-congP
+!-cong₂ = Bisimilarity.CCS.!-congP
 
 -- Proofs showing that all the CCS process constructors preserve
 -- strong bisimilarity (already mentioned above).

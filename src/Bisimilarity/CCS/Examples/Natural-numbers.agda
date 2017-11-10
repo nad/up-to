@@ -1,12 +1,11 @@
 ------------------------------------------------------------------------
--- An example using natural numbers as names
---
--- Implemented using the coinductive definition of bisimilarity.
+-- An example that uses natural numbers as names, implemented using
+-- the coinductive definition of bisimilarity
 ------------------------------------------------------------------------
 
 {-# OPTIONS --without-K --safe #-}
 
-module Bisimilarity.Exercises.Coinductive.CCS.Natural-numbers where
+module Bisimilarity.CCS.Examples.Natural-numbers where
 
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
@@ -18,8 +17,9 @@ open import Fin equality-with-J
 open import Function-universe equality-with-J as F hiding (id; _∘_)
 open import Nat equality-with-J
 
+open import Bisimilarity.CCS
 import Bisimilarity.Equational-reasoning-instances
-open import Bisimilarity.Exercises.Coinductive.CCS
+open import Bisimilarity.CCS.Examples
 open import Equational-reasoning
 open import Labelled-transition-system.CCS ℕ
 

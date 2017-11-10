@@ -131,20 +131,35 @@ import Bisimilarity.Comparison
 
 import Bisimilarity.Delay-monad
 
--- Some exercises and results from "Enhancements of the bisimulation
--- proof method" by Pous and Sangiorgi, as well as other results.
+-- Some results related to CCS, implemented without using a fixed form
+-- of bisimilarity.
 
-import Bisimilarity.Exercises.Other.CCS
-import Bisimilarity.Exercises.Classical.CCS
-import Bisimilarity.Exercises.Coinductive.CCS
-import Bisimilarity.Exercises.Coinductive.CCS.Natural-numbers
-import Bisimilarity.Exercises.Coinductive.6-2-5
+import Bisimilarity.CCS.General
+
+-- Various results or examples related to CCS, implemented using the
+-- coinductive definition of bisimilarity.
+
+import Bisimilarity.CCS
+import Bisimilarity.CCS.Examples
+import Bisimilarity.CCS.Examples.Natural-numbers
+
+-- Some of the results/examples above have also been implemented using
+-- the classical definition of bisimilarity.
+
+import Bisimilarity.CCS.Classical
+import Bisimilarity.CCS.Examples.Classical
 
 -- Up-to techniques for strong bisimilarity.
 
 import Bisimilarity.Up-to
 import Bisimilarity.Up-to.CCS
 import Bisimilarity.Up-to.Counterexamples
+
+-- Some results related to an LTS from Section 6.2.5 of "Enhancements
+-- of the bisimulation proof method" by Pous and Sangiorgi,
+-- implemented using the coinductive definition of bisimilarity.
+
+import Bisimilarity.6-2-5
 
 ------------------------------------------------------------------------
 -- Expansion

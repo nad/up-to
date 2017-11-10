@@ -11,8 +11,8 @@ open import Prelude hiding (module W)
 
 open import Function-universe equality-with-J hiding (id; _∘_)
 
+import Bisimilarity.CCS as SL
 import Bisimilarity.Equational-reasoning-instances
-import Bisimilarity.Exercises.Coinductive.CCS as SE
 import Bisimilarity.Weak.Equational-reasoning-instances
 open import Equational-reasoning
 import Expansion.Equational-reasoning-instances
@@ -172,7 +172,7 @@ module Cong-lemmas
          ! P ∣ P₁″          [ τ ]⇒⟨ par-τ′ (sym $ co-involutive a) (replication (par-right P⟶Q₂′)) P₁″⟶Q₁′ ⟩
          (! P ∣ Q₂′) ∣ Q₁′  →⟨ zip-⇒ par-left par-right (map-⇒ par-right Q₂′⇒Q₂) Q₁′⇒Q₁ ⟩■
          (! P ∣ Q₂) ∣ Q₁)
-      , ((! P ∣ Q₂) ∣ Q₁  ∼⟨ SE.swap-rightmost ⟩■
+      , ((! P ∣ Q₂) ∣ Q₁  ∼⟨ SL.swap-rightmost ⟩■
          (! P ∣ Q₁) ∣ Q₂)
 
     (steps {p′ = P₁″} {q′ = Q₁′}
@@ -197,7 +197,7 @@ module Cong-lemmas
     R P P′ → ! P′ [ μ ]⟶ Q′ →
     ∃ λ Q → ((! P) [ μ ]↝ Q) × R′ Q Q′
   !-cong _∣-cong′_ !-cong′_ {P} {P′} {Q′} {μ} P≳P′ !P′⟶Q′ =
-    case SE.6-1-3-2 !P′⟶Q′ of λ where
+    case SL.6-1-3-2 !P′⟶Q′ of λ where
 
       (inj₁ (P″ , P′⟶P″ , Q′∼!P′∣P″)) →
         let Q , P↝Q  , Q≳′P″  = right-to-left P≳P′ P′⟶P″
@@ -390,14 +390,14 @@ mutual
     lr : ∀ {Q μ} →
          ! P [ μ ]⟶ Q →
          ∃ λ Q′ → ! P′ [ μ ]⟶̂ Q′ × [ i ] Q ≳′ Q′
-    lr {Q} {μ} !P⟶Q = case SE.6-1-3-2 !P⟶Q of λ where
+    lr {Q} {μ} !P⟶Q = case SL.6-1-3-2 !P⟶Q of λ where
 
       (inj₁ (P″ , P⟶P″ , Q∼!P∣P″)) → case left-to-right P≳P′ P⟶P″ of λ where
         (_ , done s , P″≳′P′) → case silent≡τ s of λ where
           refl →
             Q          ∼⟨ Q∼!P∣P″ ⟩
             ! P  ∣ P″  ∼′⟨ !-cong′ (convert {a = ℓ} P≳P′) ∣-cong′ P″≳′P′ ⟩ S.∼:
-            ! P′ ∣ P′  ∼⟨ SE.6-1-2 ⟩■
+            ! P′ ∣ P′  ∼⟨ SL.6-1-2 ⟩■
             ! P′
               ⟵̂[ τ ]
             ! P′       ■
@@ -476,9 +476,9 @@ mutual
   where
   ⊕-congˡ-≳≈ : ∀ {P P′ Q} → P ≳ P′ → P ⊕ Q ≈ P′ ⊕ Q
   ⊕-congˡ-≳≈ {P} {P′} {Q} P≳P′ =
-    P ⊕ Q   ∼⟨ SE.⊕-comm ⟩
+    P ⊕ Q   ∼⟨ SL.⊕-comm ⟩
     Q ⊕ P   ∼′⟨ ⊕-congʳ-≳≈ P≳P′ ⟩ S.∼:
-    Q ⊕ P′  ∼⟨ SE.⊕-comm ⟩■
+    Q ⊕ P′  ∼⟨ SL.⊕-comm ⟩■
     P′ ⊕ Q
 
 -- _⊕_ does not, in general, preserve the expansion relation in its
@@ -528,9 +528,9 @@ force (⊕·-cong′ Q≳Q′) = ⊕·-cong Q≳Q′
 ·⊕-cong : ∀ {i P P′ μ Q} →
           [ i ] force P ≳′ force P′ → [ i ] μ · P ⊕ Q ≳ μ · P′ ⊕ Q
 ·⊕-cong {P = P} {P′} {μ} {Q} P≳P′ =
-  μ · P ⊕ Q   ∼⟨ SE.⊕-comm ⟩
+  μ · P ⊕ Q   ∼⟨ SL.⊕-comm ⟩
   Q ⊕ μ · P   ∼′⟨ ⊕·-cong P≳P′ ⟩ S.∼:
-  Q ⊕ μ · P′  ∼⟨ SE.⊕-comm ⟩■
+  Q ⊕ μ · P′  ∼⟨ SL.⊕-comm ⟩■
   μ · P′ ⊕ Q
 
 ·⊕-cong′ : ∀ {i P P′ μ Q} →
@@ -599,20 +599,20 @@ D₁ ⊕ D₂  [ Ps≳Qs ]-cong = ⊕-cong Ps≳Qs D₁ D₂
     [ i ] (C₁ [ Ps ]) ⊕ (C₂ [ Ps ]) ≳ (C₁ [ Qs ]) ⊕ (C₂ [ Qs ])
   ⊕-cong {Ps = Ps} {Qs} Ps≳Qs = λ where
     (process P₁) (process P₂) →
-      (context P₁ [ Ps ]) ⊕ (context P₂ [ Ps ])  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁) SE.⊕-cong SE.≡→∼ (context-[] P₂)) ⟩
-      P₁ ⊕ P₂                                    ∼⟨ SE.≡→∼ (context-[] P₁) SE.⊕-cong SE.≡→∼ (context-[] P₂) ⟩■
+      (context P₁ [ Ps ]) ⊕ (context P₂ [ Ps ])  ∼⟨ symmetric (SL.≡→∼ (context-[] P₁) SL.⊕-cong SL.≡→∼ (context-[] P₂)) ⟩
+      P₁ ⊕ P₂                                    ∼⟨ SL.≡→∼ (context-[] P₁) SL.⊕-cong SL.≡→∼ (context-[] P₂) ⟩■
       (context P₁ [ Qs ]) ⊕ (context P₂ [ Qs ])
 
     (process P₁) (action {μ = μ₂} {C = C₂} D₂) →
-      (context P₁ [ Ps ]) ⊕ μ₂ · (C₂ [ Ps ]′)  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁)) SE.⊕-cong (_ ■) ⟩
+      (context P₁ [ Ps ]) ⊕ μ₂ · (C₂ [ Ps ]′)  ∼⟨ symmetric (SL.≡→∼ (context-[] P₁)) SL.⊕-cong (_ ■) ⟩
       P₁ ⊕ μ₂ · (C₂ [ Ps ]′)                   ∼′⟨ ⊕·-cong (D₂ [ Ps≳Qs ]-cong′) ⟩ S.∼:
-      P₁ ⊕ μ₂ · (C₂ [ Qs ]′)                   ∼⟨ SE.≡→∼ (context-[] P₁) SE.⊕-cong (_ ■) ⟩■
+      P₁ ⊕ μ₂ · (C₂ [ Qs ]′)                   ∼⟨ SL.≡→∼ (context-[] P₁) SL.⊕-cong (_ ■) ⟩■
       (context P₁ [ Qs ]) ⊕ μ₂ · (C₂ [ Qs ]′)
 
     (action {μ = μ₁} {C = C₁} D₁) (process P₂) →
-      μ₁ · (C₁ [ Ps ]′) ⊕ (context P₂ [ Ps ])  ∼⟨ (_ ■) SE.⊕-cong symmetric (SE.≡→∼ (context-[] P₂)) ⟩
+      μ₁ · (C₁ [ Ps ]′) ⊕ (context P₂ [ Ps ])  ∼⟨ (_ ■) SL.⊕-cong symmetric (SL.≡→∼ (context-[] P₂)) ⟩
       μ₁ · (C₁ [ Ps ]′) ⊕ P₂                   ∼′⟨ ·⊕-cong (D₁ [ Ps≳Qs ]-cong′) ⟩ S.∼:
-      μ₁ · (C₁ [ Qs ]′) ⊕ P₂                   ∼⟨ (_ ■) SE.⊕-cong SE.≡→∼ (context-[] P₂) ⟩■
+      μ₁ · (C₁ [ Qs ]′) ⊕ P₂                   ∼⟨ (_ ■) SL.⊕-cong SL.≡→∼ (context-[] P₂) ⟩■
       μ₁ · (C₁ [ Qs ]′) ⊕ (context P₂ [ Qs ])
 
     (action {μ = μ₁} {C = C₁} D₁) (action {μ = μ₂} {C = C₂} D₂) →

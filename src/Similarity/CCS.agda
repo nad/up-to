@@ -11,8 +11,8 @@ open import Prelude
 
 open import Function-universe equality-with-J hiding (id; _∘_)
 
+import Bisimilarity.CCS as BL
 import Bisimilarity.Equational-reasoning-instances
-import Bisimilarity.Exercises.Coinductive.CCS as BE
 open import Equational-reasoning
 open import Labelled-transition-system.CCS Name
 import Similarity.Equational-reasoning-instances
@@ -24,7 +24,7 @@ open import Similarity CCS
 -- Congruence lemmas
 
 private
-  module CL {i} = BE.Cong-lemmas [ i ]_≤′_ challenge
+  module CL {i} = BL.Cong-lemmas [ i ]_≤′_ challenge
 
 mutual
 
@@ -108,7 +108,7 @@ mutual
 
   !-cong_ : ∀ {i P P′} →
             [ i ] P ≤ P′ → [ i ] ! P ≤ ! P′
-  !-cong P≤P′ = ⟨ CL.!-cong BE.6-1-3-2 _∣-cong′_ !-cong′_ P≤P′ ⟩
+  !-cong P≤P′ = ⟨ CL.!-cong BL.6-1-3-2 _∣-cong′_ !-cong′_ P≤P′ ⟩
 
   !-cong′_ : ∀ {i P P′} → [ i ] P ≤′ P′ → [ i ] ! P ≤′ ! P′
   force (!-cong′ P≤P′) = !-cong force P≤P′
@@ -186,7 +186,7 @@ mutual
   machine₁⟶ :
     ∀ {P μ} → machine₁ [ μ ]⟶ P →
     μ ≡ name pay × P ∼ machine₁ ∣ (coffee ∙ ⊕ tea ∙)
-  machine₁⟶ tr = case BE.6-1-3-2 tr of λ where
+  machine₁⟶ tr = case BL.6-1-3-2 tr of λ where
     (inj₁ (_ , action , P∼))                 → refl , P∼
     (inj₂ (_ , _ , _ , _ , action , tr , _)) →
       ⊥-elim (names-are-not-inverted tr)
@@ -212,7 +212,7 @@ mutual
   -- The second machine is similar to the first one.
 
   machine₂≤machine₁ : ∀ {i} → [ i ] machine₂ ≤ machine₁
-  machine₂≤machine₁ {i} = StepC.⟨ helper ∘ BE.6-1-3-2 ⟩
+  machine₂≤machine₁ {i} = StepC.⟨ helper ∘ BL.6-1-3-2 ⟩
     where
     machine₂≤′machine₁ : [ i ] machine₂ ≤′ machine₁
     force machine₂≤′machine₁ = machine₂≤machine₁
