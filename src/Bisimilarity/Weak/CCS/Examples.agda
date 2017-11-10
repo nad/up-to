@@ -24,7 +24,7 @@ import Expansion.CCS as EL
 import Expansion.Equational-reasoning-instances
 open import Labelled-transition-system.CCS Name
 
-open import Bisimilarity.Coinductive CCS as S using (_∼_; _∼′_; ∼:_)
+open import Bisimilarity.Coinductive CCS using (_∼_; ∼:_)
 open import Bisimilarity.Weak CCS as W
 open import Expansion CCS as E
 import Labelled-transition-system.Equational-reasoning-instances CCS
