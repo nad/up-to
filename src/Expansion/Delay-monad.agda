@@ -14,12 +14,12 @@ open import Prelude
 
 open import Function-universe equality-with-J hiding (id; _∘_)
 
-import Bisimilarity.Coinductive.Delay-monad as SD
+import Bisimilarity.Delay-monad as SD
 open import Equational-reasoning
 import Expansion.Equational-reasoning-instances
 open import Labelled-transition-system.Delay-monad A
 
-open import Bisimilarity.Coinductive delay-monad using ([_]_∼_)
+open import Bisimilarity delay-monad using ([_]_∼_)
 open import Expansion delay-monad
 
 ------------------------------------------------------------------------

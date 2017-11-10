@@ -13,7 +13,7 @@ open import Prelude as P
 open import Bijection equality-with-J using (_↔_)
 open import Function-universe equality-with-J hiding (id; _∘_)
 
-import Bisimilarity.Coinductive
+import Bisimilarity
 open import Indexed-container hiding (Bisimilarity)
 open import Indexed-container.Combinators hiding (id; _∘_)
 open import Labelled-transition-system
@@ -26,7 +26,7 @@ open import Up-to
 private
   module CCS {ℓ} (Name : Set ℓ) where
     open Labelled-transition-system.CCS Name public
-    open module B = Bisimilarity.Coinductive CCS public
+    open module B = Bisimilarity CCS public
     open module S = Similarity.Strong CCS public using (Similarity)
 
 ------------------------------------------------------------------------
@@ -113,7 +113,7 @@ compatible-for-similarity→compatible-for-bisimilarity :
   ∀ {ℓ} {lts : LTS ℓ} {F} →
   Monotone F → Symmetric swap F →
   Compatible (Similarity.Strong.StepC lts) F →
-  Compatible (Bisimilarity.Coinductive.StepC lts) F
+  Compatible (Bisimilarity.StepC lts) F
 compatible-for-similarity→compatible-for-bisimilarity mono sym comp =
   Compatible-⟷ mono sym comp comp
 
@@ -177,7 +177,7 @@ Size-preserving-reindex {C = C} {F} {f}
   ¬ (∀ {lts : LTS ℓ} {F} →
      Monotone F → Symmetric swap F →
      Size-preserving (Similarity.Strong.StepC lts) F →
-     Size-preserving (Bisimilarity.Coinductive.StepC lts) F)
+     Size-preserving (Bisimilarity.StepC lts) F)
     ×
   ¬ ({I : Set ℓ} {C₁ C₂ : Container (I × I) (I × I)}
      {F : Trans₂ ℓ I} →
@@ -249,28 +249,28 @@ Size-preserving-reindex {C = C} {F} {f}
       (∀ {lts : LTS ℓ} {F} →
        Monotone F → Symmetric swap F →
        Size-preserving (Similarity.Strong.StepC lts) F →
-       Size-preserving (Bisimilarity.Coinductive.StepC lts) F)  ↝⟨ (λ closed mono sym pres → closed mono sym pres) ⟩
+       Size-preserving (Bisimilarity.StepC lts) F)        ↝⟨ (λ closed mono sym pres → closed mono sym pres) ⟩
 
       ({F : Trans₂ ℓ (Proc ∞)} →
        Monotone F → Symmetric swap F →
        Size-preserving S.StepC F →
-       Size-preserving B.StepC F)                               ↝⟨ contradiction₂ ⟩□
+       Size-preserving B.StepC F)                         ↝⟨ contradiction₂ ⟩□
 
-      ⊥                                                         □
+      ⊥                                                   □
 
     contradiction₄ =
       ({I : Set ℓ} {C₁ C₂ : Container (I × I) (I × I)}
        {F : Trans₂ ℓ I} →
        Monotone F → Symmetric swap F →
        Size-preserving C₁ F → Size-preserving C₂ F →
-       Size-preserving (C₁ ⟷ C₂) F)                             ↝⟨ (λ closed mono symm pres → closed mono symm pres pres) ⟩
+       Size-preserving (C₁ ⟷ C₂) F)                       ↝⟨ (λ closed mono symm pres → closed mono symm pres pres) ⟩
 
       (∀ {lts : LTS ℓ} {F} →
        Monotone F → Symmetric swap F →
        Size-preserving (Similarity.Strong.StepC lts) F →
-       Size-preserving (Bisimilarity.Coinductive.StepC lts) F)  ↝⟨ contradiction₃ ⟩□
+       Size-preserving (Bisimilarity.StepC lts) F)        ↝⟨ contradiction₃ ⟩□
 
-      ⊥                                                         □
+      ⊥                                                   □
 
     contradiction₅ =
       ({I : Set ℓ} {C₁ C₂ : Container I I}

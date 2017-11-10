@@ -15,8 +15,8 @@ open import H-level equality-with-J
 open import Surjection equality-with-J using (_↠_)
 open import Univalence-axiom equality-with-J
 
+import Bisimilarity
 import Bisimilarity.Classical
-import Bisimilarity.Coinductive
 import Bisimilarity.Comparison as Comp
 import Bisimilarity.Weak.Alternative
 import Bisimilarity.Weak.Alternative.Classical
@@ -94,7 +94,7 @@ coinductive-weak-bisimilarity-is-sometimes-propositional :
   let module Co = Bisimilarity.Weak.Alternative one-loop in
   Co.Extensionality → Is-proposition (tt Co.≈ tt)
 coinductive-weak-bisimilarity-is-sometimes-propositional ext univ =
-  subst (λ lts → let module Co = Bisimilarity.Coinductive lts in
+  subst (λ lts → let module Co = Bisimilarity lts in
                   ∀ p → Co.Extensionality → Is-proposition (p Co.∼ p))
         (sym $ weak≡id ext univ one-loop (λ _ ()))
         (λ _ → Comp.coinductive-bisimilarity-is-sometimes-propositional
@@ -131,8 +131,8 @@ classical-weak-bisimilarity-is-not-propositional ext univ {ℓ} =
      Bisimilarity.Weak.Alternative.Classical.Weak-bisimilarity′
        one-loop ℓ (p , q))
 ¬coinductive↠classical ext univ ext′ {ℓ} =
-  subst (λ lts → Bisimilarity.Coinductive.Extensionality lts →
-                 ¬ (∀ {p q} → Bisimilarity.Coinductive._∼_ lts p q ↠
+  subst (λ lts → Bisimilarity.Extensionality lts →
+                 ¬ (∀ {p q} → Bisimilarity._∼_ lts p q ↠
                               Bisimilarity.Classical.Bisimilarity′
                                 lts ℓ (p , q)))
         (sym $ weak≡id ext univ one-loop (λ _ ()))
@@ -149,7 +149,7 @@ coinductive-weak-bisimilarity-is-not-propositional :
   let open Bisimilarity.Weak.Alternative two-bisimilar-processes in
   ¬ (∀ {p q} → Is-proposition (p ≈ q))
 coinductive-weak-bisimilarity-is-not-propositional ext univ =
-  subst (λ lts → let open Bisimilarity.Coinductive lts in
+  subst (λ lts → let open Bisimilarity lts in
                  ¬ (∀ {p q} → Is-proposition (p ∼ q)))
         (sym $ weak≡id ext univ two-bisimilar-processes (λ _ ()))
         Comp.coinductive-bisimilarity-is-not-propositional
@@ -166,7 +166,7 @@ weak-bisimilarity↠equality :
   let open Bisimilarity.Weak.Alternative (bisimilarity⇔equality A) in
   {p q : A} → p ≈ q ↠ p ≡ q
 weak-bisimilarity↠equality ext univ {A} =
-  subst (λ lts → let open Bisimilarity.Coinductive lts in
+  subst (λ lts → let open Bisimilarity lts in
                  ∀ {p q} → p ∼ q ↠ p ≡ q)
         (sym $ weak≡id ext univ (bisimilarity⇔equality A) (λ _ ()))
         (Comp.bisimilarity↠equality {A = A})

@@ -108,20 +108,20 @@ import Similarity.General
 
 import Bisimilarity.Step
 
+-- A parametrised coinductive definition that can be used to define
+-- strong and weak bisimilarity as well as expansion.
+
+import Bisimilarity.General
+
+-- A coinductive definition of (strong) bisimilarity.
+
+import Bisimilarity
+import Bisimilarity.Equational-reasoning-instances
+
 -- The classical definition of (strong) bisimilarity.
 
 import Bisimilarity.Classical
 import Bisimilarity.Classical.Equational-reasoning-instances
-
--- A parametrised coinductive definition that can be used to define
--- strong and weak bisimilarity as well as expansion.
-
-import Bisimilarity.Coinductive.General
-
--- A coinductive definition of (strong) bisimilarity.
-
-import Bisimilarity.Coinductive
-import Bisimilarity.Coinductive.Equational-reasoning-instances
 
 -- A comparison of the two definitions of bisimilarity.
 
@@ -129,7 +129,7 @@ import Bisimilarity.Comparison
 
 -- Some results related to strong bisimilarity for the delay monad.
 
-import Bisimilarity.Coinductive.Delay-monad
+import Bisimilarity.Delay-monad
 
 -- Some exercises and results from "Enhancements of the bisimulation
 -- proof method" by Pous and Sangiorgi, as well as other results.

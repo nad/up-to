@@ -20,10 +20,10 @@ open import Indexed-container using (Container; ν; ⟦_⟧; force)
 open import Labelled-transition-system
 import Up-to
 
+import Bisimilarity
 import Bisimilarity.Classical
-import Bisimilarity.Coinductive
-import Bisimilarity.Coinductive.Equational-reasoning-instances
 open import Bisimilarity.Comparison
+import Bisimilarity.Equational-reasoning-instances
 import Bisimilarity.Step
 import Bisimilarity.Up-to
 open import Equational-reasoning
@@ -35,9 +35,8 @@ private
 
   module Combination {ℓ} (lts : LTS ℓ) where
 
-    open Bisimilarity.Classical lts public
-      using (Progression)
-    open Bisimilarity.Coinductive lts public
+    open Bisimilarity lts public
+    open Bisimilarity.Classical lts public using (Progression)
     open Bisimilarity.Step lts (LTS._[_]⟶_ lts) (LTS._[_]⟶_ lts) public
       using (Step; Step↔StepC)
     open Bisimilarity.Up-to lts public

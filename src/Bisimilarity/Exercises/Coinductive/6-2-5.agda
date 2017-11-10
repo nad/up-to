@@ -16,13 +16,13 @@ open import Prelude
 
 open import Function-universe equality-with-J hiding (id; _∘_)
 
-import Bisimilarity.Coinductive.Equational-reasoning-instances
+import Bisimilarity.Equational-reasoning-instances
 open import Equational-reasoning
 open import Indexed-container using (⟦_⟧)
 open import Labelled-transition-system.6-2-5 Name
 open import Relation
 
-open import Bisimilarity.Coinductive 6-2-5
+open import Bisimilarity 6-2-5
 open import Bisimilarity.Up-to 6-2-5
 
 -- Some simple lemmas.

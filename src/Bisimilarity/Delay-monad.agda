@@ -4,7 +4,7 @@
 
 {-# OPTIONS --without-K --safe #-}
 
-module Bisimilarity.Coinductive.Delay-monad {a} {A : Set a} where
+module Bisimilarity.Delay-monad {a} {A : Set a} where
 
 open import Delay-monad
 open import Delay-monad.Strong-bisimilarity as D using (force)
@@ -17,8 +17,8 @@ open import Function-universe equality-with-J hiding (id; _∘_)
 open import Labelled-transition-system
 open import Labelled-transition-system.Delay-monad A
 
-open import Bisimilarity.Coinductive delay-monad
-import Bisimilarity.Coinductive.Equational-reasoning-instances
+open import Bisimilarity delay-monad
+import Bisimilarity.Equational-reasoning-instances
 open import Equational-reasoning
 
 ------------------------------------------------------------------------

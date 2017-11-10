@@ -11,8 +11,8 @@ module Bisimilarity.Weak.Alternative.Equational-reasoning-instances
 
 open import Prelude
 
-open import Bisimilarity.Coinductive lts
-import Bisimilarity.Coinductive.Equational-reasoning-instances
+open import Bisimilarity lts
+import Bisimilarity.Equational-reasoning-instances
 open import Bisimilarity.Weak.Alternative lts
 open import Equational-reasoning
 
@@ -42,5 +42,5 @@ instance
   convert∼′≈′ : Convertible _∼′_ _≈′_
   convert∼′≈′ = is-convertible ∼⇒≈″
 
-open Bisimilarity.Coinductive.Equational-reasoning-instances
+open Bisimilarity.Equational-reasoning-instances
        {lts = weak lts} public

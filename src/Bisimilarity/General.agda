@@ -7,7 +7,7 @@
 
 open import Labelled-transition-system
 
-module Bisimilarity.Coinductive.General
+module Bisimilarity.General
          {ℓ}
          (lts : LTS ℓ)
          (open LTS lts)

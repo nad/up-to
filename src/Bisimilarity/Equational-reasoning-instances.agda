@@ -8,10 +8,10 @@ open import Prelude
 
 open import Labelled-transition-system
 
-module Bisimilarity.Coinductive.Equational-reasoning-instances
+module Bisimilarity.Equational-reasoning-instances
          {ℓ} {lts : LTS ℓ} {i : Size} where
 
-open import Bisimilarity.Coinductive lts
+open import Bisimilarity lts
 open import Equational-reasoning
 
 instance

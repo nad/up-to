@@ -11,13 +11,13 @@ open import Prelude
 
 open import Function-universe equality-with-J hiding (id; _∘_)
 
-import Bisimilarity.Coinductive.Equational-reasoning-instances
+import Bisimilarity.Equational-reasoning-instances
 import Bisimilarity.Exercises.Coinductive.CCS as BE
 open import Equational-reasoning
 open import Labelled-transition-system.CCS Name
 import Similarity.Strong.Equational-reasoning-instances
 
-open import Bisimilarity.Coinductive CCS as B using (_∼_; _∼′_)
+open import Bisimilarity CCS as B using (_∼_; _∼′_)
 open import Similarity.Strong CCS
 
 ------------------------------------------------------------------------

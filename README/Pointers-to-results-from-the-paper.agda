@@ -6,11 +6,11 @@
 
 module README.Pointers-to-results-from-the-paper where
 
+import Bisimilarity
 import Bisimilarity.Classical
-import Bisimilarity.Coinductive
-import Bisimilarity.Coinductive.Delay-monad
-import Bisimilarity.Coinductive.Equational-reasoning-instances
 import Bisimilarity.Comparison
+import Bisimilarity.Delay-monad
+import Bisimilarity.Equational-reasoning-instances
 import Bisimilarity.Exercises.Coinductive.CCS
 import Bisimilarity.Exercises.Coinductive.CCS.Natural-numbers
 import Bisimilarity.Step
@@ -161,7 +161,7 @@ Bisimilar = Bisimilarity.Classical._∼_
 
 -- The definition using ν.
 
-[_]_∼_ = Bisimilarity.Coinductive.[_]_∼_
+[_]_∼_ = Bisimilarity.[_]_∼_
 
 -- The two definitions are pointwise logically equivalent.
 
@@ -170,7 +170,7 @@ classical-and-ν-equivalent =
 
 -- The definition using ν′.
 
-[_]_∼′_ = Bisimilarity.Coinductive.[_]_∼′_
+[_]_∼′_ = Bisimilarity.[_]_∼′_
 
 -- Derived transition relations.
 
@@ -191,7 +191,7 @@ _[_]→̂_ = Labelled-transition-system.LTS._[_]⟶̂_
 -- transition relations to yield strong or weak bisimilarity or the
 -- expansion relation.
 
-import Bisimilarity.Coinductive.General
+import Bisimilarity.General
 
 -- The labelled transition system for the delay monad.
 
@@ -201,8 +201,7 @@ delay-monad-lts = Labelled-transition-system.Delay-monad.delay-monad
 -- logically equivalent to the direct definition of strong
 -- bisimilarity for the delay monad.
 
-delay-monad-direct⇔indirect =
-  Bisimilarity.Coinductive.Delay-monad.direct⇔indirect
+delay-monad-direct⇔indirect = Bisimilarity.Delay-monad.direct⇔indirect
 
 -- Symmetry of bisimilarity for an arbitrary LTS.
 --
@@ -212,12 +211,12 @@ delay-monad-direct⇔indirect =
 -- function map₃ is not used, but rather a combination of other
 -- functions. Similar remarks apply to several definitions below.
 
-symmetric  = Bisimilarity.Coinductive.symmetric-∼
-symmetric′ = Bisimilarity.Coinductive.symmetric-∼′
+symmetric  = Bisimilarity.symmetric-∼
+symmetric′ = Bisimilarity.symmetric-∼′
 
 -- Transitivity of bisimilarity for an arbitrary LTS.
 
-transitive = Bisimilarity.Coinductive.transitive-∼
+transitive = Bisimilarity.transitive-∼
 
 ------------------------------------------------------------------------
 -- Section 5
@@ -261,7 +260,7 @@ module Strong-bisimilarity-congruence where
   !-cong    = Bisimilarity.Exercises.Coinductive.CCS.!-cong_
   _⊕-cong_  = Bisimilarity.Exercises.Coinductive.CCS._⊕-cong_
   ⟨ν_⟩-cong = Bisimilarity.Exercises.Coinductive.CCS.⟨ν_⟩-cong
-  ∅-cong    = Bisimilarity.Coinductive.reflexive-∼
+  ∅-cong    = Bisimilarity.reflexive-∼
 
 -- Some proofs have been repeated in order to provide code which is
 -- closer to that presented in the paper.
@@ -281,7 +280,7 @@ import Equational-reasoning
 -- symmetric to an instance corresponding to symmetric′.
 
 symmetric′-instance =
-  Bisimilarity.Coinductive.Equational-reasoning-instances.symmetric∼′
+  Bisimilarity.Equational-reasoning-instances.symmetric∼′
 
 -- Lemmas corresponding to ·-cong for expansion and weak bisimilarity.
 
@@ -304,10 +303,8 @@ P-irregular =
 -- The combinators _■ and _∼⟨_⟩_ presented in the paper correspond to
 -- two instances.
 
-_■ =
-  Bisimilarity.Coinductive.Equational-reasoning-instances.reflexive∼
-_∼⟨_⟩_ =
-  Bisimilarity.Coinductive.Equational-reasoning-instances.trans∼∼
+_■     = Bisimilarity.Equational-reasoning-instances.reflexive∼
+_∼⟨_⟩_ = Bisimilarity.Equational-reasoning-instances.trans∼∼
 
 -- Equations of the form [ ∞ ] P ∼ (C [ P ]) have unique solutions up
 -- to bisimilarity for contexts C where every hole is under a prefix.
@@ -516,12 +513,9 @@ companion-up-to = Up-to.companion-up-to
 -- Instances corresponding to some equational reasoning combinators
 -- mentioned in the paper.
 
-_∼′⟨_⟩′_ =
-  Bisimilarity.Coinductive.Equational-reasoning-instances.trans∼′∼′
-_∼⟨_⟩′_ =
-  Bisimilarity.Coinductive.Equational-reasoning-instances.trans∼∼′
-_■′ =
-  Bisimilarity.Coinductive.Equational-reasoning-instances.reflexive∼′
+_∼′⟨_⟩′_ = Bisimilarity.Equational-reasoning-instances.trans∼′∼′
+_∼⟨_⟩′_  = Bisimilarity.Equational-reasoning-instances.trans∼∼′
+_■′      = Bisimilarity.Equational-reasoning-instances.reflexive∼′
 
 -- The primed variant of _∣-cong_.
 

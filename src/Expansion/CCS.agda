@@ -11,7 +11,7 @@ open import Prelude hiding (module W)
 
 open import Function-universe equality-with-J hiding (id; _∘_)
 
-import Bisimilarity.Coinductive.Equational-reasoning-instances
+import Bisimilarity.Equational-reasoning-instances
 import Bisimilarity.Exercises.Coinductive.CCS as SE
 import Bisimilarity.Weak.Equational-reasoning-instances
 open import Equational-reasoning
@@ -19,8 +19,7 @@ import Expansion.Equational-reasoning-instances
 open import Labelled-transition-system.CCS Name
 open import Relation
 
-import Bisimilarity.Coinductive CCS as S
-open import Bisimilarity.Coinductive CCS using (_∼_)
+open import Bisimilarity CCS as S using (_∼_)
 open import Bisimilarity.Weak CCS as W using (_≈_; force)
 open import Expansion CCS
 import Labelled-transition-system.Equational-reasoning-instances CCS

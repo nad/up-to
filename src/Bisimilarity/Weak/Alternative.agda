@@ -15,8 +15,8 @@ module Bisimilarity.Weak.Alternative {ℓ} (lts : LTS ℓ) where
 
 open import Prelude
 
-import Bisimilarity.Coinductive
-import Bisimilarity.Coinductive.Equational-reasoning-instances
+import Bisimilarity
+import Bisimilarity.Equational-reasoning-instances
 open import Equational-reasoning
 
 open LTS lts
@@ -25,7 +25,7 @@ open LTS lts
 -- a different LTS.
 
 private
-  module WB = Bisimilarity.Coinductive (weak lts)
+  module WB = Bisimilarity (weak lts)
 
 open WB public
   using ( ⟨_,_⟩
@@ -55,7 +55,7 @@ syntax lr-result-with-action    p′≈q′ μ q q⟶q′ = p′≈q′ [ μ ]�
 -- Strongly bisimilar processes are weakly bisimilar.
 
 private
-  module SB = Bisimilarity.Coinductive lts
+  module SB = Bisimilarity lts
 
 open SB using (_∼_; _∼′_; [_]_∼_; [_]_∼′_; force)
 

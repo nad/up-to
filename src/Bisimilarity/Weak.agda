@@ -13,9 +13,9 @@ open import Prelude
 
 import Function-universe equality-with-J as F
 
-import Bisimilarity.Coinductive
-import Bisimilarity.Coinductive.Equational-reasoning-instances
-import Bisimilarity.Coinductive.General
+import Bisimilarity
+import Bisimilarity.Equational-reasoning-instances
+import Bisimilarity.General
 open import Equational-reasoning
 import Expansion
 import Expansion.Equational-reasoning-instances
@@ -25,14 +25,13 @@ open import Up-to
 
 open LTS lts
 private
-  open module SB = Bisimilarity.Coinductive lts
+  open module SB = Bisimilarity lts
     using (_∼_; _∼′_; [_]_∼_; [_]_∼′_)
   open module E = Expansion lts
     using (_≳_; _≳′_; _≲_; [_]_≳_; [_]_≳′_)
 
 private
-  module General =
-    Bisimilarity.Coinductive.General lts _[_]⇒̂_ _[_]⇒̂_ ⟶→⇒̂ ⟶→⇒̂
+  module General = Bisimilarity.General lts _[_]⇒̂_ _[_]⇒̂_ ⟶→⇒̂ ⟶→⇒̂
 
 open General public
   using (module StepC; ⟨_,_⟩; left-to-right; right-to-left; force;

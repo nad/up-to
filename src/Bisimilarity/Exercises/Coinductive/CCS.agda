@@ -13,12 +13,12 @@ module Bisimilarity.Exercises.Coinductive.CCS {ℓ} {Name : Set ℓ} where
 open import Equality.Propositional
 open import Prelude
 
-import Bisimilarity.Coinductive.Equational-reasoning-instances
+import Bisimilarity.Equational-reasoning-instances
 import Bisimilarity.Exercises.Other.CCS
 open import Equational-reasoning
 open import Labelled-transition-system.CCS Name
 
-open import Bisimilarity.Coinductive CCS
+open import Bisimilarity CCS
 import Labelled-transition-system.Equational-reasoning-instances CCS
 
 ------------------------------------------------------------------------

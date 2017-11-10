@@ -19,12 +19,12 @@ open import H-level.Closure equality-with-J
 open import Nat equality-with-J as Nat
 open import Surjection equality-with-J using (_↠_)
 
+import Bisimilarity
 import Bisimilarity.Classical
 import Bisimilarity.Classical.Equational-reasoning-instances
-import Bisimilarity.Coinductive
-import Bisimilarity.Coinductive.Equational-reasoning-instances
+import Bisimilarity.Equational-reasoning-instances
 open import Equational-reasoning
-open import Indexed-container as IC hiding (⟨_⟩; larger⇔smallest)
+import Indexed-container as IC
 open import Labelled-transition-system
 open import Relation
 
@@ -33,18 +33,18 @@ module _ {ℓ} {lts : LTS ℓ} where
   open LTS lts
 
   private
-    module Cl = Bisimilarity.Classical   lts
-    module Co = Bisimilarity.Coinductive lts
+    module Cl = Bisimilarity.Classical lts
+    module Co = Bisimilarity           lts
 
   -- Classically bisimilar processes are coinductively bisimilar.
 
   cl⇒co : ∀ {i p q} → p Cl.∼ q → Co.[ i ] p ∼ q
-  cl⇒co = gfp⊆ν ℓ
+  cl⇒co = IC.gfp⊆ν ℓ
 
   -- Coinductively bisimilar processes are classically bisimilar.
 
   co⇒cl : ∀ {p q} → p Co.∼ q → p Cl.∼ q
-  co⇒cl = ν⊆gfp ℓ
+  co⇒cl = IC.ν⊆gfp ℓ
 
   -- The function cl⇒co is a left inverse of co⇒cl (up to pointwise
   -- bisimilarity).
@@ -52,7 +52,7 @@ module _ {ℓ} {lts : LTS ℓ} where
   cl⇒co∘co⇒cl : ∀ {i p q}
                 (p∼q : p Co.∼ q) →
                 Co.[ i ] cl⇒co (co⇒cl p∼q) ≡ p∼q
-  cl⇒co∘co⇒cl p∼q = gfp⊆ν∘ν⊆gfp ℓ p∼q
+  cl⇒co∘co⇒cl p∼q = IC.gfp⊆ν∘ν⊆gfp ℓ p∼q
 
   -- If there are two processes that are not equal, but bisimilar,
   -- then co⇒cl is not a left inverse of cl⇒co.
@@ -72,7 +72,7 @@ module _ {ℓ} {lts : LTS ℓ} where
   -- The two definitions of bisimilarity are logically equivalent.
 
   classical⇔coinductive : ∀ {p q} → p Cl.∼ q ⇔ p Co.∼ q
-  classical⇔coinductive = gfp⇔ν ℓ
+  classical⇔coinductive = IC.gfp⇔ν ℓ
 
   -- There is a split surjection from the classical definition of
   -- bisimilarity to the coinductive one (assuming two kinds of
@@ -82,7 +82,7 @@ module _ {ℓ} {lts : LTS ℓ} where
     Extensionality ℓ ℓ →
     Co.Extensionality →
     ∀ {p q} → p Cl.∼ q ↠ p Co.∼ q
-  classical↠coinductive ext co-ext = gfp↠ν ext ℓ co-ext
+  classical↠coinductive ext co-ext = IC.gfp↠ν ext ℓ co-ext
 
 -- There is at least one LTS for which there is a split surjection
 -- from the coinductive definition of bisimilarity to the classical
@@ -90,8 +90,8 @@ module _ {ℓ} {lts : LTS ℓ} where
 
 coinductive↠classical :
   ∀ {p q} →
-  Bisimilarity.Coinductive._∼_ empty p q ↠
-  Bisimilarity.Classical._∼_   empty p q
+  Bisimilarity._∼_           empty p q ↠
+  Bisimilarity.Classical._∼_ empty p q
 coinductive↠classical {p = ()}
 
 -- There is an LTS for which coinductive bisimilarity is pointwise
@@ -99,13 +99,13 @@ coinductive↠classical {p = ()}
 
 coinductive-bisimilarity-is-sometimes-propositional :
   Extensionality lzero lzero →
-  let module Co = Bisimilarity.Coinductive one-loop in
+  let module Co = Bisimilarity one-loop in
   Co.Extensionality → Is-proposition (tt Co.∼ tt)
 coinductive-bisimilarity-is-sometimes-propositional ext co-ext =
   _⇔_.from propositional⇔irrelevant λ ∼₁ ∼₂ →
     extensionality ext co-ext (irr ∼₁ ∼₂)
   where
-  open Bisimilarity.Coinductive one-loop
+  open Bisimilarity one-loop
 
   irr : ∀ {i} ∼₁ ∼₂ → [ i ] ∼₁ ≡ ∼₂
   irr ∼₁ ∼₂ =
@@ -169,9 +169,9 @@ classical-bisimilarity-is-not-propositional {ℓ} =
 
 ¬coinductive↠classical :
   Extensionality lzero lzero →
-  Bisimilarity.Coinductive.Extensionality one-loop →
+  Bisimilarity.Extensionality one-loop →
   ∀ {ℓ} →
-  ¬ (∀ {p q} → Bisimilarity.Coinductive._∼_         one-loop    p   q ↠
+  ¬ (∀ {p q} → Bisimilarity._∼_                     one-loop    p   q ↠
                Bisimilarity.Classical.Bisimilarity′ one-loop ℓ (p , q))
 ¬coinductive↠classical ext co-ext {ℓ} =
   (∀ {p q} → p Co.∼ q ↠ Cl.Bisimilarity′ ℓ (p , q))  ↝⟨ (λ co↠cl → co↠cl {q = _}) ⟩
@@ -185,14 +185,14 @@ classical-bisimilarity-is-not-propositional {ℓ} =
 
   ⊥                                                  □
   where
-  module Cl = Bisimilarity.Classical   one-loop
-  module Co = Bisimilarity.Coinductive one-loop
+  module Cl = Bisimilarity.Classical one-loop
+  module Co = Bisimilarity           one-loop
 
 -- Note also that coinductive bisimilarity is not always
 -- propositional.
 
 coinductive-bisimilarity-is-not-propositional :
-  let open Bisimilarity.Coinductive two-bisimilar-processes in
+  let open Bisimilarity two-bisimilar-processes in
   ¬ (∀ {p q} → Is-proposition (p ∼ q))
 coinductive-bisimilarity-is-not-propositional =
   (∀ {p q} → Is-proposition (p ∼ q))            ↝⟨ (λ is-prop → is-prop {p = true} {q = true}) ⟩
@@ -202,7 +202,7 @@ coinductive-bisimilarity-is-not-propositional =
   true ≡ false                                  ↝⟨ Bool.true≢false ⟩□
   ⊥                                             □
   where
-  open Bisimilarity.Coinductive two-bisimilar-processes
+  open Bisimilarity two-bisimilar-processes
 
   open import Indexed-container
 
@@ -222,7 +222,7 @@ coinductive-bisimilarity-is-not-propositional =
 
 bisimilarity↠equality :
   ∀ {a} {A : Set a} →
-  let open Bisimilarity.Coinductive (bisimilarity⇔equality A) in
+  let open Bisimilarity (bisimilarity⇔equality A) in
   ∀ {i} {p q : A} → ([ i ] p ∼ q) ↠ p ≡ q
 bisimilarity↠equality {A = A} {i} = record
   { logical-equivalence = record
@@ -232,7 +232,7 @@ bisimilarity↠equality {A = A} {i} = record
   ; right-inverse-of = to∘from
   }
   where
-  open Bisimilarity.Coinductive (bisimilarity⇔equality A)
+  open Bisimilarity (bisimilarity⇔equality A)
 
   to : ∀ {p q} → [ i ] p ∼ q → p ≡ q
   to p∼q with left-to-right p∼q (refl , refl)

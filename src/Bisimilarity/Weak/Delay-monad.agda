@@ -16,7 +16,7 @@ open import Prelude
 
 open import Function-universe equality-with-J hiding (id; _∘_)
 
-import Bisimilarity.Coinductive.Delay-monad as SD
+import Bisimilarity.Delay-monad as SD
 import Bisimilarity.Weak.Alternative.Equational-reasoning-instances
 import Bisimilarity.Weak.Equational-reasoning-instances
 open import Bisimilarity.Weak.Equivalent
@@ -24,7 +24,7 @@ open import Equational-reasoning
 import Expansion.Delay-monad as ED
 open import Labelled-transition-system.Delay-monad A
 
-open import Bisimilarity.Coinductive delay-monad using ([_]_∼_)
+open import Bisimilarity delay-monad using ([_]_∼_)
 open import Bisimilarity.Weak delay-monad
 open import Bisimilarity.Weak.Alternative delay-monad as AW
   using (force)

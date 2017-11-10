@@ -14,21 +14,20 @@ module Expansion {ℓ} (lts : LTS ℓ) where
 open import Equality.Propositional
 open import Prelude
 
-import Bisimilarity.Coinductive
-import Bisimilarity.Coinductive.Equational-reasoning-instances
-import Bisimilarity.Coinductive.General
+import Bisimilarity
+import Bisimilarity.Equational-reasoning-instances
+import Bisimilarity.General
 open import Equational-reasoning
 open import Indexed-container using (Container; ν; ν′)
 open import Relation
 
 open LTS lts
 private
-  open module SB = Bisimilarity.Coinductive lts
+  open module SB = Bisimilarity lts
     using (_∼_; _∼′_; [_]_∼_; [_]_∼′_)
 
 private
-  module General =
-    Bisimilarity.Coinductive.General lts _[_]⟶̂_ _[_]⇒_ ⟶→⟶̂ ⟶→[]⇒
+  module General = Bisimilarity.General lts _[_]⟶̂_ _[_]⇒_ ⟶→⟶̂ ⟶→[]⇒
 
 open General public
   using (module StepC; ⟨_,_⟩; left-to-right; right-to-left; force;

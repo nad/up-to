@@ -11,8 +11,8 @@ module Bisimilarity.Weak.Equational-reasoning-instances
 
 open import Prelude
 
-open import Bisimilarity.Coinductive lts
-import Bisimilarity.Coinductive.Equational-reasoning-instances
+open import Bisimilarity lts
+import Bisimilarity.Equational-reasoning-instances
 open import Bisimilarity.Weak lts
 open import Equational-reasoning
 open import Expansion lts

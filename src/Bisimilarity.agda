@@ -6,14 +6,14 @@
 
 open import Labelled-transition-system
 
-module Bisimilarity.Coinductive {ℓ} (lts : LTS ℓ) where
+module Bisimilarity {ℓ} (lts : LTS ℓ) where
 
 open import Equality.Propositional
 open import Prelude
 
 import Function-universe equality-with-J as F
 
-import Bisimilarity.Coinductive.General
+import Bisimilarity.General
 open import Indexed-container using (Container; ν; ν′)
 open import Relation
 open import Up-to
@@ -21,8 +21,7 @@ open import Up-to
 open LTS lts
 
 private
-  module General =
-    Bisimilarity.Coinductive.General lts _[_]⟶_ _[_]⟶_ id id
+  module General = Bisimilarity.General lts _[_]⟶_ _[_]⟶_ id id
 
 open General public
   using (module StepC; ⟨_,_⟩; left-to-right; right-to-left; force;

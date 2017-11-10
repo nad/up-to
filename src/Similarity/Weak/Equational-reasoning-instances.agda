@@ -11,7 +11,7 @@ open import Labelled-transition-system
 module Similarity.Weak.Equational-reasoning-instances
          {ℓ} {lts : LTS ℓ} where
 
-open import Bisimilarity.Coinductive lts
+open import Bisimilarity lts
 open import Bisimilarity.Weak lts
 import Bisimilarity.Weak.Equational-reasoning-instances
 open import Equational-reasoning

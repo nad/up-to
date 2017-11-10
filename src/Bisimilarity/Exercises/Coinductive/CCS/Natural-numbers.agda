@@ -18,12 +18,12 @@ open import Fin equality-with-J
 open import Function-universe equality-with-J as F hiding (id; _∘_)
 open import Nat equality-with-J
 
-import Bisimilarity.Coinductive.Equational-reasoning-instances
+import Bisimilarity.Equational-reasoning-instances
 open import Bisimilarity.Exercises.Coinductive.CCS
 open import Equational-reasoning
 open import Labelled-transition-system.CCS ℕ
 
-open import Bisimilarity.Coinductive CCS
+open import Bisimilarity CCS
 
 module _ (μ : Action) where
 

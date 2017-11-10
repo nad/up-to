@@ -11,7 +11,7 @@ open import Labelled-transition-system
 module Similarity.Strong.Equational-reasoning-instances
          {ℓ} {lts : LTS ℓ} {i : Size} where
 
-open import Bisimilarity.Coinductive lts
+open import Bisimilarity lts
 open import Equational-reasoning
 open import Similarity.Strong lts
 
