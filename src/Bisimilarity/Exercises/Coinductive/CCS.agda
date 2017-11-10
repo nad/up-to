@@ -667,27 +667,25 @@ mutual
 -- _[_] preserves bisimilarity. (This result is related to Exercise
 -- 6.2.10.)
 
-mutual
+infix 5 _[_]-cong _[_]-cong′
 
-  infix 5 _[_]-cong _[_]-cong′
+_[_]-cong :
+  ∀ {i n Ps Qs}
+  (C : Context ∞ n) → (∀ x → [ i ] Ps x ∼ Qs x) →
+  [ i ] C [ Ps ] ∼ C [ Qs ]
+hole x   [ Ps∼Qs ]-cong = Ps∼Qs x
+∅        [ Ps∼Qs ]-cong = reflexive
+C₁ ∣ C₂  [ Ps∼Qs ]-cong = (C₁ [ Ps∼Qs ]-cong) ∣-cong (C₂ [ Ps∼Qs ]-cong)
+C₁ ⊕ C₂  [ Ps∼Qs ]-cong = (C₁ [ Ps∼Qs ]-cong) ⊕-cong (C₂ [ Ps∼Qs ]-cong)
+μ · C    [ Ps∼Qs ]-cong = refl ·-cong λ { .force → force C [ Ps∼Qs ]-cong }
+⟨ν a ⟩ C [ Ps∼Qs ]-cong = ⟨ν refl ⟩-cong (C [ Ps∼Qs ]-cong)
+! C      [ Ps∼Qs ]-cong = !-cong (C [ Ps∼Qs ]-cong)
 
-  _[_]-cong :
-    ∀ {i n Ps Qs}
-    (C : Context ∞ n) → (∀ x → [ i ] Ps x ∼ Qs x) →
-    [ i ] C [ Ps ] ∼ C [ Qs ]
-  hole x   [ Ps∼Qs ]-cong = Ps∼Qs x
-  ∅        [ Ps∼Qs ]-cong = reflexive
-  C₁ ∣ C₂  [ Ps∼Qs ]-cong = (C₁ [ Ps∼Qs ]-cong) ∣-cong (C₂ [ Ps∼Qs ]-cong)
-  C₁ ⊕ C₂  [ Ps∼Qs ]-cong = (C₁ [ Ps∼Qs ]-cong) ⊕-cong (C₂ [ Ps∼Qs ]-cong)
-  μ · C    [ Ps∼Qs ]-cong = refl ·-cong λ { .force → force C [ Ps∼Qs ]-cong }
-  ⟨ν a ⟩ C [ Ps∼Qs ]-cong = ⟨ν refl ⟩-cong (C [ Ps∼Qs ]-cong)
-  ! C      [ Ps∼Qs ]-cong = !-cong (C [ Ps∼Qs ]-cong)
-
-  _[_]-cong′ :
-    ∀ {i n Ps Qs}
-    (C : Context ∞ n) → (∀ x → [ i ] Ps x ∼′ Qs x) →
-    [ i ] C [ Ps ] ∼′ C [ Qs ]
-  force (C [ Ps∼Qs ]-cong′) = C [ (λ x → force (Ps∼Qs x)) ]-cong
+_[_]-cong′ :
+  ∀ {i n Ps Qs}
+  (C : Context ∞ n) → (∀ x → [ i ] Ps x ∼′ Qs x) →
+  [ i ] C [ Ps ] ∼′ C [ Qs ]
+force (C [ Ps∼Qs ]-cong′) = C [ (λ x → force (Ps∼Qs x)) ]-cong
 
 -- The proof of _[_]-cong uses 6-1-3-2 (in !-cong_). The following
 -- direct proof does not use 6-1-3-2 (but it does use
