@@ -272,6 +272,49 @@ _[_]-cong′ :
   [ i ] C [ Ps ] ≈′ C [ Qs ]
 force (C [ Ps≈Qs ]-cong′) = C [ (λ x → force (Ps≈Qs x)) ]-cong
 
+-- A variant of _[_]-cong for weakly guarded contexts.
+--
+-- Note that the input uses the primed variant of weak bisimilarity.
+--
+-- I got the idea for this lemma from Lemma 23 in Schäfer and Smolka's
+-- "Tower Induction and Up-to Techniques for CCS with Fixed Points".
+
+[]-cong-w :
+  ∀ {i n Ps Qs} {C : Context ∞ n} →
+  Weakly-guarded C → Non-degenerate ∞ C → (∀ x → [ i ] Ps x ≈′ Qs x) →
+  [ i ] C [ Ps ] ≈ C [ Qs ]
+[]-cong-w ()        hole
+[]-cong-w _         ∅          Ps≈Qs = reflexive
+[]-cong-w (W₁ ∣ W₂) (D₁ ∣ D₂)  Ps≈Qs = []-cong-w W₁ D₁ Ps≈Qs ∣-cong
+                                       []-cong-w W₂ D₂ Ps≈Qs
+[]-cong-w action    (action D) Ps≈Qs = refl ·-cong
+                                         (force D [ Ps≈Qs ]-cong′)
+[]-cong-w (⟨ν⟩ W)   (⟨ν⟩ D)    Ps≈Qs = ⟨ν refl ⟩-cong
+                                         ([]-cong-w W D Ps≈Qs)
+[]-cong-w (! W)     (! D)      Ps≈Qs = !-cong []-cong-w W D Ps≈Qs
+[]-cong-w {Ps = Ps} {Qs}
+          (W₁ ⊕ W₂) (D₁ ⊕ D₂)  Ps≈Qs = case D₁ ,′ D₂ of λ where
+  (process P₁ , process P₂) →
+    (context P₁ [ Ps ]) ⊕ (context P₂ [ Ps ])  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁) SE.⊕-cong SE.≡→∼ (context-[] P₂)) ⟩ ≈:
+    P₁ ⊕ P₂                                    ∼⟨ SE.≡→∼ (context-[] P₁) SE.⊕-cong SE.≡→∼ (context-[] P₂) ⟩■
+    (context P₁ [ Qs ]) ⊕ (context P₂ [ Qs ])
+
+  (process P₁ , action {μ = μ₂} {C = C₂} D₂) →
+    (context P₁ [ Ps ]) ⊕ μ₂ · (C₂ [ Ps ]′)  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁)) SE.⊕-cong (_ ■) ⟩
+    P₁ ⊕ μ₂ · (C₂ [ Ps ]′)                   ∼′⟨ ⊕·-cong (force D₂ [ Ps≈Qs ]-cong′) ⟩ S.∼:
+    P₁ ⊕ μ₂ · (C₂ [ Qs ]′)                   ∼⟨ SE.≡→∼ (context-[] P₁) SE.⊕-cong (_ ■) ⟩■
+    (context P₁ [ Qs ]) ⊕ μ₂ · (C₂ [ Qs ]′)
+
+  (action {μ = μ₁} {C = C₁} D₁ , process P₂) →
+    μ₁ · (C₁ [ Ps ]′) ⊕ (context P₂ [ Ps ])  ∼⟨ (_ ■) SE.⊕-cong symmetric (SE.≡→∼ (context-[] P₂)) ⟩
+    μ₁ · (C₁ [ Ps ]′) ⊕ P₂                   ∼′⟨ ·⊕-cong (force D₁ [ Ps≈Qs ]-cong′) ⟩ S.∼:
+    μ₁ · (C₁ [ Qs ]′) ⊕ P₂                   ∼⟨ (_ ■) SE.⊕-cong SE.≡→∼ (context-[] P₂) ⟩■
+    μ₁ · (C₁ [ Qs ]′) ⊕ (context P₂ [ Qs ])
+
+  (action {μ = μ₁} {C = C₁} D₁ , action {μ = μ₂} {C = C₂} D₂) →
+    μ₁ · (C₁ [ Ps ]′) ⊕ μ₂ · (C₂ [ Ps ]′)  ∼⟨ (force D₁ [ Ps≈Qs ]-cong′) ·⊕·-cong (force D₂ [ Ps≈Qs ]-cong′) ⟩■
+    μ₁ · (C₁ [ Qs ]′) ⊕ μ₂ · (C₂ [ Qs ]′)
+
 -- A generalisation to systems of inequations of the following
 -- property: If two processes satisfy the same equation X ≳ C [ X ],
 -- for a weakly guarded, non-degenerate context C, then the two

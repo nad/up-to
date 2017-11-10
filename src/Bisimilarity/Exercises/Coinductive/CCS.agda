@@ -757,6 +757,28 @@ module _ (ext : Proc-extensionality) where
     [ i ] C [ Ps ] ∼′ C [ Qs ]
   force (C [ Ps∼′Qs ]-cong₂′) = C [ (λ x → force (Ps∼′Qs x)) ]-cong₂
 
+-- A variant of _[_]-cong for weakly guarded contexts.
+--
+-- Note that the input uses the primed variant of bisimilarity.
+--
+-- I got the idea for this lemma from Lemma 23 in Schäfer and Smolka's
+-- "Tower Induction and Up-to Techniques for CCS with Fixed Points".
+
+infix 5 _[_]-cong-w
+
+_[_]-cong-w :
+  ∀ {i n Ps Qs} {C : Context ∞ n} →
+  Weakly-guarded C → (∀ x → [ i ] Ps x ∼′ Qs x) →
+  [ i ] C [ Ps ] ∼ C [ Qs ]
+∅              [ Ps∼Qs ]-cong-w = reflexive
+W₁ ∣ W₂        [ Ps∼Qs ]-cong-w = (W₁ [ Ps∼Qs ]-cong-w) ∣-cong
+                                  (W₂ [ Ps∼Qs ]-cong-w)
+action {C = C} [ Ps∼Qs ]-cong-w = refl ·-cong (force C [ Ps∼Qs ]-cong′)
+⟨ν⟩ W          [ Ps∼Qs ]-cong-w = ⟨ν refl ⟩-cong (W [ Ps∼Qs ]-cong-w)
+! W            [ Ps∼Qs ]-cong-w = !-cong (W [ Ps∼Qs ]-cong-w)
+W₁ ⊕ W₂        [ Ps∼Qs ]-cong-w = (W₁ [ Ps∼Qs ]-cong-w) ⊕-cong
+                                  (W₂ [ Ps∼Qs ]-cong-w)
+
 -- Very strong bisimilarity is contained in bisimilarity.
 
 mutual
