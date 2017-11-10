@@ -3,6 +3,10 @@
 -- bisimilarity
 ------------------------------------------------------------------------
 
+-- This definition is based on the function "wb" in Section 6.5.1 of
+-- Pous and Sangiorgi's "Enhancements of the bisimulation proof
+-- method".
+
 {-# OPTIONS --without-K --safe #-}
 
 open import Labelled-transition-system
