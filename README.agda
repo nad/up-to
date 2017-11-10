@@ -221,12 +221,12 @@ import Bisimilarity.Weak.Alternative.Up-to.Delay-monad
 
 -- A coinductive definition of (strong) similarity.
 
-import Similarity.Strong
-import Similarity.Strong.Equational-reasoning-instances
+import Similarity
+import Similarity.Equational-reasoning-instances
 
 -- Lemmas related to strong similarity for CCS.
 
-import Similarity.Strong.CCS
+import Similarity.CCS
 
 -- A coinductive definition of weak similarity.
 

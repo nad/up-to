@@ -6,7 +6,7 @@
 
 open import Labelled-transition-system
 
-module Similarity.Strong {ℓ} (lts : LTS ℓ) where
+module Similarity {ℓ} (lts : LTS ℓ) where
 
 open import Equality.Propositional
 open import Prelude

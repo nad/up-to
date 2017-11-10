@@ -19,15 +19,15 @@ open import Indexed-container.Combinators hiding (id; _∘_)
 open import Labelled-transition-system
 import Labelled-transition-system.CCS
 open import Relation
-import Similarity.Strong
-import Similarity.Strong.CCS as SC
+import Similarity
+import Similarity.CCS as SC
 open import Up-to
 
 private
   module CCS {ℓ} (Name : Set ℓ) where
     open Labelled-transition-system.CCS Name public
     open module B = Bisimilarity CCS public
-    open module S = Similarity.Strong CCS public using (Similarity)
+    open module S = Similarity CCS public using (Similarity)
 
 ------------------------------------------------------------------------
 -- Closure properties for Compatible
@@ -112,7 +112,7 @@ Compatible-⟷ {C₁ = C₁} {C₂} {F} mono sym = curry (
 compatible-for-similarity→compatible-for-bisimilarity :
   ∀ {ℓ} {lts : LTS ℓ} {F} →
   Monotone F → Symmetric swap F →
-  Compatible (Similarity.Strong.StepC lts) F →
+  Compatible (Similarity.StepC lts) F →
   Compatible (Bisimilarity.StepC lts) F
 compatible-for-similarity→compatible-for-bisimilarity mono sym comp =
   Compatible-⟷ mono sym comp comp
@@ -176,7 +176,7 @@ Size-preserving-reindex {C = C} {F} {f}
     ×
   ¬ (∀ {lts : LTS ℓ} {F} →
      Monotone F → Symmetric swap F →
-     Size-preserving (Similarity.Strong.StepC lts) F →
+     Size-preserving (Similarity.StepC lts) F →
      Size-preserving (Bisimilarity.StepC lts) F)
     ×
   ¬ ({I : Set ℓ} {C₁ C₂ : Container (I × I) (I × I)}
@@ -248,7 +248,7 @@ Size-preserving-reindex {C = C} {F} {f}
     contradiction₃ =
       (∀ {lts : LTS ℓ} {F} →
        Monotone F → Symmetric swap F →
-       Size-preserving (Similarity.Strong.StepC lts) F →
+       Size-preserving (Similarity.StepC lts) F →
        Size-preserving (Bisimilarity.StepC lts) F)        ↝⟨ (λ closed mono sym pres → closed mono sym pres) ⟩
 
       ({F : Trans₂ ℓ (Proc ∞)} →
@@ -267,7 +267,7 @@ Size-preserving-reindex {C = C} {F} {f}
 
       (∀ {lts : LTS ℓ} {F} →
        Monotone F → Symmetric swap F →
-       Size-preserving (Similarity.Strong.StepC lts) F →
+       Size-preserving (Similarity.StepC lts) F →
        Size-preserving (Bisimilarity.StepC lts) F)        ↝⟨ contradiction₃ ⟩□
 
       ⊥                                                   □

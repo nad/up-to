@@ -4,7 +4,7 @@
 
 {-# OPTIONS --without-K --safe #-}
 
-module Similarity.Strong.CCS {ℓ} {Name : Set ℓ} where
+module Similarity.CCS {ℓ} {Name : Set ℓ} where
 
 open import Equality.Propositional
 open import Prelude
@@ -15,10 +15,10 @@ import Bisimilarity.Equational-reasoning-instances
 import Bisimilarity.Exercises.Coinductive.CCS as BE
 open import Equational-reasoning
 open import Labelled-transition-system.CCS Name
-import Similarity.Strong.Equational-reasoning-instances
+import Similarity.Equational-reasoning-instances
 
 open import Bisimilarity CCS as B using (_∼_; _∼′_)
-open import Similarity.Strong CCS
+open import Similarity CCS
 
 ------------------------------------------------------------------------
 -- Congruence lemmas

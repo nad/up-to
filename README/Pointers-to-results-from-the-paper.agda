@@ -34,8 +34,8 @@ import Labelled-transition-system
 import Labelled-transition-system.CCS
 import Labelled-transition-system.Delay-monad
 import Relation
-import Similarity.Strong
-import Similarity.Strong.CCS
+import Similarity
+import Similarity.CCS
 import Up-to
 import Up-to.Closure
 
@@ -536,12 +536,12 @@ module Strong-bisimilarity-congruence₂ = Strong-bisimilarity-congruence
 
 module Strong-similarity-congruence where
 
-  _∣-cong_  = Similarity.Strong.CCS._∣-cong_
-  ·-cong    = Similarity.Strong.CCS._·-cong_
-  !-cong    = Similarity.Strong.CCS.!-cong_
-  _⊕-cong_  = Similarity.Strong.CCS._⊕-cong_
-  ⟨ν_⟩-cong = Similarity.Strong.CCS.⟨ν_⟩-cong
-  ∅-cong    = Similarity.Strong.reflexive-≤
+  _∣-cong_  = Similarity.CCS._∣-cong_
+  ·-cong    = Similarity.CCS._·-cong_
+  !-cong    = Similarity.CCS.!-cong_
+  _⊕-cong_  = Similarity.CCS._⊕-cong_
+  ⟨ν_⟩-cong = Similarity.CCS.⟨ν_⟩-cong
+  ∅-cong    = Similarity.reflexive-≤
 
 -- Proofs showing that all the CCS process constructors, except for
 -- sum, preserve the expansion relation. (For ∅ the proof is simply

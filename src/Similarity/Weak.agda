@@ -15,8 +15,8 @@ open import Bisimilarity.Weak lts as WB using ([_]_≈_; [_]_≈′_)
 open import Expansion lts as E using ([_]_≳_; [_]_≳′_)
 open import Indexed-container hiding (⟨_⟩)
 open import Relation
+open import Similarity lts as S using ([_]_≤_; [_]_≤′_)
 import Similarity.General
-open import Similarity.Strong lts as S using ([_]_≤_; [_]_≤′_)
 
 open LTS lts
 

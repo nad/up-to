@@ -25,7 +25,7 @@ import Labelled-transition-system.Equational-reasoning-instances CCS
 -- Congruence lemmas
 
 -- Some lemmas used to prove the congruence results below as well as
--- similar results in Similarity.Strong.CCS.
+-- similar results in Similarity.CCS.
 
 module Cong-lemmas
   ({R} R′ : Proc ∞ → Proc ∞ → Set ℓ)

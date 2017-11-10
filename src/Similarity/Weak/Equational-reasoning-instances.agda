@@ -17,7 +17,7 @@ import Bisimilarity.Weak.Equational-reasoning-instances
 open import Equational-reasoning
 open import Expansion lts
 import Expansion.Equational-reasoning-instances
-open import Similarity.Strong lts
+open import Similarity lts
 open import Similarity.Weak lts
 
 instance
