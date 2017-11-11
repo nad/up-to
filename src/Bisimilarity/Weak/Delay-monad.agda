@@ -191,22 +191,22 @@ size-preserving-later-cong⇔uninhabited = record
 -- There is a transitivity proof that takes weak bisimilarity and
 -- expansion to expansion iff A is uninhabited.
 
-Transitivity-≈≳ = {x y z : Delay A ∞} → x ≈ y → y ≳ z → x ≳ z
-Transitivity-≳≈ = {x y z : Delay A ∞} → x ≳ y → y ≈ z → x ≳ z
+Transitivity-≈≳≳ = {x y z : Delay A ∞} → x ≈ y → y ≳ z → x ≳ z
+Transitivity-≳≈≳ = {x y z : Delay A ∞} → x ≳ y → y ≈ z → x ≳ z
 
-transitive-≈≳⇔uninhabited : Transitivity-≈≳ ⇔ ¬ A
-transitive-≈≳⇔uninhabited =
-  Transitivity-≈≳     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
-                         →-cong _ direct⇔indirect (→-cong _ ED.direct⇔indirect ED.direct⇔indirect) ⟩
-  DE.Transitivity-≈≳  ↝⟨ DE.transitive-≈≳⇔uninhabited ⟩□
-  ¬ A                 □
+transitive-≈≳≳⇔uninhabited : Transitivity-≈≳≳ ⇔ ¬ A
+transitive-≈≳≳⇔uninhabited =
+  Transitivity-≈≳≳     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                          →-cong _ direct⇔indirect (→-cong _ ED.direct⇔indirect ED.direct⇔indirect) ⟩
+  DE.Transitivity-≈≳≳  ↝⟨ DE.transitive-≈≳≳⇔uninhabited ⟩□
+  ¬ A                  □
 
-transitive-≳≈⇔uninhabited : Transitivity-≳≈ ⇔ ¬ A
-transitive-≳≈⇔uninhabited =
-  Transitivity-≳≈     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
-                         →-cong _ ED.direct⇔indirect (→-cong _ direct⇔indirect ED.direct⇔indirect) ⟩
-  DE.Transitivity-≳≈  ↝⟨ DE.transitive-≳≈⇔uninhabited ⟩□
-  ¬ A                 □
+transitive-≳≈≳⇔uninhabited : Transitivity-≳≈≳ ⇔ ¬ A
+transitive-≳≈≳⇔uninhabited =
+  Transitivity-≳≈≳     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                          →-cong _ ED.direct⇔indirect (→-cong _ direct⇔indirect ED.direct⇔indirect) ⟩
+  DE.Transitivity-≳≈≳  ↝⟨ DE.transitive-≳≈≳⇔uninhabited ⟩□
+  ¬ A                  □
 
 -- There is a transitivity proof that preserves the size of the second
 -- argument iff A is uninhabited.
@@ -278,8 +278,24 @@ size-preserving-transitivity-≳≈ˡ⇔uninhabited =
   DE.Transitivity-≳≈ˡ  ↝⟨ DE.size-preserving-transitivity-≳≈ˡ⇔uninhabited ⟩□
   ¬ A                  □
 
+-- There is a transitivity-like proof that takes an expansion as the
+-- first argument, and preserves the size of both arguments, iff A is
+-- uninhabited.
+
+Transitivity-≳≈ =
+  ∀ {i} {x y z : Delay A ∞} →
+  [ i ] x ≳ y → [ i ] y ≈ z → [ i ] x ≈ z
+
+size-preserving-transitivity-≳≈⇔uninhabited : Transitivity-≳≈ ⇔ ¬ A
+size-preserving-transitivity-≳≈⇔uninhabited =
+  Transitivity-≳≈     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                         →-cong _ ED.direct⇔indirect (→-cong _ direct⇔indirect direct⇔indirect) ⟩
+  DE.Transitivity-≳≈  ↝⟨ DE.size-preserving-transitivity-≳≈⇔uninhabited ⟩□
+  ¬ A                 □
+
 -- There is a transitivity-like proof that preserves the size of the
--- second argument, an expansion, iff A is uninhabited.
+-- second argument, an expansion (with the arguments swapped), iff A
+-- is uninhabited.
 
 Transitivity-≈≲ʳ =
   ∀ {i} {x y z : Delay A ∞} →
@@ -291,6 +307,21 @@ size-preserving-transitivity-≈≲ʳ⇔uninhabited =
                           →-cong _ direct⇔indirect (→-cong _ ED.direct⇔indirect direct⇔indirect) ⟩
   DE.Transitivity-≈≲ʳ  ↝⟨ DE.size-preserving-transitivity-≈≲ʳ⇔uninhabited ⟩□
   ¬ A                  □
+
+-- There is a transitivity-like proof that takes an expansion (with
+-- the arguments swapped) as the second argument, and preserves the
+-- size of both arguments, iff A is uninhabited.
+
+Transitivity-≈≲ =
+  ∀ {i} {x y z : Delay A ∞} →
+  [ i ] x ≈ y → [ i ] z ≳ y → [ i ] x ≈ z
+
+size-preserving-transitivity-≈≲⇔uninhabited : Transitivity-≈≲ ⇔ ¬ A
+size-preserving-transitivity-≈≲⇔uninhabited =
+  Transitivity-≈≲     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                         →-cong _ direct⇔indirect (→-cong _ ED.direct⇔indirect direct⇔indirect) ⟩
+  DE.Transitivity-≈≲  ↝⟨ DE.size-preserving-transitivity-≈≲⇔uninhabited ⟩□
+  ¬ A                 □
 
 -- There is a transitivity-like proof that preserves the size of the
 -- first argument, and takes an expansion as the second argument, iff

@@ -194,3 +194,14 @@ size-preserving-transitivityˡ⇔uninhabited =
                       →-cong _ direct⇔indirect (→-cong _ direct⇔indirect direct⇔indirect) ⟩
   D.Transitivityˡ  ↝⟨ D.size-preserving-transitivityˡ⇔uninhabited ⟩□
   ¬ A              □
+
+Transitivity =
+  ∀ {i} {x y z : Delay A ∞} →
+  [ i ] x ≳ y → [ i ] y ≳ z → [ i ] x ≳ z
+
+size-preserving-transitivity⇔uninhabited : Transitivity ⇔ ¬ A
+size-preserving-transitivity⇔uninhabited =
+  Transitivity    ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                     →-cong _ direct⇔indirect $ →-cong _ direct⇔indirect direct⇔indirect ⟩
+  D.Transitivity  ↝⟨ D.size-preserving-transitivity⇔uninhabited ⟩□
+  ¬ A             □
