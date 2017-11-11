@@ -666,9 +666,16 @@ basic-counterexample =
 not-size-preservingʷˢ =
   Delay-monad.Weak-bisimilarity.size-preserving-transitivity-≈∼ʳ⇔uninhabited
 
--- A size-preserving translation from strong to weak bisimilarity.
+-- A size-preserving translation from strong to weak bisimilarity for
+-- the delay monad.
 
 strong-to-weak = Delay-monad.Weak-bisimilarity.∼→≈
+
+-- Size-preserving translations from strong bisimilarity to expansion
+-- and from expansion to weak bisimilarity for any LTS.
+
+strong-to-expansion = Expansion.∼⇒≳
+expansion-to-weak   = Bisimilarity.Weak.≳⇒≈
 
 -- If there is a proof of transitivity that takes a fully defined weak
 -- bisimilarity proof and a weak bisimilarity proof of size i to a
@@ -755,6 +762,16 @@ not-size-preservingᵉʷ =
   Delay-monad.Expansion.size-preserving-transitivity-≳≈ˡ⇔uninhabited
 not-size-preservingʷᵉ =
   Delay-monad.Expansion.size-preserving-transitivity-≈≳ˡ⇔uninhabited
+
+-- The functions transitiveᵉ, transitiveᵉʷ and transitiveʷᵉ cannot in
+-- general be made fully size-preserving.
+
+not-fully-size-preservingᵉ =
+  Delay-monad.Expansion.size-preserving-transitivity⇔uninhabited
+not-fully-size-preservingᵉʷ =
+  Delay-monad.Expansion.size-preserving-transitivity-≳≈⇔uninhabited
+not-fully-size-preservingʷᵉ =
+  Delay-monad.Expansion.size-preserving-transitivity-≈≲⇔uninhabited
 
 -- Up to expansion.
 
