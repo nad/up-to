@@ -248,6 +248,6 @@ import Similarity.CCS
 import Similarity.Weak
 import Similarity.Weak.Equational-reasoning-instances
 
--- Up-to techniques.
+-- An up-to technique for weak similarity.
 
 import Similarity.Weak.Up-to
