@@ -26,7 +26,8 @@ open LTS lts
 open Up-to StepC public
 
 ------------------------------------------------------------------------
--- Some examples
+-- Some examples (based on techniques presented by Pous and Sangiorgi
+-- in "Enhancements of the bisimulation proof method")
 
 -- Up to bisimilarity.
 
@@ -61,8 +62,9 @@ up-to-∪∼-monotone R⊆S = ⊎-map R⊆S id
 
 -- Up to union with bisimilarity is size-preserving.
 --
--- The proof is similar to parts of the proof of Pous and Sangiorgi's
--- Corollary 6.3.15.
+-- The proof is similar to parts of the proof of Corollary 6.3.15 from
+-- Pous and Sangiorgi's "Enhancements of the bisimulation proof
+-- method".
 
 up-to-∪∼-size-preserving : Size-preserving Up-to-∪∼
 up-to-∪∼-size-preserving =

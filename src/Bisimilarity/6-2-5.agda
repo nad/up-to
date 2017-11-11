@@ -23,7 +23,9 @@ open import Relation
 open import Bisimilarity 6-2-5
 open import Bisimilarity.Up-to 6-2-5
 
--- Some simple lemmas.
+-- Some simple lemmas. The first two are stated by Pous and Sangiorgi,
+-- and the third one is a generalisation of a result stated by Pous
+-- and Sangiorgi.
 
 op·∅ : ∀ {a} → op (a · ∅) ∼ ∅
 op·∅ {a} = ⟨ lr , (λ ()) ⟩
@@ -51,7 +53,9 @@ a≁b·c a∼b·c with right-to-left a∼b·c action
 ... | .∅ , action , ∅∼a with right-to-left (force ∅∼a) action
 ...   | _ , () , _
 
--- a ·_ preserves bisimilarity (in a size-preserving way).
+-- Pous and Sangiorgi note that every context preserves bisimilarity.
+-- One can prove that a ·_ preserves bisimilarity in a size-preserving
+-- way.
 
 ·-cong : ∀ {i a P Q} → [ i ] P ∼ Q → [ i ] a · P ∼ a · Q
 ·-cong {i} {a} P∼Q =
@@ -64,8 +68,8 @@ a≁b·c a∼b·c with right-to-left a∼b·c action
        ∃ λ Q′ → a · Q [ μ ]⟶ Q′ × [ i ] P′ ∼′ Q′
   lr P∼Q action = _ , action , convert P∼Q
 
--- op preserves bisimilarity. Note that this lemma is not necessarily
--- size-preserving.
+-- The operator op also preserves bisimilarity, but this lemma is not
+-- claimed to be size-preserving.
 
 op-cong : ∀ {i} {j : Size< i} {P Q} →
           [ i ] P ∼ Q → [ j ] op P ∼ op Q
@@ -84,6 +88,8 @@ op-cong {i} {j} P∼Q =
 
 -- Let us assume that the Name type is inhabited. In that case op-cong
 -- /cannot/ preserve the size of its argument.
+--
+-- The proof is based on an argument presented by Pous and Sangiorgi.
 
 op-cong-cannot-preserve-size :
   Name →
@@ -149,6 +155,8 @@ up-to-bisimilarity-and-context-monotone =
 
 -- Up to bisimilarity and context is not sound (assuming that Name is
 -- inhabited).
+--
+-- This result is due to Pous and Sangiorgi.
 
 ¬-up-to-bisimilarity-and-context :
   Name →
