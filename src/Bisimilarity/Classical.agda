@@ -175,15 +175,15 @@ transitive-∼ p∼q q∼r with _⇔_.to (Bisimilarity↔ _) p∼q
                         | _⇔_.to (Bisimilarity↔ _) q∼r
 ... | R₁ , R-is₁ , pR₁q | R₂ , R-is₂ , qR₂r =
   ⟨ R₁ ⊙ R₂
-  , ⟪ (λ { (q , pR₁q , qR₂r) p⟶p′ →
+  , ⟪_,_⟫ {R = _ ⊙ _}
+      (λ { (q , pR₁q , qR₂r) p⟶p′ →
            let q′ , q⟶q′ , p′R₁q′ = left-to-right R-is₁ pR₁q p⟶p′
                r′ , r⟶r′ , q′R₂r′ = left-to-right R-is₂ qR₂r q⟶q′
            in r′ , r⟶r′ , (q′ , p′R₁q′ , q′R₂r′) })
-    , (λ { (q , pR₁q , qR₂r) r⟶r′ →
+      (λ { (q , pR₁q , qR₂r) r⟶r′ →
          let q′ , q⟶q′ , q′R₂r′ = right-to-left R-is₂ qR₂r r⟶r′
              p′ , p⟶p′ , p′R₁q′ = right-to-left R-is₁ pR₁q q⟶q′
          in p′ , p⟶p′ , (q′ , p′R₁q′ , q′R₂r′) })
-    ⟫
   , (_ , pR₁q , qR₂r)
   ⟩
 
@@ -240,7 +240,8 @@ bisimulation-up-to-∼⇒bisimulation :
   Bisimulation-up-to-bisimilarity R →
   Bisimulation (Bisimilarity ⊙ R ⊙ Bisimilarity)
 bisimulation-up-to-∼⇒bisimulation R-is =
-  ⟪ (λ { (q , p∼q , r , qRr , r∼s) p⟶p′ →
+  ⟪_,_⟫ {R = _ ⊙ _ ⊙ _}
+    (λ { (q , p∼q , r , qRr , r∼s) p⟶p′ →
        let q′ , q⟶q′ , p′∼q′ =
              left-to-right bisimilarity-is-a-bisimulation p∼q p⟶p′
            r′ , r⟶r′ , (q″ , q′∼q″ , r″ , q″Rr″ , r″∼r′) =
@@ -252,7 +253,7 @@ bisimulation-up-to-∼⇒bisimulation R-is =
        , transitive-∼ p′∼q′ q′∼q″
        , r″ , q″Rr″
        , transitive-∼ r″∼r′ r′∼s′ })
-  , (λ { (q , p∼q , r , qRr , r∼s) s⟶s′ →
+    (λ { (q , p∼q , r , qRr , r∼s) s⟶s′ →
        let r′ , r⟶r′ , r′∼s′ =
              right-to-left bisimilarity-is-a-bisimulation r∼s s⟶s′
            q′ , q⟶q′ , (q″ , q′∼q″ , r″ , q″Rr″ , r″∼r′) =
@@ -264,7 +265,6 @@ bisimulation-up-to-∼⇒bisimulation R-is =
        , transitive-∼ p′∼q′ q′∼q″
        , r″ , q″Rr″
        , transitive-∼ r″∼r′ r′∼s′ })
-  ⟫
 
 -- If R is a bisimulation up to bisimilarity, then R is contained in
 -- bisimilarity.
