@@ -7,7 +7,8 @@
 module Expansion.Delay-monad {a} {A : Set a} where
 
 open import Delay-monad
-open import Delay-monad.Expansion as D using (force)
+open import Delay-monad.Bisimilarity as D using (force)
+import Delay-monad.Bisimilarity.Negative as DN
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
@@ -135,24 +136,21 @@ direct⇔indirect = record
 ------------------------------------------------------------------------
 -- Some non-existence results
 
-Laterˡ⁻¹′ = ∀ {x} →
-            later (record { force = now x }) ≳
-            later (record { force = now x }) →
-            now x ≳ later (record { force = now x })
+Now≳later-now = ∀ x → now x ≳ later (record { force = now x })
 
-laterˡ⁻¹′⇔uninhabited : Laterˡ⁻¹′ ⇔ ¬ A
-laterˡ⁻¹′⇔uninhabited =
-  Laterˡ⁻¹′    ↝⟨ inverse $ implicit-∀-cong _ $ →-cong _ direct⇔indirect direct⇔indirect ⟩
-  D.Laterˡ⁻¹′  ↝⟨ D.laterˡ⁻¹′⇔uninhabited ⟩□
-  ¬ A          □
+now≳later-now⇔uninhabited : Now≳later-now ⇔ ¬ A
+now≳later-now⇔uninhabited =
+  Now≳later-now     ↝⟨ inverse $ ∀-cong _ (λ _ → direct⇔indirect) ⟩
+  DN.Now≳later-now  ↝⟨ DN.now≳later-now⇔uninhabited ⟩□
+  ¬ A               □
 
 Laterˡ⁻¹ = ∀ {x y} → later x ≳ y → force x ≳ y
 
 laterˡ⁻¹⇔uninhabited : Laterˡ⁻¹ ⇔ ¬ A
 laterˡ⁻¹⇔uninhabited =
-  Laterˡ⁻¹    ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ →-cong _ direct⇔indirect direct⇔indirect ⟩
-  D.Laterˡ⁻¹  ↝⟨ D.laterˡ⁻¹⇔uninhabited ⟩□
-  ¬ A         □
+  Laterˡ⁻¹       ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ →-cong _ direct⇔indirect direct⇔indirect ⟩
+  DN.Laterˡ⁻¹-≳  ↝⟨ DN.laterˡ⁻¹-≳⇔uninhabited ⟩□
+  ¬ A            □
 
 Laterʳ⁻¹-∼≳ =
   ∀ {i x} →
@@ -161,17 +159,17 @@ Laterʳ⁻¹-∼≳ =
 
 size-preserving-laterʳ⁻¹-∼≳⇔uninhabited : Laterʳ⁻¹-∼≳ ⇔ ¬ A
 size-preserving-laterʳ⁻¹-∼≳⇔uninhabited =
-  Laterʳ⁻¹-∼≳    ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ →-cong _ SD.direct⇔indirect direct⇔indirect ⟩
-  D.Laterʳ⁻¹-∼≳  ↝⟨ D.size-preserving-laterʳ⁻¹-∼≳⇔uninhabited ⟩□
-  ¬ A            □
+  Laterʳ⁻¹-∼≳     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ →-cong _ SD.direct⇔indirect direct⇔indirect ⟩
+  DN.Laterʳ⁻¹-∼≳  ↝⟨ DN.size-preserving-laterʳ⁻¹-∼≳⇔uninhabited ⟩□
+  ¬ A             □
 
 Laterʳ⁻¹ = ∀ {i x y} → [ i ] x ≳ later y → [ i ] x ≳ force y
 
 size-preserving-laterʳ⁻¹⇔uninhabited : Laterʳ⁻¹ ⇔ ¬ A
 size-preserving-laterʳ⁻¹⇔uninhabited =
-  Laterʳ⁻¹    ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ →-cong _ direct⇔indirect direct⇔indirect ⟩
-  D.Laterʳ⁻¹  ↝⟨ D.size-preserving-laterʳ⁻¹⇔uninhabited ⟩□
-  ¬ A         □
+  Laterʳ⁻¹       ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ →-cong _ direct⇔indirect direct⇔indirect ⟩
+  DN.Laterʳ⁻¹-≳  ↝⟨ DN.size-preserving-laterʳ⁻¹-≳⇔uninhabited ⟩□
+  ¬ A            □
 
 Transitivity-∼≳ˡ =
   ∀ {i} {x y z : Delay A ∞} →
@@ -179,10 +177,10 @@ Transitivity-∼≳ˡ =
 
 size-preserving-transitivity-∼≳ˡ⇔uninhabited : Transitivity-∼≳ˡ ⇔ ¬ A
 size-preserving-transitivity-∼≳ˡ⇔uninhabited =
-  Transitivity-∼≳ˡ    ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
-                         →-cong _ SD.direct⇔indirect (→-cong _ direct⇔indirect direct⇔indirect) ⟩
-  D.Transitivity-∼≳ˡ  ↝⟨ D.size-preserving-transitivity-∼≳ˡ⇔uninhabited ⟩□
-  ¬ A                 □
+  Transitivity-∼≳ˡ     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                          →-cong _ SD.direct⇔indirect (→-cong _ direct⇔indirect direct⇔indirect) ⟩
+  DN.Transitivity-∼≳ˡ  ↝⟨ DN.size-preserving-transitivity-∼≳ˡ⇔uninhabited ⟩□
+  ¬ A                  □
 
 Transitivityˡ =
   ∀ {i} {x y z : Delay A ∞} →
@@ -190,10 +188,10 @@ Transitivityˡ =
 
 size-preserving-transitivityˡ⇔uninhabited : Transitivityˡ ⇔ ¬ A
 size-preserving-transitivityˡ⇔uninhabited =
-  Transitivityˡ    ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
-                      →-cong _ direct⇔indirect (→-cong _ direct⇔indirect direct⇔indirect) ⟩
-  D.Transitivityˡ  ↝⟨ D.size-preserving-transitivityˡ⇔uninhabited ⟩□
-  ¬ A              □
+  Transitivityˡ       ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                         →-cong _ direct⇔indirect (→-cong _ direct⇔indirect direct⇔indirect) ⟩
+  DN.Transitivity-≳ˡ  ↝⟨ DN.size-preserving-transitivity-≳ˡ⇔uninhabited ⟩□
+  ¬ A                 □
 
 Transitivity =
   ∀ {i} {x y z : Delay A ∞} →
@@ -201,7 +199,7 @@ Transitivity =
 
 size-preserving-transitivity⇔uninhabited : Transitivity ⇔ ¬ A
 size-preserving-transitivity⇔uninhabited =
-  Transitivity    ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
-                     →-cong _ direct⇔indirect $ →-cong _ direct⇔indirect direct⇔indirect ⟩
-  D.Transitivity  ↝⟨ D.size-preserving-transitivity⇔uninhabited ⟩□
-  ¬ A             □
+  Transitivity       ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                        →-cong _ direct⇔indirect $ →-cong _ direct⇔indirect direct⇔indirect ⟩
+  DN.Transitivity-≳  ↝⟨ DN.size-preserving-transitivity-≳⇔uninhabited ⟩□
+  ¬ A                □

@@ -8,8 +8,8 @@
 module Bisimilarity.Weak.Delay-monad {a} {A : Set a} where
 
 open import Delay-monad
-import Delay-monad.Expansion as DE
-open import Delay-monad.Weak-bisimilarity as DW using (force)
+open import Delay-monad.Bisimilarity as DB using (force)
+import Delay-monad.Bisimilarity.Negative as DN
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
@@ -59,29 +59,29 @@ laterʳ x≈y =
 -- of weak bisimilarity obtained from the transition relation.
 
 direct→indirect : ∀ {i x y} →
-                  DW.[ i ] x ≈ y → [ i ] x ≈ y
-direct→indirect DW.now        = reflexive
-direct→indirect (DW.later  p) = later-cong λ { .force →
+                  DB.[ i ] x ≈ y → [ i ] x ≈ y
+direct→indirect DB.now        = reflexive
+direct→indirect (DB.later  p) = later-cong λ { .force →
                                   direct→indirect (force p) }
-direct→indirect (DW.laterˡ p) = laterˡ (direct→indirect p)
-direct→indirect (DW.laterʳ p) = laterʳ (direct→indirect p)
+direct→indirect (DB.laterˡ p) = laterˡ (direct→indirect p)
+direct→indirect (DB.laterʳ p) = laterʳ (direct→indirect p)
 
 mutual
 
   -- The definition of weak bisimilarity obtained from the transition
   -- relation is contained in the direct one.
 
-  indirect→direct : ∀ {i} x y → [ i ] x ≈ y → DW.[ i ] x ≈ y
+  indirect→direct : ∀ {i} x y → [ i ] x ≈ y → DB.[ i ] x ≈ y
   indirect→direct {i} (now x) y =
     [ i ] now x ≈ y                                  ↝⟨ (λ p → left-to-right p now) ⟩
-    (∃ λ y′ → y [ just x ]⇒̂ y′ × [ i ] now x ≈′ y′)  ↝⟨ DE.≳→≈ ∘ ED.[just]⇒̂→≳now ∘ proj₁ ∘ proj₂ ⟩
-    DW.[ i ] y ≈ now x                               ↝⟨ DW.symmetric ⟩□
-    DW.[ i ] now x ≈ y                               □
+    (∃ λ y′ → y [ just x ]⇒̂ y′ × [ i ] now x ≈′ y′)  ↝⟨ DB.≳→ ∘ ED.[just]⇒̂→≳now ∘ proj₁ ∘ proj₂ ⟩
+    DB.[ i ] y ≈ now x                               ↝⟨ DB.symmetric ⟩□
+    DB.[ i ] now x ≈ y                               □
 
   indirect→direct {i} x (now y) =
     [ i ] x ≈ now y                                  ↝⟨ (λ p → right-to-left p now) ⟩
-    (∃ λ x′ → x [ just y ]⇒̂ x′ × [ i ] x′ ≈′ now y)  ↝⟨ DE.≳→≈ ∘ ED.[just]⇒̂→≳now ∘ proj₁ ∘ proj₂ ⟩□
-    DW.[ i ] x ≈ now y                               □
+    (∃ λ x′ → x [ just y ]⇒̂ x′ × [ i ] x′ ≈′ now y)  ↝⟨ DB.≳→ ∘ ED.[just]⇒̂→≳now ∘ proj₁ ∘ proj₂ ⟩□
+    DB.[ i ] x ≈ now y                               □
 
   indirect→direct (later x) (later y) lx≈ly
     with left-to-right lx≈ly later
@@ -90,7 +90,7 @@ mutual
     ⊥-elim (contradiction _)
 
   ... | y′ , silent _ (step _ later y⇒y′) , x≈′y′ =
-    DW.later λ { .force →
+    DB.later λ { .force →
       indirect→direct′ y⇒y′ (force x≈′y′) }
 
   ... | y′ , silent _ done , x≈′ly
@@ -100,14 +100,14 @@ mutual
     ⊥-elim (contradiction _)
 
   ...   | x′ , silent _ (step _ later x⇒x′) , x′≈′y =
-    DW.later λ { .force →
-      DW.symmetric $
+    DB.later λ { .force →
+      DB.symmetric $
       indirect→direct′ x⇒x′ $
       symmetric (force x′≈′y) }
 
   ...   | x′ , silent _ done , lx≈′y =
-    DW.later λ { .force →
-      DW.laterˡʳ⁻¹
+    DB.later λ { .force →
+      DB.laterˡʳ⁻¹
         (indirect→direct _ _ (force lx≈′y))
         (indirect→direct _ _ (force x≈′ly)) }
 
@@ -116,9 +116,9 @@ mutual
     -- A lemma used by indirect→direct.
 
     indirect→direct′ : ∀ {i x y y′} →
-                       y ⇒ y′ → [ i ] x ≈ y′ → DW.[ i ] x ≈ y
+                       y ⇒ y′ → [ i ] x ≈ y′ → DB.[ i ] x ≈ y
     indirect→direct′ done               p = indirect→direct _ _ p
-    indirect→direct′ (step _  later tr) p = DW.laterʳ (indirect→direct′ tr p)
+    indirect→direct′ (step _  later tr) p = DB.laterʳ (indirect→direct′ tr p)
     indirect→direct′ (step () now   _)
 
 -- The direct definition of weak bisimilarity is logically equivalent
@@ -126,7 +126,7 @@ mutual
 --
 -- TODO: Are the two definitions isomorphic?
 
-direct⇔indirect : ∀ {i x y} → DW.[ i ] x ≈ y ⇔ [ i ] x ≈ y
+direct⇔indirect : ∀ {i x y} → DB.[ i ] x ≈ y ⇔ [ i ] x ≈ y
 direct⇔indirect = record
   { to   = direct→indirect
   ; from = indirect→direct _ _
@@ -137,9 +137,9 @@ direct⇔indirect = record
 -- from the transition relation. Note that this proof is not
 -- size-preserving.
 
-direct⇔alternative : ∀ {x y} → x DW.≈ y ⇔ x AW.≈ y
+direct⇔alternative : ∀ {x y} → x DB.≈ y ⇔ x AW.≈ y
 direct⇔alternative {x} {y} =
-  x DW.≈ y  ↝⟨ direct⇔indirect ⟩
+  x DB.≈ y  ↝⟨ direct⇔indirect ⟩
   x ≈ y     ↝⟨ inverse alternative⇔ ⟩□
   x AW.≈ y  □
 
@@ -153,8 +153,8 @@ private
 
   uninhabited→trivial : ¬ A → ∀ x y → x AW.≈ y
   uninhabited→trivial =
-    ¬ A                 ↝⟨ DW.uninhabited→trivial ⟩
-    (∀ x y → x DW.≈ y)  ↝⟨ ∀-cong _ (λ _ → ∀-cong _ λ _ → _⇔_.to direct⇔alternative) ⟩
+    ¬ A                 ↝⟨ DB.uninhabited→trivial ⟩
+    (∀ x y → x DB.≈ y)  ↝⟨ ∀-cong _ (λ _ → ∀-cong _ λ _ → _⇔_.to direct⇔alternative) ⟩
     (∀ x y → x AW.≈ y)  □
 
 -- One can define a size-preserving "later-cong" function iff A is
@@ -168,7 +168,7 @@ size-preserving-later-cong⇔uninhabited : Later-cong ⇔ ¬ A
 size-preserving-later-cong⇔uninhabited = record
   { to   = Later-cong                ↝⟨ (λ later-cong → now≈never (λ {i} → later-cong {i})) ⟩
            (∀ x → now x AW.≈ never)  ↝⟨ ∀-cong _ (λ _ → _⇔_.from direct⇔alternative) ⟩
-           (∀ x → now x DW.≈ never)  ↝⟨ (λ hyp → DW.now≉never ∘ hyp) ⟩□
+           (∀ x → now x DB.≈ never)  ↝⟨ (λ hyp → DB.now≉never ∘ hyp) ⟩□
            ¬ A                       □
   ; from = ¬ A                 ↝⟨ uninhabited→trivial ⟩
            (∀ x y → x AW.≈ y)  ↝⟨ (λ trivial {_ _ _} _ → trivial _ _) ⟩□
@@ -198,14 +198,14 @@ transitive-≈≳≳⇔uninhabited : Transitivity-≈≳≳ ⇔ ¬ A
 transitive-≈≳≳⇔uninhabited =
   Transitivity-≈≳≳     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
                           →-cong _ direct⇔indirect (→-cong _ ED.direct⇔indirect ED.direct⇔indirect) ⟩
-  DE.Transitivity-≈≳≳  ↝⟨ DE.transitive-≈≳≳⇔uninhabited ⟩□
+  DN.Transitivity-≈≳≳  ↝⟨ DN.transitive-≈≳≳⇔uninhabited ⟩□
   ¬ A                  □
 
 transitive-≳≈≳⇔uninhabited : Transitivity-≳≈≳ ⇔ ¬ A
 transitive-≳≈≳⇔uninhabited =
   Transitivity-≳≈≳     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
                           →-cong _ ED.direct⇔indirect (→-cong _ direct⇔indirect ED.direct⇔indirect) ⟩
-  DE.Transitivity-≳≈≳  ↝⟨ DE.transitive-≳≈≳⇔uninhabited ⟩□
+  DN.Transitivity-≳≈≳  ↝⟨ DN.transitive-≳≈≳⇔uninhabited ⟩□
   ¬ A                  □
 
 -- There is a transitivity proof that preserves the size of the second
@@ -217,10 +217,10 @@ Transitivityʳ =
 
 size-preserving-transitivityʳ⇔uninhabited : Transitivityʳ ⇔ ¬ A
 size-preserving-transitivityʳ⇔uninhabited =
-  Transitivityʳ     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
-                       →-cong _ direct⇔indirect $ →-cong _ direct⇔indirect direct⇔indirect ⟩
-  DW.Transitivityʳ  ↝⟨ DW.size-preserving-transitivityʳ⇔uninhabited ⟩□
-  ¬ A               □
+  Transitivityʳ       ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                         →-cong _ direct⇔indirect $ →-cong _ direct⇔indirect direct⇔indirect ⟩
+  DN.Transitivity-≈ʳ  ↝⟨ DN.size-preserving-transitivity-≈ʳ⇔uninhabited ⟩□
+  ¬ A                 □
 
 -- There is a transitivity proof that preserves the size of the first
 -- argument iff A is uninhabited.
@@ -231,10 +231,10 @@ Transitivityˡ =
 
 size-preserving-transitivityˡ⇔uninhabited : Transitivityˡ ⇔ ¬ A
 size-preserving-transitivityˡ⇔uninhabited =
-  Transitivityˡ     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
-                       →-cong _ direct⇔indirect $ →-cong _ direct⇔indirect direct⇔indirect ⟩
-  DW.Transitivityˡ  ↝⟨ DW.size-preserving-transitivityˡ⇔uninhabited ⟩□
-  ¬ A               □
+  Transitivityˡ       ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+                         →-cong _ direct⇔indirect $ →-cong _ direct⇔indirect direct⇔indirect ⟩
+  DN.Transitivity-≈ˡ  ↝⟨ DN.size-preserving-transitivity-≈ˡ⇔uninhabited ⟩□
+  ¬ A                 □
 
 -- There is a transitivity proof that preserves the size of the second
 -- argument, a strong bisimilarity, iff A is uninhabited.
@@ -247,7 +247,7 @@ size-preserving-transitivity-≈∼ʳ⇔uninhabited : Transitivity-≈∼ʳ ⇔ 
 size-preserving-transitivity-≈∼ʳ⇔uninhabited =
   Transitivity-≈∼ʳ     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
                           →-cong _ direct⇔indirect $ →-cong _ SD.direct⇔indirect direct⇔indirect ⟩
-  DW.Transitivity-≈∼ʳ  ↝⟨ DW.size-preserving-transitivity-≈∼ʳ⇔uninhabited ⟩□
+  DN.Transitivity-≈∼ʳ  ↝⟨ DN.size-preserving-transitivity-≈∼ʳ⇔uninhabited ⟩□
   ¬ A                  □
 
 -- There is a transitivity proof that preserves the size of the first
@@ -261,7 +261,7 @@ size-preserving-transitivity-∼≈ˡ⇔uninhabited : Transitivity-∼≈ˡ ⇔ 
 size-preserving-transitivity-∼≈ˡ⇔uninhabited =
   Transitivity-∼≈ˡ     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
                           →-cong _ SD.direct⇔indirect $ →-cong _ direct⇔indirect direct⇔indirect ⟩
-  DW.Transitivity-∼≈ˡ  ↝⟨ DW.size-preserving-transitivity-∼≈ˡ⇔uninhabited ⟩□
+  DN.Transitivity-∼≈ˡ  ↝⟨ DN.size-preserving-transitivity-∼≈ˡ⇔uninhabited ⟩□
   ¬ A                  □
 
 -- There is a transitivity-like proof that preserves the size of the
@@ -275,7 +275,7 @@ size-preserving-transitivity-≳≈ˡ⇔uninhabited : Transitivity-≳≈ˡ ⇔ 
 size-preserving-transitivity-≳≈ˡ⇔uninhabited =
   Transitivity-≳≈ˡ     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
                           →-cong _ ED.direct⇔indirect (→-cong _ direct⇔indirect direct⇔indirect) ⟩
-  DE.Transitivity-≳≈ˡ  ↝⟨ DE.size-preserving-transitivity-≳≈ˡ⇔uninhabited ⟩□
+  DN.Transitivity-≳≈ˡ  ↝⟨ DN.size-preserving-transitivity-≳≈ˡ⇔uninhabited ⟩□
   ¬ A                  □
 
 -- There is a transitivity-like proof that takes an expansion as the
@@ -290,7 +290,7 @@ size-preserving-transitivity-≳≈⇔uninhabited : Transitivity-≳≈ ⇔ ¬ A
 size-preserving-transitivity-≳≈⇔uninhabited =
   Transitivity-≳≈     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
                          →-cong _ ED.direct⇔indirect (→-cong _ direct⇔indirect direct⇔indirect) ⟩
-  DE.Transitivity-≳≈  ↝⟨ DE.size-preserving-transitivity-≳≈⇔uninhabited ⟩□
+  DN.Transitivity-≳≈  ↝⟨ DN.size-preserving-transitivity-≳≈⇔uninhabited ⟩□
   ¬ A                 □
 
 -- There is a transitivity-like proof that preserves the size of the
@@ -305,7 +305,7 @@ size-preserving-transitivity-≈≲ʳ⇔uninhabited : Transitivity-≈≲ʳ ⇔ 
 size-preserving-transitivity-≈≲ʳ⇔uninhabited =
   Transitivity-≈≲ʳ     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
                           →-cong _ direct⇔indirect (→-cong _ ED.direct⇔indirect direct⇔indirect) ⟩
-  DE.Transitivity-≈≲ʳ  ↝⟨ DE.size-preserving-transitivity-≈≲ʳ⇔uninhabited ⟩□
+  DN.Transitivity-≈≲ʳ  ↝⟨ DN.size-preserving-transitivity-≈≲ʳ⇔uninhabited ⟩□
   ¬ A                  □
 
 -- There is a transitivity-like proof that takes an expansion (with
@@ -320,7 +320,7 @@ size-preserving-transitivity-≈≲⇔uninhabited : Transitivity-≈≲ ⇔ ¬ A
 size-preserving-transitivity-≈≲⇔uninhabited =
   Transitivity-≈≲     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
                          →-cong _ direct⇔indirect (→-cong _ ED.direct⇔indirect direct⇔indirect) ⟩
-  DE.Transitivity-≈≲  ↝⟨ DE.size-preserving-transitivity-≈≲⇔uninhabited ⟩□
+  DN.Transitivity-≈≲  ↝⟨ DN.size-preserving-transitivity-≈≲⇔uninhabited ⟩□
   ¬ A                 □
 
 -- There is a transitivity-like proof that preserves the size of the
@@ -335,7 +335,7 @@ size-preserving-transitivity-≈≳ˡ⇔uninhabited : Transitivity-≈≳ˡ ⇔ 
 size-preserving-transitivity-≈≳ˡ⇔uninhabited =
   Transitivity-≈≳ˡ     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
                           →-cong _ direct⇔indirect (→-cong _ ED.direct⇔indirect direct⇔indirect) ⟩
-  DE.Transitivity-≈≳ˡ  ↝⟨ DE.size-preserving-transitivity-≈≳ˡ⇔uninhabited ⟩□
+  DN.Transitivity-≈≳ˡ  ↝⟨ DN.size-preserving-transitivity-≈≳ˡ⇔uninhabited ⟩□
   ¬ A                  □
 
 ------------------------------------------------------------------------
@@ -380,9 +380,9 @@ size-preserving-⇒alternative⇔uninhabited = record
   (steps {p′ = x′} x⇒x′ x′⟶x″ x″⇒x‴)
   (steps {p′ = y′} y⇒y′ y′⟶y″ y″⇒y‴) =
 
-  x   ∼⟨ direct→indirect (DE.≳→≈ (ED.⇒→≳ x⇒x′)) ⟩
+  x   ∼⟨ direct→indirect (DB.≳→ (ED.⇒→≳ x⇒x′)) ⟩
   x′  ∼⟨ ⟶-with-equal-labels→≈ ¬s x′⟶x″ y′⟶y″ ⟩
-  y′  ∼⟨ symmetric (direct→indirect (DE.≳→≈ (ED.⇒→≳ y⇒y′))) ⟩■
+  y′  ∼⟨ symmetric (direct→indirect (DB.≳→ (ED.⇒→≳ y⇒y′))) ⟩■
   y
 
 ⇒̂-with-equal-labels→≈ :

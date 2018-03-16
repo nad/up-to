@@ -2,6 +2,10 @@
 -- Pointers to results from the paper
 ------------------------------------------------------------------------
 
+-- Note that the code has evolved after the paper was published. For
+-- code that is closer to the paper, see the version of the code that
+-- is distributed with the paper.
+
 {-# OPTIONS --without-K --safe #-}
 
 module README.Pointers-to-results-from-the-paper where
@@ -23,9 +27,9 @@ import Bisimilarity.Weak.CCS
 import Bisimilarity.Weak.Delay-monad
 import Bisimilarity.Weak.Up-to
 import Delay-monad
-import Delay-monad.Expansion
-import Delay-monad.Strong-bisimilarity
-import Delay-monad.Weak-bisimilarity
+import Delay-monad.Bisimilarity
+import Delay-monad.Bisimilarity.Alternative
+import Delay-monad.Bisimilarity.Negative
 import Expansion
 import Expansion.CCS
 import Expansion.Delay-monad
@@ -57,13 +61,19 @@ Delay′ = Delay-monad.Delay′
 never = Delay-monad.never
 
 -- Strong bisimilarity for the delay monad.
+--
+-- Note that, unlike in the paper, strong bisimilarity, weak
+-- bisimilarity and the expansion relation are defined as a single
+-- family (with an extra index).
 
-[_]_∼D_  = Delay-monad.Strong-bisimilarity.[_]_∼_
-[_]_∼′D_ = Delay-monad.Strong-bisimilarity.[_]_∼′_
+[_]_∼D_  = Delay-monad.Bisimilarity.[_]_∼_
+[_]_∼′D_ = Delay-monad.Bisimilarity.[_]_∼′_
 
 -- Strong bisimilarity is transitive.
+--
+-- (The proof is more general than the one in the paper.)
 
-transitiveˢ = Delay-monad.Strong-bisimilarity.transitive
+transitiveˢ = Delay-monad.Bisimilarity.transitive-∼ʳ
 
 ------------------------------------------------------------------------
 -- Section 3
@@ -571,9 +581,13 @@ module Weak-bisimilarity-almost-congruence where
 -- Section 9
 
 -- Weak bisimilarity for the delay monad.
+--
+-- Note that, unlike in the paper, strong bisimilarity, weak
+-- bisimilarity and the expansion relation are defined as a single
+-- family (with an extra index).
 
-[_]_≈D_  = Delay-monad.Weak-bisimilarity.[_]_≈_
-[_]_≈′D_ = Delay-monad.Weak-bisimilarity.[_]_≈′_
+[_]_≈D_  = Delay-monad.Bisimilarity.[_]_≈_
+[_]_≈′D_ = Delay-monad.Bisimilarity.[_]_≈′_
 
 -- This definition is pointwise logically equivalent, in a
 -- size-preserving way, to the one obtained from the LTS for the delay
@@ -584,12 +598,13 @@ direct⇔indirect = Bisimilarity.Weak.Delay-monad.direct⇔indirect
 -- Capretta's definition of weak bisimilarity, formulated using sized
 -- types.
 
-Capretta's-weak-bisimilarity = Delay-monad.Weak-bisimilarity.[_]_≈₃_
+Capretta's-weak-bisimilarity =
+  Delay-monad.Bisimilarity.Alternative.[_]_≈₃_
 
 -- Capretta's definition is pointwise logically equivalent, in a
 -- size-preserving way, to the one used in the paper.
 
-direct⇔Capretta = Delay-monad.Weak-bisimilarity.≈⇔≈₃
+direct⇔Capretta = Delay-monad.Bisimilarity.Alternative.≈⇔≈₃
 
 ------------------------------------------------------------------------
 -- Section 9.1
@@ -599,16 +614,21 @@ direct⇔Capretta = Delay-monad.Weak-bisimilarity.≈⇔≈₃
 transitiveʷ-lts = Bisimilarity.Weak.transitive-≈
 
 -- The later constructors can be removed.
+--
+-- (Two of the proofs are more general than the corresponding proofs
+-- in the paper.)
 
-laterʳ⁻¹ = Delay-monad.Weak-bisimilarity.laterʳ⁻¹
-laterˡ⁻¹ = Delay-monad.Weak-bisimilarity.laterˡ⁻¹
-later⁻¹  = Delay-monad.Weak-bisimilarity.later⁻¹
+laterʳ⁻¹ = Delay-monad.Bisimilarity.laterʳ⁻¹
+laterˡ⁻¹ = Delay-monad.Bisimilarity.laterˡ⁻¹
+later⁻¹  = Delay-monad.Bisimilarity.later⁻¹
 
 -- Weak bisimilarity for the delay monad is transitive.
+--
+-- (The proof is not quite identical to the one in the paper.)
 
-transitiveʷ-now   = Delay-monad.Weak-bisimilarity.transitive-now
-transitiveʷ-later = Delay-monad.Weak-bisimilarity.transitive-later
-transitiveʷ       = Delay-monad.Weak-bisimilarity.transitive
+transitiveʷ-now   = Delay-monad.Bisimilarity.transitive-≈-now
+transitiveʷ-later = Delay-monad.Bisimilarity.transitive-≈-later
+transitiveʷ       = Delay-monad.Bisimilarity.transitive-≈
 
 ------------------------------------------------------------------------
 -- Section 9.2
@@ -618,22 +638,24 @@ transitiveʷ       = Delay-monad.Weak-bisimilarity.transitive
 -- trivial.
 
 size-preserving→trivial =
-  Delay-monad.Weak-bisimilarity.size-preserving-transitivity→trivial
+  Delay-monad.Bisimilarity.Negative.size-preserving-transitivity-≈→trivial
 
 -- Weak bisimilarity for the delay monad is reflexive.
 
-_∎ʷ = Delay-monad.Weak-bisimilarity.reflexive
+_∎ʷ = Delay-monad.Bisimilarity.reflexive
 
 -- The computation now x is not weakly bisimilar to never.
+--
+-- (The proof is more general than the one in the paper.)
 
-now≉never = Delay-monad.Weak-bisimilarity.now≉never
+now≉never = Delay-monad.Bisimilarity.now≉never
 
 -- If transitivity of weak bisimilarity for the delay monad is
 -- size-preserving in both arguments, then the carrier type is
 -- uninhabited.
 
 not-size-preservingʷ =
-  Delay-monad.Weak-bisimilarity.size-preserving-transitivity→uninhabited
+  Delay-monad.Bisimilarity.Negative.size-preserving-transitivity-≈→uninhabited
 
 -- If transitivity of weak bisimilarity is size-preserving in the
 -- first argument, then weak bisimulations up to weak bisimilarity are
@@ -644,7 +666,7 @@ size-preserving→weak-bisimulations-up-to-weak-bisimilarity-works =
 
 -- The Drop-later predicate.
 
-Drop-later = Delay-monad.Weak-bisimilarity.Laterˡ⁻¹-∼≈
+Drop-later = Delay-monad.Bisimilarity.Negative.Laterˡ⁻¹-∼≈
 
 -- Drop-later A implies that A is not inhabited, and vice versa.
 --
@@ -652,7 +674,7 @@ Drop-later = Delay-monad.Weak-bisimilarity.Laterˡ⁻¹-∼≈
 -- different, because it does not include the "and vice versa" part.
 
 basic-counterexample =
-  Delay-monad.Weak-bisimilarity.size-preserving-laterˡ⁻¹-∼≈⇔uninhabited
+  Delay-monad.Bisimilarity.Negative.size-preserving-laterˡ⁻¹-∼≈⇔uninhabited
 
 -- If there is a transitivity-like proof that takes a fully defined
 -- weak bisimilarity proof and a strong bisimilarity proof of size i
@@ -664,12 +686,14 @@ basic-counterexample =
 -- the paper).
 
 not-size-preservingʷˢ =
-  Delay-monad.Weak-bisimilarity.size-preserving-transitivity-≈∼ʳ⇔uninhabited
+  Delay-monad.Bisimilarity.Negative.size-preserving-transitivity-≈∼ʳ⇔uninhabited
 
 -- A size-preserving translation from strong to weak bisimilarity for
 -- the delay monad.
+--
+-- (The implementation is more general than the one in the paper.)
 
-strong-to-weak = Delay-monad.Weak-bisimilarity.∼→≈
+strong-to-weak = Delay-monad.Bisimilarity.∼→
 
 -- Size-preserving translations from strong bisimilarity to expansion
 -- and from expansion to weak bisimilarity for any LTS.
@@ -687,12 +711,14 @@ expansion-to-weak   = Bisimilarity.Weak.≳⇒≈
 -- the paper).
 
 not-size-preservingʷʳ =
-  Delay-monad.Weak-bisimilarity.size-preserving-transitivityʳ⇔uninhabited
+  Delay-monad.Bisimilarity.Negative.size-preserving-transitivity-≈ʳ⇔uninhabited
 
 -- Size-preserving symmetry proofs for strong and weak bisimilarity.
+--
+-- (Actually a single proof that works for both relations.)
 
-symmetryˢ = Delay-monad.Strong-bisimilarity.symmetric
-symmetryʷ = Delay-monad.Weak-bisimilarity.symmetric
+symmetryˢ = Delay-monad.Bisimilarity.symmetric
+symmetryʷ = Delay-monad.Bisimilarity.symmetric
 
 -- If there is a proof of transitivity that takes a strong (or
 -- alternatively weak) bisimilarity proof of size i and a fully
@@ -700,37 +726,42 @@ symmetryʷ = Delay-monad.Weak-bisimilarity.symmetric
 -- size i, then the carrier type is uninhabited (and vice versa).
 
 not-size-preservingˢʷ =
-  Delay-monad.Weak-bisimilarity.size-preserving-transitivity-∼≈ˡ⇔uninhabited
+  Delay-monad.Bisimilarity.Negative.size-preserving-transitivity-∼≈ˡ⇔uninhabited
 not-size-preservingʷˡ =
-  Delay-monad.Weak-bisimilarity.size-preserving-transitivityˡ⇔uninhabited
+  Delay-monad.Bisimilarity.Negative.size-preserving-transitivity-≈ˡ⇔uninhabited
 
 -- If the carrier type is not inhabited, then weak bisimilarity is
 -- trivial.
+--
+-- (The proof is more general than the one in the paper.)
 
-trivial = Delay-monad.Weak-bisimilarity.uninhabited→trivial
+trivial = Delay-monad.Bisimilarity.uninhabited→trivial
 
 -- If the type A is uninhabited, then Drop-later A is inhabited (and
 -- vice versa).
 
 basic-counterexample′ =
-  Delay-monad.Weak-bisimilarity.size-preserving-laterˡ⁻¹-∼≈⇔uninhabited
+  Delay-monad.Bisimilarity.Negative.size-preserving-laterˡ⁻¹-∼≈⇔uninhabited
 
 -- If the carrier type is uninhabited, then there is a fully
 -- size-preserving transitivity proof for weak bisimilarity (and vice
 -- versa).
 
 size-preservingʷ =
-  Delay-monad.Weak-bisimilarity.size-preserving-transitivity⇔uninhabited
+  Delay-monad.Bisimilarity.Negative.size-preserving-transitivity-≈⇔uninhabited
 
 -- Size-preserving transitivity-like proofs involving strong and weak
 -- bisimilarity.
+--
+-- (The type signatures of the proofs are more general than those
+-- given in the paper.)
 
-transitiveˢʷ = Delay-monad.Weak-bisimilarity.transitive-∼≈
-transitiveʷˢ = Delay-monad.Weak-bisimilarity.transitive-≈∼
+transitiveˢʷ = Delay-monad.Bisimilarity.transitive-∼ˡ
+transitiveʷˢ = Delay-monad.Bisimilarity.transitive-∞∼ʳ
 
 -- A direct definition of expansion for the delay monad.
 
-[_]_≳D_ = Delay-monad.Expansion.[_]_≳_
+[_]_≳D_ = Delay-monad.Bisimilarity.[_]_≳_
 
 -- The direct definition of expansion for the delay monad is pointwise
 -- logically equivalent, in a size-preserving way, to the one obtained
@@ -740,11 +771,14 @@ direct⇔indirect-expansion = Expansion.Delay-monad.direct⇔indirect
 
 -- Size-preserving transitivity-like proofs involving the direct
 -- definitions of weak bisimilarity and expansion for the delay monad.
+--
+-- (The type signatures of the first three proofs are more general
+-- than those given in the paper.)
 
-transitiveᵉˢ = Delay-monad.Expansion.transitive-≳∼
-transitiveᵉ  = Delay-monad.Expansion.transitive
-transitiveᵉʷ = Delay-monad.Expansion.transitive-≳≈
-transitiveʷᵉ = Delay-monad.Expansion.transitive-≈≲
+transitiveᵉˢ = Delay-monad.Bisimilarity.transitive-∼ʳ
+transitiveᵉ  = Delay-monad.Bisimilarity.transitive-≳ˡ
+transitiveᵉʷ = Delay-monad.Bisimilarity.transitive-≳ˡ
+transitiveʷᵉ = Delay-monad.Bisimilarity.transitive-≈≲
 
 -- Size-preserving transitivity-like proofs involving weak
 -- bisimilarity and expansion defined for an arbitrary LTS.
@@ -757,21 +791,21 @@ transitiveʷᵉ-lts = Bisimilarity.Weak.transitive-≈≲
 -- Negative results related to expansion.
 
 not-size-preservingˢᵉ =
-  Delay-monad.Expansion.size-preserving-transitivity-∼≳ˡ⇔uninhabited
+  Delay-monad.Bisimilarity.Negative.size-preserving-transitivity-∼≳ˡ⇔uninhabited
 not-size-preservingᵉʷ =
-  Delay-monad.Expansion.size-preserving-transitivity-≳≈ˡ⇔uninhabited
+  Delay-monad.Bisimilarity.Negative.size-preserving-transitivity-≳≈ˡ⇔uninhabited
 not-size-preservingʷᵉ =
-  Delay-monad.Expansion.size-preserving-transitivity-≈≳ˡ⇔uninhabited
+  Delay-monad.Bisimilarity.Negative.size-preserving-transitivity-≈≳ˡ⇔uninhabited
 
 -- The functions transitiveᵉ, transitiveᵉʷ and transitiveʷᵉ cannot in
 -- general be made fully size-preserving.
 
 not-fully-size-preservingᵉ =
-  Delay-monad.Expansion.size-preserving-transitivity⇔uninhabited
+  Delay-monad.Bisimilarity.Negative.size-preserving-transitivity-≳⇔uninhabited
 not-fully-size-preservingᵉʷ =
-  Delay-monad.Expansion.size-preserving-transitivity-≳≈⇔uninhabited
+  Delay-monad.Bisimilarity.Negative.size-preserving-transitivity-≳≈⇔uninhabited
 not-fully-size-preservingʷᵉ =
-  Delay-monad.Expansion.size-preserving-transitivity-≈≲⇔uninhabited
+  Delay-monad.Bisimilarity.Negative.size-preserving-transitivity-≈≲⇔uninhabited
 
 -- Up to expansion.
 

@@ -9,11 +9,11 @@ module Bisimilarity.Weak.Alternative.Up-to.Delay-monad
          {a} {A : Set a} where
 
 open import Delay-monad
+import Delay-monad.Bisimilarity as B
 import Delay-monad.Partial-order as P
-import Delay-monad.Weak-bisimilarity as W
 open import Equality.Propositional as Eq
 open import Logical-equivalence using (_⇔_)
-open import Prelude hiding (module W)
+open import Prelude
 
 open import Double-negation equality-with-J
 open import Function-universe equality-with-J hiding (id)
@@ -49,10 +49,10 @@ everything-up-to em ext A-set F {R = R} R-prog {x = x , y} =
     ∀ {x y} {P : Rel₂ a (Delay A ∞)} →
     (∀ {x′ z} → x [ just z ]⇒̂ x′ →
      ∃ λ y′ → y [ just z ]⇒̂ y′ × P (x′ , y′)) →
-    (∃ λ z → now z W.≈ x) →
+    (∃ λ z → now z B.≈ x) →
     x ≈ y
   lemma {x} {y} hyp = uncurry λ z →
-    now z W.≈ x                              ↝⟨ _⇔_.to W′.direct⇔alternative ⟩
+    now z B.≈ x                              ↝⟨ _⇔_.to W′.direct⇔alternative ⟩
     now z ≈ x                                ↝⟨ (λ nz≈x → Σ-map id proj₁ $ left-to-right nz≈x (⟶→⇒̂ now)) ⟩
     ∃ (x [ just z ]⇒̂_)                       ↝⟨ (λ x⇒̂ → x⇒̂ , Σ-map id proj₁ (hyp (proj₂ x⇒̂))) ⟩
     ∃ (x [ just z ]⇒̂_) × ∃ (y [ just z ]⇒̂_)  ↝⟨ (uncurry λ x⇒̂ y⇒̂ → W′.⇒̂-with-equal-labels→≈ id (proj₂ x⇒̂) (proj₂ y⇒̂)) ⟩

@@ -7,15 +7,15 @@
 
 module Indexed-container.Delay-monad where
 
-open import Equality.Propositional as Equality
+open import Equality.Propositional as E using (_≡_; refl)
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 
-open import Bijection equality-with-J as Bijection using (_↔_)
-open import Function-universe equality-with-J as F hiding (_∘_)
+open import Bijection E.equality-with-J as Bijection using (_↔_)
+open import Function-universe E.equality-with-J as F hiding (_∘_)
 
 open import Delay-monad
-open import Delay-monad.Strong-bisimilarity as Strong
+open import Delay-monad.Bisimilarity as B
 
 open import Indexed-container
 open import Indexed-container.Combinators as C hiding (_∘_)
@@ -122,10 +122,10 @@ Delay⇔νDelayC-inverses {A = A} = to∘from , from∘to
   abstract
 
     from∘to : ∀ {i} x → [ i ] from (to x) ∼ x
-    from∘to (now x)   = now x ∎∼
+    from∘to (now x)   = now x ∎
     from∘to (later x) = later λ { .force →
-      from (to (force x))  ∼⟨ from∘to (force x) ⟩
-      force x              ∎∼ }
+      from (to (force x))  ∼⟨ from∘to (force x) ⟩∼
+      force x              ∎ }
 
     to∘from : ∀ {i} x → ν-bisimilar i (to (from x) , x)
     to∘from x@(just _ , _) =
@@ -145,8 +145,8 @@ Delay⇔νDelayC-inverses {A = A} = to∘from , from∘to
 
 Delay↔νDelayC :
   ∀ {a} {A : Set a} →
-  Equality.Extensionality a a →
-  Strong.Extensionality a →
+  E.Extensionality a a →
+  B.Extensionality a →
   ν′-extensionality (DelayC A) →
   Delay A ∞ ↔ ν (DelayC A) ∞ _
 Delay↔νDelayC ext ∼-ext ν′-ext = record
