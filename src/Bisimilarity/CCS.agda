@@ -253,12 +253,12 @@ infix 6 _∣-congP_
 
 _∣-congP_ : ∀ {i P P′ Q Q′} →
             [ i ] P ∼ Q → [ i ] P′ ∼ Q′ → [ i ] P ∣ P′ ∼ Q ∣ Q′
-_∣-congP_ = λ p q →
+_∣-congP_ {i} = λ p q →
   ⟨ lr p q
   , Σ-map id (Σ-map id symmetric) ∘ lr (symmetric p) (symmetric q)
   ⟩
   where
-  lr : ∀ {i P P′ P″ Q Q′ μ} →
+  lr : ∀ {P P′ P″ Q Q′ μ} →
        [ i ] P ∼ Q → [ i ] P′ ∼ Q′ → P ∣ P′ [ μ ]⟶ P″ →
        ∃ λ Q″ → Q ∣ Q′ [ μ ]⟶ Q″ × [ i ] P″ ∼′ Q″
   lr p q (par-left tr) =
@@ -349,10 +349,10 @@ infix 8 _⊕-cong_ _⊕-cong′_
 
 _⊕-cong_ : ∀ {i P P′ Q Q′} →
            [ i ] P ∼ P′ → [ i ] Q ∼ Q′ → [ i ] P ⊕ Q ∼ P′ ⊕ Q′
-P∼P′ ⊕-cong Q∼Q′ =
+_⊕-cong_ {i} P∼P′ Q∼Q′ =
   ⟨ CL.⊕-cong P∼P′ Q∼Q′
   , Σ-map id (Σ-map id symmetric) ∘
-    CL.⊕-cong (symmetric P∼P′) (symmetric Q∼Q′)
+    CL.⊕-cong {i = i} (symmetric P∼P′) (symmetric Q∼Q′)
   ⟩
 
 _⊕-cong′_ : ∀ {i P P′ Q Q′} →
@@ -429,12 +429,12 @@ mutual
 -- An alternative proof that is closer to the one in the paper.
 
 !-congP : ∀ {i P Q} → [ i ] P ∼ Q → [ i ] ! P ∼ ! Q
-!-congP = λ p →
+!-congP {i} = λ p →
   ⟨ lr p
   , Σ-map id (Σ-map id symmetric) ∘ lr (symmetric p)
   ⟩
   where
-  lr : ∀ {P Q R μ i} →
+  lr : ∀ {P Q R μ} →
        [ i ] P ∼ Q → ! P [ μ ]⟶ R →
        ∃ λ S → ! Q [ μ ]⟶ S × [ i ] R ∼′ S
   lr {P} {Q} {R} P∼Q !P⟶R with 6-1-3-2 !P⟶R

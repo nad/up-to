@@ -27,12 +27,12 @@ mutual
   -- to the standard one, in a size-preserving way.
 
   alternative⇒ : ∀ {i p q} → Alt.[ i ] p ≈ q → Std.[ i ] p ≈ q
-  alternative⇒ p≈q =
+  alternative⇒ {i} p≈q =
     Std.⟨ lr p≈q
         , Σ-map id (Σ-map id symmetric) ∘ lr (symmetric p≈q)
         ⟩
     where
-    lr : ∀ {i p p′ q μ} →
+    lr : ∀ {p p′ q μ} →
          Alt.[ i ] p ≈ q → p [ μ ]⟶ p′ →
          ∃ λ q′ → q [ μ ]⇒̂ q′ × Std.[ i ] p′ ≈′ q′
     lr p≈q p⟶p′ =
