@@ -14,8 +14,9 @@ open import Prelude
 open import Bijection equality-with-J using (_↔_)
 open import Equality.Decision-procedures equality-with-J
 open import Fin equality-with-J
-open import Function-universe equality-with-J as F hiding (id; _∘_)
-open import Nat equality-with-J
+open import Function-universe equality-with-J as F
+  hiding (id; _∘_; Distinct↔≢)
+open import Nat equality-with-J hiding (Distinct)
 
 open import Bisimilarity.CCS
 import Bisimilarity.Equational-reasoning-instances
