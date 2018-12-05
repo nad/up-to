@@ -132,8 +132,8 @@ private
   F-pres : ∀ {A} → Size-preserving (F A)
   F-pres R⊆∼i {true  , false} = R⊆∼i ∘ proj₁
   F-pres R⊆∼i {false , true}  = R⊆∼i
-  F-pres _    {true  , true}  = λ _ → reflexive
-  F-pres _    {false , false} = λ _ → reflexive
+  F-pres _    {true  , true}  = λ _ → true ■
+  F-pres _    {false , false} = λ _ → false ■
 
   F⊤≢F⊥ : F ⊤ ≢ F ⊥
   F⊤≢F⊥ =
