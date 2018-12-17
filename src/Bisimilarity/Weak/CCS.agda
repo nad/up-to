@@ -23,6 +23,7 @@ import Bisimilarity CCS as S
 open import Bisimilarity.Weak CCS
 open import Expansion CCS using (_≳_; ≳:_)
 import Labelled-transition-system.Equational-reasoning-instances CCS
+  as Dummy
 
 -- An instantiation of a module with helper lemmas.
 
@@ -78,12 +79,12 @@ infix 12 _·-cong_ _·-cong′_
 _·-cong_ :
   ∀ {i μ μ′ P P′} →
   μ ≡ μ′ → [ i ] force P ≈′ force P′ → [ i ] μ · P ≈ μ′ · P′
-refl ·-cong P≈P′ =
+_·-cong_ {i} refl P≈P′ =
   ⟨ Σ-map id (Σ-map id symmetric) ∘ rl (symmetric P≈P′)
   , rl P≈P′
   ⟩
   where
-  rl = CL.·-cong
+  rl = CL.·-cong {i = i}
 
 _·-cong′_ :
   ∀ {i μ μ′ P P′} →
@@ -168,9 +169,9 @@ mutual
 ⊕·-cong :
   ∀ {i P μ Q Q′} →
   [ i ] force Q ≈′ force Q′ → [ i ] P ⊕ μ · Q ≈ P ⊕ μ · Q′
-⊕·-cong Q≈Q′ =
+⊕·-cong {i} Q≈Q′ =
   ⟨ Σ-map id (Σ-map id symmetric) ∘ CL.⊕·-cong (symmetric Q≈Q′)
-  , CL.⊕·-cong Q≈Q′
+  , CL.⊕·-cong {i = i} Q≈Q′
   ⟩
 
 ⊕·-cong′ :
@@ -197,10 +198,10 @@ _·⊕·-cong_ :
   ∀ {i μ₁ μ₂ P₁ P₁′ P₂ P₂′} →
   [ i ] force P₁ ≈′ force P₁′ → [ i ] force P₂ ≈′ force P₂′ →
   [ i ] μ₁ · P₁ ⊕ μ₂ · P₂ ≈ μ₁ · P₁′ ⊕ μ₂ · P₂′
-P₁≈P₁′ ·⊕·-cong P₂≈P₂′ =
+_·⊕·-cong_ {i} P₁≈P₁′ P₂≈P₂′ =
   ⟨ Σ-map id (Σ-map id symmetric) ∘
     CL.·⊕·-cong (symmetric P₁≈P₁′) (symmetric P₂≈P₂′)
-  , CL.·⊕·-cong P₁≈P₁′ P₂≈P₂′
+  , CL.·⊕·-cong {i = i} P₁≈P₁′ P₂≈P₂′
   ⟩
 
 _·⊕·-cong′_ :

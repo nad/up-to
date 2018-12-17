@@ -22,6 +22,7 @@ open import Relation
 open import Bisimilarity.Weak CCS
 open import Bisimilarity.Weak.Up-to CCS
 import Labelled-transition-system.Equational-reasoning-instances CCS
+  as Dummy
 
 -- Up to (non-degenerate) context for CCS (for polyadic, coinductive
 -- contexts).

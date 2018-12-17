@@ -23,6 +23,7 @@ open import Bisimilarity CCS as S using (_∼_)
 open import Bisimilarity.Weak CCS as W using (_≈_; force)
 open import Expansion CCS
 import Labelled-transition-system.Equational-reasoning-instances CCS
+  as Dummy
 
 -- Some lemmas used to prove the congruence lemmas below as well as
 -- similar results in Bisimilarity.Weak.CCS.
@@ -395,30 +396,32 @@ mutual
       (inj₁ (P″ , P⟶P″ , Q∼!P∣P″)) → case left-to-right P≳P′ P⟶P″ of λ where
         (_ , done s , P″≳′P′) → case silent≡τ s of λ where
           refl →
-            Q          ∼⟨ Q∼!P∣P″ ⟩
-            ! P  ∣ P″  ∼′⟨ !-cong′ (convert {a = ℓ} P≳P′) ∣-cong′ P″≳′P′ ⟩ S.∼:
-            ! P′ ∣ P′  ∼⟨ SL.6-1-2 ⟩■
-            ! P′
-              ⟵̂[ τ ]
-            ! P′       ■
+              _
+            , (! P′  ■)
+            , (Q          ∼⟨ Q∼!P∣P″ ⟩
+               ! P  ∣ P″  ∼′⟨ !-cong′ (convert {a = ℓ} P≳P′) ∣-cong′ P″≳′P′ ⟩ S.∼:
+               ! P′ ∣ P′  ∼⟨ SL.6-1-2 ⟩■
+               ! P′)
 
         (Q′ , step P′⟶Q′ , P″≳′Q′) →
-          Q          ∼⟨ Q∼!P∣P″ ⟩
-          ! P  ∣ P″  ∼⟨ !-cong′ (convert {a = ℓ} P≳P′) ∣-cong′ P″≳′Q′ ⟩■
-          ! P′ ∣ Q′
-            ⟵̂[ μ ]   ←⟨ ⟶: replication (par-right P′⟶Q′) ⟩■
-          ! P′
+            _
+          , (! P′ ∣ Q′  ←⟨ ⟶: replication (par-right P′⟶Q′) ⟩■
+             ! P′)
+          , (Q          ∼⟨ Q∼!P∣P″ ⟩
+             ! P  ∣ P″  ∼⟨ !-cong′ (convert {a = ℓ} P≳P′) ∣-cong′ P″≳′Q′ ⟩■
+             ! P′ ∣ Q′)
 
       (inj₂ (refl , P″ , P‴ , a , P⟶P″ , P⟶P‴ , Q≳!P∣P″∣P‴)) →
         case left-to-right P≳P′ P⟶P″ ,′
              left-to-right P≳P′ P⟶P‴ of λ where
           ((Q′ , step P′⟶Q′ , P″≳′Q′) ,
            (Q″ , step P′⟶Q″ , P‴≳′Q″)) →
-            Q                 ∼⟨ Q≳!P∣P″∣P‴ ⟩
-            (! P ∣ P″) ∣ P‴   ∼⟨ (!-cong′ (convert {a = ℓ} P≳P′) ∣-cong′ P″≳′Q′) ∣-cong′ P‴≳′Q″ ⟩■
-            (! P′ ∣ Q′) ∣ Q″
-              ⟵̂[ μ ]          ←⟨ ⟶: replication (par-τ (replication (par-right P′⟶Q′)) P′⟶Q″) ⟩■
-            ! P′
+              _
+            , ((! P′ ∣ Q′) ∣ Q″  ←⟨ ⟶: replication (par-τ (replication (par-right P′⟶Q′)) P′⟶Q″) ⟩■
+               ! P′)
+            , (Q                 ∼⟨ Q≳!P∣P″∣P‴ ⟩
+               (! P ∣ P″) ∣ P‴   ∼⟨ (!-cong′ (convert {a = ℓ} P≳P′) ∣-cong′ P″≳′Q′) ∣-cong′ P‴≳′Q″ ⟩■
+               (! P′ ∣ Q′) ∣ Q″)
 
           ((_ , done () , _) , _)
           (_ , (_ , done () , _))

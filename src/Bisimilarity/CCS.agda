@@ -17,6 +17,7 @@ open import Labelled-transition-system.CCS Name
 
 open import Bisimilarity CCS
 import Labelled-transition-system.Equational-reasoning-instances CCS
+  as Dummy
 
 ------------------------------------------------------------------------
 -- Congruence lemmas

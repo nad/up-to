@@ -28,6 +28,7 @@ open import Bisimilarity CCS using (_∼_; ∼:_)
 open import Bisimilarity.Weak CCS as W
 open import Expansion CCS as E
 import Labelled-transition-system.Equational-reasoning-instances CCS
+  as Dummy
 
 mutual
 

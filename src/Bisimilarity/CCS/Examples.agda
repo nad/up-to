@@ -644,10 +644,11 @@ mutual
          ∃ λ Q′ → ! P [ μ ]⟶ Q′ × [ i ] Q ∼′ Q′
     lr {Q} !!P⟶Q = case 6-1-3-2 !!P⟶Q of λ where
       (inj₁ (Q′ , !P⟶Q′ , Q∼!!P∣Q′)) →
-        Q           ∼⟨ Q∼!!P∣Q′ ⟩ ∼′:
-        ! ! P ∣ Q′  ∼⟨ lemma !P⟶Q′ ⟩■
-        Q′          ⟵⟨ !P⟶Q′ ⟩
-        ! P
+          _
+        , !P⟶Q′
+        , (Q           ∼⟨ Q∼!!P∣Q′ ⟩
+           ! ! P ∣ Q′  ∼⟨ lemma !P⟶Q′ ⟩■
+           Q′)
 
       (inj₂ (refl , Q′ , Q″ , a , !P⟶Q′ , !P⟶Q″ , Q∼!!P∣Q′∣Q″)) →
         case 6-1-3-2 !P⟶Q″ of λ where
