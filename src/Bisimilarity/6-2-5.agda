@@ -105,7 +105,7 @@ op-cong-cannot-preserve-size a op-cong = a≁b·c a∼a·a
     a∼′a·a : ∀ {i} → [ i ] a · ∅ ∼′ a · a · ∅
     force a∼′a·a = a∼a·a
 
-    lemma = ∼′:
+    lemma =
       ∅               ∼⟨ symmetric op·∅ ⟩
       op (a · ∅)      ∼⟨ op-cong′ (a∼′a·a {i = i}) ⟩
       op (a · a · ∅)  ∼⟨ op··∅ ⟩■

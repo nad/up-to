@@ -155,16 +155,16 @@ instance
   -- Bisimilarity.Weak.Delay-monad.size-preserving-transitivity-≈≳ˡ⇔uninhabited.
 
   trans≈≳ : Transitive′ _≈_ _≳_
-  trans≈≳ = is-transitive (λ p≈q → transitive p≈q ∘ convert)
+  trans≈≳ = is-transitive (λ p≈q → transitive p≈q ∘ ≳⇒≈)
 
   trans≈≳′ : Transitive′ _≈_ _≳′_
-  trans≈≳′ = is-transitive (λ p≈q → transitive p≈q ∘ convert)
+  trans≈≳′ = is-transitive (λ p≈q → transitive p≈q ∘ ≳⇒≈ ∘ convert)
 
   trans≈′≳′ : Transitive′ _≈′_ _≳′_
-  trans≈′≳′ = is-transitive (λ p≈′q → transitive p≈′q ∘ convert)
+  trans≈′≳′ = is-transitive (λ p≈′q → transitive p≈′q ∘ ≳⇒≈′)
 
   trans≈′≳ : Transitive′ _≈′_ _≳_
-  trans≈′≳ = is-transitive (λ p≈′q → transitive p≈′q ∘ convert)
+  trans≈′≳ = is-transitive (λ p≈′q → transitive p≈′q ∘ ≳⇒≈′ ∘ convert)
 
   trans≈≲ : ∀ {i} → Transitive′ [ i ]_≈_ _≲_
   trans≈≲ = is-transitive transitive-≈≲

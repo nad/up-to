@@ -224,7 +224,7 @@ force ∣-left-identity′ = ∣-left-identity
 
 ∣-right-identity : ∀ {P} → P ∣ ∅ ∼ P
 ∣-right-identity {P} =
-  P ∣ ∅  ∼⟨ ∣-comm ⟩ ∼:
+  P ∣ ∅  ∼⟨ ∣-comm ⟩
   ∅ ∣ P  ∼⟨ ∣-left-identity ⟩■
   P
 
@@ -337,7 +337,7 @@ swap-in-the-middle : ∀ {P Q R S} →
 swap-in-the-middle {P} {Q} {R} {S} =
   (P ∣ Q) ∣ (R ∣ S)  ∼⟨ swap-rightmost ⟩
   (P ∣ (R ∣ S)) ∣ Q  ∼⟨ ∣-assoc ∣-cong reflexive ⟩
-  ((P ∣ R) ∣ S) ∣ Q  ∼⟨ symmetric ∣-assoc ⟩ ∼:
+  ((P ∣ R) ∣ S) ∣ Q  ∼⟨ symmetric ∣-assoc ⟩
   (P ∣ R) ∣ (S ∣ Q)  ∼⟨ reflexive ∣-cong ∣-comm ⟩■
   (P ∣ R) ∣ (Q ∣ S)
 
@@ -445,7 +445,7 @@ mutual
     ( ! Q ∣ Q′
     , replication (par-right Q⟶Q′)
     , (R         ∼⟨ R∼!P∣P′ ⟩
-       ! P ∣ P′  ∼⟨ (λ { .force → !-congP P∼Q }) ∣-cong′ P′∼′Q′ ⟩ ∼′:
+       ! P ∣ P′  ∼⟨ (λ { .force → !-congP P∼Q }) ∣-cong′ P′∼′Q′ ⟩
        ! Q ∣ Q′  ■
       )
     )
@@ -457,7 +457,7 @@ mutual
     , replication (par-τ (replication (par-right Q⟶Q′)) Q⟶Q″)
     , (R                ∼⟨ R∼!P∣P′∣P″ ⟩
        (! P ∣ P′) ∣ P″  ∼⟨ ((λ { .force → !-congP P∼Q }) ∣-cong′ P′∼′Q′)
-                             ∣-cong′ P″∼′Q″ ⟩ ∼′:
+                             ∣-cong′ P″∼′Q″ ⟩
        (! Q ∣ Q′) ∣ Q″  ■
       )
     )

@@ -40,7 +40,7 @@ mutual
   6-5-4 {i} {a} {b} = W.⟨ lr , rl ⟩
     where
     lemma =
-      (! a ∙ ∣ ! b ∙) ∣ b ∙  ∼⟨ symmetric ∣-assoc ⟩ ∼:
+      (! a ∙ ∣ ! b ∙) ∣ b ∙  ∼⟨ symmetric ∣-assoc ⟩
       ! a ∙ ∣ (! b ∙ ∣ b ∙)  ∼⟨ symmetric ∣-right-identity ∣-cong 6-1-2 ⟩■
       (! a ∙ ∣ ∅) ∣ ! b ∙
 
@@ -316,7 +316,7 @@ mutual
       Q                                                    ∼⟨ Q∼!νa[ba∣a̅P]∣νa[a∣a̅P] ⟩
 
       ! ⟨ν proj₁ a ⟩ (name b ∙ (a ∙) ∣ name (co a) ∙ P) ∣
-      ⟨ν proj₁ a ⟩ (a ∙ ∣ name (co a) ∙ P)                 ∼⟨ (_ ■) EL.∣-cong 6-5-8-1 _ ⟩ ≈′:
+      ⟨ν proj₁ a ⟩ (a ∙ ∣ name (co a) ∙ P)                 ∼⟨ (_ ■) EL.∣-cong 6-5-8-1 _ ⟩
 
       ! ⟨ν proj₁ a ⟩ (name b ∙ (a ∙) ∣ name (co a) ∙ P) ∣
       ⟨ν proj₁ a ⟩ (∅ ∣ P)                                 ∼⟨ 6-5-8-2′ WL.∣-cong′ convert {a = ℓ} (⟨ν refl ⟩-cong ∣-left-identity) ⟩■

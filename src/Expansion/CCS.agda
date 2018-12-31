@@ -207,7 +207,7 @@ module Cong-lemmas
           ! P        →⟨ !P↝R ⟩■
             ↝[ μ ]
           R          ∼⟨ R∼!P∣Q ⟩
-          ! P ∣ Q    ∼′⟨ (!-cong′ (convert P≳P′)) ∣-cong′ Q≳′P″ ⟩ S.∼:
+          ! P ∣ Q    ∼′⟨ (!-cong′ (convert P≳P′)) ∣-cong′ Q≳′P″ ⟩
           ! P′ ∣ P″  ∼⟨ symmetric Q′∼!P′∣P″ ⟩■
           Q′
 
@@ -221,7 +221,7 @@ module Cong-lemmas
           ! P               →⟨ []⇒→↝ !P⇒R ⟩■
             ↝[ τ ]
           R                 ∼⟨ R∼[!P∣Q₁]∣Q₂ ⟩
-          (! P ∣ Q₁) ∣ Q₂   ∼′⟨ ((!-cong′ (convert P≳P′)) ∣-cong′ Q₁≳′P″) ∣-cong′ Q₂≳′P‴ ⟩ S.∼:
+          (! P ∣ Q₁) ∣ Q₂   ∼′⟨ ((!-cong′ (convert P≳P′)) ∣-cong′ Q₁≳′P″) ∣-cong′ Q₂≳′P‴ ⟩
           (! P′ ∣ P″) ∣ P‴  ∼⟨ symmetric Q′∼!P′∣P″∣P‴ ⟩■
           Q′
 

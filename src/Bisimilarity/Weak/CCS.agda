@@ -246,7 +246,7 @@ D₁ ⊕ D₂  [ Ps≈Qs ]-cong = ⊕-cong Ps≈Qs D₁ D₂
     [ i ] (C₁ [ Ps ]) ⊕ (C₂ [ Ps ]) ≈ (C₁ [ Qs ]) ⊕ (C₂ [ Qs ])
   ⊕-cong {Ps = Ps} {Qs} Ps≈Qs = λ where
     (process P₁) (process P₂) →
-      (context P₁ [ Ps ]) ⊕ (context P₂ [ Ps ])  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁) SE.⊕-cong SE.≡→∼ (context-[] P₂)) ⟩ ≈:
+      (context P₁ [ Ps ]) ⊕ (context P₂ [ Ps ])  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁) SE.⊕-cong SE.≡→∼ (context-[] P₂)) ⟩
       P₁ ⊕ P₂                                    ∼⟨ SE.≡→∼ (context-[] P₁) SE.⊕-cong SE.≡→∼ (context-[] P₂) ⟩■
       (context P₁ [ Qs ]) ⊕ (context P₂ [ Qs ])
 
@@ -295,7 +295,7 @@ force (C [ Ps≈Qs ]-cong′) = C [ (λ x → force (Ps≈Qs x)) ]-cong
 []-cong-w {Ps = Ps} {Qs}
           (W₁ ⊕ W₂) (D₁ ⊕ D₂)  Ps≈Qs = case D₁ ,′ D₂ of λ where
   (process P₁ , process P₂) →
-    (context P₁ [ Ps ]) ⊕ (context P₂ [ Ps ])  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁) SE.⊕-cong SE.≡→∼ (context-[] P₂)) ⟩ ≈:
+    (context P₁ [ Ps ]) ⊕ (context P₂ [ Ps ])  ∼⟨ symmetric (SE.≡→∼ (context-[] P₁) SE.⊕-cong SE.≡→∼ (context-[] P₂)) ⟩
     P₁ ⊕ P₂                                    ∼⟨ SE.≡→∼ (context-[] P₁) SE.⊕-cong SE.≡→∼ (context-[] P₂) ⟩■
     (context P₁ [ Qs ]) ⊕ (context P₂ [ Qs ])
 

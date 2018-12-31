@@ -38,7 +38,7 @@ open import Bisimilarity.Classical CCS
   R-is : Bisimulation-up-to-bisimilarity R
   R-is = ⟪ lr , rl ⟫
     where
-    lemma = λ {P} P∼!a∣∅ →
+    lemma = λ {P : Proc ∞} P∼!a∣∅ →
       ! ! a ∙ ∣ P            ∼⟨ reflexive ∣-cong P∼!a∣∅ ⟩
       ! ! a ∙ ∣ (! a ∙ ∣ ∅)  ∼⟨ reflexive ∣-cong ∣-right-identity ⟩
       ! ! a ∙ ∣ ! a ∙        ∼⟨ 6-1-2 ⟩■
