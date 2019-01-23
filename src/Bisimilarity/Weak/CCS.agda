@@ -2,7 +2,7 @@
 -- Lemmas related to weak bisimilarity and CCS
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K --safe --sized-types #-}
 
 module Bisimilarity.Weak.CCS {ℓ} {Name : Set ℓ} where
 

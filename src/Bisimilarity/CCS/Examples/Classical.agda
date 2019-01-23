@@ -3,7 +3,7 @@
 -- classical definition of bisimilarity
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K --safe --sized-types #-}
 
 module Bisimilarity.CCS.Examples.Classical {ℓ} {Name : Set ℓ} where
 

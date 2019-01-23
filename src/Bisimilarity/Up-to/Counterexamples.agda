@@ -2,7 +2,7 @@
 -- Some counterexamples
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K --safe --sized-types #-}
 
 module Bisimilarity.Up-to.Counterexamples where
 

@@ -4,7 +4,7 @@
 -- implemented using the coinductive definition of bisimilarity
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K --safe --sized-types #-}
 
 module Bisimilarity.6-2-5 {Name : Set} where
 

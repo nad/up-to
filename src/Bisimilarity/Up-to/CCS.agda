@@ -2,7 +2,7 @@
 -- Up-to techniques for CCS
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K --safe --sized-types #-}
 
 module Bisimilarity.Up-to.CCS {ℓ} {Name : Set ℓ} where
 

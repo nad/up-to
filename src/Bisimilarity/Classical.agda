@@ -5,7 +5,7 @@
 -- This module is largely based on "Enhancements of the bisimulation
 -- proof method" by Pous and Sangiorgi.
 
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K --safe --sized-types #-}
 
 open import Labelled-transition-system
 

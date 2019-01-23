@@ -3,7 +3,7 @@
 -- bisimilarity
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K --safe --sized-types #-}
 
 module Bisimilarity.Weak.Alternative.Comparison where
 

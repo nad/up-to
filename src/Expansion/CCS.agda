@@ -2,7 +2,7 @@
 -- Lemmas related to expansion and CCS
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K --safe --sized-types #-}
 
 module Expansion.CCS {ℓ} {Name : Set ℓ} where
 

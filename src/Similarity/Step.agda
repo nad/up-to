@@ -3,7 +3,7 @@
 -- two-sided Step function
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K --safe --sized-types #-}
 
 open import Labelled-transition-system
 

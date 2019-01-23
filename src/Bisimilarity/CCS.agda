@@ -3,7 +3,7 @@
 -- coinductive definition of bisimilarity
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K --safe --sized-types #-}
 
 module Bisimilarity.CCS {ℓ} {Name : Set ℓ} where
 

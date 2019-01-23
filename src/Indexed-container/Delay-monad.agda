@@ -3,7 +3,7 @@
 -- container
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K --safe --sized-types #-}
 
 module Indexed-container.Delay-monad where
 

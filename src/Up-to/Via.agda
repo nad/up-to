@@ -2,7 +2,7 @@
 -- Up-to techniques via
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K --safe --sized-types #-}
 
 module Up-to.Via where
 
