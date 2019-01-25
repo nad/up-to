@@ -9,6 +9,7 @@ module Up-to.Closure where
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude as P
+open import Size
 
 open import Bijection equality-with-J using (_↔_)
 open import Function-universe equality-with-J hiding (id; _∘_)

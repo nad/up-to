@@ -10,6 +10,7 @@ module Similarity.Weak.Up-to {ℓ} (lts : LTS ℓ) where
 
 open import Logical-equivalence using (_⇔_)
 open import Prelude
+open import Size
 
 open import Equational-reasoning
 open import Expansion lts using (Expansion)

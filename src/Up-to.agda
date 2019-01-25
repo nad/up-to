@@ -14,6 +14,7 @@ module Up-to {ℓ} {I : Set ℓ} (C : Container I I) where
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
+open import Size
 
 open import Bijection equality-with-J using (_↔_)
 open import Function-universe equality-with-J as F hiding (id; _∘_)

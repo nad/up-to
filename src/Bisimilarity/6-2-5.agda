@@ -11,6 +11,7 @@ module Bisimilarity.6-2-5 {Name : Set} where
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
+open import Size
 
 open import Function-universe equality-with-J hiding (id; _∘_)
 

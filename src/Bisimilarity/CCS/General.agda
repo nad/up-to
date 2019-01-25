@@ -10,6 +10,7 @@ module Bisimilarity.CCS.General {ℓ} {Name : Set ℓ} where
 open import Equality.Propositional
 open import List equality-with-J
 open import Prelude
+open import Size
 
 open import Labelled-transition-system
 open import Labelled-transition-system.CCS Name

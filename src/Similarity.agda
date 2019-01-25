@@ -10,6 +10,7 @@ module Similarity {ℓ} (lts : LTS ℓ) where
 
 open import Equality.Propositional
 open import Prelude
+open import Size
 
 open import Bisimilarity lts as SB using ([_]_∼_; [_]_∼′_)
 open import Indexed-container hiding (⟨_⟩)

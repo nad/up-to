@@ -12,6 +12,7 @@ module Indexed-container where
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
+open import Size
 
 open import Bijection equality-with-J as Bijection using (_↔_)
 import Equivalence equality-with-J as Eq

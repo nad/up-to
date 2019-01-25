@@ -4,12 +4,14 @@
 
 {-# OPTIONS --without-K --safe --sized-types #-}
 
-open import Prelude
+open import Size
 
 open import Labelled-transition-system
 
 module Similarity.Equational-reasoning-instances
          {ℓ} {lts : LTS ℓ} {i : Size} where
+
+open import Prelude
 
 open import Bisimilarity lts
 open import Equational-reasoning

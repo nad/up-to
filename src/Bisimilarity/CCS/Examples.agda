@@ -13,6 +13,7 @@ module Bisimilarity.CCS.Examples {ℓ} {Name : Set ℓ} where
 
 open import Equality.Propositional
 open import Prelude
+open import Size
 
 open import Bisimilarity.CCS
 import Bisimilarity.Equational-reasoning-instances

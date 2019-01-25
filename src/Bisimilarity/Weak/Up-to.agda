@@ -11,6 +11,7 @@ module Bisimilarity.Weak.Up-to {ℓ} (lts : LTS ℓ) where
 
 open import Logical-equivalence using (_⇔_)
 open import Prelude
+open import Size
 
 open import Bisimilarity.Weak lts
 import Bisimilarity.Weak.Equational-reasoning-instances

@@ -14,6 +14,7 @@ import Delay-monad.Partial-order as P
 open import Equality.Propositional as Eq
 open import Logical-equivalence using (_⇔_)
 open import Prelude
+open import Size
 
 open import Double-negation equality-with-J
 open import Function-universe equality-with-J hiding (id)

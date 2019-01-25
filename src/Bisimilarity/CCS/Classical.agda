@@ -10,6 +10,7 @@ module Bisimilarity.CCS.Classical {ℓ} {Name : Set ℓ} where
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
+open import Size
 
 import Bisimilarity.CCS.General
 import Bisimilarity.Classical.Equational-reasoning-instances

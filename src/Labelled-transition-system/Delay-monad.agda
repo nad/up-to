@@ -9,6 +9,7 @@ module Labelled-transition-system.Delay-monad {a} (A : Set a) where
 open import Delay-monad hiding (steps)
 open import Equality.Propositional
 open import Prelude
+open import Size
 
 open import Labelled-transition-system
 

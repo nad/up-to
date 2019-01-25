@@ -13,6 +13,7 @@ module Expansion {ℓ} (lts : LTS ℓ) where
 
 open import Equality.Propositional
 open import Prelude
+open import Size
 
 import Bisimilarity
 import Bisimilarity.Equational-reasoning-instances

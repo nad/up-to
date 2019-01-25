@@ -9,6 +9,7 @@ module Bisimilarity.CCS {ℓ} {Name : Set ℓ} where
 
 open import Equality.Propositional
 open import Prelude
+open import Size
 
 import Bisimilarity.Equational-reasoning-instances
 import Bisimilarity.CCS.General

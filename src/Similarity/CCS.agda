@@ -8,6 +8,7 @@ module Similarity.CCS {ℓ} {Name : Set ℓ} where
 
 open import Equality.Propositional
 open import Prelude
+open import Size
 
 open import Function-universe equality-with-J hiding (id; _∘_)
 
