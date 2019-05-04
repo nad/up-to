@@ -101,9 +101,8 @@ coinductive-bisimilarity-is-sometimes-propositional :
   Extensionality lzero lzero →
   let module Co = Bisimilarity one-loop in
   Co.Extensionality → Is-proposition (tt Co.∼ tt)
-coinductive-bisimilarity-is-sometimes-propositional ext co-ext =
-  _⇔_.from propositional⇔irrelevant λ ∼₁ ∼₂ →
-    extensionality ext co-ext (irr ∼₁ ∼₂)
+coinductive-bisimilarity-is-sometimes-propositional ext co-ext ∼₁ ∼₂ =
+  extensionality ext co-ext (irr ∼₁ ∼₂)
   where
   open Bisimilarity one-loop
 
@@ -128,8 +127,7 @@ classical-bisimilarity-is-not-propositional :
   let module Cl = Bisimilarity.Classical one-loop in
   ∀ {ℓ} → ¬ Is-proposition (Cl.Bisimilarity′ ℓ (tt , tt))
 classical-bisimilarity-is-not-propositional {ℓ} =
-  Is-proposition (Bisimilarity′ ℓ (tt , tt))    ↝⟨ (λ is-prop → _⇔_.to propositional⇔irrelevant is-prop) ⟩
-  Proof-irrelevant (Bisimilarity′ ℓ (tt , tt))  ↝⟨ (λ f → f tt∼tt₁ tt∼tt₂) ⟩
+  Is-proposition (Bisimilarity′ ℓ (tt , tt))    ↝⟨ (λ f → f tt∼tt₁ tt∼tt₂) ⟩
   tt∼tt₁ ≡ tt∼tt₂                               ↝⟨ cong (λ R → proj₁ R (tt , tt)) {x = tt∼tt₁} {y = tt∼tt₂} ⟩
   Unit ≡ (Unit ⊎ Unit)                          ↝⟨ (λ eq → Fin 1          ↝⟨ inverse Unit↔Fin1 ⟩
                                                            Unit           ↝⟨ ≡⇒↝ _ eq ⟩
@@ -159,7 +157,7 @@ classical-bisimilarity-is-not-propositional {ℓ} =
 
   Unit↔Fin1 =
     Unit     ↔⟨ Bijection.↑↔ ⟩
-    tt ≡ tt  ↝⟨ _⇔_.to contractible⇔↔⊤ (mono₁ 0 ⊤-contractible _ _) ⟩
+    tt ≡ tt  ↝⟨ _⇔_.to contractible⇔↔⊤ (+⇒≡ $ mono₁ 0 ⊤-contractible) ⟩
     ⊤        ↝⟨ inverse ⊎-right-identity ⟩□
     Fin 1    □
 
@@ -196,8 +194,7 @@ coinductive-bisimilarity-is-not-propositional :
   ¬ (∀ {p q} → Is-proposition (p ∼ q))
 coinductive-bisimilarity-is-not-propositional =
   (∀ {p q} → Is-proposition (p ∼ q))            ↝⟨ (λ is-prop → is-prop {p = true} {q = true}) ⟩
-  Is-proposition (true ∼ true)                  ↝⟨ _⇔_.to propositional⇔irrelevant ⟩
-  Proof-irrelevant (true ∼ true)                ↝⟨ (λ irr → irr _ _) ⟩
+  Is-proposition (true ∼ true)                  ↝⟨ (λ irr → irr _ _) ⟩
   proof true true true ≡ proof false true true  ↝⟨ cong (λ p → proj₁ (left-to-right {p = true} {q = true} p {p′ = true} _)) ⟩
   true ≡ false                                  ↝⟨ Bool.true≢false ⟩□
   ⊥                                             □

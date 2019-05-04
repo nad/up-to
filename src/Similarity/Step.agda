@@ -190,8 +190,8 @@ open Temporarily-private public
    ∃ λ (eq₂ : (λ {_ _} → ch₁) ≡ ch₂) →
    ∀ {o} (p : Container.Position StepC s₁ o) →
    R (f₁ p , f₂ (subst (λ s → Container.Position StepC s o)
-                       (cong₂ _,_ eq₁ eq₂) p)))                        ↝⟨ drop-⊤-left-Σ (_⇔_.to contractible⇔↔⊤ $
-                                                                          mono₁ 0 (_⇔_.from contractible⇔↔⊤ Magic↔⊤) _ _) ⟩
+                       (cong₂ _,_ eq₁ eq₂) p)))                        ↝⟨ drop-⊤-left-Σ $ _⇔_.to contractible⇔↔⊤ $
+                                                                          +⇒≡ $ mono₁ 0 (_⇔_.from contractible⇔↔⊤ Magic↔⊤) ⟩
   (∃ λ (eq : (λ {_ _} → ch₁) ≡ ch₂) →
    ∀ {o} (p : Container.Position StepC s₁ o) →
    R (f₁ p , f₂ (subst (λ s → Container.Position StepC s o)
