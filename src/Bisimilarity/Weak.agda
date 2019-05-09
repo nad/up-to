@@ -10,7 +10,7 @@ module Bisimilarity.Weak {ℓ} (lts : LTS ℓ) where
 
 open import Equality.Propositional
 open import Prelude
-open import Size
+open import Prelude.Size
 
 import Function-universe equality-with-J as F
 

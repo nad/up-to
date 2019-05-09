@@ -9,7 +9,7 @@ module Indexed-container.Combinators where
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude as P hiding (id; const) renaming (_∘_ to _⊚_)
-open import Size
+open import Prelude.Size
 
 open import Bijection equality-with-J as Bijection using (_↔_)
 open import Equivalence equality-with-J hiding (id; _∘_; inverse)

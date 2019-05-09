@@ -4,7 +4,7 @@
 
 {-# OPTIONS --without-K --safe --sized-types #-}
 
-open import Size
+open import Prelude.Size
 
 open import Labelled-transition-system
 

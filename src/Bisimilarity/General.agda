@@ -19,7 +19,7 @@ module Bisimilarity.General
 open import Equality.Propositional as Eq hiding (Extensionality)
 open import Logical-equivalence using (_⇔_)
 open import Prelude
-open import Size
+open import Prelude.Size
 
 open import Bijection equality-with-J as Bijection using (_↔_)
 open import Function-universe equality-with-J hiding (id; _∘_)

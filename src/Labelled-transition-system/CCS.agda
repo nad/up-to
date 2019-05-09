@@ -8,7 +8,7 @@ module Labelled-transition-system.CCS {ℓ} (Name : Set ℓ) where
 
 open import Equality.Propositional
 open import Prelude
-open import Size
+open import Prelude.Size
 
 open import Bool equality-with-J
 open import Function-universe equality-with-J hiding (id; _∘_)

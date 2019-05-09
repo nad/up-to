@@ -17,7 +17,7 @@ module Similarity.General
 
 open import Equality.Propositional as Eq hiding (Extensionality)
 open import Prelude
-open import Size
+open import Prelude.Size
 
 open import Bijection equality-with-J using (_↔_)
 open import Function-universe equality-with-J hiding (id; _∘_)

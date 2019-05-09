@@ -11,7 +11,7 @@ module Bisimilarity.Up-to {ℓ} (lts : LTS ℓ) where
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
-open import Size
+open import Prelude.Size
 
 open import Bisimilarity lts
 import Bisimilarity.Equational-reasoning-instances

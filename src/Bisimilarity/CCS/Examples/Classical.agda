@@ -9,7 +9,7 @@ module Bisimilarity.CCS.Examples.Classical {ℓ} {Name : Set ℓ} where
 
 open import Equality.Propositional
 open import Prelude
-open import Size
+open import Prelude.Size
 
 open import Bisimilarity.CCS.Classical
 import Bisimilarity.Classical.Equational-reasoning-instances

@@ -10,7 +10,7 @@ module Similarity.Weak {ℓ} (lts : LTS ℓ) where
 
 open import Equality.Propositional
 open import Prelude
-open import Size
+open import Prelude.Size
 
 open import Bisimilarity.Weak lts as WB using ([_]_≈_; [_]_≈′_)
 open import Expansion lts as E using ([_]_≳_; [_]_≳′_)
