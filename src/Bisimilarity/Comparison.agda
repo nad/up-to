@@ -128,7 +128,7 @@ classical-bisimilarity-is-not-propositional :
   ∀ {ℓ} → ¬ Is-proposition (Cl.Bisimilarity′ ℓ (tt , tt))
 classical-bisimilarity-is-not-propositional {ℓ} =
   Is-proposition (Bisimilarity′ ℓ (tt , tt))    ↝⟨ (λ f → f tt∼tt₁ tt∼tt₂) ⟩
-  tt∼tt₁ ≡ tt∼tt₂                               ↝⟨ cong (λ R → proj₁ R (tt , tt)) {x = tt∼tt₁} {y = tt∼tt₂} ⟩
+  tt∼tt₁ ≡ tt∼tt₂                               ↝⟨ cong (λ R → proj₁ R (tt , tt)) ⟩
   Unit ≡ (Unit ⊎ Unit)                          ↝⟨ (λ eq → Fin 1          ↝⟨ inverse Unit↔Fin1 ⟩
                                                            Unit           ↝⟨ ≡⇒↝ _ eq ⟩
                                                            Unit ⊎ Unit    ↝⟨ Unit↔Fin1 ⊎-cong Unit↔Fin1 ⟩
