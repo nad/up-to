@@ -107,21 +107,22 @@ Step↔StepC {r = r} {R} {pq} = generalise-ext? Step⇔StepC λ ext → record
   }
   where
   to₁ : Step R pq → Container.Shape StepC pq
-  to₁ Step.⟨ lr ⟩ =
+  to₁ Temporarily-private.⟨ lr ⟩ =
       _
     , (λ p⟶p′ → Σ-map id proj₁ (lr p⟶p′))
 
   to₂ :
     (s : Step R pq) →
     Container.Position StepC (to₁ s) ⊆ R
-  to₂ Step.⟨ lr ⟩ (_ , p⟶p′ , refl) = proj₂ (proj₂ (lr p⟶p′))
+  to₂ Temporarily-private.⟨ lr ⟩ (_ , p⟶p′ , refl) =
+    proj₂ (proj₂ (lr p⟶p′))
 
   from : ⟦ StepC ⟧ R pq → Step R pq
   from ((_ , lr) , f) =
-    Step.⟨ (λ p⟶p′ →
-              let q′ , q⟶q′ = lr p⟶p′
-              in  q′ , q⟶q′ , f (_ , p⟶p′ , refl))
-         ⟩
+    Temporarily-private.⟨ (λ p⟶p′ →
+                             let q′ , q⟶q′ = lr p⟶p′
+                             in  q′ , q⟶q′ , f (_ , p⟶p′ , refl))
+                        ⟩
 
   Step⇔StepC : Step R pq ⇔ ⟦ StepC ⟧ R pq
   Step⇔StepC = record
@@ -143,7 +144,7 @@ module StepC {r} {R : Rel₂ r Proc} {p q} where
   ⟨_⟩ :
     (∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝ q′ × R (p′ , q′)) →
     ⟦ StepC ⟧ R (p , q)
-  ⟨ lr ⟩ = _⇔_.to (Step↔StepC _) Step.⟨ lr ⟩
+  ⟨ lr ⟩ = _⇔_.to (Step↔StepC _) Temporarily-private.⟨ lr ⟩
 
   -- A "projection".
 
@@ -413,9 +414,12 @@ open Temporarily-private public
 
   where
 
-  lemma₁ = λ {p q} {f g : ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ (q [ μ ]↝_)}
-             (eq : (λ {p′ μ} → f {p′ = p′} {μ = μ}) ≡ g)
-             {p′ μ} {p⟶p′ : p [ μ ]⟶ p′} →
+  lemma₁ :
+    ∀ {p q} {f g : ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ (q [ μ ]↝_)}
+    (eq : (λ {p′ μ} → f {p′ = p′} {μ = μ}) ≡ g)
+    {p′ μ} {p⟶p′ : p [ μ ]⟶ p′} →
+    _
+  lemma₁ {p} {q} {f} {g} eq {p′} {μ} {p⟶p′} =
 
     subst (λ ch →
              ∃ λ μ → ∃ λ (p⟶p′′ : p [ μ ]⟶ p′) →
@@ -494,9 +498,12 @@ open Temporarily-private public
     , sym (cong (λ ch → proj₁ (ch p⟶p′)) eq)
     )                                                   ∎
 
-  lemma₂ = λ {p q} {f g : ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ (q [ μ ]↝_)}
-             (eq : ∀ p′ → (λ {μ} → f {p′ = p′} {μ = μ}) ≡ g)
-             {p′ μ} {p⟶p′ : p [ μ ]⟶ p′} →
+  lemma₂ :
+    ∀ {p q} {f g : ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ (q [ μ ]↝_)}
+    (eq : ∀ p′ → (λ {μ} → f {p′ = p′} {μ = μ}) ≡ g)
+    {p′ μ} {p⟶p′ : p [ μ ]⟶ p′} →
+    _
+  lemma₂ {p} {q} {f} {g} eq {p′} {μ} {p⟶p′} =
 
     cong (λ ch → proj₁ (ch p⟶p′))
          (_↔_.to (implicit-extensionality-isomorphism ext) eq)         ≡⟨⟩
@@ -506,9 +513,11 @@ open Temporarily-private public
 
     cong (λ ch → proj₁ (ch p′ p⟶p′)) (apply-ext (Eq.good-ext ext) eq)  ∎
 
-  lemma₃ = λ {p q} {f g : ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ (q [ μ ]↝_)}
-             (eq : ∀ p′ μ → f {p′ = p′} {μ = μ} ≡ g)
-             {p′ μ p⟶p′} →
+  lemma₃ :
+    ∀ {p q} {f g : ∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ (q [ μ ]↝_)}
+    (eq : ∀ p′ μ → f {p′ = p′} {μ = μ} ≡ g) {p′ μ p⟶p′} →
+    _
+  lemma₃ {p} {q} {f} {g} eq {p′} {μ} {p⟶p′} =
 
     cong (λ (ch : ∀ _ {μ} → _) → proj₁ (ch p′ {μ = μ} p⟶p′))
          (apply-ext (Eq.good-ext ext)

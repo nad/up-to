@@ -7,6 +7,7 @@
 module Labelled-transition-system where
 
 open import Equality.Propositional
+import Logical-equivalence
 open import Prelude
 
 open import Bijection equality-with-J using (_↔_)

@@ -38,10 +38,18 @@ private
 
     open Bisimilarity lts public
     open Bisimilarity.Classical lts public using (Progression)
-    open Bisimilarity.Step lts (LTS._[_]⟶_ lts) (LTS._[_]⟶_ lts) public
-      using (Step; Step↔StepC)
     open Bisimilarity.Up-to lts public
     open LTS lts public hiding (_[_]⟶_)
+
+    private
+      module S =
+        Bisimilarity.Step lts (LTS._[_]⟶_ lts) (LTS._[_]⟶_ lts)
+
+    open S public using (Step; Step↔StepC) hiding (module Step)
+
+    module Step where
+      open S public using (⟨_,_⟩)
+      open S.Step public
 
 -- There is a size-preserving relation transformer that is neither
 -- monotone nor extensive.

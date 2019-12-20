@@ -140,11 +140,12 @@ Step↔StepC {R = R} {pq} ext =
   lemma = record
     { surjection = record
       { logical-equivalence = record
-        { to   = λ s → One-sided.Step.⟨ Step.left-to-right s ⟩
-                     , One-sided.Step.⟨ Step.right-to-left s ⟩
-        ; from = λ { (lr , rl) → Step.⟨ One-sided.Step.challenge lr
-                                      , One-sided.Step.challenge rl
-                                      ⟩
+        { to   = λ s → One-sided.⟨ Step.left-to-right s ⟩
+                     , One-sided.⟨ Step.right-to-left s ⟩
+        ; from = λ { (lr , rl) →
+                     Temporarily-private.⟨ One-sided.Step.challenge lr
+                                         , One-sided.Step.challenge rl
+                                         ⟩
                    }
         }
       ; right-inverse-of = λ _ → refl
@@ -172,7 +173,7 @@ module StepC {r} {R : Rel₂ r Proc} {p q} where
     (∀ {p′ μ} → p [ μ ]⟶ p′ → ∃ λ q′ → q [ μ ]↝₁ q′ × R (p′ , q′)) →
     (∀ {q′ μ} → q [ μ ]⟶ q′ → ∃ λ p′ → p [ μ ]↝₂ p′ × R (p′ , q′)) →
     ⟦ StepC ⟧ R (p , q)
-  ⟨ lr , rl ⟩ = _⇔_.to (Step↔StepC _) Step.⟨ lr , rl ⟩
+  ⟨ lr , rl ⟩ = _⇔_.to (Step↔StepC _) Temporarily-private.⟨ lr , rl ⟩
 
   -- Some "projections".
 
