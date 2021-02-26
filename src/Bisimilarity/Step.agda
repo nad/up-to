@@ -5,18 +5,19 @@
 
 {-# OPTIONS --without-K --safe --sized-types #-}
 
+open import Prelude
+
 open import Labelled-transition-system
 
 module Bisimilarity.Step
          {ℓ}
          (lts : LTS ℓ)
          (open LTS lts)
-         (_[_]↝₁_ _[_]↝₂_ : Proc → Label → Proc → Set ℓ)
+         (_[_]↝₁_ _[_]↝₂_ : Proc → Label → Proc → Type ℓ)
          where
 
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
-open import Prelude
 
 open import Bijection equality-with-J using (_↔_)
 import Equivalence equality-with-J as Eq
@@ -45,7 +46,7 @@ private
   -- "step" function.
 
   record Step {r} (R : Rel₂ r Proc) (pq : Proc × Proc) :
-              Set (ℓ ⊔ r) where
+              Type (ℓ ⊔ r) where
     constructor ⟨_,_⟩
 
     private

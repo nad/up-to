@@ -25,7 +25,7 @@ import Similarity.CCS as SC
 open import Up-to
 
 private
-  module CCS {ℓ} (Name : Set ℓ) where
+  module CCS {ℓ} (Name : Type ℓ) where
     open Labelled-transition-system.CCS Name public
     open module B = Bisimilarity CCS public
     open module S = Similarity CCS public using (Similarity)
@@ -41,7 +41,7 @@ private
 -- is monotone.
 
 Compatible-⊗ :
-  ∀ {ℓ} {I : Set ℓ} {C₁ C₂ : Container I I} {F : Trans ℓ I} →
+  ∀ {ℓ} {I : Type ℓ} {C₁ C₂ : Container I I} {F : Trans ℓ I} →
   Monotone F →
   Compatible C₁ F → Compatible C₂ F → Compatible (C₁ ⊗ C₂) F
 Compatible-⊗ {C₁ = C₁} {C₂} {F} mono comp₁ comp₂ {R = R} =
@@ -55,7 +55,7 @@ Compatible-⊗ {C₁ = C₁} {C₂} {F} mono comp₁ comp₂ {R = R} =
 -- that F is monotone and f-symmetric.
 
 Compatible-reindex₁ :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} {F : Trans ℓ I} {f : I → I} →
+  ∀ {ℓ} {I : Type ℓ} {C : Container I I} {F : Trans ℓ I} {f : I → I} →
   Monotone F → Symmetric f F →
   Compatible C F → Compatible (reindex₁ f C) F
 Compatible-reindex₁ {C = C} {F} {f} mono hyp comp {R = R} =
@@ -69,7 +69,7 @@ Compatible-reindex₁ {C = C} {F} {f} mono hyp comp {R = R} =
 -- that F is f-symmetric.
 
 Compatible-reindex₂ :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} {F : Trans ℓ I} {f : I → I} →
+  ∀ {ℓ} {I : Type ℓ} {C : Container I I} {F : Trans ℓ I} {f : I → I} →
   Symmetric f F →
   Compatible C F → Compatible (reindex₂ f C) F
 Compatible-reindex₂ {C = C} {F} {f} hyp comp {R = R} =
@@ -83,7 +83,7 @@ Compatible-reindex₂ {C = C} {F} {f} hyp comp {R = R} =
 -- that F is monotone and f-symmetric.
 
 Compatible-reindex :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} {F : Trans ℓ I} {f : I → I} →
+  ∀ {ℓ} {I : Type ℓ} {C : Container I I} {F : Trans ℓ I} {f : I → I} →
   Monotone F → Symmetric f F →
   Compatible C F → Compatible (reindex f C) F
 Compatible-reindex {C = C} {F} {f} mono hyp =
@@ -96,7 +96,7 @@ Compatible-reindex {C = C} {F} {f} mono hyp =
 -- is monotone and symmetric.
 
 Compatible-⟷ :
-  ∀ {ℓ} {I : Set ℓ}
+  ∀ {ℓ} {I : Type ℓ}
     {C₁ C₂ : Container (I × I) (I × I)} {F : Trans₂ ℓ I} →
   Monotone F → Symmetric swap F →
   Compatible C₁ F → Compatible C₂ F → Compatible (C₁ ⟷ C₂) F
@@ -129,7 +129,7 @@ compatible-for-similarity→compatible-for-bisimilarity mono sym comp =
 -- assumption that f is an involution.
 
 Size-preserving-reindex :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} {F : Trans ℓ I} {f : I → I} →
+  ∀ {ℓ} {I : Type ℓ} {C : Container I I} {F : Trans ℓ I} {f : I → I} →
   f ∘ f ≡ id → Symmetric f F →
   Size-preserving C F → Size-preserving (reindex f C) F
 Size-preserving-reindex {C = C} {F} {f}
@@ -167,7 +167,7 @@ Size-preserving-reindex {C = C} {F} {f}
 
 ¬-Size-preserving-⟷/⊗ :
   ∀ {ℓ} →
-  ({Name : Set ℓ} →
+  ({Name : Type ℓ} →
    let open CCS Name in
    Name →
    ¬ ({F : Trans₂ ℓ (Proc ∞)} →
@@ -180,13 +180,13 @@ Size-preserving-reindex {C = C} {F} {f}
      Size-preserving (Similarity.StepC lts) F →
      Size-preserving (Bisimilarity.StepC lts) F)
     ×
-  ¬ ({I : Set ℓ} {C₁ C₂ : Container (I × I) (I × I)}
+  ¬ ({I : Type ℓ} {C₁ C₂ : Container (I × I) (I × I)}
      {F : Trans₂ ℓ I} →
      Monotone F → Symmetric swap F →
      Size-preserving C₁ F → Size-preserving C₂ F →
      Size-preserving (C₁ ⟷ C₂) F)
     ×
-  ¬ ({I : Set ℓ} {C₁ C₂ : Container I I} {F : Trans ℓ I} →
+  ¬ ({I : Type ℓ} {C₁ C₂ : Container I I} {F : Trans ℓ I} →
      Monotone F →
      Size-preserving C₁ F → Size-preserving C₂ F →
      Size-preserving (C₁ ⊗ C₂) F)
@@ -196,7 +196,7 @@ Size-preserving-reindex {C = C} {F} {f}
   , Lemmas.contradiction₄ (lift tt)
   , Lemmas.contradiction₅ (lift tt)
   where
-  module Lemmas {Name : Set ℓ} (a : Name) where
+  module Lemmas {Name : Type ℓ} (a : Name) where
     open CCS Name public
 
     ≤≥≁ = SC.≤≥≁ a
@@ -260,7 +260,7 @@ Size-preserving-reindex {C = C} {F} {f}
       ⊥                                                   □
 
     contradiction₄ =
-      ({I : Set ℓ} {C₁ C₂ : Container (I × I) (I × I)}
+      ({I : Type ℓ} {C₁ C₂ : Container (I × I) (I × I)}
        {F : Trans₂ ℓ I} →
        Monotone F → Symmetric swap F →
        Size-preserving C₁ F → Size-preserving C₂ F →
@@ -274,7 +274,7 @@ Size-preserving-reindex {C = C} {F} {f}
       ⊥                                                   □
 
     contradiction₅ =
-      ({I : Set ℓ} {C₁ C₂ : Container I I}
+      ({I : Type ℓ} {C₁ C₂ : Container I I}
        {F : Trans ℓ I} →
        Monotone F →
        Size-preserving C₁ F → Size-preserving C₂ F →

@@ -4,10 +4,11 @@
 
 {-# OPTIONS --without-K --safe --sized-types #-}
 
-module Expansion.CCS {ℓ} {Name : Set ℓ} where
+open import Prelude hiding (module W)
+
+module Expansion.CCS {ℓ} {Name : Type ℓ} where
 
 open import Equality.Propositional
-open import Prelude hiding (module W)
 open import Prelude.Size
 
 open import Function-universe equality-with-J hiding (id; _∘_)
@@ -30,13 +31,13 @@ import Labelled-transition-system.Equational-reasoning-instances CCS
 -- similar results in Bisimilarity.Weak.CCS.
 
 module Cong-lemmas
-  ({R} R′ : Proc ∞ → Proc ∞ → Set ℓ)
+  ({R} R′ : Proc ∞ → Proc ∞ → Type ℓ)
   ⦃ _ : Reflexive R′ ⦄
   ⦃ _ : Convertible R R′ ⦄
   ⦃ _ : Convertible R′ R′ ⦄
   ⦃ _ : Transitive′ R′ _∼_ ⦄
   ⦃ _ : Transitive _∼_ R′ ⦄
-  {_[_]↝_ : Proc ∞ → Label → Proc ∞ → Set ℓ}
+  {_[_]↝_ : Proc ∞ → Label → Proc ∞ → Type ℓ}
   (right-to-left :
    ∀ {P Q} → R P Q →
    ∀ {Q′ μ} → Q [ μ ]⟶ Q′ → ∃ λ P′ → P [ μ ]↝ P′ × R′ P′ Q′)

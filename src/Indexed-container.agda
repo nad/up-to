@@ -28,7 +28,7 @@ open import Relation
 
 -- Doubly indexed containers.
 
-record Container {ℓ} (I O : Set ℓ) : Set (lsuc ℓ) where
+record Container {ℓ} (I O : Type ℓ) : Type (lsuc ℓ) where
   constructor _◁_
   field
     Shape    : Rel ℓ O
@@ -36,24 +36,24 @@ record Container {ℓ} (I O : Set ℓ) : Set (lsuc ℓ) where
 
 -- Interpretation of containers.
 
-⟦_⟧ : ∀ {ℓ₁ ℓ₂} {I O : Set ℓ₁} →
+⟦_⟧ : ∀ {ℓ₁ ℓ₂} {I O : Type ℓ₁} →
       Container I O → Rel ℓ₂ I → Rel (ℓ₁ ⊔ ℓ₂) O
 ⟦ S ◁ P ⟧ A = λ o → ∃ λ (s : S o) → P s ⊆ A
 
 -- A map function.
 
-map : ∀ {ℓ₁ ℓ₂ ℓ₃} {I O : Set ℓ₁} (C : Container I O)
+map : ∀ {ℓ₁ ℓ₂ ℓ₃} {I O : Type ℓ₁} (C : Container I O)
         {A : Rel ℓ₂ I} {B : Rel ℓ₃ I} →
       A ⊆ B → ⟦ C ⟧ A ⊆ ⟦ C ⟧ B
 map _ f (s , g) = (s , f ∘ g)
 
 -- Functor laws.
 
-map-id : ∀ {ℓ₁ ℓ₂} {I O : Set ℓ₁} {C : Container I O} {A : Rel ℓ₂ I} →
+map-id : ∀ {ℓ₁ ℓ₂} {I O : Type ℓ₁} {C : Container I O} {A : Rel ℓ₂ I} →
          _≡_ {A = ⟦ C ⟧ A ⊆ _} (map C id) id
 map-id = refl
 
-map-∘ : ∀ {ℓ₁ ℓ₂ ℓ₃ ℓ₄} {I O : Set ℓ₁} {C : Container I O}
+map-∘ : ∀ {ℓ₁ ℓ₂ ℓ₃ ℓ₄} {I O : Type ℓ₁} {C : Container I O}
           {D : Rel ℓ₂ I} {E : Rel ℓ₃ I} {F : Rel ℓ₄ I}
         (f : E ⊆ F) (g : D ⊆ E) →
         _≡_ {A = ⟦ C ⟧ D ⊆ _} (map C (f ∘ g)) (map C f ∘ map C g)
@@ -61,7 +61,7 @@ map-∘ _ _ = refl
 
 -- A preservation lemma.
 
-⟦⟧-cong : ∀ {k ℓ₁ ℓ₂ ℓ₃} {I O : Set ℓ₁} →
+⟦⟧-cong : ∀ {k ℓ₁ ℓ₂ ℓ₃} {I O : Type ℓ₁} →
           Extensionality? k ℓ₁ (ℓ₁ ⊔ ℓ₂ ⊔ ℓ₃) →
           (C : Container I O) {A : Rel ℓ₂ I} {B : Rel ℓ₃ I} →
           (∀ {i} → A i ↝[ k ] B i) →
@@ -77,7 +77,7 @@ map-∘ _ _ = refl
 -- (This lemma was suggested to me by an anonymous reviewer of another
 -- paper.)
 
-Shape↔⟦⟧⊤ : ∀ {ℓ} {I O : Set ℓ} (C : Container I O) {o} →
+Shape↔⟦⟧⊤ : ∀ {ℓ} {I O : Type ℓ} (C : Container I O) {o} →
             Container.Shape C o ↔ ⟦ C ⟧ (λ _ → ⊤) o
 Shape↔⟦⟧⊤ C {o} =
   Shape C o                                         ↝⟨ inverse $ drop-⊤-right (λ _ → →-right-zero) ⟩
@@ -95,18 +95,18 @@ mutual
   -- The least fixpoint of an indexed "endocontainer", expressed using
   -- sized types.
 
-  μ : ∀ {ℓ} {X : Set ℓ} → Container X X → Size → Rel ℓ X
+  μ : ∀ {ℓ} {X : Type ℓ} → Container X X → Size → Rel ℓ X
   μ C i = ⟦ C ⟧ (μ′ C i)
 
-  data μ′ {ℓ} {X : Set ℓ}
-          (C : Container X X) (i : Size) (x : X) : Set ℓ where
+  data μ′ {ℓ} {X : Type ℓ}
+          (C : Container X X) (i : Size) (x : X) : Type ℓ where
     ⟨_⟩ : {j : Size< i} → μ C j x → μ′ C i x
 
 -- The least fixpoint μ C ∞ is pointwise logically equivalent to
 -- μ′ C ∞.
 
 μ⇔μ′ :
-  ∀ {ℓ} {X : Set ℓ} {C : Container X X} {x : X} →
+  ∀ {ℓ} {X : Type ℓ} {C : Container X X} {x : X} →
   μ C ∞ x ⇔ μ′ C ∞ x
 μ⇔μ′ = record
   { to   = ⟨_⟩
@@ -116,14 +116,14 @@ mutual
 -- The least fixpoint is a post-fixpoint.
 
 μ-out :
-  ∀ {ℓ} {X : Set ℓ} {C : Container X X} →
+  ∀ {ℓ} {X : Type ℓ} {C : Container X X} →
   μ C ∞ ⊆ ⟦ C ⟧ (μ C ∞)
 μ-out {C = C} = map C (_⇔_.from μ⇔μ′)
 
 -- The least fixpoint is a pre-fixpoint.
 
 μ-in :
-  ∀ {ℓ} {X : Set ℓ} {C : Container X X} →
+  ∀ {ℓ} {X : Type ℓ} {C : Container X X} →
   ⟦ C ⟧ (μ C ∞) ⊆ μ C ∞
 μ-in {C = C} = map C (_⇔_.to μ⇔μ′)
 
@@ -131,7 +131,7 @@ mutual
 -- pre-fixpoint.
 
 fold :
-  ∀ {ℓ₁ ℓ₂} {X : Set ℓ₁} (C : Container X X) {A : Rel ℓ₂ X} →
+  ∀ {ℓ₁ ℓ₂} {X : Type ℓ₁} (C : Container X X) {A : Rel ℓ₂ X} →
   ⟦ C ⟧ A ⊆ A →
   ∀ {i} → μ C i ⊆ A
 fold C f a = f (map C (λ { ⟨ a ⟩ → fold C f a }) a)
@@ -144,11 +144,11 @@ mutual
   -- The greatest fixpoint of an indexed "endocontainer", expressed
   -- using sized types.
 
-  ν : ∀ {ℓ} {X : Set ℓ} → Container X X → Size → Rel ℓ X
+  ν : ∀ {ℓ} {X : Type ℓ} → Container X X → Size → Rel ℓ X
   ν C i = ⟦ C ⟧ (ν′ C i)
 
-  record ν′ {ℓ} {X : Set ℓ}
-            (C : Container X X) (i : Size) (x : X) : Set ℓ where
+  record ν′ {ℓ} {X : Type ℓ}
+            (C : Container X X) (i : Size) (x : X) : Type ℓ where
     coinductive
     field
       force : {j : Size< i} → ν C j x
@@ -159,7 +159,7 @@ open ν′ public
 -- ν′ C ∞.
 
 ν⇔ν′ :
-  ∀ {ℓ} {X : Set ℓ} {C : Container X X} {x : X} →
+  ∀ {ℓ} {X : Type ℓ} {C : Container X X} {x : X} →
   ν C ∞ x ⇔ ν′ C ∞ x
 ν⇔ν′ = record
   { to   = λ { x .force → x }
@@ -169,21 +169,21 @@ open ν′ public
 -- The greatest fixpoint ν C ∞ is a post-fixpoint.
 
 ν-out :
-  ∀ {ℓ} {X : Set ℓ} {i} {j : Size< i} (C : Container X X) →
+  ∀ {ℓ} {X : Type ℓ} {i} {j : Size< i} (C : Container X X) →
   ν C i ⊆ ⟦ C ⟧ (ν C j)
 ν-out C = map C (λ x → force x)
 
 private
 
   ν-out-∞ :
-    ∀ {ℓ} {X : Set ℓ} (C : Container X X) →
+    ∀ {ℓ} {X : Type ℓ} (C : Container X X) →
     ν C ∞ ⊆ ⟦ C ⟧ (ν C ∞)
   ν-out-∞ = ν-out
 
 -- The greatest fixpoint is a pre-fixpoint.
 
 ν-in :
-  ∀ {ℓ} {X : Set ℓ} {i} (C : Container X X) →
+  ∀ {ℓ} {X : Type ℓ} {i} (C : Container X X) →
   ⟦ C ⟧ (ν C i) ⊆ ν C i
 ν-in C = map C (λ x → λ { .force → x })
 
@@ -191,14 +191,14 @@ private
 -- post-fixpoint.
 
 unfold :
-  ∀ {ℓ₁ ℓ₂} {X : Set ℓ₁} {A : Rel ℓ₂ X} {i} (C : Container X X) →
+  ∀ {ℓ₁ ℓ₂} {X : Type ℓ₁} {A : Rel ℓ₂ X} {i} (C : Container X X) →
   A ⊆ ⟦ C ⟧ A → A ⊆ ν C i
 unfold C f = map C (λ a → λ { .force → unfold C f a }) ∘ f
 
 -- A generalisation of unfold with more sized types.
 
 sized-unfold :
-  ∀ {ℓ₁ ℓ₂} {X : Set ℓ₁} (C : Container X X) (A : Size → Rel ℓ₂ X) →
+  ∀ {ℓ₁ ℓ₂} {X : Type ℓ₁} (C : Container X X) (A : Size → Rel ℓ₂ X) →
   (∀ {i} {j : Size< i} → A i ⊆ ⟦ C ⟧ (A j)) →
   ∀ {i} {j : Size< i} → A i ⊆ ν C j
 sized-unfold C A f =
@@ -210,7 +210,7 @@ sized-unfold C A f =
 -- A container corresponding to bisimilarity for a given container.
 
 Bisimilarity :
-  ∀ {ℓ} {X : Set ℓ} {C : Container X X} →
+  ∀ {ℓ} {X : Type ℓ} {C : Container X X} →
   let P = ∃ λ x → ν C ∞ x × ν C ∞ x in
   Container P P
 Bisimilarity {C = C} =
@@ -225,19 +225,19 @@ Bisimilarity {C = C} =
 -- Bisimilarity for ν.
 
 ν-bisimilar :
-  ∀ {ℓ} {X : Set ℓ} {C : Container X X} {x} →
+  ∀ {ℓ} {X : Type ℓ} {C : Container X X} {x} →
   Size → Rel₂ ℓ (ν C ∞ x)
 ν-bisimilar i p = ν Bisimilarity i (_ , p)
 
 ν′-bisimilar :
-  ∀ {ℓ} {X : Set ℓ} {C : Container X X} {x} →
+  ∀ {ℓ} {X : Type ℓ} {C : Container X X} {x} →
   Size → Rel₂ ℓ (ν′ C ∞ x)
 ν′-bisimilar i (x , y) = ν′ Bisimilarity i (_ , force x , force y)
 
 -- Lifts a family of binary relations from X to ⟦ C ⟧ X.
 
 ⟦_⟧₂ :
-  ∀ {ℓ₁ ℓ₂} {I O : Set ℓ₁} {A : Rel ℓ₂ I} (C : Container I O) →
+  ∀ {ℓ₁ ℓ₂} {I O : Type ℓ₁} {A : Rel ℓ₂ I} (C : Container I O) →
   (∀ {i} → Rel₂ ℓ₁ (A i)) →
   ∀ {o} → Rel₂ ℓ₁ (⟦ C ⟧ A o)
 ⟦ C ⟧₂ R ((s , f) , (t , g)) =
@@ -250,7 +250,7 @@ Bisimilarity {C = C} =
 -- An alternative characterisation of bisimilarity.
 
 ν-bisimilar↔ :
-  ∀ {k ℓ} {X : Set ℓ} {C : Container X X} {x i} →
+  ∀ {k ℓ} {X : Type ℓ} {C : Container X X} {x i} →
   Extensionality? k ℓ ℓ →
   (x y : ν C ∞ x) →
   ν-bisimilar i (x , y) ↝[ k ] ⟦ C ⟧₂ (ν′-bisimilar i) (x , y)
@@ -350,7 +350,7 @@ Bisimilarity {C = C} =
      ν′-bisimilar i (f₁ p , f₂ (subst (λ s → Position C s x) eq p)))      □
 
 module Bisimilarity
-         {ℓ} {X : Set ℓ} {C : Container X X} {x i}
+         {ℓ} {X : Type ℓ} {C : Container X X} {x i}
          (x y : ν C ∞ x)
          where
 
@@ -374,7 +374,7 @@ module Bisimilarity
 -- Bisimilarity is reflexive.
 
 reflexive-ν :
-  ∀ {ℓ} {X : Set ℓ} {C : Container X X} {x} (x : ν C ∞ x) {i} →
+  ∀ {ℓ} {X : Type ℓ} {C : Container X X} {x} (x : ν C ∞ x) {i} →
   ν-bisimilar i (x , x)
 reflexive-ν x =
   Bisimilarity.⟨ x , x , refl
@@ -384,7 +384,7 @@ reflexive-ν x =
 -- Bisimilarity is symmetric.
 
 symmetric-ν :
-  ∀ {ℓ} {X : Set ℓ} {C : Container X X} {x} (x y : ν C ∞ x) {i} →
+  ∀ {ℓ} {X : Type ℓ} {C : Container X X} {x} (x y : ν C ∞ x) {i} →
   ν-bisimilar i (x , y) → ν-bisimilar i (y , x)
 symmetric-ν x y bisim with Bisimilarity.split x y bisim
 ... | refl , bisim′ =
@@ -398,7 +398,7 @@ symmetric-ν x y bisim with Bisimilarity.split x y bisim
 -- Bisimilarity is transitive.
 
 transitive-ν :
-  ∀ {ℓ} {X : Set ℓ} {C : Container X X} {x} (x y z : ν C ∞ x) {i} →
+  ∀ {ℓ} {X : Type ℓ} {C : Container X X} {x} (x y z : ν C ∞ x) {i} →
   ν-bisimilar i (x , y) → ν-bisimilar i (y , z) →
   ν-bisimilar i (x , z)
 transitive-ν x y z bisim₁ bisim₂ with Bisimilarity.split x y bisim₁
@@ -422,7 +422,7 @@ transitive-ν x y z bisim₁ bisim₂ with Bisimilarity.split x y bisim₁
 -- this is a consistent assumption. Uses of this and similar
 -- assumptions are tracked using the type system.
 
-ν′-extensionality : ∀ {ℓ} {X : Set ℓ} → Container X X → Set ℓ
+ν′-extensionality : ∀ {ℓ} {X : Type ℓ} → Container X X → Type ℓ
 ν′-extensionality C =
   ∀ {x} {y z : ν′ C ∞ x} → ν′-bisimilar ∞ (y , z) → y ≡ z
 
@@ -431,7 +431,7 @@ transitive-ν x y z bisim₁ bisim₂ with Bisimilarity.split x y bisim₁
 -- extensionality for functions).
 
 ν-extensionality :
-  ∀ {ℓ} {X : Set ℓ} {C : Container X X} →
+  ∀ {ℓ} {X : Type ℓ} {C : Container X X} →
   Extensionality ℓ ℓ →
   ν′-extensionality C →
   ∀ {x} {y z : ν C ∞ x} → ν-bisimilar ∞ (y , z) → y ≡ z
@@ -457,7 +457,7 @@ transitive-ν x y z bisim₁ bisim₂ with Bisimilarity.split x y bisim₁
   ∀ {ℓ} →
   Extensionality ℓ (lsuc ℓ) →
   Univalence ℓ →
-  {X : Set ℓ} (C : Container X X) →
+  {X : Type ℓ} (C : Container X X) →
   ν′-extensionality C →
   ν C ∞ ≡ ⟦ C ⟧ (ν C ∞)
 ν-fixpoint ext univ C ν′-ext =
@@ -481,7 +481,7 @@ transitive-ν x y z bisim₁ bisim₂ with Bisimilarity.split x y bisim₁
 -- The unfold function makes a certain diagram commute.
 
 unfold-commute :
-  ∀ {ℓ₁ ℓ₂} {X : Set ℓ₁} (C : Container X X) {A : Rel ℓ₂ X}
+  ∀ {ℓ₁ ℓ₂} {X : Type ℓ₁} (C : Container X X) {A : Rel ℓ₂ X}
   (f : A ⊆ ⟦ C ⟧ A) →
   ∀ {i x} (a : A x) →
   ν-bisimilar i
@@ -499,7 +499,7 @@ unfold-commute C f a =
 -- A uniqueness property for unfold.
 
 unfold-unique :
-  ∀ {ℓ₁ ℓ₂} {X : Set ℓ₁} (C : Container X X) {A : Rel ℓ₂ X}
+  ∀ {ℓ₁ ℓ₂} {X : Type ℓ₁} (C : Container X X) {A : Rel ℓ₂ X}
   (f : A ⊆ ⟦ C ⟧ A) (u : A ⊆ ν C ∞) {i} →
   (∀ {x} (a : A x) →
    ν-bisimilar i (u a , ν-in C (map C u (f a)))) →
@@ -527,14 +527,14 @@ unfold-unique C f u bisim a
 -- The greatest fixpoint of an indexed "endocontainer" (parametrised
 -- by a universe level).
 
-gfp : ∀ {ℓ₁} ℓ₂ {X : Set ℓ₁} → Container X X → Rel (lsuc (ℓ₁ ⊔ ℓ₂)) X
+gfp : ∀ {ℓ₁} ℓ₂ {X : Type ℓ₁} → Container X X → Rel (lsuc (ℓ₁ ⊔ ℓ₂)) X
 gfp {ℓ₁} ℓ₂ {X} C x = ∃ λ (R : Rel (ℓ₁ ⊔ ℓ₂) X) → R ⊆ ⟦ C ⟧ R × R x
 
 -- The greatest fixpoint is greater than or equal to every
 -- sufficiently small post-fixpoint.
 
 gfp-unfold :
-  ∀ {ℓ₁ ℓ₂} ℓ₃ {X : Set ℓ₁} {C : Container X X} {A : Rel ℓ₂ X} →
+  ∀ {ℓ₁ ℓ₂} ℓ₃ {X : Type ℓ₁} {C : Container X X} {A : Rel ℓ₂ X} →
   A ⊆ ⟦ C ⟧ A →
   A ⊆ gfp (ℓ₂ ⊔ ℓ₃) C
 gfp-unfold {ℓ₁} ℓ₃ {C = C} {A} f a =
@@ -542,7 +542,7 @@ gfp-unfold {ℓ₁} ℓ₃ {C = C} {A} f a =
 
 -- The greatest fixpoint is a post-fixpoint.
 
-gfp-out : ∀ {ℓ₁} ℓ₂ {X : Set ℓ₁} {C : Container X X} →
+gfp-out : ∀ {ℓ₁} ℓ₂ {X : Type ℓ₁} {C : Container X X} →
           gfp ℓ₂ C ⊆ ⟦ C ⟧ (gfp ℓ₂ C)
 gfp-out ℓ₂ {C = C} (R , R⊆CR , Ri) =
   map C (λ Ri → R , (λ {_} → R⊆CR) , Ri) (R⊆CR Ri)
@@ -554,21 +554,21 @@ gfp-out ℓ₂ {C = C} (R , R⊆CR , Ri) =
 -- The first definition of greatest fixpoints is contained in the
 -- second one.
 
-ν⊆gfp : ∀ {ℓ₁} ℓ₂ {X : Set ℓ₁} {C : Container X X} →
+ν⊆gfp : ∀ {ℓ₁} ℓ₂ {X : Type ℓ₁} {C : Container X X} →
         ν C ∞ ⊆ gfp ℓ₂ C
 ν⊆gfp ℓ₂ = gfp-unfold ℓ₂ (ν-out {i = ∞} _)
 
 -- The second definition of greatest fixpoints is contained in the
 -- first one.
 
-gfp⊆ν : ∀ {ℓ₁} ℓ₂ {X : Set ℓ₁} {C : Container X X} {i} →
+gfp⊆ν : ∀ {ℓ₁} ℓ₂ {X : Type ℓ₁} {C : Container X X} {i} →
         gfp ℓ₂ C ⊆ ν C i
 gfp⊆ν ℓ₂ = unfold _ (gfp-out ℓ₂)
 
 -- Thus the two definitions of greatest fixpoints are pointwise
 -- logically equivalent.
 
-gfp⇔ν : ∀ {ℓ₁} ℓ₂ {X : Set ℓ₁} {C : Container X X} {i} →
+gfp⇔ν : ∀ {ℓ₁} ℓ₂ {X : Type ℓ₁} {C : Container X X} {i} →
         gfp ℓ₂ C i ⇔ ν C ∞ i
 gfp⇔ν ℓ₂ = record
   { to   = gfp⊆ν ℓ₂
@@ -579,7 +579,7 @@ gfp⇔ν ℓ₂ = record
 -- bisimilarity).
 
 gfp⊆ν∘ν⊆gfp :
-  ∀ {ℓ₁} ℓ₂ {X : Set ℓ₁} {C : Container X X} {x} (x : ν C ∞ x) {i} →
+  ∀ {ℓ₁} ℓ₂ {X : Type ℓ₁} {C : Container X X} {x} (x : ν C ∞ x) {i} →
   ν-bisimilar i (gfp⊆ν ℓ₂ (ν⊆gfp ℓ₂ x) , x)
 gfp⊆ν∘ν⊆gfp ℓ₂ {C = C} x =
   _⇔_.from (ν-bisimilar↔ _ (gfp⊆ν ℓ₂ (ν⊆gfp ℓ₂ x)) x)
@@ -593,7 +593,7 @@ gfp⊆ν∘ν⊆gfp ℓ₂ {C = C} x =
 gfp↠ν :
   ∀ {ℓ₁} →
   Extensionality ℓ₁ ℓ₁ →
-  ∀ ℓ₂ {X : Set ℓ₁} {C : Container X X} →
+  ∀ ℓ₂ {X : Type ℓ₁} {C : Container X X} →
   ν′-extensionality C →
   ∀ {x} → gfp ℓ₂ C x ↠ ν C ∞ x
 gfp↠ν ext ℓ₂ ν′-ext = record
@@ -606,7 +606,7 @@ gfp↠ν ext ℓ₂ ν′-ext = record
 -- one.
 
 larger⇔smallest :
-  ∀ {ℓ₁} ℓ₂ {X : Set ℓ₁} {C : Container X X} {x} →
+  ∀ {ℓ₁} ℓ₂ {X : Type ℓ₁} {C : Container X X} {x} →
   gfp ℓ₂ C x ⇔ gfp lzero C x
 larger⇔smallest ℓ₂ {C = C} {x} =
   gfp ℓ₂ C x     ↝⟨ gfp⇔ν ℓ₂ ⟩

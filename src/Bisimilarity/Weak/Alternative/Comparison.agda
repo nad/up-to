@@ -11,7 +11,7 @@ open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 
-open import H-level equality-with-J hiding (Set)
+open import H-level equality-with-J
 open import Surjection equality-with-J using (_↠_)
 open import Univalence-axiom equality-with-J
 
@@ -162,7 +162,7 @@ weak-bisimilarity↠equality :
   ∀ {a} →
   Extensionality a (lsuc a) →
   Univalence a →
-  {A : Set a} →
+  {A : Type a} →
   let open Bisimilarity.Weak.Alternative (bisimilarity⇔equality A) in
   {p q : A} → p ≈ q ↠ p ≡ q
 weak-bisimilarity↠equality ext univ {A} =

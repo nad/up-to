@@ -118,7 +118,7 @@ private
 
   open Combination lts
 
-  F : Set → Trans₂ (# 0) Bool
+  F : Type → Trans₂ (# 0) Bool
   F A R p@(true  , false) = R p × A
   F A R p@(false , true)  = R p
   F A R p                 = ¬ R p
@@ -156,7 +156,7 @@ private
 -- not up-to techniques with respect to C.
 
 ∃special-case-of-size-preserving×¬up-to :
-  ∃ λ (I : Set) →
+  ∃ λ (I : Type) →
   ∃ λ (C : Container I I) →
   ∃ λ (F : Trans (# 0) I) →
   ∃ λ (G : Trans (# 0) I) →
@@ -174,10 +174,10 @@ private
   , G⊤≢G⊥
   where
 
-  data Proc : Set where
+  data Proc : Type where
     p q r : Proc
 
-  data _⟶_ : Proc → Proc → Set where
+  data _⟶_ : Proc → Proc → Type where
     p : p ⟶ p
     q : q ⟶ r
 
@@ -190,7 +190,7 @@ private
 
   open Combination lts hiding (Proc)
 
-  G : Set → Trans₂ (# 0) Proc
+  G : Type → Trans₂ (# 0) Proc
   G A R x = R (r , r) → ¬ R (p , r) → R x × A
 
   p≁r : ∀ {i} → ¬ Bisimilarity i (p , r)
@@ -234,7 +234,7 @@ private
 -- not size-preserving with respect to C.
 
 ∃special-case-of-size-preserving×¬size-preserving :
-  ∃ λ (I : Set) →
+  ∃ λ (I : Type) →
   ∃ λ (C : Container I I) →
   ∃ λ (F : Trans (# 0) I) →
   ∃ λ (G : Trans (# 0) I) →
@@ -353,22 +353,22 @@ module PQR where
   -- An LTS with two sets of processes, three "to the left", and three
   -- "to the right".
 
-  Side : Set
+  Side : Type
   Side = Bool
 
   pattern left  = true
   pattern right = false
 
-  data Process : Set where
+  data Process : Type where
     p q r : Side → Process
 
-  data Label : Set where
+  data Label : Type where
     pq pr : Label
     qq rr : Side → Label
 
   infix 4 _[_]⟶_
 
-  data _[_]⟶_ : Process → Label → Process → Set where
+  data _[_]⟶_ : Process → Label → Process → Type where
     pq : ∀ {s} → p s [ pq ]⟶ q s
     pr : ∀ {s} → p s [ pr ]⟶ r s
     qq : ∀ {s} → q s [ qq s ]⟶ q s

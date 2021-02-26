@@ -4,13 +4,14 @@
 
 {-# OPTIONS --without-K --safe --sized-types #-}
 
-module Bisimilarity.Delay-monad {a} {A : Set a} where
+open import Prelude
+
+module Bisimilarity.Delay-monad {a} {A : Type a} where
 
 open import Delay-monad
 open import Delay-monad.Bisimilarity as D using (force)
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
-open import Prelude
 
 open import Function-universe equality-with-J hiding (id; _∘_)
 

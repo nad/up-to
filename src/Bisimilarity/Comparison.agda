@@ -14,7 +14,7 @@ open import Bijection equality-with-J as Bijection using (_↔_)
 open import Equality.Decision-procedures equality-with-J
 open import Fin equality-with-J
 open import Function-universe equality-with-J hiding (_∘_; id)
-open import H-level equality-with-J as H-level hiding (Set)
+open import H-level equality-with-J as H-level
 open import H-level.Closure equality-with-J
 open import Nat equality-with-J as Nat
 open import Surjection equality-with-J using (_↠_)
@@ -218,7 +218,7 @@ coinductive-bisimilarity-is-not-propositional =
 -- on A.
 
 bisimilarity↠equality :
-  ∀ {a} {A : Set a} →
+  ∀ {a} {A : Type a} →
   let open Bisimilarity (bisimilarity⇔equality A) in
   ∀ {i} {p q : A} → ([ i ] p ∼ q) ↠ p ≡ q
 bisimilarity↠equality {A = A} {i} = record

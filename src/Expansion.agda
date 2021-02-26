@@ -58,16 +58,16 @@ Expansion′ = ν′ StepC
 
 infix 4 _≳_ _≳′_ [_]_≳_ [_]_≳′_
 
-[_]_≳_ : Size → Proc → Proc → Set ℓ
+[_]_≳_ : Size → Proc → Proc → Type ℓ
 [ i ] p ≳ q = ν StepC i (p , q)
 
-[_]_≳′_ : Size → Proc → Proc → Set ℓ
+[_]_≳′_ : Size → Proc → Proc → Type ℓ
 [ i ] p ≳′ q = ν′ StepC i (p , q)
 
-_≳_ : Proc → Proc → Set ℓ
+_≳_ : Proc → Proc → Type ℓ
 _≳_ = [ ∞ ]_≳_
 
-_≳′_ : Proc → Proc → Set ℓ
+_≳′_ : Proc → Proc → Type ℓ
 _≳′_ = [ ∞ ]_≳′_
 
 private
@@ -97,16 +97,16 @@ private
 
 infix 4 _≲_ _≲′_ [_]_≲_ [_]_≲′_
 
-[_]_≲_ : Size → Proc → Proc → Set ℓ
+[_]_≲_ : Size → Proc → Proc → Type ℓ
 [_]_≲_ i = flip [ i ]_≳_
 
-[_]_≲′_ : Size → Proc → Proc → Set ℓ
+[_]_≲′_ : Size → Proc → Proc → Type ℓ
 [_]_≲′_ i = flip [ i ]_≳′_
 
-_≲_ : Proc → Proc → Set ℓ
+_≲_ : Proc → Proc → Type ℓ
 _≲_ = [ ∞ ]_≲_
 
-_≲′_ : Proc → Proc → Set ℓ
+_≲′_ : Proc → Proc → Type ℓ
 _≲′_ = [ ∞ ]_≲′_
 
 -- Combinators that can perhaps make the code a bit nicer to read.

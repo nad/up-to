@@ -24,13 +24,13 @@ open import Relation
 
 -- A container for the delay monad.
 
-DelayC : ∀ {ℓ} → Set ℓ → Container (↑ ℓ ⊤) (↑ ℓ ⊤)
+DelayC : ∀ {ℓ} → Type ℓ → Container (↑ ℓ ⊤) (↑ ℓ ⊤)
 DelayC A =
   (λ _ → Maybe A) ◁ λ { (just _) _ → ⊥; nothing _ → ↑ _ ⊤ }
 
 -- An alternative definition.
 
-DelayC′ : ∀ {ℓ} → Set ℓ → Container (↑ ℓ ⊤) (↑ ℓ ⊤)
+DelayC′ : ∀ {ℓ} → Type ℓ → Container (↑ ℓ ⊤) (↑ ℓ ⊤)
 DelayC′ A = C.id ⊕ C.const (λ _ → A)
 
 -- The two containers' interpretations are pointwise logically
@@ -38,7 +38,7 @@ DelayC′ A = C.id ⊕ C.const (λ _ → A)
 -- pointwise isomorphic.
 
 ⟦DelayC⟧↔⟦DelayC′⟧ :
-  ∀ {k a x} {A : Set a} {X : Rel x (↑ a ⊤)} {i} →
+  ∀ {k a x} {A : Type a} {X : Rel x (↑ a ⊤)} {i} →
   Extensionality? k a (a ⊔ x) →
   ⟦ DelayC A ⟧ X i ↝[ k ] ⟦ DelayC′ A ⟧ X i
 ⟦DelayC⟧↔⟦DelayC′⟧ {k} {a} {A = A} {X} {i} ext =
@@ -65,7 +65,7 @@ DelayC′ A = C.id ⊕ C.const (λ _ → A)
 
 -- An unfolding lemma.
 
-νDelayC↔ : ∀ {k a i} {A : Set a} →
+νDelayC↔ : ∀ {k a i} {A : Type a} →
            Extensionality? k a a →
            ν (DelayC A) i _ ↝[ k ] A ⊎ ν′ (DelayC A) i _
 νDelayC↔ {i = i} {A} ext =
@@ -88,14 +88,15 @@ DelayC′ A = C.id ⊕ C.const (λ _ → A)
 
 mutual
 
-  Delay⇔νDelayC : ∀ {a i} {A : Set a} → Delay A i ⇔ ν (DelayC A) i _
+  Delay⇔νDelayC : ∀ {a i} {A : Type a} → Delay A i ⇔ ν (DelayC A) i _
   Delay⇔νDelayC {i = i} {A} =
     Delay A i              ↔⟨ Delay↔ ⟩
     A ⊎ Delay′ A i         ↝⟨ F.id ⊎-cong Delay′⇔ν′DelayC ⟩
     A ⊎ ν′ (DelayC A) i _  ↝⟨ inverse $ νDelayC↔ _ ⟩□
     ν (DelayC A) i _       □
 
-  Delay′⇔ν′DelayC : ∀ {a i} {A : Set a} → Delay′ A i ⇔ ν′ (DelayC A) i _
+  Delay′⇔ν′DelayC :
+    ∀ {a i} {A : Type a} → Delay′ A i ⇔ ν′ (DelayC A) i _
   Delay′⇔ν′DelayC = record
     { to   = λ x → λ { .force → _⇔_.to   Delay⇔νDelayC (force x) }
     ; from = λ x → λ { .force → _⇔_.from Delay⇔νDelayC (force x) }
@@ -105,7 +106,7 @@ mutual
 -- (strong) bisimilarity.
 
 Delay⇔νDelayC-inverses :
-  ∀ {a} {A : Set a} →
+  ∀ {a} {A : Type a} →
   let to   = _⇔_.to   (Delay⇔νDelayC {i = ∞})
       from = _⇔_.from (Delay⇔νDelayC {i = ∞})
   in
@@ -145,7 +146,7 @@ Delay⇔νDelayC-inverses {A = A} = to∘from , from∘to
 -- (assuming three kinds of extensionality).
 
 Delay↔νDelayC :
-  ∀ {a} {A : Set a} →
+  ∀ {a} {A : Type a} →
   E.Extensionality a a →
   B.Extensionality a →
   ν′-extensionality (DelayC A) →

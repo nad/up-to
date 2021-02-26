@@ -4,11 +4,12 @@
 
 {-# OPTIONS --without-K --safe --sized-types #-}
 
-module Bisimilarity.Up-to.CCS {ℓ} {Name : Set ℓ} where
+open import Prelude
+
+module Bisimilarity.Up-to.CCS {ℓ} {Name : Type ℓ} where
 
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
-open import Prelude
 open import Prelude.Size
 
 open import Bijection equality-with-J using (_↔_)

@@ -6,11 +6,12 @@
 
 {-# OPTIONS --without-K --safe --sized-types #-}
 
-module Bisimilarity.6-2-5 {Name : Set} where
+open import Prelude
+
+module Bisimilarity.6-2-5 {Name : Type} where
 
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
-open import Prelude
 open import Prelude.Size
 
 open import Function-universe equality-with-J hiding (id; _∘_)

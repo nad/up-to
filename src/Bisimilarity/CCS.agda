@@ -5,10 +5,11 @@
 
 {-# OPTIONS --without-K --safe --sized-types #-}
 
-module Bisimilarity.CCS {ℓ} {Name : Set ℓ} where
+open import Prelude
+
+module Bisimilarity.CCS {ℓ} {Name : Type ℓ} where
 
 open import Equality.Propositional
-open import Prelude
 open import Prelude.Size
 
 import Bisimilarity.Equational-reasoning-instances
@@ -27,7 +28,7 @@ import Labelled-transition-system.Equational-reasoning-instances CCS
 -- similar results in Similarity.CCS.
 
 module Cong-lemmas
-  ({R} R′ : Proc ∞ → Proc ∞ → Set ℓ)
+  ({R} R′ : Proc ∞ → Proc ∞ → Type ℓ)
   ⦃ _ : Convertible R R′ ⦄
   ⦃ _ : Convertible R′ R′ ⦄
   ⦃ _ : Convertible _∼_ R′ ⦄

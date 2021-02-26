@@ -8,10 +8,11 @@
 
 {-# OPTIONS --without-K --safe --sized-types #-}
 
-module Bisimilarity.Weak.CCS.Examples {ℓ} {Name : Set ℓ} where
+open import Prelude hiding (module W)
+
+module Bisimilarity.Weak.CCS.Examples {ℓ} {Name : Type ℓ} where
 
 open import Equality.Propositional
-open import Prelude hiding (module W)
 
 open import Function-universe equality-with-J hiding (id; _∘_)
 

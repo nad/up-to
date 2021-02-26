@@ -23,12 +23,12 @@ open import Relation
 -- Taken from "Indexed containers" by Altenkirch, Ghani, Hancock,
 -- McBride and Morris (JFP, 2015).
 
-id : ∀ {i} {I : Set i} → Container I I
+id : ∀ {i} {I : Type i} → Container I I
 id = (λ _ → ↑ _ ⊤) ◁ λ {i} _ i′ → i ≡ i′
 
 -- An unfolding lemma for ⟦ id ⟧.
 
-⟦id⟧↔ : ∀ {k ℓ x} {I : Set ℓ} {X : Rel x I} {i} →
+⟦id⟧↔ : ∀ {k ℓ x} {I : Type ℓ} {X : Rel x I} {i} →
         Extensionality? k ℓ (ℓ ⊔ x) →
         ⟦ id ⟧ X i ↝[ k ] X i
 ⟦id⟧↔ {X = X} {i} ext =
@@ -41,7 +41,7 @@ id = (λ _ → ↑ _ ⊤) ◁ λ {i} _ i′ → i ≡ i′
 -- An unfolding lemma for ⟦ id ⟧₂.
 
 ⟦id⟧₂↔ :
-  ∀ {k ℓ x} {I : Set ℓ} {X : Rel x I} →
+  ∀ {k ℓ x} {I : Type ℓ} {X : Rel x I} →
   Extensionality? k ℓ ℓ →
   ∀ (R : ∀ {i} → Rel₂ ℓ (X i)) {i} →
   (x y : ⟦ id ⟧ X i) →
@@ -70,7 +70,7 @@ id = (λ _ → ↑ _ ⊤) ◁ λ {i} _ i′ → i ≡ i′
 -- A second unfolding lemma for ⟦ id ⟧₂.
 
 ⟦id⟧₂≡↔ :
-  ∀ {ℓ} {I : Set ℓ} {X : Rel ℓ I} {i} →
+  ∀ {ℓ} {I : Type ℓ} {X : Rel ℓ I} {i} →
   Extensionality ℓ ℓ →
   (x y : ⟦ id ⟧ X i) →
   ⟦ id ⟧₂ (uncurry _≡_) (x , y) ↔ x ≡ y
@@ -88,12 +88,12 @@ id = (λ _ → ↑ _ ⊤) ◁ λ {i} _ i′ → i ≡ i′
 
 -- A constant combinator.
 
-const : ∀ {i} {I : Set i} → Rel i I → Container I I
+const : ∀ {i} {I : Type i} → Rel i I → Container I I
 const X = X ◁ λ _ _ → ⊥
 
 -- An unfolding lemma for ⟦ const ⟧.
 
-⟦const⟧↔ : ∀ {k ℓ y} {I : Set ℓ} X {Y : Rel y I} {i} →
+⟦const⟧↔ : ∀ {k ℓ y} {I : Type ℓ} X {Y : Rel y I} {i} →
            Extensionality? k ℓ (ℓ ⊔ y) →
            ⟦ const X ⟧ Y i ↝[ k ] X i
 ⟦const⟧↔ {k} {ℓ} {I = I} X {Y} {i} ext =
@@ -105,7 +105,7 @@ const X = X ◁ λ _ _ → ⊥
 -- An unfolding lemma for ⟦ const ⟧₂.
 
 ⟦const⟧₂↔ :
-  ∀ {k ℓ y} {I : Set ℓ} {X} {Y : Rel y I} →
+  ∀ {k ℓ y} {I : Type ℓ} {X} {Y : Rel y I} →
   Extensionality? k ℓ ℓ →
   ∀ (R : ∀ {i} → Rel₂ ℓ (Y i)) {i}
   (x y : ⟦ const X ⟧ Y i) →
@@ -135,7 +135,7 @@ const X = X ◁ λ _ _ → ⊥
 
 infixr 9 _∘_
 
-_∘_ : ∀ {ℓ} {I J K : Set ℓ} →
+_∘_ : ∀ {ℓ} {I J K : Type ℓ} →
       Container J K → Container I J → Container I K
 C ∘ D =
   ⟦ C ⟧ (Shape D)
@@ -147,7 +147,7 @@ C ∘ D =
 
 -- An unfolding lemma for ⟦ C ∘ D ⟧.
 
-⟦∘⟧↔ : ∀ {fk ℓ x} {I J K : Set ℓ} {X : Rel x I} →
+⟦∘⟧↔ : ∀ {fk ℓ x} {I J K : Type ℓ} {X : Rel x I} →
        Extensionality? fk ℓ (ℓ ⊔ x) →
        ∀ (C : Container J K) {D : Container I J} {k} →
        ⟦ C ∘ D ⟧ X k ↝[ fk ] ⟦ C ⟧ (⟦ D ⟧ X) k
@@ -221,13 +221,13 @@ C ∘ D =
 --
 -- Taken from "Indexed containers".
 
-reindex₂ : ∀ {ℓ} {I O₁ O₂ : Set ℓ} →
+reindex₂ : ∀ {ℓ} {I O₁ O₂ : Type ℓ} →
            (O₂ → O₁) → Container I O₁ → Container I O₂
 reindex₂ f (S ◁ P) = (S ⊚ f) ◁ P
 
 -- An unfolding lemma for ⟦ reindex₂ f C ⟧.
 
-⟦reindex₂⟧↔ : ∀ {ℓ x} {I O₁ O₂ : Set ℓ} (f : O₂ → O₁)
+⟦reindex₂⟧↔ : ∀ {ℓ x} {I O₁ O₂ : Type ℓ} (f : O₂ → O₁)
               (C : Container I O₁) {X : Rel x I} {o} →
               ⟦ reindex₂ f C ⟧ X o ↔ ⟦ C ⟧ X (f o)
 ⟦reindex₂⟧↔ f C = Bijection.id
@@ -235,7 +235,7 @@ reindex₂ f (S ◁ P) = (S ⊚ f) ◁ P
 -- An unfolding lemma for ⟦ reindex₂ f C ⟧₂.
 
 ⟦reindex₂⟧₂↔ :
-  ∀ {ℓ x} {I O : Set ℓ} {X : Rel x I}
+  ∀ {ℓ x} {I O : Type ℓ} {X : Rel x I}
   (C : Container I O) (f : I → O) (R : ∀ {i} → Rel₂ ℓ (X i)) {i}
   (x y : ⟦ reindex₂ f C ⟧ X i) →
 
@@ -260,7 +260,7 @@ reindex₂ f (S ◁ P) = (S ⊚ f) ◁ P
 
 -- Another reindexing combinator.
 
-reindex₁ : ∀ {ℓ} {I₁ I₂ O : Set ℓ} →
+reindex₁ : ∀ {ℓ} {I₁ I₂ O : Type ℓ} →
            (I₁ → I₂) → Container I₁ O → Container I₂ O
 reindex₁ f C =
   Shape C
@@ -271,7 +271,7 @@ reindex₁ f C =
 
 -- An unfolding lemma for ⟦ reindex₁ f C ⟧.
 
-⟦reindex₁⟧↔ : ∀ {k ℓ x} {I₁ I₂ O : Set ℓ} {f : I₁ → I₂} →
+⟦reindex₁⟧↔ : ∀ {k ℓ x} {I₁ I₂ O : Type ℓ} {f : I₁ → I₂} →
               Extensionality? k ℓ (ℓ ⊔ x) →
               ∀ (C : Container I₁ O) {X : Rel x I₂} {o} →
               ⟦ reindex₁ f C ⟧ X o ↝[ k ] ⟦ C ⟧ (X ⊚ f) o
@@ -300,7 +300,7 @@ reindex₁ f C =
 -- An unfolding lemma for ⟦ reindex₁ f C ⟧₂.
 
 ⟦reindex₁⟧₂↔ :
-  ∀ {k ℓ x} {I O : Set ℓ} {X : Rel x O} →
+  ∀ {k ℓ x} {I O : Type ℓ} {X : Rel x O} →
   Extensionality? k ℓ ℓ →
   ∀ (C : Container I O) (f : I → O) (R : ∀ {o} → Rel₂ ℓ (X o)) {o}
   (x y : ⟦ reindex₁ f C ⟧ X o) →
@@ -422,13 +422,13 @@ reindex₁ f C =
 -- from Section 6.3.4.1 in Pous and Sangiorgi's "Enhancements of the
 -- bisimulation proof method".
 
-reindex : ∀ {ℓ} {I O : Set ℓ} →
+reindex : ∀ {ℓ} {I O : Type ℓ} →
           (I → O) → Container I O → Container O I
 reindex f = reindex₂ f ⊚ reindex₁ f
 
 -- An unfolding lemma for ⟦ reindex f C ⟧.
 
-⟦reindex⟧↔ : ∀ {k ℓ x} {I O : Set ℓ} {f : I → O} →
+⟦reindex⟧↔ : ∀ {k ℓ x} {I O : Type ℓ} {f : I → O} →
              Extensionality? k ℓ (ℓ ⊔ x) →
              ∀ (C : Container I O) {X : Rel x O} {i} →
              ⟦ reindex f C ⟧ X i ↝[ k ] ⟦ C ⟧ (X ⊚ f) (f i)
@@ -441,7 +441,7 @@ reindex f = reindex₂ f ⊚ reindex₁ f
 -- An unfolding lemma for ⟦ reindex f C ⟧₂.
 
 ⟦reindex⟧₂↔ :
-  ∀ {k ℓ x} {I O : Set ℓ} {X : Rel x O} →
+  ∀ {k ℓ x} {I O : Type ℓ} {X : Rel x O} →
   Extensionality? k ℓ ℓ →
   ∀ (C : Container I O) (f : I → O) (R : ∀ {o} → Rel₂ ℓ (X o)) {i}
   (x y : ⟦ reindex f C ⟧ X i) →
@@ -472,7 +472,7 @@ reindex f = reindex₂ f ⊚ reindex₁ f
 mutual
 
   ν-reindex⇔ :
-    ∀ {ℓ} {I : Set ℓ} {C : Container I I} {f : I → I} →
+    ∀ {ℓ} {I : Type ℓ} {C : Container I I} {f : I → I} →
     f ⊚ f ≡ P.id →
     ∀ {i x} → ν (reindex f C) i x ⇔ ν C i (f x)
   ν-reindex⇔ {C = C} {f} inv {i} {x} =
@@ -484,7 +484,7 @@ mutual
     ν C i (f x)                             □
 
   ν′-reindex⇔ :
-    ∀ {ℓ} {I : Set ℓ} {C : Container I I} {f : I → I} →
+    ∀ {ℓ} {I : Type ℓ} {C : Container I I} {f : I → I} →
     f ⊚ f ≡ P.id →
     ∀ {i x} → ν′ (reindex f C) i x ⇔ ν′ C i (f x)
   ν′-reindex⇔ {C = C} {f} inv = record { to = to; from = from }
@@ -503,7 +503,7 @@ mutual
 
 infixr 2 _⊗_
 
-_⊗_ : ∀ {ℓ} {I O : Set ℓ} →
+_⊗_ : ∀ {ℓ} {I O : Type ℓ} →
       Container I O → Container I O → Container I O
 C₁ ⊗ C₂ =
   (λ o → Shape C₁ o × Shape C₂ o)
@@ -514,7 +514,7 @@ C₁ ⊗ C₂ =
 
 -- An unfolding lemma for ⟦ C₁ ⊗ C₂ ⟧.
 
-⟦⊗⟧↔ : ∀ {k ℓ x} {I O : Set ℓ} →
+⟦⊗⟧↔ : ∀ {k ℓ x} {I O : Type ℓ} →
        Extensionality? k ℓ (ℓ ⊔ x) →
        ∀ (C₁ C₂ : Container I O) {X : Rel x I} {o} →
        ⟦ C₁ ⊗ C₂ ⟧ X o ↝[ k ] ⟦ C₁ ⟧ X o × ⟦ C₂ ⟧ X o
@@ -551,7 +551,7 @@ C₁ ⊗ C₂ =
 -- An unfolding lemma for ⟦ C₁ ⊗ C₂ ⟧₂.
 
 ⟦⊗⟧₂↔ :
-  ∀ {k ℓ x} {I : Set ℓ} {X : Rel x I} →
+  ∀ {k ℓ x} {I : Type ℓ} {X : Rel x I} →
   Extensionality? k ℓ ℓ →
   ∀ (C₁ C₂ : Container I I) (R : ∀ {i} → Rel₂ ℓ (X i)) {i}
   (x y : ⟦ C₁ ⊗ C₂ ⟧ X i) →
@@ -691,7 +691,7 @@ C₁ ⊗ C₂ =
 -- intersection ν C₁ i ∩ ν C₂ i.
 
 ν-⊗⊆ :
-  ∀ {ℓ} {I : Set ℓ} {C₁ C₂ : Container I I} {i} →
+  ∀ {ℓ} {I : Type ℓ} {C₁ C₂ : Container I I} {i} →
   ν (C₁ ⊗ C₂) i ⊆ ν C₁ i ∩ ν C₂ i
 ν-⊗⊆ {C₁ = C₁} {C₂} {i} =
   ν (C₁ ⊗ C₂) i                                      ⊆⟨⟩
@@ -714,7 +714,7 @@ C₁ ⊗ C₂ =
 
 infixr 2 _⊕_
 
-_⊕_ : ∀ {ℓ} {I O : Set ℓ} →
+_⊕_ : ∀ {ℓ} {I O : Type ℓ} →
       Container I O → Container I O → Container I O
 C₁ ⊕ C₂ =
   (λ o → Shape C₁ o ⊎ Shape C₂ o)
@@ -725,7 +725,7 @@ C₁ ⊕ C₂ =
 
 -- An unfolding lemma for ⟦ C₁ ⊕ C₂ ⟧.
 
-⟦⊕⟧↔ : ∀ {ℓ x} {I O : Set ℓ}
+⟦⊕⟧↔ : ∀ {ℓ x} {I O : Type ℓ}
        (C₁ C₂ : Container I O) {X : Rel x I} {o} →
        ⟦ C₁ ⊕ C₂ ⟧ X o ↔ ⟦ C₁ ⟧ X o ⊎ ⟦ C₂ ⟧ X o
 ⟦⊕⟧↔ C₁ C₂ {X} {o} =
@@ -744,7 +744,7 @@ C₁ ⊕ C₂ =
 -- An unfolding lemma for ⟦ C₁ ⊕ C₂ ⟧₂.
 
 ⟦⊕⟧₂↔ :
-  ∀ {k ℓ x} {I : Set ℓ} {X : Rel x I} →
+  ∀ {k ℓ x} {I : Type ℓ} {X : Rel x I} →
   Extensionality? k ℓ ℓ →
   ∀ (C₁ C₂ : Container I I) (R : ∀ {i} → Rel₂ ℓ (X i)) {i}
   (x y : ⟦ C₁ ⊕ C₂ ⟧ X i) →
@@ -845,7 +845,7 @@ mutual
   -- Section 6.3.4.1 in Pous and Sangiorgi's "Enhancements of the
   -- bisimulation proof method".
 
-  ⟷[_] : ∀ {ℓ} {I : Set ℓ} →
+  ⟷[_] : ∀ {ℓ} {I : Type ℓ} →
          Container (I × I) (I × I) → Container (I × I) (I × I)
   ⟷[ C ] = C ⟷ C
 
@@ -853,14 +853,14 @@ mutual
 
   infix 1 _⟷_
 
-  _⟷_ : ∀ {ℓ} {I : Set ℓ} →
+  _⟷_ : ∀ {ℓ} {I : Type ℓ} →
         (_ _ : Container (I × I) (I × I)) → Container (I × I) (I × I)
   C₁ ⟷ C₂ = C₁ ⊗ reindex swap C₂
 
 -- An unfolding lemma for ⟦ C₁ ⟷ C₂ ⟧.
 
 ⟦⟷⟧↔ :
-  ∀ {k ℓ x} {I : Set ℓ} →
+  ∀ {k ℓ x} {I : Type ℓ} →
   Extensionality? k ℓ (ℓ ⊔ x) →
   ∀ (C₁ C₂ : Container (I × I) (I × I)) {X : Rel₂ x I} {i} →
   ⟦ C₁ ⟷ C₂ ⟧ X i
@@ -875,7 +875,7 @@ mutual
 -- An unfolding lemma for ⟦ C₁ ⟷ C₂ ⟧₂.
 
 ⟦⟷⟧₂↔ :
-  ∀ {k ℓ x} {I : Set ℓ} {X : Rel₂ x I} →
+  ∀ {k ℓ x} {I : Type ℓ} {X : Rel₂ x I} →
   Extensionality? k ℓ ℓ →
   ∀ (C₁ C₂ : Container (I × I) (I × I)) (R : ∀ {i} → Rel₂ ℓ (X i)) {i}
   (x y : ⟦ C₁ ⟷ C₂ ⟧ X i) →
@@ -913,7 +913,7 @@ mutual
 -- The greatest fixpoint ν (C₁ ⟷ C₂) i is contained in the
 -- intersection ν C₁ i ∩ ν C₂ i ⁻¹.
 
-ν-↔⊆ : ∀ {ℓ} {I : Set ℓ} {C₁ C₂ : Container (I × I) (I × I)} {i} →
+ν-↔⊆ : ∀ {ℓ} {I : Type ℓ} {C₁ C₂ : Container (I × I) (I × I)} {i} →
        ν (C₁ ⟷ C₂) i ⊆ ν C₁ i ∩ ν C₂ i ⁻¹
 ν-↔⊆ {C₁ = C₁} {C₂} {i} =
   ν (C₁ ⟷ C₂) i                   ⊆⟨⟩
@@ -929,7 +929,7 @@ mutual
 -- post-fixpoints of ⟷[ C ].
 
 ⊆reindex₂-swap-⊗→⊆⟷ :
-  ∀ {ℓ r} {I : Set ℓ} {C : Container (I × I) (I × I)} {R : Rel₂ r I} →
+  ∀ {ℓ r} {I : Type ℓ} {C : Container (I × I) (I × I)} {R : Rel₂ r I} →
   R ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ R → R ⊆ ⟦ ⟷[ C ] ⟧ R
 ⊆reindex₂-swap-⊗→⊆⟷ {C = C} {R} R⊆ =
   R                          ⊆⟨ (λ x → lemma₁ x , lemma₂ x) ⟩
@@ -963,7 +963,7 @@ mutual
 -- post-fixpoint of reindex₂ swap id ⊗ C.
 
 ⊆⟷→∪-swap⊆reindex₂-swap-⊗ :
-  ∀ {ℓ r} {I : Set ℓ} {C : Container (I × I) (I × I)} {R : Rel₂ r I} →
+  ∀ {ℓ r} {I : Type ℓ} {C : Container (I × I) (I × I)} {R : Rel₂ r I} →
   R ⊆ ⟦ ⟷[ C ] ⟧ R →
   R ∪ R ⁻¹ ⊆ ⟦ reindex₂ swap id ⊗ C ⟧ (R ∪ R ⁻¹)
 ⊆⟷→∪-swap⊆reindex₂-swap-⊗ {C = C} {R} R⊆ =
@@ -993,7 +993,7 @@ mutual
 -- Figure out if the proof can be made size-preserving.
 
 ν-⟷⇔ :
-  ∀ {ℓ} {I : Set ℓ} {C : Container (I × I) (I × I)} {p} →
+  ∀ {ℓ} {I : Type ℓ} {C : Container (I × I) (I × I)} {p} →
   ν ⟷[ C ] ∞ p ⇔ ν (reindex₂ swap id ⊗ C) ∞ p
 ν-⟷⇔ {C = C} = record
   { to =

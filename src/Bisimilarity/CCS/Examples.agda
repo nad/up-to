@@ -9,10 +9,11 @@
 
 {-# OPTIONS --without-K --safe --sized-types #-}
 
-module Bisimilarity.CCS.Examples {ℓ} {Name : Set ℓ} where
+open import Prelude
+
+module Bisimilarity.CCS.Examples {ℓ} {Name : Type ℓ} where
 
 open import Equality.Propositional
-open import Prelude
 open import Prelude.Size
 
 open import Bisimilarity.CCS
@@ -136,7 +137,7 @@ mutual
   6-2-4 : ∀ {a i} → [ i ] ! ! a ∙ ∼ ! a ∙
   6-2-4 {a} {i} = ⟨ lr , rl ⟩
     where
-    impossible : ∀ {μ P q} {Q : Set q} →
+    impossible : ∀ {μ P q} {Q : Type q} →
                  ! ! a ∙ [ μ ]⟶ P → μ ≡ τ → Q
     impossible {μ} !!a⟶P μ≡τ = ⊥-elim $ name≢τ
       (name a  ≡⟨ !-only (!-only ·-only) !!a⟶P ⟩

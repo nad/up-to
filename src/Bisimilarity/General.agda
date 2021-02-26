@@ -5,25 +5,26 @@
 
 {-# OPTIONS --without-K --safe --sized-types #-}
 
+open import Prelude
+
 open import Labelled-transition-system
 
 module Bisimilarity.General
          {ℓ}
          (lts : LTS ℓ)
          (open LTS lts)
-         (_[_]↝₁_ _[_]↝₂_ : Proc → Label → Proc → Set ℓ)
+         (_[_]↝₁_ _[_]↝₂_ : Proc → Label → Proc → Type ℓ)
          (⟶→↝₁ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]↝₁ q)
          (⟶→↝₂ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]↝₂ q)
          where
 
 open import Equality.Propositional as Eq hiding (Extensionality)
 open import Logical-equivalence using (_⇔_)
-open import Prelude
 open import Prelude.Size
 
 open import Bijection equality-with-J as Bijection using (_↔_)
 open import Function-universe equality-with-J hiding (id; _∘_)
-open import H-level equality-with-J hiding (Set)
+open import H-level equality-with-J
 open import H-level.Closure equality-with-J
 
 open import Bisimilarity.Step lts _[_]↝₁_ _[_]↝₂_ as Step public
@@ -49,16 +50,16 @@ Bisimilarity = ν StepC
 Bisimilarity′ : Size → Rel₂ ℓ Proc
 Bisimilarity′ = ν′ StepC
 
-[_]_∼_ : Size → Proc → Proc → Set ℓ
+[_]_∼_ : Size → Proc → Proc → Type ℓ
 [_]_∼_ i = curry (Bisimilarity i)
 
-[_]_∼′_ : Size → Proc → Proc → Set ℓ
+[_]_∼′_ : Size → Proc → Proc → Type ℓ
 [_]_∼′_ i = curry (Bisimilarity′ i)
 
-_∼_ : Proc → Proc → Set ℓ
+_∼_ : Proc → Proc → Type ℓ
 _∼_ = [ ∞ ]_∼_
 
-_∼′_ : Proc → Proc → Set ℓ
+_∼′_ : Proc → Proc → Type ℓ
 _∼′_ = [ ∞ ]_∼′_
 
 -- Bisimilarity is reflexive.
@@ -95,10 +96,10 @@ infix -2 ∼:_ ∼′:_
 
 infix 4 [_]_≡_ [_]_≡′_
 
-[_]_≡_ : ∀ {p q} → Size → (_ _ : ν StepC ∞ (p , q)) → Set ℓ
+[_]_≡_ : ∀ {p q} → Size → (_ _ : ν StepC ∞ (p , q)) → Type ℓ
 [_]_≡_ i = curry (ν-bisimilar i)
 
-[_]_≡′_ : ∀ {p q} → Size → (_ _ : ν′ StepC ∞ (p , q)) → Set ℓ
+[_]_≡′_ : ∀ {p q} → Size → (_ _ : ν′ StepC ∞ (p , q)) → Type ℓ
 [_]_≡′_ i = curry (ν′-bisimilar i)
 
 -- An alternative characterisation of bisimilarity of bisimilarity
@@ -242,7 +243,7 @@ module Bisimilarity-of-∼
 
 -- A statement of extensionality for bisimilarity.
 
-Extensionality : Set ℓ
+Extensionality : Type ℓ
 Extensionality = ν′-extensionality StepC
 
 -- This form of extensionality can be used to derive another form

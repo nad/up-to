@@ -5,11 +5,12 @@
 
 {-# OPTIONS --without-K --safe --sized-types #-}
 
-module Bisimilarity.CCS.Classical {ℓ} {Name : Set ℓ} where
+open import Prelude
+
+module Bisimilarity.CCS.Classical {ℓ} {Name : Type ℓ} where
 
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
-open import Prelude
 open import Prelude.Size
 
 import Bisimilarity.CCS.General

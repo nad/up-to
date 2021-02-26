@@ -29,7 +29,7 @@ open import Relation
 
 -- Progressions.
 
-Progression : ∀ {r s} → Rel₂ r Proc → Rel₂ s Proc → Set (ℓ ⊔ r ⊔ s)
+Progression : ∀ {r s} → Rel₂ r Proc → Rel₂ s Proc → Type (ℓ ⊔ r ⊔ s)
 Progression R S = R ⊆ Step S
 
 module Progression
@@ -64,7 +64,7 @@ open Progression public
 
 -- Bisimulations.
 
-Bisimulation : ∀ {r} → Rel₂ r Proc → Set (ℓ ⊔ r)
+Bisimulation : ∀ {r} → Rel₂ r Proc → Type (ℓ ⊔ r)
 Bisimulation R = Progression R R
 
 -- Bisimilarity with a level argument.
@@ -89,7 +89,7 @@ Bisimilarity = Bisimilarity′ lzero
 
 infix 4 _∼_
 
-_∼_ : Proc → Proc → Set (lsuc ℓ)
+_∼_ : Proc → Proc → Type (lsuc ℓ)
 p ∼ q = ∃ λ R → R ⊆ ⟦ StepC ⟧ R × R (p , q)
 
 private
@@ -228,7 +228,7 @@ bisimulation⊆∼ {r} {R} R-is-a-bisimulation =
 -- Bisimulations up to bisimilarity.
 
 Bisimulation-up-to-bisimilarity :
-  ∀ {r} → Rel₂ r Proc → Set (lsuc ℓ ⊔ r)
+  ∀ {r} → Rel₂ r Proc → Type (lsuc ℓ ⊔ r)
 Bisimulation-up-to-bisimilarity R =
   Progression R (Bisimilarity ⊙ R ⊙ Bisimilarity)
 
@@ -283,7 +283,7 @@ bisimulation-up-to-∼⊆∼ {R = R} R-is =
 
 -- Bisimulations up to ∪.
 
-Bisimulation-up-to-∪ : ∀ {r} → Rel₂ r Proc → Set (lsuc ℓ ⊔ r)
+Bisimulation-up-to-∪ : ∀ {r} → Rel₂ r Proc → Type (lsuc ℓ ⊔ r)
 Bisimulation-up-to-∪ R = Progression R (R ∪ Bisimilarity)
 
 -- If _R_ is a bisimulation up to ∪, then _R_ ∪ _∼_ is a bisimulation.
@@ -320,7 +320,7 @@ bisimulation-up-to-∪⊆∼ {R = R} R-is =
 
 -- Bisimulations up to reflexive transitive closure.
 
-Bisimulation-up-to-* : Rel₂ ℓ Proc → Set ℓ
+Bisimulation-up-to-* : Rel₂ ℓ Proc → Type ℓ
 Bisimulation-up-to-* R = Progression R (R *)
 
 -- If R is a bisimulation up to reflexive transitive closure, then R *

@@ -5,18 +5,19 @@
 
 {-# OPTIONS --without-K --safe --sized-types #-}
 
+open import Prelude
+
 open import Labelled-transition-system
 
 module Similarity.General
          {ℓ}
          (lts : LTS ℓ)
          (open LTS lts)
-         (_[_]↝_ : Proc → Label → Proc → Set ℓ)
+         (_[_]↝_ : Proc → Label → Proc → Type ℓ)
          (⟶→↝ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]↝ q)
          where
 
 open import Equality.Propositional as Eq hiding (Extensionality)
-open import Prelude
 open import Prelude.Size
 
 open import Bijection equality-with-J using (_↔_)
@@ -40,16 +41,16 @@ Similarity i = ν StepC i
 Similarity′ : Size → Rel₂ ℓ Proc
 Similarity′ i = ν′ StepC i
 
-[_]_≤_ : Size → Proc → Proc → Set ℓ
+[_]_≤_ : Size → Proc → Proc → Type ℓ
 [_]_≤_ i = curry (Similarity i)
 
-[_]_≤′_ : Size → Proc → Proc → Set ℓ
+[_]_≤′_ : Size → Proc → Proc → Type ℓ
 [_]_≤′_ i = curry (Similarity′ i)
 
-_≤_ : Proc → Proc → Set ℓ
+_≤_ : Proc → Proc → Type ℓ
 _≤_ = [ ∞ ]_≤_
 
-_≤′_ : Proc → Proc → Set ℓ
+_≤′_ : Proc → Proc → Type ℓ
 _≤′_ = [ ∞ ]_≤′_
 
 -- Similarity is reflexive.
@@ -82,10 +83,10 @@ infix -2 ≤:_ ≤′:_
 
 infix 4 [_]_≡_ [_]_≡′_
 
-[_]_≡_ : ∀ {p q} → Size → (_ _ : ν StepC ∞ (p , q)) → Set ℓ
+[_]_≡_ : ∀ {p q} → Size → (_ _ : ν StepC ∞ (p , q)) → Type ℓ
 [_]_≡_ i = curry (ν-bisimilar i)
 
-[_]_≡′_ : ∀ {p q} → Size → (_ _ : ν′ StepC ∞ (p , q)) → Set ℓ
+[_]_≡′_ : ∀ {p q} → Size → (_ _ : ν′ StepC ∞ (p , q)) → Type ℓ
 [_]_≡′_ i = curry (ν′-bisimilar i)
 
 -- An alternative characterisation of bisimilarity of similarity
@@ -124,7 +125,7 @@ infix 4 [_]_≡_ [_]_≡′_
 
 -- A statement of extensionality for similarity.
 
-Extensionality : Set ℓ
+Extensionality : Type ℓ
 Extensionality = ν′-extensionality StepC
 
 -- This form of extensionality can be used to derive another form (in

@@ -27,8 +27,8 @@ open import Up-to
 -- method".
 
 Up-to-technique-via :
-  ∀ {ℓ} {I : Set ℓ} →
-  Container I I → Trans ℓ I → Trans ℓ I → Set (lsuc ℓ)
+  ∀ {ℓ} {I : Type ℓ} →
+  Container I I → Trans ℓ I → Trans ℓ I → Type (lsuc ℓ)
 Up-to-technique-via C F G =
   Extensive G
     ×
@@ -40,7 +40,7 @@ Up-to-technique-via C F G =
 -- after Definition 6.3.25.
 
 up-to-via→up-to :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} {F G} →
+  ∀ {ℓ} {I : Type ℓ} {C : Container I I} {F G} →
   Up-to-technique-via C F G → Up-to-technique C F
 up-to-via→up-to {C = C} {F} {G} up-to {R} =
   R ⊆ ⟦ C ⟧ (F R)    ↝⟨ proj₂ up-to _ ⟩
@@ -52,7 +52,7 @@ up-to-via→up-to {C = C} {F} {G} up-to {R} =
 -- _∪ ν C ∞.
 
 up-to→up-to-via :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} {F} →
+  ∀ {ℓ} {I : Type ℓ} {C : Container I I} {F} →
   Up-to-technique C F → Up-to-technique-via C F (_∪ ν C ∞)
 up-to→up-to-via {C = C} {F} up-to =
     (λ R →
@@ -74,7 +74,7 @@ up-to→up-to-via {C = C} {F} up-to =
 -- closed under G ∘_.
 
 up-to-via-∘ :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} {F G H} →
+  ∀ {ℓ} {I : Type ℓ} {C : Container I I} {F G H} →
   Extensive G →
   (∀ R → R ⊆ ⟦ C ⟧ R → G R ⊆ ⟦ C ⟧ (G R)) →
   Up-to-technique-via C F H →
@@ -96,7 +96,7 @@ mutual
   -- result corresponds to Pous and Sangiorgi's Proposition 6.3.28.
 
   up-to-via→ν-∘⊆ν :
-    ∀ {ℓ} {I : Set ℓ} {C : Container (I × I) (I × I)} {F G} →
+    ∀ {ℓ} {I : Type ℓ} {C : Container (I × I) (I × I)} {F G} →
     Symmetric swap G →
     Up-to-technique-via C ⟦ F ⟧ G →
     ν ⟷[ C ⊚ F ] ∞ ⊆ ν ⟷[ C ] ∞
@@ -105,7 +105,7 @@ mutual
   -- A generalisation of the result above.
 
   up-to-via²→ν-∘⊆ν :
-    ∀ {ℓ} {I : Set ℓ} {C₁ C₂ : Container I I} {F₁ F₂ G} {f : I → I} →
+    ∀ {ℓ} {I : Type ℓ} {C₁ C₂ : Container I I} {F₁ F₂ G} {f : I → I} →
     f ∘ f ≡ id →
     Symmetric f G →
     Up-to-technique-via C₁ ⟦ F₁ ⟧ G →
@@ -158,7 +158,7 @@ mutual
 -- Theorem 6.3.26.
 
 monotone→compatible→up-to-via :
-  ∀ {ℓ} {I : Set ℓ} {C : Container I I} {F} →
+  ∀ {ℓ} {I : Type ℓ} {C : Container I I} {F} →
   Monotone F →
   Compatible C F → Up-to-technique-via C F (F ^ω_)
 monotone→compatible→up-to-via {C = C} {F} mono comp =

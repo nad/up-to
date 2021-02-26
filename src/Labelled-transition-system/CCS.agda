@@ -4,10 +4,11 @@
 
 {-# OPTIONS --without-K --safe --sized-types #-}
 
-module Labelled-transition-system.CCS {ℓ} (Name : Set ℓ) where
+open import Prelude
+
+module Labelled-transition-system.CCS {ℓ} (Name : Type ℓ) where
 
 open import Equality.Propositional
-open import Prelude
 open import Prelude.Size
 
 open import Bool equality-with-J
@@ -35,7 +36,7 @@ infix   4 _[_]⟶_ _∉_
 -- Names with kinds: (a , true) stands for "a", and (a , false) stands
 -- for "a̅".
 
-Name-with-kind : Set ℓ
+Name-with-kind : Type ℓ
 Name-with-kind = Name × Bool
 
 -- Turns names of one kind into names of the other kind.
@@ -45,7 +46,7 @@ co (a , kind) = a , not kind
 
 -- Actions.
 
-data Action : Set ℓ where
+data Action : Type ℓ where
   name : Name-with-kind → Action
   τ    : Action
 
@@ -59,14 +60,14 @@ is-silent τ        = true
 
 mutual
 
-  data Proc (i : Size) : Set ℓ where
+  data Proc (i : Size) : Type ℓ where
     ∅       : Proc i
     _∣_ _⊕_ : Proc i → Proc i → Proc i
     _·_     : Action → Proc′ i → Proc i
     ⟨ν_⟩    : Name → Proc i → Proc i
     !_      : Proc i → Proc i
 
-  record Proc′ (i : Size) : Set ℓ where
+  record Proc′ (i : Size) : Type ℓ where
     coinductive
     field
       force : {j : Size< i} → Proc j
@@ -86,13 +87,13 @@ a ∙ = name a ∙ ∅
 -- The predicate a ∉ μ holds if a is not the underlying name of μ (if
 -- any).
 
-_∉_ : Name → Action → Set ℓ
+_∉_ : Name → Action → Type ℓ
 a ∉ name (b , _) = ¬ a ≡ b
 a ∉ τ            = ↑ ℓ ⊤
 
 -- Transition relation.
 
-data _[_]⟶_ : Proc ∞ → Action → Proc ∞ → Set ℓ where
+data _[_]⟶_ : Proc ∞ → Action → Proc ∞ → Type ℓ where
   par-left    : ∀ {P Q P′ μ} → P [ μ ]⟶ P′ → P ∣ Q [ μ ]⟶ P′ ∣ Q
   par-right   : ∀ {P Q Q′ μ} → Q [ μ ]⟶ Q′ → P ∣ Q [ μ ]⟶ P  ∣ Q′
   par-τ       : ∀ {P P′ Q Q′ a} →
@@ -126,7 +127,7 @@ mutual
 
   -- Polyadic contexts.
 
-  data Context (i : Size) (n : ℕ) : Set ℓ where
+  data Context (i : Size) (n : ℕ) : Type ℓ where
     hole    : (x : Fin n) → Context i n
     ∅       : Context i n
     _∣_ _⊕_ : Context i n → Context i n → Context i n
@@ -134,7 +135,7 @@ mutual
     ⟨ν_⟩    : (a : Name) → Context i n → Context i n
     !_      : Context i n → Context i n
 
-  record Context′ (i : Size) (n : ℕ) : Set ℓ where
+  record Context′ (i : Size) (n : ℕ) : Type ℓ where
     coinductive
     field
       force : {j : Size< i} → Context j n
@@ -159,7 +160,7 @@ mutual
 
 -- A context is weakly guarded if every hole is under a prefix (μ ·_).
 
-data Weakly-guarded {n : ℕ} : Context ∞ n → Set ℓ where
+data Weakly-guarded {n : ℕ} : Context ∞ n → Type ℓ where
   ∅      : Weakly-guarded ∅
   _∣_    : ∀ {C₁ C₂} →
            Weakly-guarded C₁ → Weakly-guarded C₂ →
@@ -185,7 +186,7 @@ context (! P)      = ! context P
 
 mutual
 
-  data Non-degenerate (i : Size) {n : ℕ} : Context ∞ n → Set ℓ where
+  data Non-degenerate (i : Size) {n : ℕ} : Context ∞ n → Type ℓ where
     hole   : ∀ {x} → Non-degenerate i (hole x)
     ∅      : Non-degenerate i ∅
     _∣_    : ∀ {C₁ C₂} →
@@ -201,13 +202,13 @@ mutual
     !_     : ∀ {C} → Non-degenerate i C → Non-degenerate i (! C)
 
   data Non-degenerate-summand (i : Size) {n : ℕ} :
-                              Context ∞ n → Set ℓ where
+                              Context ∞ n → Type ℓ where
     process : ∀ P → Non-degenerate-summand i (context P)
     action  : ∀ {μ C} →
               Non-degenerate′ i (force C) →
               Non-degenerate-summand i (μ · C)
 
-  record Non-degenerate′ (i : Size) {n} (C : Context ∞ n) : Set ℓ where
+  record Non-degenerate′ (i : Size) {n} (C : Context ∞ n) : Type ℓ where
     coinductive
     field
       force : {j : Size< i} → Non-degenerate j C
@@ -222,7 +223,7 @@ open Non-degenerate′ public
 
 mutual
 
-  data Equal (i : Size) : Proc ∞ → Proc ∞ → Set ℓ where
+  data Equal (i : Size) : Proc ∞ → Proc ∞ → Type ℓ where
     ∅    : Equal i ∅ ∅
     _∣_  : ∀ {P₁ P₂ Q₁ Q₂} →
            Equal i P₁ P₂ → Equal i Q₁ Q₂ → Equal i (P₁ ∣ Q₁) (P₂ ∣ Q₂)
@@ -235,7 +236,7 @@ mutual
            a₁ ≡ a₂ → Equal i P₁ P₂ → Equal i (⟨ν a₁ ⟩ P₁) (⟨ν a₂ ⟩ P₂)
     !_   : ∀ {P₁ P₂} → Equal i P₁ P₂ → Equal i (! P₁) (! P₂)
 
-  record Equal′ (i : Size) (P₁ P₂ : Proc ∞) : Set ℓ where
+  record Equal′ (i : Size) (P₁ P₂ : Proc ∞) : Type ℓ where
     coinductive
     field
       force : {j : Size< i} → Equal j P₁ P₂
@@ -244,7 +245,7 @@ open Equal′ public
 
 -- Extensionality for very strong bisimilarity.
 
-Proc-extensionality : Set ℓ
+Proc-extensionality : Type ℓ
 Proc-extensionality = ∀ {P Q} → Equal ∞ P Q → P ≡ Q
 
 ------------------------------------------------------------------------
@@ -462,7 +463,7 @@ mutual
   -- A relation expressing that a certain process matches a certain
   -- context.
 
-  data Matches (i : Size) {n} : Proc ∞ → Context ∞ n → Set ℓ where
+  data Matches (i : Size) {n} : Proc ∞ → Context ∞ n → Type ℓ where
     hole   : ∀ {P} (x : Fin n) → Matches i P (hole x)
     ∅      : Matches i ∅ ∅
     _∣_    : ∀ {P₁ P₂ C₁ C₂} →
@@ -478,7 +479,7 @@ mutual
     !_     : ∀ {P C} → Matches i P C → Matches i (! P) (! C)
 
   record Matches′
-           (i : Size) {n} (P : Proc ∞) (C : Context ∞ n) : Set ℓ where
+           (i : Size) {n} (P : Proc ∞) (C : Context ∞ n) : Type ℓ where
     coinductive
     field
       force : {j : Size< i} → Matches j P C
@@ -516,7 +517,7 @@ Matches-cong (! p)         (! q)      = ! Matches-cong p q
 -- A predicate that identifies a process as being finite. Note that
 -- this is an inductive definition.
 
-data Finite : Proc ∞ → Set ℓ where
+data Finite : Proc ∞ → Type ℓ where
   ∅      : Finite ∅
   _∣_    : ∀ {P Q} → Finite P → Finite Q → Finite (P ∣ Q)
   _⊕_    : ∀ {P Q} → Finite P → Finite Q → Finite (P ⊕ Q)
@@ -539,7 +540,7 @@ finite→finite (replication tr)    (! f)      = finite→finite tr (! f ∣ f)
 
 -- Subprocess P Q means that P is a syntactic subprocess of Q.
 
-data Subprocess (P : Proc ∞) : Proc ∞ → Set ℓ where
+data Subprocess (P : Proc ∞) : Proc ∞ → Type ℓ where
   refl        : ∀ {Q} → Equal ∞ P Q → Subprocess P Q
   par-left    : ∀ {Q₁ Q₂} → Subprocess P Q₁ → Subprocess P (Q₁ ∣ Q₂)
   par-right   : ∀ {Q₁ Q₂} → Subprocess P Q₂ → Subprocess P (Q₁ ∣ Q₂)
@@ -552,7 +553,7 @@ data Subprocess (P : Proc ∞) : Proc ∞ → Set ℓ where
 -- A process is regular if it has a finite number of distinct
 -- subprocesses.
 
-Regular : Proc ∞ → Set ℓ
+Regular : Proc ∞ → Type ℓ
 Regular P =
   ∃ λ n → ∃ λ (Qs : Fin n → Proc ∞) →
     ∀ {Q} → Subprocess Q P →

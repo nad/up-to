@@ -4,11 +4,12 @@
 
 {-# OPTIONS --without-K --safe --sized-types #-}
 
-module Labelled-transition-system.Delay-monad {a} (A : Set a) where
+open import Prelude
+
+module Labelled-transition-system.Delay-monad {a} (A : Type a) where
 
 open import Delay-monad hiding (steps)
 open import Equality.Propositional
-open import Prelude
 open import Prelude.Size
 
 open import Labelled-transition-system
@@ -18,7 +19,7 @@ open import Labelled-transition-system
 
 infix 4 _[_]⟶_
 
-data _[_]⟶_ : Delay A ∞ → Maybe A → Delay A ∞ → Set a where
+data _[_]⟶_ : Delay A ∞ → Maybe A → Delay A ∞ → Type a where
   now   : ∀ {x} → now   x [ just x  ]⟶ now   x
   later : ∀ {x} → later x [ nothing ]⟶ force x
 

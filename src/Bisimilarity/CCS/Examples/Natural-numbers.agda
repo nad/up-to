@@ -67,7 +67,7 @@ module _ (μ : Action) where
   P-irregular : ∀ {n} → ¬ Regular (P n)
   P-irregular (k , Qs , hyp) = irregular′ k hyp
     where
-    Regular′ : ℕ → ∀ k → (Fin k → Proc ∞) → Set
+    Regular′ : ℕ → ∀ k → (Fin k → Proc ∞) → Type
     Regular′ n k Qs =
       ∀ {Q} → Subprocess Q (P n) →
         ∃ λ (i : Fin k) → Equal ∞ Q (Qs i)

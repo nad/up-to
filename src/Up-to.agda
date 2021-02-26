@@ -7,13 +7,14 @@
 
 -- The definitions below are parametrised by an indexed container.
 
+open import Prelude
+
 open import Indexed-container
 
-module Up-to {ℓ} {I : Set ℓ} (C : Container I I) where
+module Up-to {ℓ} {I : Type ℓ} (C : Container I I) where
 
 open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
-open import Prelude
 open import Prelude.Size
 
 open import Bijection equality-with-J using (_↔_)
@@ -39,13 +40,13 @@ open import Relation
 -- * The type-theoretic greatest fixpoint ν takes the place of a
 --   set-theoretic greatest fixpoint.
 
-Sound : Container I I → Set ℓ
+Sound : Container I I → Type ℓ
 Sound F = ν (C ⊚ F) ∞ ⊆ ν C ∞
 
 -- A relation transformer F is a (sound) up-to technique if every
 -- relation R that is contained in ⟦ C ⟧ (F R) is contained in ν C ∞.
 
-Up-to-technique : Trans ℓ I → Set (lsuc ℓ)
+Up-to-technique : Trans ℓ I → Type (lsuc ℓ)
 Up-to-technique F = ∀ {R} → R ⊆ ⟦ C ⟧ (F R) → R ⊆ ν C ∞
 
 -- The two definitions above are pointwise logically equivalent, if
@@ -81,7 +82,7 @@ Sound⇔ F = record
 -- This definition corresponds to Pous and Sangiorgi's definition of
 -- b-compatibility.
 
-Compatible : Trans ℓ I → Set (lsuc ℓ)
+Compatible : Trans ℓ I → Type (lsuc ℓ)
 Compatible F = ∀ {R} → F (⟦ C ⟧ R) ⊆ ⟦ C ⟧ (F R)
 
 -- If F is monotone and compatible, and R is contained in ⟦ C ⟧ (F R),
@@ -126,7 +127,7 @@ monotone→compatible→up-to {F} mono comp {R = R} R⊆ =
 -- F is size-preserving if, for any relation R, if R is contained in
 -- ν C i, then F R is contained in ν C i.
 
-Size-preserving : Trans ℓ I → Set (lsuc ℓ)
+Size-preserving : Trans ℓ I → Type (lsuc ℓ)
 Size-preserving F = ∀ {R i} → R ⊆ ν C i → F R ⊆ ν C i
 
 -- If a transformer is size-preserving, then it satisfies the
@@ -198,7 +199,7 @@ monotone→⇔ mono = record
 
 -- A special case of compatibility.
 
-Compatible′ : Trans ℓ I → Set ℓ
+Compatible′ : Trans ℓ I → Type ℓ
 Compatible′ F = ∀ {i} → F (⟦ C ⟧ (ν′ C i)) ⊆ ⟦ C ⟧ (F (ν′ C i))
 
 -- Monotone transformers that satisfy the special case of
@@ -315,7 +316,7 @@ private
 -- also size-preserving.
 
 ⋃-closure :
-  {A : Set ℓ} {F : A → Trans ℓ I} →
+  {A : Type ℓ} {F : A → Trans ℓ I} →
   (∀ a → Size-preserving (F a)) →
   Size-preserving (⋃ lzero F)
 ⋃-closure {F = F} pres {R = R} {i = i} =
@@ -354,7 +355,7 @@ Companion R x = ∀ {i} → R ⊆ ν C i → ν C i x
 -- below the companion. This notion was presented by Pous in
 -- "Coinduction All the Way Up".
 
-Below-the-companion : Trans ℓ I → Set (lsuc ℓ)
+Below-the-companion : Trans ℓ I → Type (lsuc ℓ)
 Below-the-companion F = ∀ {R} → F R ⊆ Companion R
 
 -- A transformer is below the companion iff it is size-preserving.
@@ -477,7 +478,7 @@ below-the-companion-example {F} =
   (⟦ C ⟧ ∘ F) Below (Companion ∘ Companion)  ↝⟨ (λ below {_ _} → companion∘companion-below ∘ below {_}) ⟩□
   (⟦ C ⟧ ∘ F) Below Companion                □
   where
-  _Below_ : Trans ℓ I → Trans ℓ I → Set (lsuc ℓ)
+  _Below_ : Trans ℓ I → Trans ℓ I → Type (lsuc ℓ)
   F Below G = ∀ {R} → F R ⊆ G R
 
   ∘-cong₂ : ∀ {F₁ F₂ G₁ G₂ : Trans ℓ I} →
@@ -679,12 +680,12 @@ companion-compatible⇔companion⊆companion₁ = record
 
 -- Assumptions used by companion-compatible below.
 
-record Companion-compatible-assumptions : Set (lsuc ℓ) where
+record Companion-compatible-assumptions : Type (lsuc ℓ) where
   field
     -- A strong form of excluded middle, not compatible with
     -- univalence.
 
-    excluded-middle : (P : Set ℓ) → Dec P
+    excluded-middle : (P : Type ℓ) → Dec P
 
   -- The type i < j means that i is a smaller size than j, i ≣ j means
   -- that i is equal to j, and i ≤ j means that i is smaller than or
@@ -692,20 +693,20 @@ record Companion-compatible-assumptions : Set (lsuc ℓ) where
 
   infix 4 _<_ _≣_ _≤_
 
-  _<_ : Size → Size → Set
+  _<_ : Size → Size → Type
   _<_ = λ i j → Σ (Size< j in-type) λ { k → record { size = i } ≡ k }
 
-  _≣_ : Size → Size → Set
+  _≣_ : Size → Size → Type
   _≣_ = λ i j →
     _≡_ {A = Size in-type} (record { size = i }) (record { size = j })
 
-  _≤_ : Size → Size → Set
+  _≤_ : Size → Size → Type
   _≤_ = λ i j → i < j ⊎ i ≣ j
 
   -- Successor sizes: Sizes i for which there is a size j < i such
   -- that every size k < i satisfies k ≤ j.
 
-  Successor : Size → Set
+  Successor : Size → Type
   Successor i = ∃ λ (j : Size< i in-type) → (k : Size< i) → k ≤ size j
 
   field
@@ -731,19 +732,19 @@ record Companion-compatible-assumptions : Set (lsuc ℓ) where
     -- has suggested that this implementation should not be allowed.
 
     size-elim :
-      (P : Size → Set ℓ) →
+      (P : Size → Type ℓ) →
       (∀ i → ((j : Size< i) → P j) → P i) →
       ∀ i → P i
 
   -- A variant of excluded-middle.
 
-  excluded-middle₀ : (P : Set) → Dec P
+  excluded-middle₀ : (P : Type) → Dec P
   excluded-middle₀ P =
     ⊎-map lower (_∘ lift) $ excluded-middle (↑ ℓ P)
 
   -- "Not for all" implies "exists not".
 
-  ¬∀→∃¬ : {A : Set} {P : A → Set ℓ} →
+  ¬∀→∃¬ : {A : Type} {P : A → Type ℓ} →
           ¬ (∀ x → P x) → ∃ λ x → ¬ P x
   ¬∀→∃¬ {P = P} ¬∀ = case excluded-middle (∃ λ x → ¬ P x) of λ where
     (inj₁ ∃¬P)  → ∃¬P

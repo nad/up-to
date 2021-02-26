@@ -5,9 +5,9 @@
 
 {-# OPTIONS --without-K --safe #-}
 
-module Labelled-transition-system.6-2-5 (Name : Set) where
-
 open import Prelude
+
+module Labelled-transition-system.6-2-5 (Name : Type) where
 
 open import Labelled-transition-system
 
@@ -17,14 +17,14 @@ infix   4 _[_]⟶_
 
 -- Processes.
 
-data Proc : Set where
+data Proc : Type where
   op  : Proc → Proc
   _·_ : Name → Proc → Proc
   ∅   : Proc
 
 -- Transitions.
 
-data _[_]⟶_ : Proc → Name → Proc → Set where
+data _[_]⟶_ : Proc → Name → Proc → Type where
   action : ∀ {a P} → a · P [ a ]⟶ P
   op     : ∀ {a P P′ P″} → P [ a ]⟶ P′ → P′ [ a ]⟶ P″ → op P [ a ]⟶ P″
 
@@ -42,7 +42,7 @@ open LTS 6-2-5 public hiding (Proc; _[_]⟶_)
 
 -- Polyadic contexts.
 
-data Context (n : ℕ) : Set where
+data Context (n : ℕ) : Type where
   hole : (x : Fin n) → Context n
   op   : Context n → Context n
   _·_  : (a : Name) → Context n → Context n

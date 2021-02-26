@@ -5,15 +5,16 @@
 
 {-# OPTIONS --without-K --safe --sized-types #-}
 
+open import Prelude
+
 module Bisimilarity.Weak.Alternative.Up-to.Delay-monad
-         {a} {A : Set a} where
+         {a} {A : Type a} where
 
 open import Delay-monad
 import Delay-monad.Bisimilarity as B
 import Delay-monad.Partial-order as P
 open import Equality.Propositional as Eq
 open import Logical-equivalence using (_⇔_)
-open import Prelude
 open import Prelude.Size
 
 open import Excluded-middle equality-with-J

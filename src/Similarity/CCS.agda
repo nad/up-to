@@ -4,10 +4,11 @@
 
 {-# OPTIONS --without-K --safe --sized-types #-}
 
-module Similarity.CCS {ℓ} {Name : Set ℓ} where
+open import Prelude
+
+module Similarity.CCS {ℓ} {Name : Type ℓ} where
 
 open import Equality.Propositional
-open import Prelude
 open import Prelude.Size
 
 open import Function-universe equality-with-J hiding (id; _∘_)

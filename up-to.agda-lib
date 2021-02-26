@@ -1,3 +1,4 @@
 name: up-to
 depend: equality delay-monad
 include: src
+flags: --no-import-sorts
