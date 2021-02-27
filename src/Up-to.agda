@@ -18,6 +18,7 @@ open import Prelude.Size
 
 open import Bijection equality-with-J using (_↔_)
 open import Function-universe equality-with-J as F hiding (id; _∘_)
+open import Function-universe.Size equality-with-J
 
 open import Indexed-container.Combinators
   hiding (id; const) renaming (_∘_ to _⊚_)
@@ -405,7 +406,7 @@ companion-cong :
   (∀ {x} → R x ↝[ ⌊ k ⌋-sym ] S x) →
   (∀ {x} → Companion R x ↝[ ⌊ k ⌋-sym ] Companion S x)
 companion-cong {k} {R} {S} ext R↝S {x} =
-  (∀ {i} → R ⊆ ν C i → ν C i x)  ↝⟨ implicit-∀-cong (lower-extensionality? ⌊ k ⌋-sym _ lzero ext) (→-cong ext (⊆-cong ext R↝S F.id) F.id) ⟩□
+  (∀ {i} → R ⊆ ν C i → ν C i x)  ↝⟨ implicit-∀-size-cong (lower-extensionality? ⌊ k ⌋-sym _ lzero ext) (→-cong ext (⊆-cong ext R↝S F.id) F.id) ⟩□
   (∀ {i} → S ⊆ ν C i → ν C i x)  □
 
 -- The companion is an up-to technique.
@@ -573,7 +574,7 @@ module _
   companion-symmetric : ∀ {R} → Companion R ∘ f ⊆ Companion R
   companion-symmetric {R} {x} =
     Companion R (f x)                  ↔⟨⟩
-    (∀ {i} → R ⊆ ν C i → ν C i (f x))  ↝⟨ (λ hyp {i} R⊆ν → ν-symmetric (hyp R⊆ν)) ⟩
+    (∀ {i} → R ⊆ ν C i → ν C i (f x))  ↝⟨ (λ hyp R⊆ν → ν-symmetric (hyp R⊆ν)) ⦂ (_ → (∀ {i} → R ⊆ ν C i → ν C i x)) ⟩
     (∀ {i} → R ⊆ ν C i → ν C i x)      ↔⟨⟩
     Companion R x                      □
 
@@ -650,8 +651,8 @@ companion-compatible⇔companion⊆companion₁ = record
   { to   = λ comp f → (Companion , companion-monotone , comp , f)
   ; from = λ below f →
              let (F , mono , comp , FCR) = below f
-             in map C (λ FR {_} →
-                         companion₁⊆companion (F , mono , comp , FR))
+             in map C ((λ FR → companion₁⊆companion (F , mono , comp , FR)) ⦂
+                       (_ → Companion _ _))
                       (comp FCR)
   }
   where
@@ -685,22 +686,27 @@ record Companion-compatible-assumptions : Set (lsuc ℓ) where
 
     excluded-middle : (P : Set ℓ) → Dec P
 
-  -- The type i < j means that i is a smaller size than j, and i ≤ j
-  -- means that i is smaller than or equal to j.
+  -- The type i < j means that i is a smaller size than j, i ≣ j means
+  -- that i is equal to j, and i ≤ j means that i is smaller than or
+  -- equal to j.
 
-  infix 4 _<_ _≤_
+  infix 4 _<_ _≣_ _≤_
 
   _<_ : Size → Size → Set
-  _<_ = λ i j → Σ (Size< j) λ { k → i ≡ k }
+  _<_ = λ i j → Σ (Size< j in-type) λ { k → record { size = i } ≡ k }
+
+  _≣_ : Size → Size → Set
+  _≣_ = λ i j →
+    _≡_ {A = Size in-type} (record { size = i }) (record { size = j })
 
   _≤_ : Size → Size → Set
-  _≤_ = λ i j → i < j ⊎ i ≡ j
+  _≤_ = λ i j → i < j ⊎ i ≣ j
 
   -- Successor sizes: Sizes i for which there is a size j < i such
   -- that every size k < i satisfies k ≤ j.
 
   Successor : Size → Set
-  Successor i = Σ (Size< i) λ { j → (k : Size< i) → k ≤ j }
+  Successor i = ∃ λ (j : Size< i in-type) → (k : Size< i) → k ≤ size j
 
   field
     -- If i is not smaller than or equal to j, then j is smaller
@@ -749,10 +755,10 @@ record Companion-compatible-assumptions : Set (lsuc ℓ) where
   -- by either _<_, _≡_, or flip _<_. However, note that all three
   -- relations hold for ∞ and ∞, so we do not get a law of trichotomy.
 
-  compare : ∀ i j → i < j ⊎ i ≡ j ⊎ j < i
+  compare : ∀ i j → i < j ⊎ i ≣ j ⊎ j < i
   compare i j = case excluded-middle₀ (i < j) of λ where
     (inj₁ i<j) → inj₁ i<j
-    (inj₂ i≮j) → case excluded-middle₀ (i ≡ j) of λ where
+    (inj₂ i≮j) → case excluded-middle₀ (i ≣ j) of λ where
       (inj₁ i≡j) → inj₂ (inj₁ i≡j)
       (inj₂ i≢j) → inj₂ (inj₂ (≰→> [ i≮j , i≢j ]))
 
@@ -777,37 +783,43 @@ companion-compatible assumptions {R} = case lemma R of λ where
 
     (inj₁ R⊆νC) →
       Companion (⟦ C ⟧ R)  ⊆⟨ _$ map C (λ Rx → λ { .force → R⊆νC Rx }) ⟩
-      ν C ∞                ⊆⟨ map C (λ ν′C∞x {_} _ → force ν′C∞x) ⟩∎
+      ν C ∞                ⊆⟨ map C ((λ ν′C∞x _ → force ν′C∞x) ⦂ (_ → Companion _ _)) ⟩∎
       ⟦ C ⟧ (Companion R)  ∎
 
     (inj₂ (1+i , (i , <1+i→≤i) , <1+i→R⊆νC , R⊈νC[1+i])) →
 
       let CR⊆νC[1+i] =
-            ⟦ C ⟧ R        ⊆⟨ map C (<1+i→R⊆νC i) ⟩
-            ⟦ C ⟧ (ν C i)  ⊆⟨ map C (λ x → λ { .force {j} → cast (<1+i→≤i j) x }) ⟩∎
-            ν C 1+i        ∎
+            ⟦ C ⟧ R               ⊆⟨ map C (<1+i→R⊆νC (size i)) ⟩
+            ⟦ C ⟧ (ν C (size i))  ⊆⟨ map C (λ x → λ { .force {j} → cast (<1+i→≤i j) x }) ⟩∎
+            ν C (size 1+i)        ∎
 
           νCi⊆CompanionR =
-            ν C i                                                ⊆⟨ (λ hyp → λ { j≤i → cast j≤i hyp }) ⟩
-            (λ x → ∀ {j} → j ≤ i → ν C j x)                      ⊆⟨ (λ hyp → λ { (j , refl) → hyp (<1+i→≤i j) }) ⟩
-            (λ x → ∀ {j} → j < 1+i → ν C j x)                    ⊆⟨ (λ hyp → λ { j<1+i _ → hyp j<1+i }) ⟩
-            (λ x → ∀ {j} → j < 1+i → R ⊆ ν C j → ν C j x)        ⊆⟨ (λ hyp → λ { 1+i≰j → hyp (≰→> 1+i≰j) }) ⟩
-            (λ x → ∀ {j} → ¬ 1+i ≤ j → R ⊆ ν C j → ν C j x)      ⊆⟨ (λ hyp → λ { {j} → [ (λ 1+i≤j R⊆νCj →
-                                                                                            ⊥-elim $ R⊈νC[1+i] (
-                R                                                                             ⊆⟨ (λ {x} → R⊆νCj {x}) ⟩
-                ν C j                                                                         ⊆⟨ cast 1+i≤j ⟩∎
-                ν C 1+i                                                                       ∎))
-                                                                                       , hyp
-                                                                                       ] }) ⟩
-            (λ x → ∀ {j} → Dec (1+i ≤ j) → R ⊆ ν C j → ν C j x)  ⊆⟨ (λ hyp → λ { {_} → hyp (excluded-middle₀ _) }) ⟩
-            (λ x → ∀ {j} → R ⊆ ν C j → ν C j x)                  ⊆⟨ id ⟩∎
-            Companion R                                          ∎
+            ν C (size i)                                              ⊆⟨ (λ hyp → λ { j≤i → cast j≤i hyp }) ⟩
+            (λ x → ∀ {j} → j ≤ size i → ν C j x)                      ⊆⟨ (λ hyp → λ { (j , refl) → hyp (<1+i→≤i (size j)) }) ⟩
+            (λ x → ∀ {j} → j < size 1+i → ν C j x)                    ⊆⟨ (λ hyp → λ { j<1+i _ → hyp j<1+i }) ⟩
+            (λ x → ∀ {j} → j < size 1+i → R ⊆ ν C j → ν C j x)        ⊆⟨ (λ hyp → λ { 1+i≰j → hyp (≰→> 1+i≰j) }) ⟩
+            (λ x → ∀ {j} → ¬ size 1+i ≤ j → R ⊆ ν C j → ν C j x)      ⊆⟨ (λ hyp → λ { {j} → [ (λ 1+i≤j R⊆νCj →
+                                                                                                 ⊥-elim $ R⊈νC[1+i] (
+                R                                                                                  ⊆⟨ (λ {x} → R⊆νCj {x}) ⟩
+                ν C j                                                                              ⊆⟨ cast 1+i≤j ⟩∎
+                ν C (size 1+i)                                                                     ∎))
+                                                                                            , hyp
+                                                                                            ] }) ⟩
+            (λ x → ∀ {j} → Dec (size 1+i ≤ j) → R ⊆ ν C j → ν C j x)  ⊆⟨ (λ hyp → λ { {_} → hyp (excluded-middle₀ _) }) ⟩
+            (λ x → ∀ {j} → R ⊆ ν C j → ν C j x)                       ⊆⟨ id ⟩∎
+            Companion R                                               ∎
+
+          ν′C[1+i]⊆νCi : ν′ C (size 1+i) ⊆ ν C (size i)
+          ν′C[1+i]⊆νCi {x} y =
+            let y′ : (j : Size< (size 1+i)) → ν C j x
+                y′ = λ { j → y .force {j = j} }
+            in y′ (size i)
       in
-      Companion (⟦ C ⟧ R)  ⊆⟨ _$ CR⊆νC[1+i] ⟩
-      ν C 1+i              ⊆⟨⟩
-      ⟦ C ⟧ (ν′ C 1+i)     ⊆⟨ map C (λ x → force x) ⟩
-      ⟦ C ⟧ (ν C i)        ⊆⟨ map C νCi⊆CompanionR ⟩∎
-      ⟦ C ⟧ (Companion R)  ∎
+      Companion (⟦ C ⟧ R)      ⊆⟨ (λ c → c {i = size 1+i} CR⊆νC[1+i]) ⟩
+      ν C (size 1+i)           ⊆⟨⟩
+      ⟦ C ⟧ (ν′ C (size 1+i))  ⊆⟨ map C ν′C[1+i]⊆νCi ⟩
+      ⟦ C ⟧ (ν C (size i))     ⊆⟨ map C νCi⊆CompanionR ⟩∎
+      ⟦ C ⟧ (Companion R)      ∎
 
   where
   open Companion-compatible-assumptions assumptions
@@ -819,22 +831,31 @@ companion-compatible assumptions {R} = case lemma R of λ where
   lemma :
     ∀ R → (∀ {i} → R ⊆ ν C i)
             ⊎
-          ∃ λ i → Successor i ×
-                  ((j : Size< i) → R ⊆ ν C j) ×
-                  ¬ R ⊆ ν C i
+          ∃ λ i → Successor (size i) ×
+                  ((j : Size< (size i)) → R ⊆ ν C j) ×
+                  ¬ R ⊆ ν C (size i)
   lemma R =
     case excluded-middle (∀ {i} → R ⊆ ν C i) of
       ⊎-map id
-        (¬ (∀ {i} → R ⊆ ν C i)                                ↝⟨ (λ hyp → ¬∀→∃¬ {P = λ _ → _ ⊆ _} (λ ∀iR⊆νCi → hyp λ {i} → ∀iR⊆νCi i)) ⟩
+        (¬ (∀ {i} → R ⊆ ν C i)                          ↝⟨ (λ hyp₁ hyp₂ → hyp₁ λ { {i} → hyp₂ {i = record { size = i }} }) ⟩
 
-         (∃ λ i → ¬ R ⊆ ν C i)                                ↝⟨ uncurry $
-                                                                   size-elim (λ i → ¬ R ⊆ ν C i → _)
-                                                                   (λ i ind-hyp R⊈νCi → case excluded-middle _ of λ where
-                                                                        (inj₁ ∀<R⊆νC)  → i , ∀<R⊆νC , R⊈νCi
-                                                                        (inj₂ ¬∀<R⊆νC) → let j , R⊈νCj = ¬∀→∃¬ ¬∀<R⊆νC
-                                                                                         in ind-hyp j R⊈νCj) ⟩
+         ¬ (∀ {i} → R ⊆ ν C (size i))                   ↝⟨ (λ hyp → ¬∀→∃¬ {P = λ _ → _ ⊆ _} (λ ∀iR⊆νCi → hyp λ {i} → ∀iR⊆νCi i)) ⟩
 
-         (∃ λ i → ((j : Size< i) → R ⊆ ν C j) × ¬ R ⊆ ν C i)  ↝⟨ (λ { (i , hyp) → (i , uncurry (is-successor i) hyp , hyp) }) ⟩□
+         (∃ λ i → ¬ R ⊆ ν C (size i))                   ↝⟨ (λ (i , R⊈νCi) →
+                                                              size-elim
+                                                                (λ i → ¬ R ⊆ ν C i → _)
+                                                                (λ i ind-hyp R⊈νCi → case excluded-middle
+                                                                                            ((j : Size< i in-type) → R ⊆ ν C (size j))
+                                                                                     of λ where
+                                                                     (inj₁ ∀<R⊆νC)  → record { size = i }
+                                                                                    , (λ { j → ∀<R⊆νC (record { size = j }) })
+                                                                                    , R⊈νCi
+                                                                     (inj₂ ¬∀<R⊆νC) → let j , R⊈νCj = ¬∀→∃¬ ¬∀<R⊆νC
+                                                                                      in ind-hyp (size j) R⊈νCj)
+                                                                (size i) R⊈νCi) ⟩
+         (∃ λ i → ((j : Size< (size i)) → R ⊆ ν C j) ×
+                  ¬ R ⊆ ν C (size i))                   ↝⟨ (λ { (i , hyp) → (i , uncurry (is-successor (size i)) hyp , hyp) }) ⟩□
 
-         (∃ λ i → Successor i ×
-                  ((j : Size< i) → R ⊆ ν C j) × ¬ R ⊆ ν C i)  □)
+         (∃ λ i → Successor (size i) ×
+                  ((j : Size< (size i)) → R ⊆ ν C j) ×
+                  ¬ R ⊆ ν C (size i))                   □)

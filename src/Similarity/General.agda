@@ -41,10 +41,10 @@ Similarity′ : Size → Rel₂ ℓ Proc
 Similarity′ i = ν′ StepC i
 
 [_]_≤_ : Size → Proc → Proc → Set ℓ
-[_]_≤_ = curry ∘ Similarity
+[_]_≤_ i = curry (Similarity i)
 
 [_]_≤′_ : Size → Proc → Proc → Set ℓ
-[_]_≤′_ = curry ∘ Similarity′
+[_]_≤′_ i = curry (Similarity′ i)
 
 _≤_ : Proc → Proc → Set ℓ
 _≤_ = [ ∞ ]_≤_
@@ -83,10 +83,10 @@ infix -2 ≤:_ ≤′:_
 infix 4 [_]_≡_ [_]_≡′_
 
 [_]_≡_ : ∀ {p q} → Size → (_ _ : ν StepC ∞ (p , q)) → Set ℓ
-[_]_≡_ = curry ∘ ν-bisimilar
+[_]_≡_ i = curry (ν-bisimilar i)
 
 [_]_≡′_ : ∀ {p q} → Size → (_ _ : ν′ StepC ∞ (p , q)) → Set ℓ
-[_]_≡′_ = curry ∘ ν′-bisimilar
+[_]_≡′_ i = curry (ν′-bisimilar i)
 
 -- An alternative characterisation of bisimilarity of similarity
 -- proofs.

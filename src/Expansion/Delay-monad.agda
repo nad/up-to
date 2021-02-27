@@ -15,6 +15,7 @@ open import Prelude
 open import Prelude.Size
 
 open import Function-universe equality-with-J hiding (id; _∘_)
+open import Function-universe.Size equality-with-J
 
 import Bisimilarity.Delay-monad as SD
 open import Equational-reasoning
@@ -160,7 +161,7 @@ Laterʳ⁻¹-∼≳ =
 
 size-preserving-laterʳ⁻¹-∼≳⇔uninhabited : Laterʳ⁻¹-∼≳ ⇔ ¬ A
 size-preserving-laterʳ⁻¹-∼≳⇔uninhabited =
-  Laterʳ⁻¹-∼≳     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ →-cong _ SD.direct⇔indirect direct⇔indirect ⟩
+  Laterʳ⁻¹-∼≳     ↝⟨ inverse $ implicit-∀-size-cong _ $ implicit-∀-cong _ $ →-cong _ SD.direct⇔indirect direct⇔indirect ⟩
   DN.Laterʳ⁻¹-∼≳  ↝⟨ DN.size-preserving-laterʳ⁻¹-∼≳⇔uninhabited ⟩□
   ¬ A             □
 
@@ -168,7 +169,7 @@ Laterʳ⁻¹ = ∀ {i x y} → [ i ] x ≳ later y → [ i ] x ≳ force y
 
 size-preserving-laterʳ⁻¹⇔uninhabited : Laterʳ⁻¹ ⇔ ¬ A
 size-preserving-laterʳ⁻¹⇔uninhabited =
-  Laterʳ⁻¹       ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ →-cong _ direct⇔indirect direct⇔indirect ⟩
+  Laterʳ⁻¹       ↝⟨ inverse $ implicit-∀-size-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ →-cong _ direct⇔indirect direct⇔indirect ⟩
   DN.Laterʳ⁻¹-≳  ↝⟨ DN.size-preserving-laterʳ⁻¹-≳⇔uninhabited ⟩□
   ¬ A            □
 
@@ -178,7 +179,7 @@ Transitivity-∼≳ˡ =
 
 size-preserving-transitivity-∼≳ˡ⇔uninhabited : Transitivity-∼≳ˡ ⇔ ¬ A
 size-preserving-transitivity-∼≳ˡ⇔uninhabited =
-  Transitivity-∼≳ˡ     ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+  Transitivity-∼≳ˡ     ↝⟨ inverse $ implicit-∀-size-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
                           →-cong _ SD.direct⇔indirect (→-cong _ direct⇔indirect direct⇔indirect) ⟩
   DN.Transitivity-∼≳ˡ  ↝⟨ DN.size-preserving-transitivity-∼≳ˡ⇔uninhabited ⟩□
   ¬ A                  □
@@ -189,7 +190,7 @@ Transitivityˡ =
 
 size-preserving-transitivityˡ⇔uninhabited : Transitivityˡ ⇔ ¬ A
 size-preserving-transitivityˡ⇔uninhabited =
-  Transitivityˡ       ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+  Transitivityˡ       ↝⟨ inverse $ implicit-∀-size-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
                          →-cong _ direct⇔indirect (→-cong _ direct⇔indirect direct⇔indirect) ⟩
   DN.Transitivity-≳ˡ  ↝⟨ DN.size-preserving-transitivity-≳ˡ⇔uninhabited ⟩□
   ¬ A                 □
@@ -200,7 +201,7 @@ Transitivity =
 
 size-preserving-transitivity⇔uninhabited : Transitivity ⇔ ¬ A
 size-preserving-transitivity⇔uninhabited =
-  Transitivity       ↝⟨ inverse $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
+  Transitivity       ↝⟨ inverse $ implicit-∀-size-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $ implicit-∀-cong _ $
                         →-cong _ direct⇔indirect $ →-cong _ direct⇔indirect direct⇔indirect ⟩
   DN.Transitivity-≳  ↝⟨ DN.size-preserving-transitivity-≳⇔uninhabited ⟩□
   ¬ A                □

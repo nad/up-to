@@ -16,7 +16,7 @@ open import Logical-equivalence using (_⇔_)
 open import Prelude
 open import Prelude.Size
 
-open import Double-negation equality-with-J
+open import Excluded-middle equality-with-J
 open import Function-universe equality-with-J hiding (id)
 open import H-level equality-with-J
 

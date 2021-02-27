@@ -11,7 +11,7 @@ open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 
-open import H-level equality-with-J
+open import H-level equality-with-J hiding (Set)
 open import Surjection equality-with-J using (_↠_)
 open import Univalence-axiom equality-with-J
 

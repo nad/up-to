@@ -21,7 +21,7 @@ open import Prelude
 open import Bijection equality-with-J as Bijection using (_↔_)
 import Equivalence equality-with-J as Eq
 open import Function-universe equality-with-J as F hiding (id; _∘_)
-open import H-level equality-with-J
+open import H-level equality-with-J hiding (Set)
 open import H-level.Closure equality-with-J
 
 open import Indexed-container hiding (⟨_⟩)
@@ -204,7 +204,7 @@ open Temporarily-private public
                                                                            trans-reflˡ (cong (_ ,_) eq)) ⟩
   (∃ λ (eq : (λ {_ _} → ch₁) ≡ ch₂) →
    ∀ {o} (p : Container.Position StepC s₁ o) →
-   R (f₁ p , f₂ (subst (λ s → Container.Position StepC s o)
+   R (f₁ p , f₂ (subst (λ (s : _ × _) → Container.Position StepC s o)
                        (cong (_ ,_) eq) p)))                           ↝⟨ (∃-cong λ eq → implicit-∀-cong ext λ {o} → ∀-cong ext λ p →
                                                                            ≡⇒↝ _ $ cong (λ p → R {o = o} (f₁ _ , f₂ p)) $ sym $
                                                                            subst-∘ (λ (s : Container.Shape StepC _) → Container.Position StepC s o)

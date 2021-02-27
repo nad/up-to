@@ -23,7 +23,7 @@ open import Prelude.Size
 
 open import Bijection equality-with-J as Bijection using (_↔_)
 open import Function-universe equality-with-J hiding (id; _∘_)
-open import H-level equality-with-J
+open import H-level equality-with-J hiding (Set)
 open import H-level.Closure equality-with-J
 
 open import Bisimilarity.Step lts _[_]↝₁_ _[_]↝₂_ as Step public
@@ -50,10 +50,10 @@ Bisimilarity′ : Size → Rel₂ ℓ Proc
 Bisimilarity′ = ν′ StepC
 
 [_]_∼_ : Size → Proc → Proc → Set ℓ
-[_]_∼_ = curry ∘ Bisimilarity
+[_]_∼_ i = curry (Bisimilarity i)
 
 [_]_∼′_ : Size → Proc → Proc → Set ℓ
-[_]_∼′_ = curry ∘ Bisimilarity′
+[_]_∼′_ i = curry (Bisimilarity′ i)
 
 _∼_ : Proc → Proc → Set ℓ
 _∼_ = [ ∞ ]_∼_
@@ -96,10 +96,10 @@ infix -2 ∼:_ ∼′:_
 infix 4 [_]_≡_ [_]_≡′_
 
 [_]_≡_ : ∀ {p q} → Size → (_ _ : ν StepC ∞ (p , q)) → Set ℓ
-[_]_≡_ = curry ∘ ν-bisimilar
+[_]_≡_ i = curry (ν-bisimilar i)
 
 [_]_≡′_ : ∀ {p q} → Size → (_ _ : ν′ StepC ∞ (p , q)) → Set ℓ
-[_]_≡′_ = curry ∘ ν′-bisimilar
+[_]_≡′_ i = curry (ν′-bisimilar i)
 
 -- An alternative characterisation of bisimilarity of bisimilarity
 -- proofs.
