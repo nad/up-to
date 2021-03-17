@@ -12,7 +12,7 @@ open import Prelude as P hiding (id; const) renaming (_∘_ to _⊚_)
 open import Prelude.Size
 
 open import Bijection equality-with-J as Bijection using (_↔_)
-open import Equivalence equality-with-J hiding (id; _∘_; inverse)
+import Equivalence equality-with-J as Eq
 open import Function-universe equality-with-J as F hiding (id; _∘_)
 
 open import Indexed-container
@@ -78,9 +78,9 @@ id = (λ _ → ↑ _ ⊤) ◁ λ {i} _ i′ → i ≡ i′
 
   ⟦ id ⟧₂ (uncurry _≡_) (x , y)  ↝⟨ ⟦id⟧₂↔ ext (uncurry _≡_) x y ⟩
 
-  s ≡ t × f refl ≡ g refl        ↔⟨ ∃-cong (λ _ → ≃-≡ (↔⇒≃ $ inverse $ ∀-intro ext _)) ⟩
+  s ≡ t × f refl ≡ g refl        ↔⟨ ∃-cong (λ _ → Eq.≃-≡ (Eq.↔⇒≃ $ inverse $ ∀-intro ext _)) ⟩
 
-  s ≡ t × (λ _ → f) ≡ (λ _ → g)  ↔⟨ ∃-cong (λ _ → ≃-≡ (↔⇒≃ Bijection.implicit-Π↔Π)) ⟩
+  s ≡ t × (λ _ → f) ≡ (λ _ → g)  ↔⟨ ∃-cong (λ _ → Eq.≃-≡ (Eq.↔⇒≃ Bijection.implicit-Π↔Π)) ⟩
 
   s ≡ t × (λ {_} → f) ≡ g        ↝⟨ ≡×≡↔≡ ⟩
 
