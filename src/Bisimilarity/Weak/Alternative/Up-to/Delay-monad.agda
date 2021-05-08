@@ -3,7 +3,7 @@
 -- coinductive definition of weak bisimilarity
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe --sized-types #-}
+{-# OPTIONS --safe --sized-types #-}
 
 open import Prelude
 

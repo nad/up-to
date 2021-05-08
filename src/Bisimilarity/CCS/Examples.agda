@@ -7,7 +7,7 @@
 -- case of exercises) below are taken from "Enhancements of the
 -- bisimulation proof method" by Pous and Sangiorgi.
 
-{-# OPTIONS --without-K --safe --sized-types #-}
+{-# OPTIONS --safe --sized-types #-}
 
 open import Prelude
 

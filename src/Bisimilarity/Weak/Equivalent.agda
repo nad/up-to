@@ -3,7 +3,7 @@
 -- logically equivalent
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe --sized-types #-}
+{-# OPTIONS --safe --sized-types #-}
 
 open import Labelled-transition-system
 

@@ -2,7 +2,7 @@
 -- Closure properties for Compatible and Size-preserving
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe --sized-types #-}
+{-# OPTIONS --safe --sized-types #-}
 
 module Up-to.Closure where
 

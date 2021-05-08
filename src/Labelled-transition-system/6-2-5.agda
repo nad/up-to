@@ -3,7 +3,7 @@
 -- proof method" by Pous and Sangiorgi
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --safe #-}
 
 open import Prelude
 

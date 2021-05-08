@@ -2,7 +2,7 @@
 -- Overloaded "equational" reasoning combinators
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --safe #-}
 
 module Equational-reasoning where
 

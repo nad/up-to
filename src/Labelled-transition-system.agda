@@ -2,7 +2,7 @@
 -- Labelled transition systems
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --safe #-}
 
 module Labelled-transition-system where
 

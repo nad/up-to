@@ -2,7 +2,7 @@
 -- "Equational" reasoning combinator setup
 ------------------------------------------------------------------------
 
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --safe #-}
 
 open import Labelled-transition-system
 
