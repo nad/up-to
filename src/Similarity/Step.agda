@@ -3,7 +3,7 @@
 -- two-sided Step function
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 open import Prelude
 

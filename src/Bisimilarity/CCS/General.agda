@@ -3,7 +3,7 @@
 -- of bisimilarity
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 open import Prelude
 

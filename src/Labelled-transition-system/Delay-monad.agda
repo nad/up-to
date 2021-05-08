@@ -2,7 +2,7 @@
 -- A labelled transition system for the delay monad
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 open import Prelude
 

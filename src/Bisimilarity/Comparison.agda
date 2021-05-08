@@ -2,7 +2,7 @@
 -- A comparison of the two definitions of bisimilarity
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 module Bisimilarity.Comparison where
 

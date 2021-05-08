@@ -2,7 +2,7 @@
 -- Some results related to strong bisimilarity for the delay monad
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 open import Prelude
 

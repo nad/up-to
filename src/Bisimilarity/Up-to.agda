@@ -2,7 +2,7 @@
 -- Up-to techniques for strong bisimilarity
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 open import Labelled-transition-system
 

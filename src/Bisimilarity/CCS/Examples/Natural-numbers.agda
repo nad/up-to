@@ -3,7 +3,7 @@
 -- the coinductive definition of bisimilarity
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 module Bisimilarity.CCS.Examples.Natural-numbers where
 

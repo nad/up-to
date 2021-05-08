@@ -5,7 +5,7 @@
 -- Some parts are based on "Indexed containers" by Altenkirch, Ghani,
 -- Hancock, McBride and Morris (JFP, 2015).
 
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 module Indexed-container where
 

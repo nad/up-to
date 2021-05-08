@@ -2,7 +2,7 @@
 -- Lemmas related to strong similarity for CCS
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 open import Prelude
 

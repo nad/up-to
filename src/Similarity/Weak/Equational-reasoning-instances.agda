@@ -2,7 +2,7 @@
 -- "Equational" reasoning combinator setup
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 open import Prelude
 

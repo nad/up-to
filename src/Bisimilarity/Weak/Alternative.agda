@@ -7,7 +7,7 @@
 -- Pous and Sangiorgi's "Enhancements of the bisimulation proof
 -- method".
 
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 open import Labelled-transition-system
 

@@ -2,7 +2,7 @@
 -- Up-to techniques for CCS
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 open import Prelude
 

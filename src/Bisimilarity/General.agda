@@ -3,7 +3,7 @@
 -- strong and weak bisimilarity as well as expansion
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 open import Prelude
 

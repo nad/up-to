@@ -2,7 +2,7 @@
 -- Lemmas related to expansion and CCS
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 open import Prelude hiding (module W)
 

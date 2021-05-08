@@ -2,7 +2,7 @@
 -- A coinductive definition of weak similarity
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 open import Labelled-transition-system
 

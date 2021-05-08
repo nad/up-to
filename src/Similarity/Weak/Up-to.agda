@@ -2,7 +2,7 @@
 -- An up-to technique for weak similarity
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 open import Labelled-transition-system
 

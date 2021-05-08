@@ -6,7 +6,7 @@
 -- bisimilarity and expansion.
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --sized-types #-}
+{-# OPTIONS --sized-types #-}
 
 open import Prelude hiding (module W)
 
