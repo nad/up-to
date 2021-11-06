@@ -94,18 +94,16 @@ Step↔StepC :
   ∀ {k r} {R : Rel₂ r Proc} {pq} →
   Extensionality? k ℓ (ℓ ⊔ r) →
   Step R pq ↝[ k ] ⟦ StepC ⟧ R pq
-Step↔StepC {r = r} {R} {pq} = generalise-ext? Step⇔StepC λ ext → record
-  { surjection = record
-    { logical-equivalence = Step⇔StepC
-    ; right-inverse-of    = λ where
-        (_ , f) →
-          Σ-≡,≡→≡ refl $
-            implicit-extensionality ext λ _ →
-            apply-ext (lower-extensionality lzero ℓ ext) $
-              to₂∘from f
-    }
-  ; left-inverse-of = λ _ → refl
-  }
+Step↔StepC {r = r} {R} {pq} =
+  generalise-ext?
+    Step⇔StepC
+    (λ ext →
+         (λ (_ , f) →
+            Σ-≡,≡→≡ refl $
+              implicit-extensionality ext λ _ →
+              apply-ext (lower-extensionality lzero ℓ ext) $
+                to₂∘from f)
+       , (λ _ → refl))
   where
   to₁ : Step R pq → Container.Shape StepC pq
   to₁ Temporarily-private.⟨ lr ⟩ =
@@ -270,7 +268,7 @@ open Temporarily-private public
       f₂ (subst (λ ch → ∃ λ μ → ∃ λ (p⟶p′ : p [ μ ]⟶ p′) →
                         proj₁ (ch p⟶p′) ≡ q′)
                 eq (μ , p⟶p′ , ≡q′))))                                 ↝⟨ (∃-cong λ _ → ∀-cong ext λ _ → ∀-cong ext λ _ → ∀-cong ext λ _ →
-                                                                              inverse $ ∀-intro ext _) ⟩
+                                                                              inverse $ ∀-intro _ ext) ⟩
   (∃ λ (eq : _≡_ {A = ∀ {p′ μ} → _} ch₁ ch₂) →
    ∀ p′ μ (p⟶p′ : p [ μ ]⟶ p′) →
    R (f₁ (μ , p⟶p′ , refl) ,

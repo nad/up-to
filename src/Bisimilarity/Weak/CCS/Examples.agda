@@ -8,7 +8,7 @@
 
 {-# OPTIONS --sized-types #-}
 
-open import Prelude hiding (module W)
+open import Prelude hiding (module W; step-→)
 
 module Bisimilarity.Weak.CCS.Examples {ℓ} {Name : Type ℓ} where
 

@@ -35,7 +35,7 @@ id = (λ _ → ↑ _ ⊤) ◁ λ {i} _ i′ → i ≡ i′
   ↑ _ ⊤ × (λ i′ → i ≡ i′) ⊆ X  ↔⟨ drop-⊤-left-× (λ _ → Bijection.↑↔) ⟩
   (λ i′ → i ≡ i′) ⊆ X          ↔⟨⟩
   (∀ {i′} → i ≡ i′ → X i′)     ↔⟨ Bijection.implicit-Π↔Π ⟩
-  (∀ i′ → i ≡ i′ → X i′)       ↝⟨ inverse-ext? (λ ext → ∀-intro ext _) ext ⟩□
+  (∀ i′ → i ≡ i′ → X i′)       ↝⟨ inverse-ext? (λ ext → ∀-intro _ ext) ext ⟩□
   X i                          □
 
 -- An unfolding lemma for ⟦ id ⟧₂.
@@ -60,7 +60,7 @@ id = (λ _ → ↑ _ ⊤) ◁ λ {i} _ i′ → i ≡ i′
 
   (∃ λ (eq : s ≡ t) →
    ∀ o (p : i ≡ o) →
-   R (f p , g (subst (λ _ → i ≡ o) eq p)))        ↝⟨ ∃-cong (λ _ → inverse-ext? (λ ext → ∀-intro ext _) ext) ⟩
+   R (f p , g (subst (λ _ → i ≡ o) eq p)))        ↝⟨ ∃-cong (λ _ → inverse-ext? (λ ext → ∀-intro _ ext) ext) ⟩
 
   (∃ λ (eq : s ≡ t) →
    R (f refl , g (subst (λ _ → i ≡ i) eq refl)))  ↝⟨ ∃-cong (λ eq → ≡⇒↝ _ (cong (λ eq → R (f refl , g eq)) (subst-const eq))) ⟩
@@ -78,7 +78,7 @@ id = (λ _ → ↑ _ ⊤) ◁ λ {i} _ i′ → i ≡ i′
 
   ⟦ id ⟧₂ (uncurry _≡_) (x , y)  ↝⟨ ⟦id⟧₂↔ ext (uncurry _≡_) x y ⟩
 
-  s ≡ t × f refl ≡ g refl        ↔⟨ ∃-cong (λ _ → Eq.≃-≡ (Eq.↔⇒≃ $ inverse $ ∀-intro ext _)) ⟩
+  s ≡ t × f refl ≡ g refl        ↔⟨ ∃-cong (λ _ → Eq.≃-≡ (Eq.↔⇒≃ $ inverse $ ∀-intro _ ext)) ⟩
 
   s ≡ t × (λ _ → f) ≡ (λ _ → g)  ↔⟨ ∃-cong (λ _ → Eq.≃-≡ (Eq.↔⇒≃ Bijection.implicit-Π↔Π)) ⟩
 
@@ -288,7 +288,7 @@ reindex₁ f C =
    ∀ i i′ → f i′ ≡ i → Position C s i′ → X i)          ↔⟨ (∃-cong λ _ → Π-comm) ⟩
 
   (∃ λ (s : Shape C o) →
-   ∀ i i′ → f i ≡ i′ → Position C s i → X i′)          ↝⟨ (∃-cong λ _ → ∀-cong ext λ _ → inverse-ext? (λ ext → ∀-intro ext _) ext) ⟩
+   ∀ i i′ → f i ≡ i′ → Position C s i → X i′)          ↝⟨ (∃-cong λ _ → ∀-cong ext λ _ → inverse-ext? (λ ext → ∀-intro _ ext) ext) ⟩
 
   (∃ λ (s : Shape C o) →
    ∀ i → Position C s i → X (f i))                     ↔⟨ (∃-cong λ _ → inverse Bijection.implicit-Π↔Π) ⟩
@@ -354,7 +354,7 @@ reindex₁ f C =
    R ( g (o , ≡o′ , p)
      , h (o , ≡o′ , subst (λ s → Position C s o) eq p)
      ))                                                                   ↝⟨ (∃-cong λ _ → ∀-cong ext λ _ →
-                                                                              inverse-ext? (λ ext → ∀-intro ext _) ext) ⟩
+                                                                              inverse-ext? (λ ext → ∀-intro _ ext) ext) ⟩
   (∃ λ (eq : s ≡ t) →
    ∀ o (p : Position C s o) →
    R ( g (o , refl , p)

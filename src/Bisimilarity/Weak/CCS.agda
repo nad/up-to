@@ -4,7 +4,7 @@
 
 {-# OPTIONS --sized-types #-}
 
-open import Prelude
+open import Prelude hiding (step-→)
 
 module Bisimilarity.Weak.CCS {ℓ} {Name : Type ℓ} where
 

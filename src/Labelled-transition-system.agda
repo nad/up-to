@@ -266,7 +266,17 @@ record LTS ℓ : Type (lsuc ℓ) where
         Extensionality? k lzero lzero →
         (∀ μ → ¬ Silent μ) →
         ∀ {p μ q} → p [ μ ]⟶ q ↝[ k ] p [ μ ]⇒̂ q
-  ⟶↔⇒̂ ext ¬silent = generalise-ext? ⟶⇔⇒̂ ⟶↔⇒̂′ ext
+  ⟶↔⇒̂ ext ¬silent = generalise-ext?
+    ⟶⇔⇒̂
+    (λ ext →
+         (λ { (silent s _)      → ⊥-elim (¬silent _ s)
+            ; (non-silent _ tr) →
+                cong₂ non-silent
+                      (apply-ext ext (⊥-elim ∘ ¬silent _))
+                      (_↔_.right-inverse-of (⟶↔⇒ ¬silent) tr)
+            })
+       , (λ _ → refl))
+    ext
     where
     ⟶⇔⇒̂ = record
       { to   = λ tr → non-silent (¬silent _) (_↔_.to (⟶↔⇒ ¬silent) tr)
@@ -274,20 +284,6 @@ record LTS ℓ : Type (lsuc ℓ) where
           { (silent s _)      → ⊥-elim (¬silent _ s)
           ; (non-silent _ tr) → _↔_.from (⟶↔⇒ ¬silent) tr
           }
-      }
-
-    ⟶↔⇒̂′ = λ ext → record
-      { surjection = record
-        { logical-equivalence = ⟶⇔⇒̂
-        ; right-inverse-of    = λ
-            { (silent s _)      → ⊥-elim (¬silent _ s)
-            ; (non-silent _ tr) →
-                cong₂ non-silent
-                      (apply-ext ext (⊥-elim ∘ ¬silent _))
-                      (_↔_.right-inverse-of (⟶↔⇒ ¬silent) tr)
-            }
-        }
-      ; left-inverse-of = λ _ → refl
       }
 
   -- Map-like functions.

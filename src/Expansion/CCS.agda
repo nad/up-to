@@ -4,7 +4,7 @@
 
 {-# OPTIONS --sized-types #-}
 
-open import Prelude hiding (module W)
+open import Prelude hiding (module W; step-→)
 
 module Expansion.CCS {ℓ} {Name : Type ℓ} where
 
