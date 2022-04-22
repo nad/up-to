@@ -12,6 +12,7 @@ open import Prelude
 
 open import Bijection equality-with-J using (_↔_)
 open import Equivalence equality-with-J using (↔⇒≃)
+open import Extensionality equality-with-J
 open import Function-universe equality-with-J hiding (id; _∘_)
 open import Univalence-axiom equality-with-J
 

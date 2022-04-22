@@ -12,6 +12,7 @@ open import Prelude hiding (Unit)
 
 open import Bijection equality-with-J as Bijection using (_↔_)
 open import Equality.Decision-procedures equality-with-J
+open import Extensionality equality-with-J
 open import Fin equality-with-J
 open import Function-universe equality-with-J hiding (_∘_; id)
 open import H-level equality-with-J as H-level

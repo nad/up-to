@@ -18,11 +18,12 @@ module Bisimilarity.General
          (⟶→↝₂ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]↝₂ q)
          where
 
-open import Equality.Propositional as Eq hiding (Extensionality)
+open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude.Size
 
 open import Bijection equality-with-J as Bijection using (_↔_)
+open import Extensionality equality-with-J as Eq hiding (Extensionality)
 open import Function-universe equality-with-J hiding (id; _∘_)
 open import H-level equality-with-J
 open import H-level.Closure equality-with-J

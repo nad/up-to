@@ -7,13 +7,14 @@
 
 module Indexed-container.Delay-monad where
 
-open import Equality.Propositional as E using (_≡_; refl)
+open import Equality.Propositional as Eq using (_≡_; refl)
 open import Logical-equivalence using (_⇔_)
 open import Prelude
 open import Prelude.Size
 
-open import Bijection E.equality-with-J as Bijection using (_↔_)
-open import Function-universe E.equality-with-J as F hiding (_∘_)
+open import Bijection Eq.equality-with-J as Bijection using (_↔_)
+import Extensionality Eq.equality-with-J as E
+open import Function-universe Eq.equality-with-J as F hiding (_∘_)
 
 open import Delay-monad
 open import Delay-monad.Bisimilarity as B

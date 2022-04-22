@@ -13,11 +13,12 @@ module Bisimilarity.Weak.Alternative.Up-to.Delay-monad
 open import Delay-monad
 import Delay-monad.Bisimilarity as B
 import Delay-monad.Partial-order as P
-open import Equality.Propositional as Eq
+open import Equality.Propositional
 open import Logical-equivalence using (_⇔_)
 open import Prelude.Size
 
 open import Excluded-middle equality-with-J
+import Extensionality equality-with-J as Eq
 open import Function-universe equality-with-J hiding (id)
 open import H-level equality-with-J
 

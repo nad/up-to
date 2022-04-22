@@ -13,6 +13,7 @@ open import Prelude.Size
 
 open import Bijection equality-with-J as Bijection using (_↔_)
 import Equivalence equality-with-J as Eq
+open import Extensionality equality-with-J
 open import Function-universe equality-with-J as F hiding (id; _∘_)
 
 open import Indexed-container

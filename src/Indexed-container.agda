@@ -16,6 +16,7 @@ open import Prelude.Size
 
 open import Bijection equality-with-J as Bijection using (_↔_)
 import Equivalence equality-with-J as Eq
+open import Extensionality equality-with-J
 open import Function-universe equality-with-J hiding (id; _∘_)
 open import H-level.Closure equality-with-J
 open import Surjection equality-with-J using (_↠_)

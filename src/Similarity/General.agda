@@ -17,10 +17,11 @@ module Similarity.General
          (⟶→↝ : ∀ {p μ q} → p [ μ ]⟶ q → p [ μ ]↝ q)
          where
 
-open import Equality.Propositional as Eq hiding (Extensionality)
+open import Equality.Propositional
 open import Prelude.Size
 
 open import Bijection equality-with-J using (_↔_)
+open import Extensionality equality-with-J as Eq hiding (Extensionality)
 open import Function-universe equality-with-J hiding (id; _∘_)
 
 open import Indexed-container hiding (⟨_⟩)

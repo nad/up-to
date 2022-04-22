@@ -12,8 +12,8 @@ open import Prelude
 open import Prelude.Size
 
 open import Bijection equality-with-J as Bijection using (_↔_)
+open import Extensionality equality-with-J
 open import Function-universe equality-with-J as F hiding (id; _∘_)
-open import H-level.Closure equality-with-J using (ext⁻¹)
 
 open import Indexed-container
 open import Indexed-container.Combinators
