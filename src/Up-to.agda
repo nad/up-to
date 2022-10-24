@@ -844,7 +844,10 @@ companion-compatible assumptions {R} = case lemma R of λ where
 
          (∃ λ i → ¬ R ⊆ ν C (size i))                   ↝⟨ (λ (i , R⊈νCi) →
                                                               size-elim
-                                                                (λ i → ¬ R ⊆ ν C i → _)
+                                                                (λ i →
+                                                                   ¬ R ⊆ ν C i →
+                                                                   (∃ λ i → ((j : Size< (size i)) → R ⊆ ν C j) ×
+                                                                            ¬ R ⊆ ν C (size i)))
                                                                 (λ i ind-hyp R⊈νCi → case excluded-middle
                                                                                             ((j : Size< i in-type) → R ⊆ ν C (size j))
                                                                                      of λ where
