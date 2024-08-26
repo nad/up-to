@@ -12,7 +12,7 @@ module Bisimilarity.CCS {ℓ} {Name : Type ℓ} where
 open import Equality.Propositional
 open import Prelude.Size
 
-import Bisimilarity.Equational-reasoning-instances
+import Bisimilarity.Equational-reasoning-instances as I
 import Bisimilarity.CCS.General
 open import Equational-reasoning
 open import Labelled-transition-system.CCS Name
@@ -151,7 +151,13 @@ module Cong-lemmas
         ! P′
 
 private
-  module CL {i} = Cong-lemmas [ i ]_∼′_ left-to-right
+  module CL {i} =
+    Cong-lemmas
+      [ i ]_∼′_
+      ⦃ I.convert∼∼′  {i = i} ⦄
+      ⦃ I.convert∼′∼′ {i = i} ⦄
+      ⦃ I.convert∼∼′  {i = i} ⦄
+      left-to-right
 
 ------------------------------------------------------------------------
 -- Various lemmas related to _∣_

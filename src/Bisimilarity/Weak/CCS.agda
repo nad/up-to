@@ -15,7 +15,7 @@ open import Function-universe equality-with-J hiding (id; _∘_)
 
 import Bisimilarity.CCS as SE
 import Bisimilarity.Equational-reasoning-instances
-import Bisimilarity.Weak.Equational-reasoning-instances
+import Bisimilarity.Weak.Equational-reasoning-instances as I
 open import Equational-reasoning
 import Expansion.CCS as E
 import Expansion.Equational-reasoning-instances
@@ -32,7 +32,11 @@ import Labelled-transition-system.Equational-reasoning-instances CCS
 private
   module CL {i} =
     E.Cong-lemmas
-      [ i ]_≈′_ right-to-left (⇒̂→[]⇒ (λ ())) ⇒→⇒̂
+      [ i ]_≈′_
+      ⦃ I.reflexive≈′ {i = i} ⦄
+      ⦃ I.convert≈≈′  {i = i} ⦄
+      ⦃ I.convert≈′≈′ {i = i} ⦄
+      right-to-left (⇒̂→[]⇒ (λ ())) ⇒→⇒̂
       map-⇒̂ map-⇒̂′ zip-⇒̂
       (λ hyp {P Q} → λ where
 

@@ -17,7 +17,7 @@ import Bisimilarity.CCS as SL
 import Bisimilarity.Equational-reasoning-instances
 import Bisimilarity.Weak.Equational-reasoning-instances
 open import Equational-reasoning
-import Expansion.Equational-reasoning-instances
+import Expansion.Equational-reasoning-instances as I
 open import Labelled-transition-system.CCS Name
 open import Relation
 
@@ -264,7 +264,11 @@ module Cong-lemmas
 private
   module CL {i} =
     Cong-lemmas
-      [ i ]_≳′_ right-to-left id id
+      [ i ]_≳′_
+      ⦃ I.reflexive≳′ {i = i} ⦄
+      ⦃ I.convert≳≳′  {i = i} ⦄
+      ⦃ I.convert≳′≳′ {i = i} ⦄
+      right-to-left id id
       map-[]⇒ map-[]⇒′ (λ f g _ _ _ → zip-[]⇒ f g)
       (λ hyp P⇒Q → _ , hyp P⇒Q , reflexive)
 

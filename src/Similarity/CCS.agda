@@ -17,7 +17,7 @@ import Bisimilarity.CCS as BL
 import Bisimilarity.Equational-reasoning-instances
 open import Equational-reasoning
 open import Labelled-transition-system.CCS Name
-import Similarity.Equational-reasoning-instances
+import Similarity.Equational-reasoning-instances as I
 
 open import Bisimilarity CCS as B using (_∼_; _∼′_)
 open import Similarity CCS
@@ -26,7 +26,13 @@ open import Similarity CCS
 -- Congruence lemmas
 
 private
-  module CL {i} = BL.Cong-lemmas [ i ]_≤′_ challenge
+  module CL {i} =
+    BL.Cong-lemmas
+      [ i ]_≤′_
+      ⦃ I.convert≤≤′  {i = i} ⦄
+      ⦃ I.convert≤′≤′ {i = i} ⦄
+      ⦃ I.convert∼≤′  {i = i} ⦄
+      challenge
 
 mutual
 
