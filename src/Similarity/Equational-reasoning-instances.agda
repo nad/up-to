@@ -46,13 +46,13 @@ instance
   convert∼′≤ : Convertible _∼′_ [ i ]_≤_
   convert∼′≤ = is-convertible (convert ∘ ∼⇒≤′)
 
-  convert∼≤′ : ∀ {i} → Convertible [ i ]_∼_ [ i ]_≤′_
-  convert∼≤′ {i} = is-convertible lemma
+  convert∼≤′ : Convertible [ i ]_∼_ [ i ]_≤′_
+  convert∼≤′ = is-convertible lemma
     where
     lemma : ∀ {p q} → [ i ] p ∼ q → [ i ] p ≤′ q
     force (lemma p∼q) = ∼⇒≤ p∼q
 
-  convert∼′≤′ : ∀ {i} → Convertible [ i ]_∼′_ [ i ]_≤′_
+  convert∼′≤′ : Convertible [ i ]_∼′_ [ i ]_≤′_
   convert∼′≤′ = is-convertible ∼⇒≤′
 
   trans≤≤ : Transitive [ i ]_≤_ [ i ]_≤_
