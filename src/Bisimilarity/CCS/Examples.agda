@@ -39,16 +39,19 @@ mutual
       ! (a ∙ ⊕ b ∙)      ∼⟨ !∙⊕∙∼′!∙∣!∙ {i = i} ⟩■
       ! a ∙ ∣ ! b ∙
 
+    left-lemma : [ i ] _ ∼′ _
     left-lemma =
       ! (a ∙ ⊕ b ∙) ∣ ∅    ∼⟨ lemma ⟩
       ! a ∙ ∣ ! b ∙        ∼⟨ symmetric ∣-right-identity ∣-cong reflexive ⟩■
       (! a ∙ ∣ ∅) ∣ ! b ∙
 
+    right-lemma : [ i ] _ ∼′ _
     right-lemma =
       ! (a ∙ ⊕ b ∙) ∣ ∅    ∼⟨ lemma ⟩
       ! a ∙ ∣  ! b ∙       ∼⟨ reflexive ∣-cong symmetric ∣-right-identity ⟩■
       ! a ∙ ∣ (! b ∙ ∣ ∅)
 
+    τ-lemma : [ i ] _ ∼′ _
     τ-lemma =
       (! (a ∙ ⊕ b ∙) ∣ ∅) ∣ ∅    ∼⟨ ∣-right-identity ⟩
       ! (a ∙ ⊕ b ∙) ∣ ∅          ∼⟨ lemma ⟩
@@ -144,7 +147,7 @@ mutual
        μ       ≡⟨ μ≡τ ⟩∎
        τ       ∎)
 
-    lemma : ∀ {P} → P ∼ ! a ∙ ∣ ∅ → _
+    lemma : ∀ {P} → P ∼ ! a ∙ ∣ ∅ → [ i ] _ ∼′ _
     lemma {P} P∼!a∣∅ =
       ! ! a ∙ ∣ P            ∼⟨ reflexive ∣-cong P∼!a∣∅ ⟩
       ! ! a ∙ ∣ (! a ∙ ∣ ∅)  ∼⟨ reflexive ∣-cong ∣-right-identity ⟩
@@ -222,16 +225,19 @@ mutual
     [ i ] ! (name a ∙ P ⊕ name b ∙ Q) ∼ ! name a ∙ P ∣ ! name b ∙ Q
   6-2-14 {i} {a} {b} {P} {Q} = ⟨ lr , rl ⟩
     where
+    left-lemma : [ i ] _ ∼′ _
     left-lemma =
       ! (name a ∙ P ⊕ name b ∙ Q) ∣ P    ∼⟨ 6-2-14′ {i = i} ∣-cong′ reflexive ⟩
       (! name a ∙ P ∣ ! name b ∙ Q) ∣ P  ∼⟨ swap-rightmost ⟩■
       (! name a ∙ P ∣ P) ∣ ! name b ∙ Q
 
+    right-lemma : [ i ] _ ∼′ _
     right-lemma =
       ! (name a ∙ P ⊕ name b ∙ Q) ∣ Q    ∼⟨ 6-2-14′ {i = i} ∣-cong′ reflexive ⟩
       (! name a ∙ P ∣ ! name b ∙ Q) ∣ Q  ∼⟨ symmetric ∣-assoc ⟩■
       ! name a ∙ P ∣ (! name b ∙ Q ∣ Q)
 
+    τ-lemma : [ i ] _ ∼′ _
     τ-lemma =
       (! (name a ∙ P ⊕ name b ∙ Q) ∣ P) ∣ Q    ∼⟨ left-lemma ∣-cong′ reflexive ⟩
       ((! name a ∙ P ∣ P) ∣ ! name b ∙ Q) ∣ Q  ∼⟨ symmetric ∣-assoc ⟩■
@@ -387,17 +393,20 @@ mutual
       T                ⟵⟨ !P∣!Q⟶T ⟩
       ! P ∣ ! Q
 
-    lemma = λ {R S : Proc ∞} →
+    lemma : {R S : Proc ∞} → [ i ] _ ∼′ _
+    lemma {R} {S} =
       ! (P ∣ Q) ∣ (R ∣ S)    ∼⟨ 6-2-17-1′ {i = i} ∣-cong′ reflexive ⟩
       (! P ∣ ! Q) ∣ (R ∣ S)  ∼⟨ swap-in-the-middle ⟩■
       (! P ∣ R) ∣ (! Q ∣ S)
 
-    left-lemma = λ {R : Proc ∞} →
+    left-lemma : {R : Proc ∞} → [ i ] _ ∼′ _
+    left-lemma {R} =
       ! (P ∣ Q) ∣ (R ∣ Q)    ∼⟨ lemma ⟩
       (! P ∣ R) ∣ (! Q ∣ Q)  ∼⟨ reflexive ∣-cong 6-1-2 ⟩■
       (! P ∣ R) ∣ ! Q
 
-    right-lemma = λ {R : Proc ∞} →
+    right-lemma : {R : Proc ∞} → [ i ] _ ∼′ _
+    right-lemma {R} =
       ! (P ∣ Q) ∣ (P ∣ R)    ∼⟨ lemma ⟩
       (! P ∣ P) ∣ (! Q ∣ R)  ∼⟨ 6-1-2 ∣-cong reflexive ⟩■
       ! P ∣ (! Q ∣ R)
@@ -467,27 +476,32 @@ mutual
   6-2-17-2 : ∀ {i P Q} → [ i ] ! (P ⊕ Q) ∼ ! P ∣ ! Q
   6-2-17-2 {i} {P} {Q} = ⟨ lr , rl ⟩
     where
-    left-lemma = λ {R : Proc ∞} →
+    left-lemma : {R : Proc ∞} → [ i ] _ ∼′ _
+    left-lemma {R} =
       ! (P ⊕ Q) ∣ R    ∼⟨ 6-2-17-2′ {i = i} ∣-cong′ reflexive ⟩
       (! P ∣ ! Q) ∣ R  ∼⟨ swap-rightmost ⟩■
       (! P ∣ R) ∣ ! Q
 
-    right-lemma = λ {R : Proc ∞} →
+    right-lemma : {R : Proc ∞} → [ i ] _ ∼′ _
+    right-lemma {R} =
       ! (P ⊕ Q) ∣ R    ∼⟨ 6-2-17-2′ {i = i} ∣-cong′ reflexive ⟩
       (! P ∣ ! Q) ∣ R  ∼⟨ symmetric ∣-assoc ⟩■
       ! P ∣ (! Q ∣ R)
 
-    τ-lemma₁ = λ {P′ P″ : Proc ∞} →
+    τ-lemma₁ : {P′ P″ : Proc ∞} → [ i ] _ ∼′ _
+    τ-lemma₁ {P′} {P″} =
       (! (P ⊕ Q) ∣ P′) ∣ P″    ∼⟨ left-lemma ∣-cong′ reflexive ⟩
       ((! P ∣ P′) ∣ ! Q) ∣ P″  ∼⟨ swap-rightmost ⟩■
       ((! P ∣ P′) ∣ P″) ∣ ! Q
 
-    τ-lemma₂ = λ {P′ Q′ : Proc ∞} →
+    τ-lemma₂ : {P′ Q′ : Proc ∞} → [ i ] _ ∼′ _
+    τ-lemma₂ {P′} {Q′} =
       (! (P ⊕ Q) ∣ P′) ∣ Q′    ∼⟨ left-lemma ∣-cong′ reflexive ⟩
       ((! P ∣ P′) ∣ ! Q) ∣ Q′  ∼⟨ symmetric ∣-assoc ⟩■
       (! P ∣ P′) ∣ (! Q ∣ Q′)
 
-    τ-lemma₃ = λ {Q′ Q″ : Proc ∞} →
+    τ-lemma₃ : {Q′ Q″ : Proc ∞} → [ i ] _ ∼′ _
+    τ-lemma₃ {Q′} {Q″} =
       (! (P ⊕ Q) ∣ Q′) ∣ Q″    ∼⟨ right-lemma ∣-cong′ reflexive ⟩
       (! P ∣ (! Q ∣ Q′)) ∣ Q″  ∼⟨ symmetric ∣-assoc ⟩■
       ! P ∣ ((! Q ∣ Q′) ∣ Q″)
@@ -637,8 +651,9 @@ mutual
   6-2-17-4 : ∀ {P i} → [ i ] ! ! P ∼ ! P
   6-2-17-4 {P} {i} = ⟨ lr , rl ⟩
     where
-    lemma = λ {Q μ} (!P⟶Q : ! P [ μ ]⟶ Q) →
-      ! ! P ∣ Q  ∼⟨ 6-2-17-4′ {i = i} ∣-cong′ reflexive ⟩
+    lemma : ∀ {Q μ} → ! P [ μ ]⟶ Q → [ i ] _ ∼′ _
+    lemma {Q} {μ} !P⟶Q =
+      ! ! P ∣ Q  ∼⟨ 6-2-17-4′ ∣-cong′ reflexive ⟩
       ! P ∣ Q    ∼⟨ symmetric (6-2-17-4-lemma !P⟶Q) ⟩■
       Q
 
